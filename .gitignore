@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/
+vendor/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+secrets/
+credentials.json
+service-account*.json
+
+# Model weights & generated media — never commit these
+*.safetensors
+*.ckpt
+*.bin
+*.gguf
+*.pt
+*.pth
+*.onnx
+*.npy
+generated/
+media/
+loras/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+
+# Test & coverage
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Editors
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local scratch
+tmp/
+scratch/
+.cache/
+
+# Research captures are large HTML dumps; keep the extracted notes, not the raw pages
+docs/research/raw/
