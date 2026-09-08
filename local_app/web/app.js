@@ -103,7 +103,7 @@ async function drain(){
           if(mine!==epoch)break;media.src=item.video;await attemptPlay(media);
         }
       }else{media.src=item.video||item.audio;await attemptPlay(media);}
-      if(item.video){speech.src=item.audio;await attemptPlay(speech);}
+      if(item.video&&item.audio){speech.src=item.audio;speech.load();await attemptPlay(speech);}
       if(!media.ended)await waitEvent(media,"ended",controller.signal,Math.max(45000,(item.duration_s+20)*1000));
     }catch(error){
       if(mine===epoch&&error.name!=="AbortError"){notice(error.message,true);$("resume").hidden=false;}
@@ -173,7 +173,7 @@ async function interrupt(){
   else notice("Reply stopped. Type your next message.");
 }
 $("stop").addEventListener("click",interrupt);
-$("sound").addEventListener("click",async()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;controls();if(soundOn){const media=$("audio").src?$("audio"):$("video");try{await media.play();notice("Sound enabled.");}catch{notice("Tap Replay to start sound for this reply.");}}});
+$("sound").addEventListener("click",async()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;if(soundOn&&lastMedia?.audio&&!$("audio").src){$("audio").src=lastMedia.audio;$("audio").load();}controls();if(soundOn){const media=$("audio").src?$("audio"):$("video");try{await media.play();notice("Sound enabled.");}catch{notice("Tap Replay to start sound for this reply.");}}});
 function renderFacts(facts=[]){
   $("facts").replaceChildren();
   if(!facts.length){const p=document.createElement("p");p.className="no-facts";p.textContent="No facts saved yet."; $("facts").append(p);}
