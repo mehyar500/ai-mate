@@ -71,3 +71,12 @@ scratch/
 
 # Research captures are large HTML dumps; keep the extracted notes, not the raw pages
 docs/research/raw/
+
+# Local worktrees, Python and Workers credentials
+.worktrees/
+.venv/
+__pycache__/
+*.pyc
+.dev.vars
+.dev.vars.*
+.wrangler/

@@ -1,0 +1,72 @@
+{
+  "as_of": "2026-09-07",
+  "currency": "USD",
+  "sources": {
+    "cloudflare_ai": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+    "cloudflare_sfu": "https://developers.cloudflare.com/realtime/sfu/pricing/",
+    "processor_registration": "https://ccbill.com/pricing",
+    "gpu_reference_not_quote": "https://www.tensordock.com/"
+  },
+  "published_rates": {
+    "llm_input_per_million": 0.051,
+    "llm_output_per_million": 0.335,
+    "guard_input_per_million": 0.484,
+    "guard_output_per_million": 0.030,
+    "streaming_asr_per_minute": 0.0077,
+    "tts_per_thousand_characters": 0.030,
+    "sfu_per_gb": 0.05
+  },
+  "assumptions_not_vendor_quotes": {
+    "gpu_per_hour": 1.00,
+    "vm_extras_per_hour": 0.20,
+    "billable_utilization": 0.50,
+    "concurrent_calls_per_gpu": 1,
+    "call_turns_per_minute": 3,
+    "call_input_tokens_per_turn": 4096,
+    "call_output_tokens_per_minute": 100,
+    "tts_characters_per_minute": 450,
+    "aggregate_sfu_egress_mbps": 1.128,
+    "call_misc_per_minute": 0.001,
+    "variable_cost_buffer": 0.25,
+    "chat_input_tokens": 2048,
+    "chat_output_tokens": 120,
+    "guard_input_tokens_per_exchange": 1024,
+    "guard_output_tokens_per_exchange": 64,
+    "free_monthly_messages": 900,
+    "paid_monthly_messages": 2000,
+    "local_adult_text_per_message_including_safety": 0.0015,
+    "profile_storage_asset_monthly": 0.12,
+    "support_per_payer_monthly": 0.75,
+    "processor_fraction": 0.15,
+    "processor_fixed_per_payment": 0.50,
+    "refund_chargeback_loss_fraction": 0.03,
+    "reserve_fraction": 0.10,
+    "age_check_per_user": 1.00,
+    "cohort_new_payers": 100,
+    "cohort_new_free_users": 500,
+    "monthly_fixed_excluding_gpu": 250.00,
+    "clip_gpu_seconds_per_attempt": 120,
+    "clip_success_fraction": 0.80,
+    "clip_other_per_delivered": 0.35,
+    "clip_pack_price": 9.99,
+    "clips_per_pack": 5,
+    "topup_price": 12.99,
+    "topup_minutes": 60,
+    "cohort_payers": 100,
+    "cohort_free_users": 500
+  },
+  "competitor_reference": {
+    "name": "Chaturbate",
+    "customer_wire_usd_per_token": 0.08,
+    "wire_minimum_purchase_usd": 250,
+    "performer_usd_per_token": 0.05,
+    "private_tokens_per_minute": [6, 18, 30, 60, 90],
+    "buyer_source": "https://support.chaturbate.com/hc/en-us/articles/360036511091-How-do-I-buy-tokens",
+    "performer_source": "https://support.chaturbate.com/hc/en-us/articles/360037125852-How-do-I-convert-my-tokens",
+    "private_source": "https://support.chaturbate.com/hc/en-us/articles/360048401752-Show-Types"
+  },
+  "plans": [
+    {"name": "Close", "monthly_price": 24.99, "live_minutes": 60, "share": 0.5},
+    {"name": "Together", "monthly_price": 49.99, "live_minutes": 180, "share": 0.5}
+  ]
+}

@@ -1,0 +1,782 @@
+{
+  "retrieved_utc": "2026-09-08T00:55:18.231722+00:00",
+  "source": "https://developers.cloudflare.com/workers-ai/models/",
+  "scope": "All model detail links on Workers AI hosted catalog; includes deprecated entries. Not every world model or AI Gateway provider. Display prices may be rounded; use platform pricing for budgets. Listing is not a license or availability test.",
+  "count": 86,
+  "models": [
+    {
+      "id": "@cf/ai4bharat/indictrans2-en-indic-1B",
+      "task": "Translation",
+      "author": "ai4bharat",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.34 per M input tokens, $0.34 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/indictrans2-en-indic-1B/"
+    },
+    {
+      "id": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+      "task": "Text Generation",
+      "author": "aisingapore",
+      "deprecated": false,
+      "context": "128,000 tokens",
+      "display_price": "$0.35 per M input tokens, $0.56 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-sea-lion-v4-27b-it/"
+    },
+    {
+      "id": "@cf/baai/bge-base-en-v1.5",
+      "task": "Text Embeddings",
+      "author": "BAAI",
+      "deprecated": false,
+      "context": "153,600 tokens",
+      "display_price": "$0.067 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/bge-base-en-v1.5/"
+    },
+    {
+      "id": "@cf/baai/bge-large-en-v1.5",
+      "task": "Text Embeddings",
+      "author": "BAAI",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.20 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/bge-large-en-v1.5/"
+    },
+    {
+      "id": "@cf/baai/bge-m3",
+      "task": "Text Embeddings",
+      "author": "BAAI",
+      "deprecated": false,
+      "context": "60,000 tokens",
+      "display_price": "$0.012 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/bge-m3/"
+    },
+    {
+      "id": "@cf/baai/bge-reranker-base",
+      "task": "Text Classification",
+      "author": "BAAI",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0031 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/bge-reranker-base/"
+    },
+    {
+      "id": "@cf/baai/bge-small-en-v1.5",
+      "task": "Text Embeddings",
+      "author": "BAAI",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.02 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/bge-small-en-v1.5/"
+    },
+    {
+      "id": "@cf/black-forest-labs/flux-1-schnell",
+      "task": "Text-to-Image",
+      "author": "Black Forest Labs",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.000053 per 512 by 512 tile, $0.00011 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/flux-1-schnell/"
+    },
+    {
+      "id": "@cf/black-forest-labs/flux-2-dev",
+      "task": "Text-to-Image",
+      "author": "Black Forest Labs",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00021 per input 512x512 tile, per step, $0.00041 per output 512x512 tile, per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/flux-2-dev/"
+    },
+    {
+      "id": "@cf/black-forest-labs/flux-2-klein-4b",
+      "task": "Text-to-Image",
+      "author": "Black Forest Labs",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.000059 per input 512x512 tile, $0.000287 per output 512x512 tile",
+      "source": "https://developers.cloudflare.com/workers-ai/models/flux-2-klein-4b/"
+    },
+    {
+      "id": "@cf/black-forest-labs/flux-2-klein-9b",
+      "task": "Text-to-Image",
+      "author": "Black Forest Labs",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.015 per first MP (1024x1024), $0.002 per subsequent MP, $0.002 per input image MP",
+      "source": "https://developers.cloudflare.com/workers-ai/models/flux-2-klein-9b/"
+    },
+    {
+      "id": "@cf/bytedance/stable-diffusion-xl-lightning",
+      "task": "Text-to-Image",
+      "author": "ByteDance",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/stable-diffusion-xl-lightning/"
+    },
+    {
+      "id": "@cf/deepgram/aura-1",
+      "task": "Text-to-Speech",
+      "author": "Deepgram",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.015 per 1k characters",
+      "source": "https://developers.cloudflare.com/workers-ai/models/aura-1/"
+    },
+    {
+      "id": "@cf/deepgram/aura-2-en",
+      "task": "Text-to-Speech",
+      "author": "Deepgram",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.03 per 1k characters",
+      "source": "https://developers.cloudflare.com/workers-ai/models/aura-2-en/"
+    },
+    {
+      "id": "@cf/deepgram/aura-2-es",
+      "task": "Text-to-Speech",
+      "author": "Deepgram",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.03 per 1k characters",
+      "source": "https://developers.cloudflare.com/workers-ai/models/aura-2-es/"
+    },
+    {
+      "id": "@cf/deepgram/flux",
+      "task": "Automatic Speech Recognition",
+      "author": "Deepgram",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0077 per audio minute (websocket)",
+      "source": "https://developers.cloudflare.com/workers-ai/models/flux/"
+    },
+    {
+      "id": "@cf/deepgram/nova-3",
+      "task": "Automatic Speech Recognition",
+      "author": "Deepgram",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0052 per audio minute, $0.0092 per audio minute (websocket)",
+      "source": "https://developers.cloudflare.com/workers-ai/models/nova-3/"
+    },
+    {
+      "id": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+      "task": "Text Generation",
+      "author": "DeepSeek",
+      "deprecated": false,
+      "context": "80,000 tokens",
+      "display_price": "$0.50 per M input tokens, $4.88 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/deepseek-r1-distill-qwen-32b/"
+    },
+    {
+      "id": "@cf/deepseek-ai/deepseek-v4-flash-0731",
+      "task": "Text Generation",
+      "author": "DeepSeek",
+      "deprecated": false,
+      "context": "1,310,720 tokens",
+      "display_price": "$0.44 per M input tokens, $1.32 per M output tokens, $0.014 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/deepseek-v4-flash-0731/"
+    },
+    {
+      "id": "@cf/deepseek-ai/deepseek-v4-pro-0813",
+      "task": "Text Generation",
+      "author": "DeepSeek",
+      "deprecated": false,
+      "context": "1,048,576 tokens",
+      "display_price": "$1.32 per M input tokens, $3.96 per M output tokens, $0.044 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/deepseek-v4-pro-0813/"
+    },
+    {
+      "id": "@cf/defog/sqlcoder-7b-2",
+      "task": "Text Generation",
+      "author": "Defog",
+      "deprecated": true,
+      "context": "10,000 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/sqlcoder-7b-2/"
+    },
+    {
+      "id": "@cf/facebook/bart-large-cnn",
+      "task": "Summarization",
+      "author": "Meta",
+      "deprecated": true,
+      "context": null,
+      "display_price": "$0.00 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/bart-large-cnn/"
+    },
+    {
+      "id": "@cf/facebook/detr-resnet-50",
+      "task": "Object Detection",
+      "author": "Meta",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0000075 per inference request",
+      "source": "https://developers.cloudflare.com/workers-ai/models/detr-resnet-50/"
+    },
+    {
+      "id": "@cf/google/embeddinggemma-300m",
+      "task": "Text Embeddings",
+      "author": "Google",
+      "deprecated": false,
+      "context": null,
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/embeddinggemma-300m/"
+    },
+    {
+      "id": "@cf/google/gemma-2b-it-lora",
+      "task": "Text Generation",
+      "author": "Google",
+      "deprecated": false,
+      "context": "8,192 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-2b-it-lora/"
+    },
+    {
+      "id": "@cf/google/gemma-3-12b-it",
+      "task": "Text Generation",
+      "author": "Google",
+      "deprecated": true,
+      "context": "80,000 tokens",
+      "display_price": "$0.35 per M input tokens, $0.56 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-3-12b-it/"
+    },
+    {
+      "id": "@cf/google/gemma-4-26b-a4b-it",
+      "task": "Text Generation",
+      "author": "Google",
+      "deprecated": false,
+      "context": "256,000 tokens",
+      "display_price": "$0.10 per M input tokens, $0.30 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/"
+    },
+    {
+      "id": "@cf/google/gemma-7b-it-lora",
+      "task": "Text Generation",
+      "author": "Google",
+      "deprecated": false,
+      "context": "3,500 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-7b-it-lora/"
+    },
+    {
+      "id": "@cf/huggingface/distilbert-sst-2-int8",
+      "task": "Text Classification",
+      "author": "HuggingFace",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.026 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/distilbert-sst-2-int8/"
+    },
+    {
+      "id": "@cf/ibm-granite/granite-4.0-h-micro",
+      "task": "Text Generation",
+      "author": "IBM",
+      "deprecated": false,
+      "context": "131,000 tokens",
+      "display_price": "$0.017 per M input tokens, $0.11 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/granite-4.0-h-micro/"
+    },
+    {
+      "id": "@cf/leonardo/lucid-origin",
+      "task": "Text-to-Image",
+      "author": "Leonardo",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.007 per 512 by 512 tile, $0.00013 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/lucid-origin/"
+    },
+    {
+      "id": "@cf/leonardo/phoenix-1.0",
+      "task": "Text-to-Image",
+      "author": "Leonardo",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0058 per 512 by 512 tile, $0.00011 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/phoenix-1.0/"
+    },
+    {
+      "id": "@cf/llava-hf/llava-1.5-7b-hf",
+      "task": "Image-to-Text",
+      "author": "llava-hf",
+      "deprecated": false,
+      "context": null,
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/llava-1.5-7b-hf/"
+    },
+    {
+      "id": "@cf/lykon/dreamshaper-8-lcm",
+      "task": "Text-to-Image",
+      "author": "lykon",
+      "deprecated": false,
+      "context": null,
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/dreamshaper-8-lcm/"
+    },
+    {
+      "id": "@cf/meta-llama/llama-2-7b-chat-hf-lora",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "8,192 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-2-7b-chat-hf-lora/"
+    },
+    {
+      "id": "@cf/meta/llama-2-7b-chat-fp16",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "4,096 tokens",
+      "display_price": "$0.56 per M input tokens, $6.67 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-2-7b-chat-fp16/"
+    },
+    {
+      "id": "@cf/meta/llama-2-7b-chat-int8",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "8,192 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-2-7b-chat-int8/"
+    },
+    {
+      "id": "@cf/meta/llama-3-8b-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "7,968 tokens",
+      "display_price": "$0.28 per M input tokens, $0.83 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3-8b-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-3-8b-instruct-awq",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "8,192 tokens",
+      "display_price": "$0.12 per M input tokens, $0.27 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3-8b-instruct-awq/"
+    },
+    {
+      "id": "@cf/meta/llama-3.1-70b-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "24,000 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.1-70b-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-3.1-8b-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "7,968 tokens",
+      "display_price": "$0.28 per M input tokens, $0.83 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-3.1-8b-instruct-awq",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "8,192 tokens",
+      "display_price": "$0.12 per M input tokens, $0.27 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-awq/"
+    },
+    {
+      "id": "@cf/meta/llama-3.1-8b-instruct-fast",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "128,000 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fast/"
+    },
+    {
+      "id": "@cf/meta/llama-3.1-8b-instruct-fp8",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "32,000 tokens",
+      "display_price": "$0.15 per M input tokens, $0.29 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fp8/"
+    },
+    {
+      "id": "@cf/meta/llama-3.2-11b-vision-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "128,000 tokens",
+      "display_price": "$0.049 per M input tokens, $0.68 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.2-11b-vision-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-3.2-1b-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "60,000 tokens",
+      "display_price": "$0.027 per M input tokens, $0.20 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.2-1b-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-3.2-3b-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "80,000 tokens",
+      "display_price": "$0.051 per M input tokens, $0.34 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.2-3b-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "24,000 tokens",
+      "display_price": "$0.29 per M input tokens, $2.25 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-3.3-70b-instruct-fp8-fast/"
+    },
+    {
+      "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "131,000 tokens",
+      "display_price": "$0.27 per M input tokens, $0.85 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-4-scout-17b-16e-instruct/"
+    },
+    {
+      "id": "@cf/meta/llama-guard-3-8b",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": "131,072 tokens",
+      "display_price": "$0.48 per M input tokens, $0.03 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/llama-guard-3-8b/"
+    },
+    {
+      "id": "@cf/meta/m2m100-1.2b",
+      "task": "Translation",
+      "author": "Meta",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.34 per M input tokens, $0.34 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/m2m100-1.2b/"
+    },
+    {
+      "id": "@cf/microsoft/phi-2",
+      "task": "Text Generation",
+      "author": "Microsoft",
+      "deprecated": true,
+      "context": "2,048 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/phi-2/"
+    },
+    {
+      "id": "@cf/microsoft/resnet-50",
+      "task": "Image Classification",
+      "author": "Microsoft",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0000025 per inference request",
+      "source": "https://developers.cloudflare.com/workers-ai/models/resnet-50/"
+    },
+    {
+      "id": "@cf/mistral/mistral-7b-instruct-v0.1",
+      "task": "Text Generation",
+      "author": "MistralAI",
+      "deprecated": true,
+      "context": "2,824 tokens",
+      "display_price": "$0.11 per M input tokens, $0.19 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/mistral-7b-instruct-v0.1/"
+    },
+    {
+      "id": "@cf/mistral/mistral-7b-instruct-v0.2-lora",
+      "task": "Text Generation",
+      "author": "MistralAI",
+      "deprecated": false,
+      "context": "15,000 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/mistral-7b-instruct-v0.2-lora/"
+    },
+    {
+      "id": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+      "task": "Text Generation",
+      "author": "MistralAI",
+      "deprecated": false,
+      "context": "128,000 tokens",
+      "display_price": "$0.35 per M input tokens, $0.56 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/mistral-small-3.1-24b-instruct/"
+    },
+    {
+      "id": "@cf/moondream/moondream3.1-9B-A2B",
+      "task": "Image-to-Text",
+      "author": "moondream",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.30 per M input tokens, $1.00 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/moondream3.1-9B-A2B/"
+    },
+    {
+      "id": "@cf/moonshotai/kimi-k2.5",
+      "task": "Text Generation",
+      "author": "Moonshot AI",
+      "deprecated": true,
+      "context": "256,000 tokens",
+      "display_price": "$0.60 per M input tokens, $3.00 per M output tokens, $0.10 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/kimi-k2.5/"
+    },
+    {
+      "id": "@cf/moonshotai/kimi-k2.6",
+      "task": "Text Generation",
+      "author": "Moonshot AI",
+      "deprecated": false,
+      "context": "262,144 tokens",
+      "display_price": "$0.95 per M input tokens, $0.16 per M cached input tokens, $4.00 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/kimi-k2.6/"
+    },
+    {
+      "id": "@cf/moonshotai/kimi-k2.7-code",
+      "task": "Text Generation",
+      "author": "Moonshot AI",
+      "deprecated": false,
+      "context": "262,144 tokens",
+      "display_price": "$0.95 per M input tokens, $4.00 per M output tokens, $0.19 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/kimi-k2.7-code/"
+    },
+    {
+      "id": "@cf/myshell-ai/melotts",
+      "task": "Text-to-Speech",
+      "author": "MyShell",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.0002 per audio minute",
+      "source": "https://developers.cloudflare.com/workers-ai/models/melotts/"
+    },
+    {
+      "id": "@cf/nvidia/nemotron-3-120b-a12b",
+      "task": "Text Generation",
+      "author": "NVIDIA",
+      "deprecated": false,
+      "context": "256,000 tokens",
+      "display_price": "$0.50 per M input tokens, $1.50 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/nemotron-3-120b-a12b/"
+    },
+    {
+      "id": "@cf/openai/gpt-oss-120b",
+      "task": "Text Generation",
+      "author": "OpenAI",
+      "deprecated": false,
+      "context": "128,000 tokens",
+      "display_price": "$0.35 per M input tokens, $0.75 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/gpt-oss-120b/"
+    },
+    {
+      "id": "@cf/openai/gpt-oss-20b",
+      "task": "Text Generation",
+      "author": "OpenAI",
+      "deprecated": false,
+      "context": "128,000 tokens",
+      "display_price": "$0.20 per M input tokens, $0.30 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/gpt-oss-20b/"
+    },
+    {
+      "id": "@cf/openai/whisper",
+      "task": "Automatic Speech Recognition",
+      "author": "OpenAI",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00045 per audio minute",
+      "source": "https://developers.cloudflare.com/workers-ai/models/whisper/"
+    },
+    {
+      "id": "@cf/openai/whisper-large-v3-turbo",
+      "task": "Automatic Speech Recognition",
+      "author": "OpenAI",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00051 per audio minute",
+      "source": "https://developers.cloudflare.com/workers-ai/models/whisper-large-v3-turbo/"
+    },
+    {
+      "id": "@cf/openai/whisper-tiny-en",
+      "task": "Automatic Speech Recognition",
+      "author": "OpenAI",
+      "deprecated": false,
+      "context": null,
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/whisper-tiny-en/"
+    },
+    {
+      "id": "@cf/pfnet/plamo-embedding-1b",
+      "task": "Text Embeddings",
+      "author": "pfnet",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.019 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/plamo-embedding-1b/"
+    },
+    {
+      "id": "@cf/pipecat-ai/smart-turn-v2",
+      "task": "Voice Activity Detection",
+      "author": "Pipecat",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00034 per audio minute",
+      "source": "https://developers.cloudflare.com/workers-ai/models/smart-turn-v2/"
+    },
+    {
+      "id": "@cf/qwen/qwen2.5-coder-32b-instruct",
+      "task": "Text Generation",
+      "author": "Qwen",
+      "deprecated": false,
+      "context": "32,768 tokens",
+      "display_price": "$0.66 per M input tokens, $1.00 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/qwen2.5-coder-32b-instruct/"
+    },
+    {
+      "id": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "task": "Text Generation",
+      "author": "Qwen",
+      "deprecated": false,
+      "context": "32,768 tokens",
+      "display_price": "$0.051 per M input tokens, $0.34 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/"
+    },
+    {
+      "id": "@cf/qwen/qwen3-embedding-0.6b",
+      "task": "Text Embeddings",
+      "author": "Qwen",
+      "deprecated": false,
+      "context": "8,192 tokens",
+      "display_price": "$0.012 per M input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/qwen3-embedding-0.6b/"
+    },
+    {
+      "id": "@cf/qwen/qwen3.8-27b",
+      "task": "Image-Text-to-Text",
+      "author": "Qwen",
+      "deprecated": false,
+      "context": "262,144 tokens",
+      "display_price": "$0.45 per M input tokens, $3.20 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/qwen3.8-27b/"
+    },
+    {
+      "id": "@cf/qwen/qwq-32b",
+      "task": "Text Generation",
+      "author": "Qwen",
+      "deprecated": false,
+      "context": "24,000 tokens",
+      "display_price": "$0.66 per M input tokens, $1.00 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/qwq-32b/"
+    },
+    {
+      "id": "@cf/runwayml/stable-diffusion-v1-5-img2img",
+      "task": "Text-to-Image",
+      "author": "RunwayML",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/stable-diffusion-v1-5-img2img/"
+    },
+    {
+      "id": "@cf/runwayml/stable-diffusion-v1-5-inpainting",
+      "task": "Text-to-Image",
+      "author": "RunwayML",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/stable-diffusion-v1-5-inpainting/"
+    },
+    {
+      "id": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+      "task": "Text-to-Image",
+      "author": "Stability.ai",
+      "deprecated": false,
+      "context": null,
+      "display_price": "$0.00 per step",
+      "source": "https://developers.cloudflare.com/workers-ai/models/stable-diffusion-xl-base-1.0/"
+    },
+    {
+      "id": "@cf/unum/uform-gen2-qwen-500m",
+      "task": "Image-to-Text",
+      "author": "Unum",
+      "deprecated": true,
+      "context": null,
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/uform-gen2-qwen-500m/"
+    },
+    {
+      "id": "@cf/zai-org/glm-4.7-flash",
+      "task": "Text Generation",
+      "author": "Zhipu AI",
+      "deprecated": false,
+      "context": "131,072 tokens",
+      "display_price": "$0.06 per M input tokens, $0.40 per M output tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/glm-4.7-flash/"
+    },
+    {
+      "id": "@cf/zai-org/glm-5.2",
+      "task": "Text Generation",
+      "author": "Zhipu AI",
+      "deprecated": false,
+      "context": "262,144 tokens",
+      "display_price": "$1.40 per M input tokens, $4.40 per M output tokens, $0.26 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/glm-5.2/"
+    },
+    {
+      "id": "@cf/zai-org/glm-5.3",
+      "task": "Text Generation",
+      "author": "Zhipu AI",
+      "deprecated": false,
+      "context": "1,048,576 tokens",
+      "display_price": "$1.40 per M input tokens, $4.40 per M output tokens, $0.26 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/glm-5.3/"
+    },
+    {
+      "id": "@cf/zai-org/glm-5.3-flash",
+      "task": "Text Generation",
+      "author": "Zhipu AI",
+      "deprecated": false,
+      "context": "1,048,576 tokens",
+      "display_price": "$0.15 per M input tokens, $0.50 per M output tokens, $0.03 per M cached input tokens",
+      "source": "https://developers.cloudflare.com/workers-ai/models/glm-5.3-flash/"
+    },
+    {
+      "id": "@hf/google/gemma-7b-it",
+      "task": "Text Generation",
+      "author": "Google",
+      "deprecated": true,
+      "context": "8,192 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-7b-it/"
+    },
+    {
+      "id": "@hf/meta-llama/meta-llama-3-8b-instruct",
+      "task": "Text Generation",
+      "author": "Meta",
+      "deprecated": true,
+      "context": "8,192 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/meta-llama-3-8b-instruct/"
+    },
+    {
+      "id": "@hf/mistral/mistral-7b-instruct-v0.2",
+      "task": "Text Generation",
+      "author": "MistralAI",
+      "deprecated": true,
+      "context": "3,072 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/mistral-7b-instruct-v0.2/"
+    },
+    {
+      "id": "@hf/nousresearch/hermes-2-pro-mistral-7b",
+      "task": "Text Generation",
+      "author": "nousresearch",
+      "deprecated": true,
+      "context": "24,000 tokens",
+      "display_price": null,
+      "source": "https://developers.cloudflare.com/workers-ai/models/hermes-2-pro-mistral-7b/"
+    }
+  ]
+}

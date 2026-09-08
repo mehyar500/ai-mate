@@ -1,0 +1,81 @@
+# Adapter-neutral route manifest.
+# Provider/model IDs must be refreshed from the authenticated Docker OmniRoute
+# instance before use. Do not place API keys in this file.
+
+routes:
+  foundry/cto-primary:
+    provider: openai-codex
+    model: gpt-5.6-terra
+    reasoning_effort: medium
+    capability_floor: high-reasoning
+    review_required: true
+
+  foundry/reasoning-fallback:
+    candidates:
+      - provider: omni
+        model: antigravity/claude-opus-4-6-thinking
+      - provider: omni
+        model: agy/claude-opus-4-6-thinking
+      # Cursor Fable/Opus candidates require exact sync, smoke tests, and
+      # explicit data-policy approval before enabling.
+      # - provider: omni
+      #   model: cu/claude-fable-5-thinking-xhigh
+    capability_floor: high-reasoning
+    review_required: true
+
+  foundry/research-visual:
+    candidates:
+      - provider: omni
+        model: antigravity/gemini-3.7-flash-high
+      - provider: omni
+        model: agy/gemini-3.7-flash-high
+      - provider: omni
+        model: antigravity/claude-sonnet-4-6
+    capability_floor: multimodal-research
+    review_required: true
+
+  foundry/bulk-build:
+    candidates:
+      - provider: minimax-oauth
+        model: MiniMax-M3
+      - provider: omni
+        model: antigravity/gemini-3.7-flash-medium
+    capability_floor: bounded-implementation
+    review_required: true
+
+  foundry/kiro-specialist:
+    candidates:
+      - provider: omni
+        model: kiro/qwen3-coder-next
+      # The Kiro Claude/GPT catalog rows are visible but returned 400 in the
+      # current request probe; keep them as candidates until revalidated.
+      # - provider: omni
+      #   model: kiro/claude-sonnet-5
+      # - provider: omni
+      #   model: kiro/gpt-5.6-terra
+    capability_floor: bounded-agentic-coding
+    review_required: true
+    note: KIRO FREE entitlement and tool behavior must be probed before use; not a silent fallback for R2/R3 work.
+
+  foundry/independent-review:
+    selection: different-provider-family-than-author
+    preferred: codex-or-verified-claude
+    capability_floor: critical-review
+    review_required: true
+
+  foundry/emergency:
+    provider: minimax-oauth
+    model: MiniMax-M3
+    capability_floor: bounded-recovery
+    review_required: true
+
+selection_policy:
+  catalog_is_not_entitlement: true
+  require_health_probe: true
+  require_structured_output_probe: true
+  require_tool_probe_for_tool_tasks: true
+  retry_transient_errors: 1
+  automatic_replay_non_idempotent: false
+  preserve_capability_floor: true
+  circuit_breaker_after_auth_or_quota_failures: 2
+  redact_secrets_and_production_data: true
