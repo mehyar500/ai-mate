@@ -10,9 +10,9 @@ Five active product documents:
 2. [REPORT](docs/REPORT.md): offer, launch budget and development estimate.
 3. [BUILD](docs/BUILD.md): models, scene flow, memory, PWA and measurements.
 4. [ECONOMICS](docs/ECONOMICS.md): generated costs, funding and sensitivity.
-5. [USA](docs/USA.md): processor options and internal age-assurance limits.
+5. [USA](docs/USA.md): commercial licenses, hosting, US release conditions and age assurance.
 
-One inference provider: a selected TensorDock US host, subject to business approval. Cloudflare serves the web/control plane and media transport; an approved processor handles payments. One provider does not mean one model or one GPU.
+Private inference candidate: a selected TensorDock US host, subject to full-business acceptance. Cloudflare serves the web/control plane, media transport and eligible neutral AI tasks; an approved processor handles payments. One inference provider does not mean one model or one GPU. Self-hosting does not override licenses or establish nationwide legality.
 
 This is documentation and an offline calculator, not a working app. No production account, paid inference, deployment or processor approval has been created. Earlier plans remain in Git history. Catalog JSON and agent/factory files are reference/history.
 
@@ -25,4 +25,4 @@ python -m compileall -q scripts tests
 git diff --check
 ```
 
-Keep the first private POC within $250 technical spending after funding authorization. A commercial adult pilot has separate startup and working-capital needs; the baseline 100-payer funding budget is about $5,918, including unquoted review allowances and excluding paid engineering labor.
+Keep the first private POC within $250 technical spending after funding authorization. The illustrated build month plus two paid pilot months needs $12,096.50 before relying on customer payouts, including a $1,500 buffer and unquoted review allowances. Round to $12,500 baseline; paid engineering is extra. The 0/50/150 payer scenario still loses $5,368.14 over the quarter. See the downside cases before committing funds.

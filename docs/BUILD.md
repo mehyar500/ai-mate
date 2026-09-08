@@ -40,6 +40,14 @@ Use one selected TensorDock US provider for the inference services. Keep a warm 
 
 The $0.60/hour auxiliary and $0.90/hour renderer are complete-service budgets requiring offers and load testing. Warm auxiliary pool is $432/30-day month. At scale, model capacity and replication must grow with tokens/second and peak calls; a single warm pool is a pilot assumption. Cloudflare serves the PWA, account/data plane and WebRTC; payment remains a separate approved service.
 
+For the first capacity experiment, use separate auxiliary and visual workers at one accepted US host. Benchmark Qwen3-8B plus ASR/TTS first; do not assume that an additional 8B guard and image model fit in the same 24GB device alongside all runtime caches. If capacity requires a second auxiliary GPU, the three-month stress budget explicitly doubles that cost. Large Wan recorded-video trials use a separate 80GB worker at an assumed $2.50/hour. No paid application traffic is routed yet.
+
+Cloudflare's neutral managed candidate is `@cf/qwen/qwen3-30b-a3b-fp8` for product FAQs or public structured operations only. Do not send companion conversations or derived intimate memory to this route. A privacy-preserving route is a data boundary, not permission to evade terms: the product and each service still need to be eligible. Budget $20/month for this neutral use until actual token billing is measured. [Official model listing](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), [developer service terms](https://www.cloudflare.com/service-specific-terms-developer-platform/).
+
+A controller may deallocate unused visual workers after the ready window/session ends, leaving only approved encrypted disk/cache storage. Verify the host's actual stop/delete billing behavior and capacity availability before promising scale-to-zero. Running VMs cost money while idle. Prepaid-balance monitoring must reserve enough to fulfill already-purchased usage; a zero balance or unavailable replacement GPU is a service interruption, not a free operating mode.
+
+Owned workstation comparison is an illustrative capital scenario in REPORT, not the launch architecture. Do not purchase hardware or rent compute from these planning settings. Actual node quotes, US region, complete license manifest and account acceptance remain required.
+
 ## Persistent state
 
 Keep four account-scoped records:
@@ -52,6 +60,8 @@ Keep four account-scoped records:
 User facts are not character fiction. A sentence such as 'I'm in the bathroom' changes the fictional scene state, not a claim about a real person's location. The AI disclosure stays visible. The character only knows supplied/consented information.
 
 Use a 4,096-token prompt cap, short summary, recent turns and relevant confirmed facts. Summarize after ten turns/end call. Confirm meaningful new facts before long-term storage; no covert sensitive-trait inference. Inspect/correct/forget/export controls invalidate derived summaries and cached prompts.
+
+Token sizing example, not a measured conversation: two model replies/minute, each reading 2,000 input tokens and producing 60 output tokens, gives 4,000 input/120 output tokens per minute, or 240,000 input/7,200 output for an hour. At the 4,096-token input cap that input total becomes 491,520/hour. Memory updates, checks and retries add work. Self-hosted bills are GPU time/capacity, not an external per-token tariff; measure prefill/decode throughput, queue delay and peak concurrency rather than multiplying this example by an invented API price.
 
 ## Scene-to-call flow
 
@@ -69,6 +79,8 @@ Use a 4,096-token prompt cap, short summary, recent turns and relevant confirmed
 Targets to test: cached-scene preparation 1–5 seconds; a new scene on warm hardware 5–30 seconds; cold worker 30–120 seconds or longer depending on actual provider startup. These are hypotheses, not SLAs. Show the measured ETA and permit cancellation. The user's tolerated pre-call delay lets us avoid an always-on renderer.
 
 Budget $0.10/accepted scene, $0.05/photo and $0.15/accepted portrait clip. These are existing hypotheses and do not price general Wan video. For illustration, 60 seconds at $0.90/hour costs $0.015 of node time before loading, retries, checks and other costs. All successful-but-rejected work counts. A two-minute warm-up plus two-minute ready hold costs $0.06 at this node rate even if nobody joins; scene-budget feasibility must be measured against abandonment.
+
+Keep general recorded video in a separate queue and price contract. At an illustrative $2.50/hour, two five-minute attempts cost $0.42 compute, while two 20-minute attempts cost $1.67. Add loading, checks, rejected jobs and delivery costs; longer output may need more generation or extensions. The proposed $1.25 accepted-clip ceiling and $9.99 sale price are experiments, not Wan performance claims. No output or delivery-time guarantee is established; general-video sales are excluded from the three-month forecast. Never apply the $0.15 portrait budget to arbitrary video.
 
 ## During the visual call
 

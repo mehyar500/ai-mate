@@ -27,6 +27,27 @@ def validate(c):
             raise ValueError("Price must be positive")
     if not c["plans"] or not math.isclose(sum(p["share"] for p in c["plans"]),1):
         raise ValueError("Plan shares must sum to one")
+    fixed=c["monthly_fixed_breakdown"]
+    if any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or v<0 for v in fixed.values()):
+        raise ValueError("Invalid fixed-cost breakdown")
+    if not math.isclose(sum(fixed.values()),a["monthly_fixed"]):
+        raise ValueError("Fixed-cost breakdown must match monthly_fixed")
+    lag=c["launch"]["settlement_lag_months"]
+    if isinstance(lag,bool) or not isinstance(lag,int) or lag<0:
+        raise ValueError("Settlement lag must be whole nonnegative months")
+    if len(c["launch"]["months"])!=3:
+        raise ValueError("This report requires exactly three launch months")
+    previous_paid=previous_free=0
+    for m in c["launch"]["months"]:
+        for k in ("payers","new_payers","free_users","new_free","aux_hours","renderer_open_hours"):
+            v=m[k]
+            if isinstance(v,bool) or not isinstance(v,int) or v<0:
+                raise ValueError("Launch counts and scheduled hours must be nonnegative integers")
+        if m["new_payers"]>m["payers"] or m["payers"]-m["new_payers"]>previous_paid:
+            raise ValueError("Paid cohort cannot grow without new customers")
+        if m["new_free"]>m["free_users"] or m["free_users"]-m["new_free"]>previous_free:
+            raise ValueError("Free cohort cannot grow without new customers")
+        previous_paid,previous_free=m["payers"],m["free_users"]
 
 def price_floor(cost,fees,return_on_cost=3):
     denominator=1/(1+return_on_cost)-fees
@@ -55,7 +76,7 @@ def calculate(c):
     idle_topup=max(0,a["renderer_open_hours"]*a["gpu_hour"]-renderer_allocated)
     aux_fixed=a["aux_gpu_hour"]*a["aux_hours"]
     recurring=n*unit+a["monthly_fixed"]+aux_fixed+a["free_users"]*a["free_user"]+a["founder_labor"]+idle_topup
-    startup=sum(a[k] for k in ("setup_technical","registration","legal_setup","security_setup","tooling_setup","domain_setup"))
+    startup=sum(a[k] for k in ("setup_technical","registration","legal_setup","security_setup","tooling_setup","domain_setup","entity_setup"))
     acquisition=n*a["cac"]
     verification=(n+a["free_users"])*a["verification_per_new_user"]
     first_cost=recurring+startup+acquisition+verification
@@ -73,72 +94,144 @@ def calculate(c):
                 aux_fixed=aux_fixed,verification_labor=verification_labor,first_profit_after_review_labor=revenue-first_cost-verification_labor,
                 funding_before_receipts=funding)
 
+def forecast(c):
+    """Cash planning, not GAAP accounting. New cohorts exclude free-to-paid conversions.
+
+    Fees/loss allowance and reserves are withheld; eligible proceeds settle after
+    an explicit lag. Reserve release is outside this three-month horizon.
+    """
+    validate(c)
+    a=c["assumptions"]; lag=c["launch"]["settlement_lag_months"]
+    months=[]; cumulative_cash=0; peak_deficit=0
+    for i,m in enumerate(c["launch"]["months"]):
+        x=copy.deepcopy(c)
+        x["assumptions"].update({k:m[k] for k in ("payers","free_users","aux_hours","renderer_open_hours")})
+        d=calculate(x)
+        startup=d["startup"] if i==0 else 0
+        verified=m["new_payers"]+m["new_free"]
+        verification=verified*a["verification_per_new_user"]
+        acquisition=m["new_payers"]*a["cac"]
+        withheld=m["payers"]*((a["processor_fraction"]+a["loss_fraction"])*d["arpu"]+a["payment_fixed"])
+        reserve=d["revenue"]*a["reserve_fraction"]
+        eligible=d["revenue"]-withheld-reserve
+        expenses=d["recurring_cost"]+startup+verification+acquisition
+        cash_out=expenses-withheld
+        receipts=eligible if lag==0 else (months[i-lag]["eligible"] if i>=lag else 0)
+        cash_change=receipts-cash_out
+        cumulative_cash+=cash_change
+        peak_deficit=max(peak_deficit,-cumulative_cash)
+        months.append(dict(m,revenue=d["revenue"],startup=startup,expenses=expenses,
+                           delivery=m["payers"]*sum(p["share"]*p["delivery"] for p in d["plans"]),
+                           fixed=a["monthly_fixed"],aux=d["aux_fixed"],idle=d["idle_topup"],
+                           free_delivery=m["free_users"]*a["free_user"],founder_pay=a["founder_labor"],
+                           verified=verified,verification=verification,acquisition=acquisition,
+                           withheld=withheld,reserve=reserve,eligible=eligible,
+                           profit=d["revenue"]-expenses,cash_out=cash_out,receipts=receipts,
+                           cash_change=cash_change,cumulative_cash=cumulative_cash,
+                           review_labor=verified*a["verification_minutes"]/60*a["review_hour_value"]))
+    totals={k:sum(m[k] for m in months) for k in (
+        "revenue","expenses","profit","cash_out","receipts","reserve","eligible","verified","review_labor")}
+    totals.update(unsettled=totals["eligible"]-totals["receipts"],cash_change=cumulative_cash,
+                  minimum_funding=peak_deficit+a["working_buffer"],
+                  funding_without_receipts=totals["cash_out"]+a["working_buffer"])
+    return dict(months=months,totals=totals)
+
+
+def no_sales(c):
+    x=copy.deepcopy(c)
+    for m in x["launch"]["months"]:
+        m.update(payers=0,new_payers=0)
+    return x
+
+
 def report(c):
-    a=c["assumptions"];d=calculate(c)
-    rows=["# Adult-first PWA economics","",f"USD, checked {c['as_of']}. Generated from [config](../config/economics.json). {c['scope']}. No benchmark, binding provider quote or customer forecast. Full allowance redemption; before income tax. No paid tier launches until its included adult modalities pass the REPORT requirements.",
-          "","## Unit delivery and payment assumptions","",
-          f"Renderer node \u0024{a['gpu_hour']:.2f}/hour, {a['streams']} concurrent stream, {a['occupancy']:.0%} occupancy. Renderer allocation \u0024{d['renderer_minute']:.3f}/connected minute; transport, contingency and floor produce \u0024{d['live_minute']:.3f}/visual minute. A separate warm auxiliary GPU pool costs \u0024{d['aux_fixed']:.0f}/month and is counted below. One provider does not mean one GPU holds every model.",
-          f"Voice-only \u0024{a['phone_minute']:.2f}/minute; accepted portrait video \u0024{a['clip_cost']:.2f}; photo \u0024{a['photo_cost']:.2f}; prepared scene \u0024{a['scene_cost']:.2f}. Paid text/recorded voice/check-ins/memory \u0024{a['paid_messages']:.2f}/month plus \u0024{a['support']:.2f} support allowance. These are budgets requiring measured acceptance/retry costs.",
-          f"Processor {a['processor_fraction']:.0%} + refunds/losses {a['loss_fraction']:.0%} + \u0024{a['payment_fixed']:.2f}/transaction; hold {a['reserve_fraction']:.0%} of gross receipts. All are planning assumptions, not CCBill quotes.",
-          "","## Monthly plans: full usage","",
-          "| Plan | Price | Visual / voice min | Photos / videos / scenes | Direct cost | Contribution | Margin |",
+    a=c["assumptions"]; d=calculate(c); f=forecast(c); t=f["totals"]
+    rows=["# Adult-first PWA economics","",
+          f"USD; checked {c['as_of']}. Generated from [config](../config/economics.json). {c['scope']}. This is a cash-planning model with startup costs expensed at kickoff, not financial statements, a benchmark, a binding quote or a customer forecast. All included allowances are fully redeemed. Sales tax is assumed collected separately and remitted; income taxes and paid engineering are excluded.",
+          "","## Decision","",
+          f"Budget **${t['funding_without_receipts']:,.2f} before relying on any customer payout** for the illustrated three-month pilot, including a ${a['working_buffer']:,.0f} unspent liquidity buffer. Under the modeled settlement timing the month-end minimum is ${t['minimum_funding']:,.2f}; that smaller number depends on receipts arriving as assumed and does not model intramonth payment dates. Round the stronger budget up, obtain quotes, and do not spend if launch eligibility fails.",
+          "","## Unit economics and monthly offer","",
+          f"Fully configured GPU allowances: auxiliary ${a['aux_gpu_hour']:.2f}/hour, renderer ${a['gpu_hour']:.2f}/hour. These exceed advertised GPU-only starting rates and are not verified US offers. One stream and {a['occupancy']:.0%} occupied renderer capacity give ${d['renderer_minute']:.3f}/connected minute. Transport, contingency and a floor produce **${d['live_minute']:.3f}/visual minute**. Warm auxiliary capacity is a separate fixed cost; incremental media/message allowances cover burst capacity and processing. Do not charge the same GPU hours twice when replacing estimates with bills.",
+          f"Voice-only ${a['phone_minute']:.2f}/minute; accepted portrait clip ${a['clip_cost']:.2f}; photo ${a['photo_cost']:.2f}; scene ${a['scene_cost']:.2f}. These are cost ceilings to validate including loading, retries, rejected outputs and checks. They do not price unrestricted general video. Each paid account includes ${a['paid_messages']:.2f} incremental text/voice-note processing and ${a['support']:.2f} support allowance; human support exceeding this raises cost.",
+          f"Payments: {a['processor_fraction']:.0%} processing + {a['loss_fraction']:.0%} refunds/chargeback-loss allowance + ${a['payment_fixed']:.2f} per monthly payment, with a {a['reserve_fraction']:.0%} rolling reserve. These are assumptions, not a CCBill quote. Refunds/loss allowance is conservatively modeled as withheld cash. Actual fees, chargebacks, minimums and reserves may differ.",
+          "","| Plan | Price | Visual / voice minutes | Photos / portrait clips / scenes | Direct cost | Contribution | Margin |",
           "|---|---:|---:|---:|---:|---:|---:|"]
     for p in d["plans"]:
-        rows.append(f"| {p['name']} | \u0024{p['price']:.2f} | {p['live_minutes']} / {p['phone_minutes']} | {p['photos']} / {p['clips']} / {p['scenes']} | \u0024{p['cost']:.2f} | \u0024{p['profit']:.2f} | {p['margin']:.1%} |")
-    rows+=["","Optional proactive photos/videos consume these included allowances only after opt-in; no extra surprise charge. Failed preparation restores the user's credit but may still cost us. Do not use unused credits as the profitability assumption.",
-           "","| Optional pack | Price | Direct cost | Margin |","|---|---:|---:|---:|"]
+        rows.append(f"| {p['name']} | ${p['price']:.2f} | {p['live_minutes']} / {p['phone_minutes']} | {p['photos']} / {p['clips']} / {p['scenes']} | ${p['cost']:.2f} | ${p['profit']:.2f} | {p['margin']:.1%} |")
+    rows += ["","Direct contribution is before warm capacity, overhead, verification, acquisition and startup. It is not net profit. Feature entitlements cannot be sold before their adult-use license, capability and cost gates pass. Free access is capped at 25 verified pilot accounts; no unlimited free generation.",
+             "","| Optional pack | Price | Direct cost | Margin |","|---|---:|---:|---:|"]
     for p in d["packs"]:
-        rows.append(f"| {p['name']} | \u0024{p['price']:.2f} | \u0024{p['cost']:.2f} | {p['margin']:.1%} |")
-    rows+=["","## First-month funding at configured cohort","",
-           "| Item | Budget | Basis |","|---|---:|---|",
-           f"| Technical POC | \u0024{a['setup_technical']:.0f} | Fixed experiment cap |",
-           f"| Card registration | \u0024{a['registration']:.0f} | CCBill US/Canada reference, subject to approval/quote |",
-           f"| Legal/state/provider review | \u0024{a['legal_setup']:.0f} | Planning allowance, not a quote or completed national review |",
-           f"| Independent security review | \u0024{a['security_setup']:.0f} | Narrow pilot scope allowance, not a full audit quote |",
-           f"| Development tools/API allowance | \u0024{a['tooling_setup']:.0f} | Not a published GPT-6 price; excludes existing subscriptions |",
-           f"| Domain | \u0024{a['domain_setup']:.0f} | Budget |",
-           f"| Warm auxiliary inference | \u0024{d['aux_fixed']:.0f} | {a['aux_hours']} hours x \u0024{a['aux_gpu_hour']:.2f} |",
-           f"| Platform, storage, monitoring, transactional delivery | \u0024{a['monthly_fixed']:.0f} | Monthly allowance |",
-           f"| Free-account delivery | \u0024{a['free_users']*a['free_user']:.2f} | {a['free_users']} accounts |",
-           f"| Paid delivery, excluding withheld payment fees | \u0024{a['payers']*sum(p['share']*p['delivery'] for p in d['plans']):.2f} | Full included usage, {a['payers']} payers |",
-           f"| Uncovered renderer availability | \u0024{d['idle_topup']:.2f} | Minimum {a['renderer_open_hours']} hours; no double counting allocated GPU |",
-           f"| Internal age-check processing | \u0024{d['verification']:.2f} | \u0024{a['verification_per_new_user']:.2f}/new free/paid user, no vendor fee |",
-           f"| Working buffer | \u0024{a['working_buffer']:.0f} | Liquidity, not an expense |",
-           f"| **Cash funding before receipts** | **\u0024{d['funding_before_receipts']:.2f}** | Assumes no customer receipts fund promised month-one delivery |"]
-    rows += ["",f"Internal review is not free economically: {a['verification_minutes']} minutes/account at \u0024{a['review_hour_value']:.0f}/hour values age-review time at \u0024{d['verification_labor']:.2f} for this cohort. Founder cash pay defaults to \u0024{a['founder_labor']:.0f}; engineering labor remains excluded. Development or legal overruns require more capital, not relaxed release gates.",
-             "","## Profit versus available cash","",
-             "| Payers | Revenue | All first-month modeled expense | Profit/loss | Cash after assumed hold |",
-             "|---|---:|---:|---:|---:|"]
-    for n in (20,100,250,300,500):
-        x=copy.deepcopy(c);x["assumptions"]["payers"]=n;z=calculate(x)
-        rows.append(f"| {n} | \u0024{z['revenue']:.2f} | \u0024{z['first_cost']:.2f} | \u0024{z['first_profit']:.2f} | \u0024{z['cash_after_reserve']:.2f} |")
-    thresholds={}
-    for key in ("first_profit","cash_after_reserve"):
-        thresholds[key]=None
-        for n in range(1,10001):
-            x=copy.deepcopy(c);x["assumptions"]["payers"]=n
-            if calculate(x)[key]>=0:
-                thresholds[key]=n;break
-    rows += ["",f"At the assumed plan mix, first-month expense break-even is about {thresholds['first_profit']} payers; cash break-even after the modeled hold is about {thresholds['cash_after_reserve']}. Fractions in plan mix are expectations; actual sales mix changes these thresholds. A waitlist is not collected revenue. No sales, settlement date or profit is guaranteed.",
-             "","## Stress cases at configured cohort","",
-             "| Change | Funding before receipts | First-month profit |","|---|---:|---:|"]
-    for label,updates in [("Adult photo/scene/clip costs double",dict(photo_cost=a['photo_cost']*2,scene_cost=a['scene_cost']*2,clip_cost=a['clip_cost']*2)),("Adult visual delivery budget doubles",dict(live_minute_floor=d['live_minute']*2)),("Quote-dependent $600 registration",dict(registration=600)),("No internal API fee but $1 vendor fallback",dict(verification_per_new_user=1)),("25% renderer occupancy",dict(occupancy=.25)),("CAC $5",dict(cac=5)),("Legal budget $3,000",dict(legal_setup=3000)),("Founder pay $3,000",dict(founder_labor=3000))]:
-        x=copy.deepcopy(c);x["assumptions"].update(updates);z=calculate(x)
-        rows.append(f"| {label} | \u0024{z['funding_before_receipts']:.2f} | \u0024{z['first_profit']:.2f} |")
-    rows+=["","The $600 registration scenario is an illustrative USD allowance for a lower-fee approved quote, not a verified EUR conversion or proof that Verotel Basic supports this visual-call business. Its public chart lists EUR 500 annual registration but excludes webcam billing on Basic and has additional recurring fees; confirm full scope.",
-           "","Recommended target: roughly 60% direct contribution margin, then positive cash after overhead. A 300-500% return is no longer a requirement. At scale, retention, service quality and acquisition costs determine profit. Keep at least one month of fulfillment/refund runway; do not take restricted reserves or unearned annual subscriptions as spendable profit.",
-           "","Sources: [CCBill fees](https://ccbill.com/doc/visa-and-mastercard-payment-processing-faqs), [CCBill pricing](https://ccbill.com/pricing), [Verotel chart](https://www.verotel.com/en/pricechart.html), [TensorDock](https://www.tensordock.com/). Processor approval, appropriate internal age assurance and model/content suitability are not established.",""]
+        rows.append(f"| {p['name']} | ${p['price']:.2f} | ${p['cost']:.2f} | {p['margin']:.1%} |")
+    rows += ["","Separate general-video experiment: an 80GB node allowance of $2.50/hour costs $0.42 for two five-minute attempts. Adding $0.25 for other fulfillment yields $0.67; two 20-minute attempts instead yield $1.92. These times are illustrative, not Wan benchmarks, and producing a coherent 15-second result may require extensions. Proposed ceiling $1.25/accepted clip, proposed price $9.99, direct cost including assumed payment deductions $3.55, contribution $6.44 (64.5%). A 60% contribution target requires price at least (delivery + $0.50) / (1 - 0.18 - 0.60), or $7.95 at the ceiling. No general-video revenue, cost or entitlement is included in the forecast. Activate only after measured cost and delivery time support a separately priced offer.",
+             "","## Startup purchases and review allowances","",
+             "| Item | Budget | Basis |","|---|---:|---|"]
+    for key,label,basis in [
+        ("setup_technical","Technical POC","Capped GPU experiments; no purchase made"),
+        ("registration","Card registration","CCBill US/Canada Visa $950 + Mastercard $1,000 annual reference; obtain initial merchant quote"),
+        ("legal_setup","Legal, contracts and state review","Narrow launch allowance; not a 50-state clearance or quote"),
+        ("security_setup","Independent security/privacy review","Narrow pilot review allowance, not a comprehensive audit"),
+        ("entity_setup","Entity/administrative setup","Jurisdiction-dependent allowance; avoid duplicate cost if already formed"),
+        ("domain_setup","Domain","Allowance")]:
+        rows.append(f"| {label} | ${a[key]:,.2f} | {basis} |")
+    if a["tooling_setup"]:
+        rows.append(f"| Additional one-time tooling | ${a['tooling_setup']:,.2f} | Separate from monthly subscriptions |")
+    rows.append(f"| **Startup total** | **${d['startup']:,.2f}** | Charged once in M1 for conservative budgeting |")
+    rows += ["","Technical validation and host eligibility precede larger commitments. Registration is not paid merely to keep experimenting. Annual card fees recur outside this quarter; save $162.50/month thereafter if the $1,950 annual figure applies. Legal/security overruns are possible and not covered by an unlimited guarantee.",
+             "","## Fixed monthly allowances","","| Item | Per month |","|---|---:|"]
+    for label,value in c["monthly_fixed_breakdown"].items():
+        rows.append(f"| {label} | ${value:,.2f} |")
+    rows.append(f"| **Total excluding GPUs** | **${a['monthly_fixed']:,.2f}** |")
+    rows += ["","The $100 age-service minimum and $1.25/new unique user are procurement allowances, not Yoti prices: $1/check plus 25% retry provision. An accepted internal method could reduce vendor spend, but has development, privacy and review costs. No provider quote or insurance coverage is bound. Cloudflare's $20 neutral inference allowance is not a quoted token tariff; adult conversations stay on the approved private route. Warm dialogue/audio GPU adds $432 per 30-day pilot month. GPU disk costs persist when compute is stopped; a running idle VM is billable.",
+             "","## Three months from kickoff","",
+             "Scenario: M1 builds with no paying customers and 120 auxiliary GPU hours; M2 has 50 payers; M3 has 150. M3 keeps 40 of M2's 50 and adds 110, illustrating 20% monthly churn. New paid users are separate from the initial 25 free users; no free-to-paid conversion or repeated renewal verification is assumed. Plan mix: 25% Together, 50% Closer, 25% Companion. Counts/mix are planning expectations, not demand evidence. M2/M3 only happen if development and all release gates pass; timing may slip.",
+             f"Settlement assumption: eligible proceeds arrive {c['launch']['settlement_lag_months']} model month(s) later; reserve release is outside this quarter. Month 3 receivables and restricted reserves are not available cash.",
+             "","| Item | M1 build | M2 pilot | M3 pilot | Three months |","|---|---:|---:|---:|---:|"]
+    for label,key in [("Active payers","payers"),("New unique age checks","verified"),("Gross revenue","revenue"),
+                      ("One-time startup","startup"),("Fixed non-GPU overhead","fixed"),("Auxiliary GPU","aux"),
+                      ("Paid service delivery","delivery"),("Uncovered renderer availability","idle"),
+                      ("Free service delivery","free_delivery"),("Age checks","verification"),
+                      ("Customer acquisition","acquisition"),("Founder cash pay","founder_pay"),
+                      ("Processing/refund/loss allowance","withheld"),("Total modeled expense","expenses"),
+                      ("Profit / loss","profit"),("New restricted reserve","reserve"),
+                      ("Cash payouts received","receipts"),("Cash paid out, excluding withheld fees","cash_out"),
+                      ("Net cash change","cash_change")]:
+        values=[m[key] for m in f["months"]]
+        if key in ("payers","verified"):
+            display=[str(v) for v in values]+["—" if key=="payers" else str(sum(values))]
+        else:
+            display=[f"${v:,.2f}" for v in values]+[f"${sum(values):,.2f}"]
+        rows.append("| "+label+" | "+" | ".join(display)+" |")
+    rows += ["",f"Quarter reconciliation: profit ${t['profit']:,.2f} minus restricted reserves ${t['reserve']:,.2f} minus unsettled eligible proceeds ${t['unsettled']:,.2f} = cash change ${t['cash_change']:,.2f}. The ${a['working_buffer']:,.0f} buffer is capital kept available, not an expense or reserve fee.",
+             f"The quarter has {t['verified']} new age checks. Four minutes of founder review per account at $30/hour adds ${t['review_labor']:,.2f} of unpaid economic labor value, excluded from cash expenses. Baseline acquisition cost is zero only as an organic-founder-distribution assumption; it is not evidence users arrive free.",
+             "","## Funding and downside cases","",
+             "| Scenario | Three-month expense | Profit / loss | Funding with no payouts + buffer |","|---|---:|---:|---:|"]
+    scenarios=[("Baseline",c),("No paying users; retain scheduled pilot capacity",no_sales(c))]
+    for label,updates in [("CAC $20 per new payer",dict(cac=20)),
+                          ("Visual delivery $0.08/min; photos/scenes/clips double",dict(live_minute_floor=.08,photo_cost=.10,scene_cost=.20,clip_cost=.30)),
+                          ("Two auxiliary GPUs throughout",dict(aux_gpu_hour=1.20)),
+                          ("Founder cash pay $3,000/month",dict(founder_labor=3000)),
+                          ("Legal/security quotes total $9,000",dict(legal_setup=6000,security_setup=3000))]:
+        x=copy.deepcopy(c);x["assumptions"].update(updates);scenarios.append((label,x))
+    for label,x in scenarios:
+        z=forecast(x)["totals"]
+        rows.append(f"| {label} | ${z['expenses']:,.2f} | ${z['profit']:,.2f} | ${z['funding_without_receipts']:,.2f} |")
+    rows += ["","Stress cases change one factor at a time and can combine. No-sales operation is a downside budget, not a reason to keep spending after failure. At 160 new paid users, $20 CAC adds $3,200. Founder pay and hired engineering are separate: illustrative 160–320 hours at $75/hour adds $12,000–$24,000 if outsourced. Neither the hourly rate nor effort is a quote. Unlimited investigations, legal defense, hardware purchase and a full national launch are outside this pilot budget.",
+             "","## Operating break-even and release decision","",
+             f"Weighted revenue is ${d['arpu']:.2f}/payer and direct contribution ${d['arpu']-d['unit_cost']:.2f} before fixed costs. At the configured {a['payers']} active-payer snapshot, ongoing expense is ${d['recurring_cost']:,.2f}, revenue ${d['revenue']:,.2f}, and operating contribution after modeled overhead ${d['recurring_profit']:,.2f}; this snapshot excludes new-user verification, acquisition and startup recovery.",
+             "No guarantee of first-month profit is possible. With zero M1 revenue, its startup/build expense is a loss in this planning model. A profitable recurring month does not repay startup automatically and can still precede payment settlement. Target about 60% direct contribution, measure retention and CAC, then require cash runway for already-promised usage. Do not treat a reserve or prepaid annual liability as profit.",
+             "","Sources: [TensorDock advertised rates](https://www.tensordock.com/), [CCBill registration reference](https://ccbill.com/doc/visa-and-mastercard-payment-processing-faqs), [CCBill pricing](https://ccbill.com/pricing), [Yoti age-service overview](https://www.yoti.com/business/age-verification/). Actual full-node offers, processor terms, vendor minimums, adult model performance and licensing acceptance remain unresolved. See [BUILD](BUILD.md) and [USA](USA.md).",""]
     return "\n".join(rows)
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--write",action="store_true");p.add_argument("--json",action="store_true");p.add_argument("--payers",type=int)
+    p.add_argument("--write",action="store_true");p.add_argument("--json",action="store_true")
+    p.add_argument("--payers",type=int,help="Override the steady-cohort snapshot only; launch cohorts remain in config")
     args=p.parse_args()
     if args.write and (args.json or args.payers is not None):
         p.error("--write cannot combine with output/assumption overrides")
     c=load()
     if args.payers is not None: c["assumptions"]["payers"]=args.payers
-    try: output=json.dumps(calculate(c),indent=2) if args.json else report(c)
+    try: output=json.dumps(dict(unit_economics=calculate(c),launch=forecast(c)),indent=2) if args.json else report(c)
     except ValueError as e: p.error(str(e))
     if args.write:
         (ROOT/"docs/ECONOMICS.md").write_text(output,encoding="utf-8")

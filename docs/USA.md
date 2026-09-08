@@ -6,6 +6,29 @@ The launch scope is original fictional adults, lawful consensual adult content, 
 
 The launch cannot proceed as a non-explicit substitute when adult eligibility fails. The founder's decision is to stop, find a permitted adult route, or explicitly change scope. Keep adult flags disabled until evidence is complete; disabled deployment flags do not mean adult content is optional in the product requirements.
 
+## What self-hosting does and does not permit
+
+Self-hosting a commercially licensed checkpoint can avoid a managed inference API's separate content policy. It does not waive the checkpoint license, incorporated use policy, training/asset rights, hosting agreement or applicable law. "Open weights" does not mean public domain, and an absent license is not permission. Buying hardware changes ownership of the machine, not these rights.
+
+| Exact checkpoint | Published licensing basis | What this establishes |
+|---|---|---|
+| Qwen/Qwen3-8B | [Apache-2.0 license](https://huggingface.co/Qwen/Qwen3-8B/blob/main/LICENSE) | Commercial use grant without a blanket adult-content prohibition in that license; intended behavior remains untested |
+| black-forest-labs/FLUX.2-klein-4B | [Apache-2.0 model card](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) | Commercial image/editing candidate; card addresses unlawful/nonconsensual uses and says its prose does not modify the released license |
+| Wan-AI/Wan2.2-I2V-A14B | [Apache-2.0 model card](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B) | Commercial recorded-video candidate; no verified adult-quality, fast-delivery or project-eligibility evidence |
+| hexgrad/Kokoro-82M | [Apache-2.0 model card](https://huggingface.co/hexgrad/Kokoro-82M) | Commercial speech candidate; specific voice, dependency and source-asset rights still require review |
+
+These are royalty-free licensing candidates subject to their conditions, not warranties that all outputs are lawful or non-infringing. A license cannot authorize a third party's likeness or copyrighted material it does not own. Preserve attribution/notices as required; pin exact revisions, obtain an auditable dependency/voice/asset manifest and avoid unlicensed reuploads. The model evidence/exclusions in BUILD and below distinguish eligibility from demonstrated capability.
+
+## Conditional US legal path
+
+**There is no hosting location or model choice that guarantees we cannot be sued. This review does not clear a nationwide launch.** A lawful adult service may be possible within reviewed content and jurisdictions, but age verification alone does not establish legality. Qualified US counsel needs to evaluate the actual supported content, synthetic-media rights, applicable state access rules and the complete delivery/payment flow.
+
+Federal law prohibits commercial distribution of legally obscene material, including through interactive computer services; the Miller test matters even when viewers are adults. Do not equate "consensual and over 18" with automatic protection for every output. [DOJ federal obscenity overview](https://www.justice.gov/criminal/criminal-ceos/citizens-guide-us-federal-law-obscenity).
+
+The FTC began enforcing covered-platform duties under TAKE IT DOWN in May 2026, including a notice process and removal within 48 hours of a valid request. The law addresses qualifying nonconsensual intimate imagery, including digital forgeries. Counsel must assess platform coverage and the precise handling/identical-copy obligations for our service. Build reporting, access revocation and deletion handling; do not assume "no user uploads" resolves every duty. [FTC enforcement notice](https://www.ftc.gov/news-events/news/press-releases/2026/05/ftc-begins-enforcing-take-it-down-act).
+
+Use original fictional adult identities and permitted voices, disable user face/camera uploads, review age/consent controls, keep private material isolated and make AI disclosures visible. Review any applicable 18 USC 2257/2257A recordkeeping duties with counsel, especially if real performers or source footage enter the pipeline; no blanket exemption is asserted. Enable only reviewed states, with accepted age methods and a documented incident/takedown process. Contracts, legal review and insurance can manage particular risks; they do not provide lawsuit immunity.
+
 ## Processor shortlist
 
 | Processor | Public evidence | Decision |
@@ -50,7 +73,7 @@ Proposed internal pilot route, only after acceptance: secure separate verificati
 
 No homemade face-age model is certified here. NIST documents variable age-estimation performance; an estimate around the adult threshold needs appropriate assurance, not a universal pass. [NIST evaluation](https://www.nist.gov/news-events/news/2024/05/nist-reports-first-results-age-estimation-software-evaluation).
 
-Budget zero third-party API fee plus $0.10/account internal processing and four minutes of review as an explicit scenario. At 125 accounts, review is about 8.3 hours ($250 economic value at $30/hour). Security, fraud, storage and appeals remain work. If the method or required anonymous option cannot be provided, integrate an accepted service or do not enable that jurisdiction. Never waive the method to preserve the budget.
+The canonical budget now reserves $100/month for an age-service minimum and $1.25/new unique account ($1 assumed check plus a 25% retry provision). These are procurement allowances, not [Yoti tariffs](https://www.yoti.com/business/age-verification/). The three-month scenario has 185 new verified accounts and $231.25 variable checks. An accepted internal method could save these vendor amounts, but security, fraud, appeals and development remain work. Four minutes of review per account values founder effort at $370 across the quarter; cash pay defaults to zero. If a required method or anonymous option is unavailable, integrate an accepted service or do not enable that jurisdiction.
 
 ## Other release duties
 

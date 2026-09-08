@@ -20,12 +20,12 @@
     "loss_fraction": 0.02,
     "payment_fixed": 0.5,
     "reserve_fraction": 0.1,
-    "verification_per_new_user": 0.1,
-    "monthly_fixed": 100,
+    "verification_per_new_user": 1.25,
+    "monthly_fixed": 420,
     "renderer_open_hours": 120,
     "setup_technical": 250,
     "registration": 1950,
-    "legal_setup": 1500,
+    "legal_setup": 3000,
     "founder_labor": 0,
     "cac": 0,
     "payers": 100,
@@ -35,10 +35,28 @@
     "review_hour_value": 30,
     "aux_gpu_hour": 0.6,
     "aux_hours": 720,
-    "security_setup": 500,
-    "tooling_setup": 100,
+    "security_setup": 1500,
+    "tooling_setup": 0,
     "domain_setup": 20,
-    "working_buffer": 500
+    "entity_setup": 300,
+    "working_buffer": 1500
+  },
+  "monthly_fixed_breakdown": {
+    "Cloudflare application, data and base media": 30,
+    "GPU disks and backups": 50,
+    "Neutral Workers AI allowance": 20,
+    "Email and monitoring": 20,
+    "Accounting, insurance and administration allowance": 100,
+    "Coding tools and development API allowance": 100,
+    "Age-assurance vendor minimum allowance": 100
+  },
+  "launch": {
+    "settlement_lag_months": 1,
+    "months": [
+      {"name": "M1 build", "payers": 0, "new_payers": 0, "free_users": 25, "new_free": 25, "aux_hours": 120, "renderer_open_hours": 0},
+      {"name": "M2 pilot", "payers": 50, "new_payers": 50, "free_users": 25, "new_free": 0, "aux_hours": 720, "renderer_open_hours": 120},
+      {"name": "M3 pilot", "payers": 150, "new_payers": 110, "free_users": 25, "new_free": 0, "aux_hours": 720, "renderer_open_hours": 120}
+    ]
   },
   "plans": [
     {

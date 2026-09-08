@@ -3,7 +3,7 @@ import math
 import subprocess
 import sys
 import unittest
-from scripts.economics import calculate, load, report, price_floor, ROOT
+from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, ROOT
 
 class EconomicsTests(unittest.TestCase):
     def test_renderer_capacity_and_idle_allocation(self):
@@ -44,10 +44,10 @@ class EconomicsTests(unittest.TestCase):
 
     def test_first_month_counts_registration_and_all_age_checks(self):
         c=load();d=calculate(c)
-        self.assertEqual(d["startup"],4320)
-        self.assertEqual(d["verification"],12.5)
+        self.assertEqual(d["startup"],7020)
+        self.assertEqual(d["verification"],156.25)
         c["assumptions"]["verification_per_new_user"]=0
-        self.assertAlmostEqual(d["first_cost"]-calculate(c)["first_cost"],12.5)
+        self.assertAlmostEqual(d["first_cost"]-calculate(c)["first_cost"],156.25)
 
     def test_paid_units_do_not_prove_first_month_profit(self):
         d=calculate(load())
@@ -67,7 +67,7 @@ class EconomicsTests(unittest.TestCase):
     def test_cac_and_legal_are_counted(self):
         c=load();d=calculate(c)
         c["assumptions"].update(cac=5,legal_setup=4500)
-        self.assertAlmostEqual(calculate(c)["first_cost"]-d["first_cost"],3500)
+        self.assertAlmostEqual(calculate(c)["first_cost"]-d["first_cost"],2000)
 
     def test_invalid_inputs(self):
         for k,v in [("streams",0),("occupancy",0),("occupancy",2),("gpu_hour",math.nan),("payers",-1),("reserve_fraction",2)]:
@@ -92,17 +92,82 @@ class EconomicsTests(unittest.TestCase):
 
     def test_funding_counts_service_and_buffer_without_withheld_fees(self):
         c=load();d=calculate(c)
-        self.assertAlmostEqual(d['funding_before_receipts'],5918.25)
+        self.assertAlmostEqual(d['funding_before_receipts'],10082)
         c['assumptions']['working_buffer']=0
         after=calculate(c)
-        self.assertAlmostEqual(d['funding_before_receipts']-after['funding_before_receipts'],500)
+        self.assertAlmostEqual(d['funding_before_receipts']-after['funding_before_receipts'],1500)
         self.assertEqual(d['first_profit'],after['first_profit'])
 
     def test_startup_profit_is_distinct_from_available_cash(self):
-        c=load();c['assumptions']['payers']=250
+        c=load();c['assumptions']['payers']=420
         d=calculate(c)
         self.assertGreater(d['first_profit'],0)
         self.assertLess(d['cash_after_reserve'],0)
+
+    def test_three_month_expense_components_and_single_startup(self):
+        f=forecast(load())
+        self.assertEqual([m['startup'] for m in f['months']],[7020,0,0])
+        self.assertAlmostEqual(f['totals']['expenses'],11866.14)
+        self.assertAlmostEqual(f['totals']['profit'],-5368.14)
+        for m in f['months']:
+            components=sum(m[k] for k in ('startup','fixed','aux','delivery','idle',
+                'free_delivery','verification','acquisition','founder_pay','withheld'))
+            self.assertAlmostEqual(m['expenses'],components)
+
+    def test_new_cohorts_drive_verification_and_acquisition(self):
+        c=load();before=forecast(c)
+        self.assertEqual(before['totals']['verified'],185)
+        self.assertEqual(before['months'][2]['verified'],110)
+        c['assumptions']['cac']=20
+        after=forecast(c)
+        self.assertAlmostEqual(after['totals']['expenses']-before['totals']['expenses'],3200)
+        self.assertEqual(after['months'][2]['acquisition'],2200)
+
+    def test_settlement_and_reserve_cash_reconciliation(self):
+        for lag in (0,1,2,5):
+            c=load();c['launch']['settlement_lag_months']=lag
+            f=forecast(c);t=f['totals']
+            self.assertAlmostEqual(t['profit']-t['reserve']-t['unsettled'],t['cash_change'])
+            self.assertAlmostEqual(t['cash_out'],sum(m['expenses']-m['withheld'] for m in f['months']))
+            self.assertLessEqual(t['minimum_funding'],t['funding_without_receipts'])
+        self.assertEqual(f['totals']['receipts'],0)
+
+    def test_delayed_payout_not_new_revenue(self):
+        f=forecast(load())
+        self.assertEqual(f['months'][1]['receipts'],0)
+        self.assertAlmostEqual(f['months'][2]['receipts'],1144.64)
+        self.assertAlmostEqual(f['totals']['unsettled'],3433.92)
+        self.assertAlmostEqual(f['totals']['minimum_funding'],10951.86)
+        self.assertAlmostEqual(f['totals']['funding_without_receipts'],12096.50)
+
+    def test_no_sales_retains_capacity_and_counts_no_payment_fees(self):
+        f=forecast(no_sales(load()))
+        self.assertEqual(f['totals']['revenue'],0)
+        self.assertEqual(f['totals']['verified'],25)
+        self.assertEqual(f['totals']['reserve'],0)
+        self.assertAlmostEqual(f['totals']['expenses'],9478.25)
+        self.assertAlmostEqual(f['totals']['profit'],-f['totals']['cash_out'])
+
+    def test_buffer_and_reserve_not_expenses(self):
+        c=load();before=forecast(c)
+        c['assumptions'].update(working_buffer=0,reserve_fraction=0)
+        after=forecast(c)
+        self.assertEqual(before['totals']['expenses'],after['totals']['expenses'])
+        self.assertAlmostEqual(before['totals']['funding_without_receipts']-after['totals']['funding_without_receipts'],1500)
+        self.assertGreater(after['totals']['receipts'],before['totals']['receipts'])
+
+    def test_invalid_launch_assumptions(self):
+        for lag in (-1,1.5,True):
+            c=load();c['launch']['settlement_lag_months']=lag
+            with self.assertRaises(ValueError): forecast(c)
+        c=load();c['launch']['months'][2]['new_payers']=99
+        with self.assertRaises(ValueError): forecast(c)
+        c=load();c['monthly_fixed_breakdown']['Coding tools and development API allowance']=0
+        with self.assertRaises(ValueError): forecast(c)
+        c=load();c['launch']['months']=[]
+        with self.assertRaises(ValueError): forecast(c)
+        c=load();c['launch']['months'].append(copy.deepcopy(c['launch']['months'][-1]))
+        with self.assertRaises(ValueError): forecast(c)
 
     def test_cli_cannot_overwrite_report_with_overrides(self):
         before=(ROOT/"docs/ECONOMICS.md").read_bytes()
