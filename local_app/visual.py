@@ -49,11 +49,12 @@ class PortraitRenderer:
         if self.encoder == "libx264":
             print("NVENC is unavailable with this FFmpeg/driver pair; using CPU H.264 encoding.", flush=True)
 
-    def prepare(self, scene="mira"):
-        if self.portrait is not None and self.scene == scene:
+    def prepare(self, scene="mira", reference_path=None):
+        path = Path(reference_path) if reference_path else ROOT / "generated/local-app" / (scene + ".png")
+        reference_key = (str(path), path.stat().st_mtime_ns)
+        if self.portrait is not None and getattr(self, "reference_key", None) == reference_key:
             return
         cv, np, torch = self.cv, self.np, self.torch
-        path = ROOT / "generated/local-app" / (scene + ".png")
         frame = cv.imread(str(path))
         if frame is None:
             raise RuntimeError("Prepare the local portrait before starting video replies.")
@@ -92,8 +93,29 @@ class PortraitRenderer:
         mask = cv.GaussianBlur(mask, (17, 17), 0)
         self.mask = cv.resize(mask, (x2-x1, y2-y1))[:, :, None]
         self.portrait, self.box, self.scene = frame, (x1, y1, x2, y2), scene
+        self.reference_key = reference_key
 
-    def motion_frames(self, path, nframes, fps, cancel):
+    def capture_last_frame(self, video, destination):
+        capture = self.cv.VideoCapture(str(video))
+        try:
+            # Fragmented MP4's estimated frame count may include AAC padding.
+            # Decode this bounded short clip instead of seeking past its last frame.
+            frame = None
+            for _ in range(1801):
+                ok, next_frame = capture.read()
+                if not ok:
+                    break
+                frame = next_frame
+            else:
+                raise RuntimeError("The completed video exceeds the pose capture limit.")
+            if frame is None:
+                raise RuntimeError("The completed video has no pose to continue from.")
+            if not self.cv.imwrite(str(destination), frame):
+                raise RuntimeError("Could not preserve the completed video pose.")
+        finally:
+            capture.release()
+
+    def motion_frames(self, path, nframes, fps, cancel, lip_frames=None):
         """Track the face on generated body footage; never move a static cutout."""
         cv, np = self.cv, self.np
         capture = cv.VideoCapture(str(path))
@@ -117,6 +139,9 @@ class PortraitRenderer:
         for i in range(nframes):
             check_cancel(cancel)
             index = min(len(frames)-1, int(i * source_fps / fps))
+            if lip_frames is not None and i >= lip_frames:
+                result.append((frames[index], None, None, None))
+                continue
             if index not in tracked:
                 frame = frames[index]
                 _, faces = detector.detect(frame)
@@ -159,12 +184,29 @@ class PortraitRenderer:
         if rate != 16000:
             common = math.gcd(rate, 16000)
             data = resample_poly(data, 16000 // common, rate // common)
+        speech_duration = len(data) / 16000
+        if motion_path:
+            probe = cv.VideoCapture(str(motion_path))
+            try:
+                source_fps = probe.get(cv.CAP_PROP_FPS)
+                source_frames = probe.get(cv.CAP_PROP_FRAME_COUNT)
+            finally:
+                probe.release()
+            if not 1 <= source_fps <= 60 or not 1 <= source_frames <= 1800:
+                raise RuntimeError("The generated movement has invalid timing.")
+            duration = max(speech_duration, source_frames/source_fps)
+            if duration > 30:
+                raise ValueError("Visual replies are limited to 30 seconds.")
+            # Finish the physical action even when the spoken sentence is short.
+            samples = math.ceil(math.ceil(duration*fps)/fps*16000)
+            data = np.pad(data,(0,max(0,samples-len(data))))
         nframes = max(1, math.ceil(len(data) / 16000 * fps))
         if nframes > 30 * fps:
             raise ValueError("Visual replies are limited to 30 seconds.")
         inputs = self.features(data, sampling_rate=16000, return_tensors="pt").input_features.to("cuda", self.dtype)
         tracking_start = time.perf_counter()
-        movement = self.motion_frames(motion_path, nframes, fps, cancel) if motion_path else None
+        lip_frames = min(nframes, math.ceil((speech_duration+.15)*fps/batch_size)*batch_size) if motion_path else nframes
+        movement = self.motion_frames(motion_path, nframes, fps, cancel, lip_frames) if motion_path else None
         tracking_seconds = time.perf_counter()-tracking_start
         height, width = (movement[0][0] if movement else self.portrait).shape[:2]
         # Pipe raw frames to one local encoder; no per-frame PNG disk round trips.
@@ -175,7 +217,8 @@ class PortraitRenderer:
         command = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24",
                    "-s", f"{width}x{height}", "-r", str(fps), "-i", "pipe:0", "-i", str(audio_path),
                    *encoding, "-pix_fmt", "yuv420p",
-                   "-c:a", "aac", "-shortest", *delivery, str(destination)]
+                   "-c:a", "aac", *(["-af", "apad", "-t", str(nframes/fps)] if motion_path else []),
+                   "-shortest", *delivery, str(destination)]
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE,
                                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         try:
@@ -191,6 +234,14 @@ class PortraitRenderer:
                 features_seconds = time.perf_counter()-start
                 for offset in range(0, nframes, batch_size):
                     check_cancel(cancel)
+                    if movement and offset >= lip_frames:
+                        # Speech has finished: deliver real LTX body frames, including
+                        # their natural facial expression, without inventing silent speech.
+                        composite_start = time.perf_counter()
+                        for item in movement[offset:offset+batch_size]:
+                            process.stdin.write(item[0].tobytes())
+                        composite_seconds += time.perf_counter()-composite_start
+                        continue
                     neural_start = time.perf_counter()
                     count = min(batch_size, nframes-offset)
                     conditioning = chunks[offset:offset+count] + self.pe
@@ -241,7 +292,9 @@ class PortraitRenderer:
                 process.stdin.close()
         elapsed = time.perf_counter() - start
         return {"render_s": elapsed, "frames": nframes, "fps": nframes / elapsed,
-                "duration_s": len(data) / 16000, "resolution": f"{width}x{height}", "face_region": "256x256",
+                "duration_s": len(data) / 16000, "speech_duration_s":speech_duration,
+                "lip_sync_frames":lip_frames,
+                "resolution": f"{width}x{height}", "face_region": "256x256",
                 "torch_peak_allocated_mib": torch.cuda.max_memory_allocated()/1048576,
                 "torch_peak_reserved_mib": torch.cuda.max_memory_reserved()/1048576,
                 "audio_features_s": features_seconds, "neural_s": neural_seconds,

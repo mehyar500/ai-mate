@@ -6,6 +6,7 @@
   <div class="visual" aria-label="Companion view">
     <img id="portrait" src="/portrait/mira.png" alt="Mira, a fictional adult AI companion">
     <video id="video" playsinline hidden aria-label="Mira's generated video reply"></video>
+    <canvas id="held-frame" hidden aria-label="Last generated video frame"></canvas>
     <div class="shade"></div>
   </div>
   <header>
@@ -25,6 +26,7 @@
     <div class="call-controls">
       <div class="call-actions"><button id="sound" class="glass">Sound on</button><button id="test-sound" class="glass">Test sound</button><button id="stop" class="glass" hidden>Interrupt</button></div>
       <button id="replay" class="subtle" hidden>Replay</button>
+      <button id="history-toggle" class="subtle" hidden aria-expanded="false" aria-controls="chat">Show messages</button>
     </div>
     <p class="disclosure">AI-generated companion · Video replies, not a live camera</p>
   </section>
@@ -35,7 +37,7 @@
   <h3>Things you've shared</h3><div id="facts"></div>
   <label for="memory">Notes you want to keep</label><textarea id="memory" maxlength="1200" rows="3" placeholder="Anything you'd like Mira to remember…"></textarea>
   <button id="save-memory">Save notes</button>
-  <details><summary>Connection & prototype limits</summary><p id="provider-note">Dialogue, voice and video run locally.</p><p>Type to talk. Video and voice play together as the reply is generated. Ask for “just text” or “voice only” to change replies. Use Interrupt to stop. Video generates mouth movement on a prepared picture; head and body motion are not generated.</p><p id="metrics">No reply measured yet.</p><p>Memories are model-selected excerpts, not verified facts. Removing a fact does not erase it from recent conversation. Clear all to erase both.</p></details>
+  <details><summary>Connection & prototype limits</summary><p id="provider-note">Dialogue, voice and video run locally.</p><p>Type to talk. Video and voice play together as the reply is generated. Ask for “just text” or “voice only” to change replies. Use Interrupt to stop. Wave and distance commands generate experimental body movement with speech; other video replies use the current portrait or pose. Movement quality and direction are not yet reliable.</p><p id="metrics">No reply measured yet.</p><p>Memories are model-selected excerpts, not verified facts. Removing a fact does not erase it from recent conversation. Clear all to erase both.</p></details>
   <button id="reset" class="quiet danger-text">Clear all conversation & memory</button>
 </dialog>
 <audio id="audio" hidden></audio>

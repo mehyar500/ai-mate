@@ -34,6 +34,10 @@ class Application:
         self.startup_s = None
         self.factory = model_factory
         self.scene = self.store.current_scene()
+        self.pose = None  # (scene, private PNG), committed only after successful video completion.
+        for path in self.directory.glob('*-pose.png'):
+            if re.fullmatch(r'[a-f0-9]{32}-\d+-pose\.png',path.name):
+                path.unlink(missing_ok=True)
 
     def warm(self):
         started = time.perf_counter()
@@ -108,6 +112,9 @@ class Application:
             self.cancel()
             self.store.reset()
             self.scene = "mira"
+            if self.pose:
+                self.pose[1].unlink(missing_ok=True)
+                self.pose = None
             # In-flight files belong to the cancelling worker. Also clear replies
             # from previous process lifetimes, whose jobs are no longer in RAM.
             active_keys = {job["id"] for job in self.jobs.values()
@@ -127,6 +134,7 @@ class Application:
         job = self.jobs[key]
         event = job["cancel"]
         started = time.perf_counter()
+        pose_candidate = None
         try:
             if raw is not None:
                 text = self.models.transcribe(raw)
@@ -149,6 +157,7 @@ class Application:
                     job["presentation"], job["scene"], job["action"] = mode, scene, plan.get("action", "none")
                     job["text"] = plan["reply"]
                     job["metrics"]["first_text_s"] = round(time.perf_counter()-started, 3)
+                    job["metrics"]["decision_source"] = plan.get("decision_source", "model")
                     if mode == "portrait":
                         job["portrait"] = "/portrait/" + scene + ".png"
                 if mode == "portrait":
@@ -157,7 +166,9 @@ class Application:
                 with self.lock:
                     job["state"] = "warming_video"
                 renderer = self.models.load_visual()
-                renderer.prepare(scene)
+                with self.lock:
+                    pose_reference = self.pose[1] if self.pose and self.pose[0] == scene else None
+                renderer.prepare(scene, **({"reference_path":pose_reference} if pose_reference else {}))
                 check_cancel(event)
             with self.lock:
                 job["state"] = "thinking"
@@ -189,10 +200,15 @@ class Application:
                             if plan and plan.get("action", "none") != "none":
                                 from .motion import generate
                                 motion_path = self.directory / (filename+"-motion.mp4")
-                                motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path)
+                                motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path,
+                                                          reference_path=pose_reference)
                             metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
                                                       scene, streaming=True, **({"motion_path":motion_path} if motion_path else {}))
                             metrics.update(motion_metrics)
+                            if (motion_path or pose_reference) and hasattr(renderer,"capture_last_frame"):
+                                pose_candidate = self.directory / (filename+"-pose.png")
+                                renderer.capture_last_frame(self.directory/(filename+".mp4"),pose_candidate)
+                                metrics["continues_previous_pose"] = bool(pose_reference)
                         finally:
                             if motion_path:
                                 motion_path.unlink(missing_ok=True)
@@ -214,6 +230,14 @@ class Application:
                     job["remembered"] = plan["facts"]
                 self.scene = scene
                 self.store.set_scene(scene)
+                if pose_candidate:
+                    previous = self.pose
+                    self.pose = (scene, pose_candidate)
+                    if previous and previous[1] != pose_candidate:
+                        previous[1].unlink(missing_ok=True)
+                elif self.pose and self.pose[0] != scene:
+                    self.pose[1].unlink(missing_ok=True)
+                    self.pose = None
                 job["metrics"]["total_s"] = round(time.perf_counter()-started, 3)
                 job["state"] = "done"
         except Cancelled:
@@ -234,6 +258,8 @@ class Application:
             print(f"Reply failed: {type(error).__name__}", flush=True)
         finally:
             with self.lock:
+                if pose_candidate and (not self.pose or self.pose[1] != pose_candidate):
+                    pose_candidate.unlink(missing_ok=True)
                 self.busy = False
             # Bound generated media growth. Keep the latest 100 files, never scene assets.
             files = sorted([p for p in self.directory.iterdir() if re.fullmatch(r"[a-f0-9]{32}-\d+\.(wav|mp4)", p.name)], key=lambda p: p.stat().st_mtime)

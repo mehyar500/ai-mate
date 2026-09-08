@@ -26,6 +26,7 @@ def main():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--action', choices=tuple(PROMPTS), default='wave')
     parser.add_argument('--reference', choices=['fullbody','fullbody-candidate','mira'], default='fullbody')
+    parser.add_argument('--return-to-reference', action='store_true', help='Guide the final frame back to the reviewed starting image.')
     parser.add_argument('--encoder', choices=['h264','vp9'], default='h264')
     parser.add_argument('--wait-models', type=int, default=0)
     opts = parser.parse_args()
@@ -39,10 +40,11 @@ def main():
             raise RuntimeError('LTX checkpoint/text encoder download is incomplete.')
         print('Waiting for existing LTX model downloads.', flush=True)
         time.sleep(min(30, max(0,deadline-time.monotonic())))
-    graph = workflow(opts.width, opts.height, opts.frames, opts.seed, opts.action, opts.encoder)
     source = ROOT/'generated/local-app'/(opts.reference+'.png')
     target = ROOT/'.cache/local-poc/ComfyUI/input'/('benchmark-'+opts.reference+'.png')
     shutil.copyfile(source,target)
+    graph = workflow(opts.width, opts.height, opts.frames, opts.seed, opts.action, opts.encoder,
+                     end_image=target.name if opts.return_to_reference else None)
     graph['5']['inputs']['image'] = target.name
     audit = ROOT/'generated/local-app/audit'
     audit.mkdir(parents=True, exist_ok=True)
@@ -62,6 +64,7 @@ def main():
             record = {'wall_s':round(time.perf_counter()-started,3), 'seed':opts.seed,
                       'server_execution_s':execution_s, 'action':opts.action, 'encoder':opts.encoder, 'reference':opts.reference,
                       'resolution':[opts.width,opts.height], 'frames':opts.frames,
+                      'return_to_reference':opts.return_to_reference,
                       'checkpoint':CHECKPOINT, 'status':result.get('status'), 'outputs':result.get('outputs')}
             (audit/f'ltx-motion-{key}.json').write_text(json.dumps(record,indent=2),encoding='utf-8')
             print(json.dumps(record),flush=True)

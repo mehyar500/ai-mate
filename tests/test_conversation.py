@@ -8,12 +8,31 @@ import unittest
 from unittest.mock import patch
 import urllib.request
 
-from local_app.conversation import Conversation, validate_plan
+from local_app.conversation import Conversation, validate_plan, direct_motion_plan
 from local_app.core import Store, messages_for
 from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
 class PlanTests(unittest.TestCase):
+    def test_direct_commands_bypass_network_but_context_and_negations_do_not(self):
+        with patch.dict(os.environ, {'AI_MATE_LLM_PROVIDER':'ollama'},clear=True), patch('urllib.request.urlopen') as network:
+            model=Conversation('local')
+            plan=model.plan({'memory':'','turns':[]},'Raise your hand and say hello briefly.','video','fullbody',['fullbody'],threading.Event())
+            self.assertEqual((plan['action'],plan['reply'],plan['decision_source']),('wave','Hello.','direct_command'))
+            network.assert_not_called()
+        for text in ["Don't wave",'Wave if you remember my name','Come closer and tell me about yesterday',
+                     'What does wave mean?', 'Raise your hand but do not move']:
+            self.assertIsNone(direct_motion_plan(text,['fullbody']))
+        self.assertIsNone(direct_motion_plan('Wave hello',['mira']))
+
+    def test_explicit_repeat_motion_is_not_lost_to_none_action(self):
+        data={'reply':'Hello','presentation':'continue','scene':'keep','action':'none','facts':[]}
+        for text, expected in [('Raise your hand and say hello.','wave'),('Come closer.','closer'),('Step back.','farther')]:
+            plan=validate_plan(data,text,'video','mira',['mira','fullbody'])
+            self.assertEqual((plan['action'],plan['presentation'],plan['scene']),(expected,'video','fullbody'))
+        for text in ["Don't wave.", 'What does wave mean?', 'Please do not come closer.']:
+            self.assertEqual(validate_plan(data,text,'video','mira',['mira','fullbody'])['action'],'none')
+
     def test_unsupported_action_and_scene_cannot_escape_allowlist(self):
         plan = validate_plan({"reply":"Hello", "presentation":"execute", "scene":"../../secret", "action":"run_code", "facts":[]}, "hi", "auto", "mira", ["mira"])
         self.assertEqual((plan["presentation"], plan["scene"]), ("text", "mira"))

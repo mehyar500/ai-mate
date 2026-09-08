@@ -4,6 +4,7 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
 let replyMode="video",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let soundOn=true;
+let historyOpen=false;
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
 const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
@@ -13,6 +14,7 @@ function controls(){
   $("reset").disabled=submitting;
   $("call-state").textContent=playing?(firstPlayed===null?"Connecting picture…":"Mira is speaking"):busy?"Preparing reply…":"Type to talk";
   $("sound").textContent=soundOn?"Sound on":"Sound off";
+  $("history-toggle").hidden=scene!=="fullbody";
 }
 async function api(path,body){
   const response=await fetch(path,{method:body===undefined?"GET":"POST",headers:{"X-Local-Token":token,...(body===undefined?{}:{"Content-Type":"application/json"})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(10000)});
@@ -30,18 +32,28 @@ function bubble(text,role){
 function renderHistory(turns){$("chat").replaceChildren();for(const t of turns){bubble(t.user,"user");bubble(t.assistant,"assistant");}}
 function setScene(value){
   if(!sceneNames[value])return;
+  if(value!==scene)$("held-frame").hidden=true;
+  document.querySelector(".visual").dataset.scene=value;
+  document.querySelector(".conversation").dataset.scene=value;
+  document.querySelector(".conversation").dataset.history=historyOpen?"open":"closed";
   scene=value;$("portrait").src="/portrait/"+scene+".png";
   $("video").poster="/portrait/"+scene+".png";
   $("media-label").textContent=sceneNames[scene]+" · AI portrait";
 }
 function setAction(value="none"){document.querySelector(".visual").dataset.action=value||"none";}
-function resetPlayback(){
+function resetPlayback(holdFrame=false){
+  const held=$("held-frame"),picture=$("video");
+  if(holdFrame&&!picture.hidden&&picture.readyState>=2){
+    held.width=picture.videoWidth;held.height=picture.videoHeight;
+    held.getContext("2d").drawImage(picture,0,0);held.hidden=false;
+  }else if(!holdFrame)held.hidden=true;
   epoch++;queue=[];playing=false;abortMedia?.abort();abortMedia=null;
   for(const media of [$("video"),$("audio")]){media.pause();media.removeAttribute("src");media.load();}
   if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
   $("video").hidden=true;$("resume").hidden=true;setScene(scene);controls();
 }
 function played(){
+  if(!$("video").hidden)$("held-frame").hidden=true;
   if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}
   if(firstPlayed===null){firstPlayed=(performance.now()-lastStart)/1000;updateMetrics();}
   $("resume").hidden=true;updateMetrics();controls();
@@ -159,7 +171,7 @@ async function follow(key,node){
 }
 async function submit(text,raw=null,inputMode=null){
   if(busy||!ready||(!raw&&!text.trim()))return;
-  resetPlayback();lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
+  resetPlayback(true);lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
   pendingStop=false;submitting=true;busy=true;controls();
   const node=bubble(raw?"Listening…":text,"user");
   if(!raw)$("message").value="";
@@ -178,13 +190,20 @@ async function submit(text,raw=null,inputMode=null){
 $("composer").addEventListener("submit",e=>{e.preventDefault();submit($("message").value);});
 $("message").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit($("message").value);}});
 async function interrupt(){
-  resetPlayback();
+  resetPlayback(true);
   if(submitting){pendingStop=true;return;}
   if(active){try{await api("/api/cancel",{id:active});notice("Stopping…");}catch(error){notice(error.message,true);}}
   else notice("Reply stopped. Type your next message.");
 }
 $("stop").addEventListener("click",interrupt);
 $("sound").addEventListener("click",()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;controls();});
+$("history-toggle").addEventListener("click",()=>{
+  historyOpen=!historyOpen;
+  document.querySelector(".conversation").dataset.history=historyOpen?"open":"closed";
+  $("history-toggle").textContent=historyOpen?"Hide messages":"Show messages";
+  $("history-toggle").setAttribute("aria-expanded",String(historyOpen));
+  $("chat").scrollTop=$("chat").scrollHeight;
+});
 let soundTestContext;
 $("test-sound").addEventListener("click",async()=>{
   try{

@@ -39,7 +39,7 @@ PROMPTS = {
 }
 
 
-def workflow(width, height, frames, seed, action='wave', encoder='h264'):
+def workflow(width, height, frames, seed, action='wave', encoder='h264', end_image=None):
     def node(kind, **inputs):
         return {'class_type':kind, 'inputs':inputs}
     graph = {
@@ -63,6 +63,13 @@ def workflow(width, height, frames, seed, action='wave', encoder='h264'):
         graph['12'] = node('CreateVideo', images=['11',0], fps=24)
         graph['13'] = node('SaveVideo', video=['12',0], filename_prefix='motion/ltx-'+action,
                            format='mp4', **{'format.codec':'h264'})
+    if end_image:
+        graph['14'] = node('LoadImage', image=end_image)
+        graph['15'] = node('LTXVAddGuide', positive=['7',0], negative=['7',1],
+                           latent=['7',2], vae=['1',2], image=['14',0], frame_idx=-1, strength=1.0)
+        graph['10']['inputs'].update(positive=['15',0], negative=['15',1], latent_image=['15',2])
+        graph['16'] = node('LTXVCropGuides', positive=['15',0], negative=['15',1], latent=['10',1])
+        graph['11']['inputs']['samples'] = ['16',2]
     return graph
 
 
@@ -74,7 +81,7 @@ def request(path, data=None):
         return json.loads(raw) if raw else {}
 
 
-def generate(scene, action, duration, cancel, destination):
+def generate(scene, action, duration, cancel, destination, reference_path=None):
     """Generate one fresh action. No model-authored URLs, paths or graph nodes."""
     if scene not in {'mira','garden','cafe','fullbody'} or action not in PROMPTS:
         raise ValueError('Unsupported motion scene or action.')
@@ -83,9 +90,17 @@ def generate(scene, action, duration, cancel, destination):
     tag = 'mate-'+secrets.token_hex(16)
     source = root/'input'/(tag+'.png')
     source.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT/'generated/local-app'/(scene+'.png'), source)
+    reference = Path(reference_path) if reference_path else ROOT/'generated/local-app'/(scene+'.png')
+    if reference.resolve().parent != (ROOT/'generated/local-app').resolve() or reference.suffix != '.png':
+        raise ValueError('The motion reference must be an app-owned image.')
+    shutil.copyfile(reference, source)
     frames = min(97, max(49, math.ceil(duration*24/8)*8+1))
-    graph = workflow(384,576,frames,secrets.randbits(32),action)
+    if action == 'wave':
+        # Two-second start/end-guided tests stayed still; allow time to raise
+        # and lower the arm. Three-second trials moved across three fresh seeds.
+        frames = max(73,frames)
+    graph = workflow(384,576,frames,secrets.randbits(32),action,
+                     end_image=source.name if action == 'wave' else None)
     graph['5']['inputs']['image'] = source.name
     graph['13']['inputs']['filename_prefix'] = 'motion/'+tag
     started = time.perf_counter()

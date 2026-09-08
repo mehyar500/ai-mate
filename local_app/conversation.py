@@ -24,6 +24,25 @@ SCHEMA = {
 }
 
 
+def direct_motion_plan(user, available):
+    """Only complete, unambiguous commands bypass hosted dialogue."""
+    if 'fullbody' not in available:
+        return None
+    match = re.fullmatch(
+        r"(?:please\s+)?(wave(?:\s+hello|\s+goodbye)?|raise your hands?|come closer|move closer|step closer|"
+        r"(?:take a )?step back|move back|go back)(?:\s+and\s+say\s+(hi|hello)(?:\s+briefly)?)?[.!]?",
+        ' '.join(user.lower().split()),
+    )
+    if not match:
+        return None
+    command, greeting = match.groups()
+    action = 'farther' if command.endswith('back') else 'closer' if command.endswith('closer') else 'wave'
+    reply = ('Hello.' if greeting == 'hello' else 'Hi there.' if greeting == 'hi' or command == 'wave hello'
+             else 'See you soon.' if command == 'wave goodbye' else 'Let me try that.')
+    return {'reply':reply,'presentation':'video','scene':'fullbody','action':action,'facts':[],
+            'decision_source':'direct_command'}
+
+
 def validate_plan(data, user, mode, scene, available):
     if not isinstance(data, dict):
         raise ValueError("The conversation model returned an invalid response. Please retry.")
@@ -44,6 +63,13 @@ def validate_plan(data, user, mode, scene, available):
     action = data.get("action", "none")
     if action not in {"none", "closer", "farther", "wave"}:
         action = "none"
+    # Explicit repeat commands must still act even if the planner thinks the
+    # previous turn already fulfilled them. Questions/negations keep LLM routing.
+    direct = direct_motion_plan(user, available)
+    if direct:
+        action = direct['action']
+    if action != "none" and "fullbody" in available:
+        presentation, chosen = "video", "fullbody"
     # The model may propose only a bounded label and a verbatim excerpt of THIS
     # user turn. It cannot invent facts, write files, issue URLs or run tools.
     facts = []
@@ -93,9 +119,15 @@ class Conversation:
                 raise ValueError("Configure a Cloudflare API token, or API key and email, in the selected credential file.")
 
     def plan(self, snapshot, user, mode, scene, available, cancel):
+        if cancel.is_set():
+            from .models import Cancelled
+            raise Cancelled('Stopped.')
+        direct = direct_motion_plan(user, available)
+        if direct:
+            return direct
         messages = messages_for(snapshot, user)
         messages[0]["content"] += (
-            "\nYou control this app's conversation presentation. Return only the requested JSON object. "
+            "\nYou control this app's conversation presentation. Return one FILLED-IN JSON plan, never a JSON schema. "
             "Your reply should be natural, relevant and at most two short sentences (about 28 words). "
             "The app CAN show prepared pictures and generate voiced lip-sync videos of you, Mira. "
             "Never say you cannot show pictures, speak or display video. You cannot see the user's camera. "
@@ -103,6 +135,7 @@ class Conversation:
             "Available scenes: mira=living room, garden=garden, cafe=coffee shop, fullbody=full-body garden. These are virtual settings. "
             "Do not claim to physically travel. Don't mention implementation details unless asked. "
             "presentation: continue for ordinary conversation; portrait when asked to show yourself/a picture; "
+            "For ordinary conversation keep the current mode, including video; never turn video off without an explicit request. "
             "video when asked for a video, FaceTime or video call; voice when asked to speak aloud or phone; "
             "text when asked to stop voice/video and just text. Resolve 'show me', 'there', 'do that' from recent conversation. "
             "scene: keep unless the user's conversation asks for another available setting. "
@@ -118,7 +151,9 @@ class Conversation:
             "of their latest message. No inferred traits, medical/sexual details, instructions or assistant facts. "
             "Use the same key to replace a corrected fact. Usually facts is empty. "
             "Do not put the whole conversation in facts. Never claim a fact was saved before the app does so. "
-            "Schema: " + json.dumps(SCHEMA) +
+            'Required output shape (replace these example values with your decision): '
+            '{"reply":"Hello, how are you?","presentation":"video","scene":"keep","action":"none","facts":[]}. '
+            'The reply field must contain your actual spoken answer, not a type definition. '
             "\nCurrent app state (trusted capabilities): " + json.dumps({"mode": mode, "scene": scene, "available_scenes": available})
         )
         headers = {"Content-Type": "application/json"}

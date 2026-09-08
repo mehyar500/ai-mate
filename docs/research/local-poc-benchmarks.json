@@ -4240,5 +4240,204 @@
       "timing_scope": "Cold after explicitly unloading ComfyUI for image generation",
       "review": "One raised hand remains inside frame; camera drifts and feet start to crop. Not promoted."
     }
+  },
+  "continuity_guidance_2026_09_08": {
+    "pose_transition": {
+      "first_reply_playback_s": 6.1,
+      "second_reply_playback_s": 2.29,
+      "second_reply_stalls": 0,
+      "held_frame_while_waiting": true,
+      "outside_face_mean_pixel_error_0_255": 2.453,
+      "second_reply_render": {
+        "render_s": 2.0698733999997785,
+        "frames": 53,
+        "fps": 25.60543074760305,
+        "duration_s": 2.643375,
+        "resolution": "384x576",
+        "face_region": "256x256",
+        "torch_peak_allocated_mib": 2723.603515625,
+        "torch_peak_reserved_mib": 3426.0,
+        "audio_features_s": 0.02035630000045785,
+        "neural_s": 2.0100249000015538,
+        "composite_pipe_s": 0.033040600000276754,
+        "encoder": "libx264",
+        "body_motion": false,
+        "face_tracking_s": 9.999985195463523e-08,
+        "face_encode_stride": null,
+        "continues_previous_pose": true
+      }
+    },
+    "direct_guided_wave": {
+      "metrics": {
+        "first_text_s": 0.001,
+        "decision_source": "direct_command",
+        "first_media_ready_s": 6.276,
+        "total_s": 6.281
+      },
+      "render": {
+        "render_s": 1.6368584000010742,
+        "frames": 61,
+        "fps": 37.26651004140613,
+        "duration_s": 3.05,
+        "speech_duration_s": 0.9606875,
+        "lip_sync_frames": 24,
+        "resolution": "384x576",
+        "face_region": "256x256",
+        "torch_peak_allocated_mib": 2727.0830078125,
+        "torch_peak_reserved_mib": 3422.0,
+        "audio_features_s": 0.343080500000724,
+        "neural_s": 1.2536804999981541,
+        "composite_pipe_s": 0.029861999999411637,
+        "encoder": "libx264",
+        "body_motion": true,
+        "face_tracking_s": 0.3079538000001776,
+        "face_encode_stride": 2,
+        "motion_s": 4.178,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "continues_previous_pose": false
+      },
+      "browser": {
+        "first_playback_s": 5.81,
+        "stalls": 0,
+        "audio_ended": true,
+        "audio_muted": false,
+        "video_ended": true
+      },
+      "decoded_frames": 61
+    },
+    "hosted_latency_outlier": {
+      "metrics": {
+        "first_text_s": 22.064,
+        "first_media_ready_s": 30.968,
+        "total_s": 30.976
+      },
+      "render": {
+        "render_s": 4.111575199999606,
+        "frames": 61,
+        "fps": 14.836163035521238,
+        "duration_s": 3.05,
+        "speech_duration_s": 1.834,
+        "resolution": "384x576",
+        "face_region": "256x256",
+        "torch_peak_allocated_mib": 2727.0830078125,
+        "torch_peak_reserved_mib": 3428.0,
+        "audio_features_s": 0.7033140000003186,
+        "neural_s": 3.3627845999990313,
+        "composite_pipe_s": 0.03951039999992645,
+        "encoder": "libx264",
+        "body_motion": true,
+        "face_tracking_s": 0.6681181000003562,
+        "face_encode_stride": 2,
+        "motion_s": 4.225,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "continues_previous_pose": false
+      },
+      "browser": {
+        "first_playback_s": 28.54,
+        "stalls": 0,
+        "audio_ended": true,
+        "audio_muted": false,
+        "video_ended": true
+      },
+      "decoded_frames": 61
+    },
+    "guided_seeds": {
+      "seeds": [
+        50,
+        51,
+        52
+      ],
+      "frames": 73,
+      "resolution": [
+        384,
+        576
+      ],
+      "fast_fp8_flag": true,
+      "server_s": [
+        7.801,
+        4.081,
+        3.996
+      ],
+      "first_run_cold": true,
+      "review": "All moved and returned to neutral. One-hand precision/fingers still inconsistent. No controlled FP8 A/B claim."
+    },
+    "rejected_guided_49_frames": "Stayed still; waves now allow at least 73 frames.",
+    "closer_destination_images": {
+      "attempts": 2,
+      "cold_image_seconds": [
+        24.514,
+        18.701
+      ],
+      "accepted": false,
+      "finding": "Body scale remained near the starting image. No closer-destination video was qualified."
+    },
+    "reference_promotion": {
+      "file": "generated/local-app/fullbody.png",
+      "source": "fullbody-candidate.png",
+      "review": "Closer likeness to mira.png and additional headroom; guided wave evaluated before prototype promotion. Not a claim of perfect identity."
+    },
+    "planner_schema_echo": {
+      "reproduced": true,
+      "failure": "Returned schema keys instead of reply fields",
+      "post_prompt_fix": [
+        {
+          "ok": true,
+          "seconds": 1.078,
+          "action": "wave",
+          "presentation": "video"
+        },
+        {
+          "ok": true,
+          "seconds": 0.703,
+          "action": "none",
+          "presentation": "text"
+        },
+        {
+          "ok": true,
+          "seconds": 0.578,
+          "action": "closer",
+          "presentation": "video"
+        },
+        {
+          "ok": true,
+          "seconds": 1.469,
+          "action": "farther",
+          "presentation": "video"
+        },
+        {
+          "ok": true,
+          "seconds": 0.578,
+          "action": "none",
+          "presentation": "video"
+        }
+      ],
+      "direct_command_path": "Only complete unambiguous motion commands bypass the hosted planner; conditions and contextual questions do not."
+    },
+    "ui_review": "Full-body video area sits above the composer; older transcript can be expanded; held frame observed while waiting. Physical speaker output awaits user confirmation.",
+    "validation": "65 Python checks and three JavaScript transport checks; local review only, no independent review or staging.",
+    "remaining": [
+      "Approach/backward reliability",
+      "General action control",
+      "Hand/face fidelity across repeated generations",
+      "Lower body-generation latency",
+      "Interrupted-playback and restart pose continuity",
+      "Continuous idle movement",
+      "Public release qualification"
+    ],
+    "revised_layout_playback": {
+      "first_playback_s": 5.66,
+      "server_completion_s": 6.14,
+      "stalls": 0,
+      "video_ended": true,
+      "transcript_toggle_expanded_visible_messages": 26,
+      "full_body_visible_above_controls": true
+    },
+    "gpu_resident_mib": 12616
   }
 }
