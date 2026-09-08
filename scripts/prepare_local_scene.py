@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--scene", choices=["mira", "garden", "cafe"], default="mira")
+    parser.add_argument("--scene", choices=["mira", "garden", "cafe", "fullbody"], default="mira")
+    parser.add_argument("--candidate", action="store_true", help="Save separately for image review before changing an active scene.")
     args = parser.parse_args()
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -19,7 +20,7 @@ def main():
     start = time.perf_counter()
     pipe = Flux2KleinPipeline.from_pretrained(str(ROOT / ".cache/local-poc/klein"), torch_dtype=torch.bfloat16, local_files_only=True)
     pipe.enable_model_cpu_offload()
-    locations = {"mira": "a cozy bright living room with plants", "garden": "a leafy garden patio", "cafe": "a quiet sunlit cafe"}
+    locations = {"mira": "a cozy bright living room with plants", "garden": "a leafy garden patio", "cafe": "a quiet sunlit cafe", "fullbody":"a leafy garden patio"}
     prompt = ("Natural candid webcam photograph of a fictional 30-year-old woman, friendly relaxed expression, "
               "closed lips, brown eyes, shoulder-length dark brown hair tucked away from both cheeks, "
               "wearing a modest cream crew-neck sweater, sitting in " + locations[args.scene] + ". "
@@ -40,11 +41,25 @@ def main():
             "Remove the couch and living-room plants. Keep the exact same adult woman's face, hair, cream "
             "sweater, frontal pose and framing. Natural realistic photography, no writing, no other people."
         )
+    if args.scene == "fullbody":
+        kwargs.update(height=1152, width=768)
+        kwargs["prompt"] = (
+            "Create a full-length candid photograph of the EXACT same adult woman in the reference image. "
+            "Preserve her specific face, dark eyebrows, brown eyes, nose, lips, skin tone and shoulder-length "
+            "dark brown hair. Move the camera back to show her whole body, wearing the same cream knit sweater "
+            "with blue jeans and white sneakers, standing on a quiet garden patio. Both arms hang naturally "
+            "at her sides with all fingers visible. Her entire head and both shoes are inside the image. "
+            "Leave generous empty space above her head, below her feet and beside both hands. "
+            "Her body occupies only the middle seventy percent of the image height. A relaxed closed-mouth "
+            "smile, natural skin pores, soft overcast daylight, ordinary smartphone photograph, subtle colors, "
+            "real anatomy, no beauty retouching, no text, no other people."
+        )
     result = pipe(**kwargs).images[0]
-    result.save(output / (args.scene + ".png"))
+    name = args.scene + ("-candidate" if args.candidate else "")
+    result.save(output / (name + ".png"))
     record = {"model": "FLUX.2-klein-4B", "seed": 217, "prompt": kwargs["prompt"],
               "elapsed_with_load_s": time.perf_counter()-start, "scene": args.scene, "synthetic": True}
-    (output / (args.scene + ".json")).write_text(json.dumps(record, indent=2))
+    (output / (name + ".json")).write_text(json.dumps(record, indent=2))
     print(json.dumps(record, indent=2))
 
 

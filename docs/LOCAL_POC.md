@@ -7,6 +7,7 @@ Updated September 8, 2026. **Current interaction: type a message, receive a spok
 On the configured PC:
 
 ```powershell
+.\scripts\start_motion.ps1 -Background
 .\scripts\start_local.ps1 -Background -Provider cloudflare -EnvFile C:\Users\mehya\.env
 ```
 
@@ -14,7 +15,7 @@ Open **http://127.0.0.1:8765**. The script avoids starting a duplicate server. B
 
 Try **“Let’s talk in the café. How are you?”**, **“Back to the garden. Say something cheerful.”**, or **“Send a video from there.”** Ordinary messages receive video plus voice by default. “Voice only” and “just text” change the response style through the conversation. Sound, Interrupt and Replay remain explicit controls. Memory & settings contains saved facts, notes and diagnostics.
 
-Supported settings are living room, garden, café and a full-body garden portrait. These are prepared pictures of a fictional adult character; the separately generated full-body portrait has not passed identity-consistency review. The interactive renderer generates mouth movement and speech; it cannot wave, walk, change clothing or perform arbitrary body actions. The former CSS wave/cutout has been removed. It has no live view of the user.
+Supported settings are living room, garden, café and a full-body garden portrait. These are prepared pictures of a fictional adult character; the separately generated full-body portrait has not passed identity-consistency review. Wave, closer and farther commands now generate fresh LTX body video with tracked MuseTalk lip-sync and Kokoro voice. Wave/forward motion has been observed; backward direction has failed review. Ordinary messages still use the talking portrait. Arbitrary actions and turn-to-turn pose continuity are not implemented. The former CSS wave/cutout has been removed. It has no live view of the user.
 
 ## What was wrong, and what changed
 
@@ -33,7 +34,8 @@ A microphone call experiment exposed background-noise handling problems. That fl
 | Conversation/action planner | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Hosted, `/no_think`, bounded JSON response; no local GPU |
 | Voice | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CPU, four intra-op threads |
 | Lip-sync | MuseTalk 1.5 + SD VAE ft-mse + Whisper-tiny encoder | GPU FP16, batch eight; 20 FPS streaming output |
-| Face location | OpenCV YuNet 2023mar | CPU |
+| Body motion | LTX-Video 2B 0.9.8 distilled FP8 + T5-XXL FP8 | Local ComfyUI, 8 Euler steps |
+| Face location | OpenCV YuNet 2023mar | CPU, per-frame movement tracking |
 | Scene preparation | FLUX.2 Klein 4B, four steps, 512x640 | Separate GPU process with CPU offload; never during replies |
 | Encoding | FFmpeg H.264/AAC | CPU libx264; installed FFmpeg/NVENC driver pair is incompatible |
 | Speech recognition, retained diagnostics | faster-whisper Base English int8 | CPU; no microphone capture in the current UI |
@@ -44,13 +46,9 @@ The verified PC has an RTX 4060 Ti (16,380 MiB VRAM), approximately 47.7 GiB RAM
 
 ## Hosted dialogue, local graphics
 
-**Preferred next configuration: hosted conversation, CPU speech, local GPU video.** A MiniMax adapter is implemented behind `AI_MATE_LLM_PROVIDER=minimax`. It uses the official text endpoint and defaults to `MiniMax-M2.7`; `MiniMax-M2.7-highspeed` is an optional model setting. It has not been live-tested because no MiniMax/OpenAI API key was configured in this project's environment. No paid request was made. The current server therefore still uses Qwen locally.
+Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` is the running dialogue provider. `start_local.ps1 -EnvFile` reads only Cloudflare credentials from the explicitly selected private file. API key and email use `X-Auth-Key` / `X-Auth-Email`, taking priority over a token. A live authentication/planner request completed in 0.97 seconds; this is one sample. Never commit credentials.
 
-Set these **process environment variables** before launching the server: `AI_MATE_LLM_PROVIDER`, optional `AI_MATE_LLM_MODEL`, and private `MINIMAX_API_KEY`. Missing credentials fail clearly before an external request. The app does not read `.env` or `.env.example`; the latter lists settings, not loaded configuration. With a working hosted provider selected, stop the old server and unload Qwen with `ollama stop qwen3.5:9b-q4_K_M`, then relaunch. This removes the resident local LLM from the graphics GPU.
-
-Hosted dialogue sends text, recent context and saved notes to that provider. Audio, pictures and video remain local. No silent cloud fallback is used. The UI discloses the selected provider. A paid chat/coding subscription is not assumed to supply an application API key. Codex SDK is a separate agent integration; this app does not proxy Codex tokens or expose coding-agent tools to conversation inputs. [Official Codex authentication](https://learn.chatgpt.com/docs/auth), [MiniMax text API](https://platform.minimax.io/docs/api-reference/text-post).
-
-MiniMax currently lists M2.7 at $0.30/M input tokens and $1.20/M output; highspeed is $0.60/$2.40. An example with 2,000 input and 300 billed output tokens is $0.00096 per turn, or about $0.35 for 360 turns. This excludes extra reasoning tokens, retries, taxes and every non-LLM cost; it is not a measured call bill or latency guarantee. [Official pricing](https://platform.minimax.io/docs/guides/pricing-paygo).
+The hosted provider receives conversation text, recent context and saved notes. Audio, pictures and video remain local. Ollama is unloaded. MiniMax and Ollama are explicit alternatives, not silent fallbacks; coding/chat subscriptions are not assumed to supply application API access.
 
 ## Memory and boundaries
 
@@ -84,34 +82,28 @@ Current browser captures and synthetic traces are under ignored `generated/local
 
 **Tested and rejected for the current goal: OmniAvatar-1.3B**, with Wan2.1-T2V-1.3B, UMT5-XXL, Wan VAE and Wav2Vec2-base-960h. [Upstream](https://github.com/Omni-Avatar/OmniAvatar) is pinned to `1536bf31abaec74364fb7d5883470d5b23ffa7f8` by `scripts/benchmark_omniavatar.py`. The Windows runner removes unnecessary NCCL setup and Linux shell-copy/export commands. All weights downloaded successfully. Two 256×384, 2.56-second clips exported with audio: **67.5s cold / 31s denoising / 3.96 GiB peak model allocation** at 10 steps; **60.5s cold / 27s denoising / 3.86 GiB** at 8 steps with stronger text guidance. Both ignored the wave command: reviewed frames show arms staying down. This is a measured failure of these configurations, not proof all full-body models are impossible on 16 GB. See [benchmark evidence](research/local-poc-benchmarks.json).
 
-**Next experiment: ComfyUI + LTX-Video 2B 0.9.8 distilled FP8 + T5-XXL FP8.** ComfyUI source is installed in the ignored cache at `00d34d92fe0afbfbab3893ebbab2d5d70f5e9882`; its isolated environment and approximately 9.35 GB of pinned model files are being prepared. `scripts/download_ltx_motion.py` downloads just the checkpoint and encoder. This tests image-to-video movement first; it does not yet provide speech synchronization or a live integration. [Official image-to-video workflow](https://comfyanonymous.github.io/ComfyUI_examples/ltxv/), [LTX model repository](https://github.com/Lightricks/LTX-Video).
+**Current experiment: LTX-Video 2B 0.9.8 distilled FP8 and T5-XXL FP8**, installed in native ComfyUI pinned to `00d34d92fe0afbfbab3893ebbab2d5d70f5e9882`. The two pinned weight files total 9.35 GB; see `scripts/download_ltx_motion.py`. The isolated `.cache/comfy-env` uses loopback port 8188, disables custom/API nodes and reserves 4 GB for the speech renderer. [Official workflow](https://comfyanonymous.github.io/ComfyUI_examples/ltxv/), [LTX source](https://github.com/Lightricks/LTX-Video).
 
-The isolated environment `.cache/omni-env` reuses the installed CUDA PyTorch through `app-runtime.pth`; its older Transformers/NumPy dependencies are pinned in `config/omniavatar-requirements.txt`. Do not install those dependencies into the app's `.venv`. Example after downloads finish, with the app stopped to free GPU/RAM:
+Flow: Cloudflare decision -> CPU Kokoro WAV -> fresh LTX body video at 384x576/24 FPS -> per-frame YuNet tracking -> MuseTalk mouth synthesis on moving frames -> H.264 fragments and synchronized WAV in the browser. Face appearance is encoded every two frames (50ms reuse at 20 FPS); body tracking and audio-driven mouth synthesis still update every frame. Body clips cap at about four seconds; longer speech holds the final body frame. Commands select bounded graph parameters, never model-authored code, URLs or paths. Cancellation targets only the application's own Comfy prompt. A live cancellation test completed in 0.078s while Comfy was generating, preserving conversation and removing app media. ComfyUI is an unauthenticated trusted loopback development service; do not expose it publicly.
 
-```powershell
-.cache/omni-env/Scripts/python.exe -X utf8 scripts/benchmark_omniavatar.py --image generated/local-app/fullbody.png --audio PATH_TO_SHORT_TEST_WAV
-```
+| Measured sample | Delay | Finding |
+|---|---:|---|
+| LTX cold wave, VP9, 384x576, 49 frames | 11.486s | Real arm movement, framing drift |
+| LTX warm wave, VP9 | 7.176s | Encoding was expensive |
+| LTX H.264 wave, same dimensions/frames | 3.645s | Material encoding improvement |
+| LTX H.264, 256x384, 57 frames | 2.948s | Faster, visibly softer face |
+| Integrated moving speech, full appearance encoding | 7.14s first playback; 9.11s completion | One 0.54s stall |
+| Integrated moving speech, two-frame appearance reuse | 5.80s first playback; 6.94s completion | Zero stalls, audio/video both ended |
 
-The runner records completion status, cold wall time and peak CUDA allocation in its ignored upstream cache. A failed/import-only run does not qualify as a working demo. The two completed OmniAvatar clips also failed the command-following acceptance test and were not integrated.
+The optimized sample measured 0.752s to text, 3.28s for LTX and 2.428s for moving lip-sync. Resident GPU memory between replies was 12,588 MiB of 16,380 MiB. These are individual samples with differing seeds/speech durations, not controlled p95 or long-call measurements. Unmuted browser playback is not confirmation of physical speaker output or phoneme accuracy.
 
-Research alternatives: the [ComfyUI OmniAvatar node](https://github.com/CallMe1101/ComfyUI_OmniAvatar) exposes image/audio/prompt inputs but does not establish this GPU's speed. [StreamDiffusionV2](https://github.com/daitomanabe/streamdiffusionv2) offers single-GPU causal video-to-video streaming and a lightweight VAE option; it requires a driving video and has no measured 4060 Ti result here. [Vidu Q3](https://www.vidu.com/vidu-q3) documents native audiovisual clips up to 16 seconds; this is not evidence for local weights, continuous live generation or the claimed “S3 July” release. None of these links establishes unrestricted adult-use eligibility.
+**Quality is not accepted.** Review source images first, then first-frame likeness, hands/feet, body proportions and scene geometry, then consecutive motion and speech. The old close-up/full-body assets differ in identity. `prepare_local_scene.py --scene fullbody --candidate` now creates a separate identity-conditioned 768x1152 candidate for review without replacing active media. The first candidate took 22.24s including model loading; its still image has more headroom and a closer facial likeness. Its cold motion test took 7.414s after ComfyUI was unloaded for image generation: the raised hand stays in frame, but framing drifts and feet begin cropping. It remains a candidate.
 
-A photorealistic full-body generator has **not yet met call latency on this 16 GB RTX 4060 Ti**. Earlier wording claimed this was impossible without measuring it; that conclusion was unsupported. Candidate differences matter:
+Reviewed motion raises hands and visibly moves legs, but framing drifts, hands crop out, one-arm prompts can raise both arms, and a backward-step prompt moved forward. Still needed: reliable direction, continuous pose across replies, broader command following, natural idle movement, better identity/hand stability, lower first-playback latency and sustained browser/audio recovery testing. This is discrete audiovisual generation, not seamless FaceTime.
 
-* **SoulX-FlashHead Lite** is the best local low-latency talking-avatar candidate, but it remains a head/upper-body model. Its published 96 FPS result is on an RTX 4090, not this card. [Repository](https://github.com/Soul-AILab/SoulX-FlashHead)
-* **Tencent MimicMotion 1.1** accepts pose guidance and can create body actions such as waving, walking and sitting, but its own README reports about 20 minutes for a 35-second clip on an RTX 4090 and approximately 16 GB VRAM. It is a prepared-clip generator, not a FaceTime renderer. [Repository](https://github.com/Tencent/MimicMotion)
+OmniAvatar's two completed runs were rejected above. Alternatives remain unmeasured on this GPU: [StreamDiffusionV2](https://github.com/daitomanabe/streamdiffusionv2) needs driving video; [LongCat-Video-Avatar 1.5](https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5) has larger memory requirements; [SoulX-FlashHead](https://github.com/Soul-AILab/SoulX-FlashHead) targets head/upper-body movement. [Vidu Q3](https://www.vidu.com/vidu-q3) is hosted clip generation, not established local continuous generation. None establishes unrestricted adult-use eligibility; see [USA](USA.md).
 
-A possible fallback is a library of actual generated action clips, selected by commands and voiced locally. This is not implemented and would support only the prepared actions. It must not be presented as arbitrary instant body generation.
-
-**New primary evaluation target: LongCat-Video-Avatar 1.5.** Its September 2026 model card describes audio-text-to-video and audio-image-text-to-video, full-body temporal stability, identity consistency, 8-step distillation and INT8 inference, with model weights under MIT. The INT8 checkpoint is four shards totaling approximately 16 GB before the base model, Whisper-large-v3 and runtime overhead. The published quick start uses a separate Python 3.10/PyTorch 2.6/FlashAttention environment and two distributed processes. It is therefore a serious full-body candidate, but it has not been installed or benchmarked on this 16 GB card. Do not route production traffic to it until a local smoke test proves VRAM, first-frame latency, audio synchronization and cancellation. [LongCat-Video-Avatar 1.5 model card](https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5)
-
-**Lower-memory evaluation target: OmniAvatar 1.3B.** Its official project publishes a Wan2.1 1.3B base, an OmniAvatar 1.3B audio/body adapter and a dedicated `inference_1.3B.yaml`; it is the smaller full-body route to test first on this 16 GB card. The base still includes an approximately 5.7 GB diffusion checkpoint, 11.4 GB T5 encoder and 0.5 GB VAE, so CPU offload and a separate environment are required. Downloading the checkpoints is now supported by `scripts/download_omniavatar.py`; no inference is claimed until the files finish and the model is benchmarked. [OmniAvatar repository](https://github.com/Omni-Avatar/OmniAvatar) · [1.3B weights](https://huggingface.co/OmniAvatar/OmniAvatar-1.3B)
-
-A responsive phone-shaped interface and incremental lip-sync are progress, but they do not create natural head/body movement or full-duplex conversation. The current demo is explicitly text input with generated audiovisual replies. Long-lived WebRTC tracks, acoustic echo handling, semantic turn detection, real barge-in, browser/mobile recovery and a motion-capable portrait model still require work. Switching the LLM alone does not add those capabilities.
-
-For a public motion-model evaluation, **SoulX-FlashHead Model_Lite** is the next credible candidate: the code/model card declare Apache-2.0 and the authors report up to 96 generated FPS on one RTX 4090. Those results are not measurements on this 4060 Ti; first-frame delay, VRAM, voice alignment and quality need a separate test. The Pro variant's reported 10.8 FPS on one 4090 is unsuitable as this machine's assumed realtime path. Audit its VAE/audio dependencies and asset rights separately. [Repository](https://github.com/Soul-AILab/SoulX-FlashHead), [weights](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B).
-
-**LiveTalking** is a useful integration reference for MuseTalk, WebRTC and interruption. Its Apache code license does not automatically clear all selectable model weights; do not treat its Wav2Lip option as commercially interchangeable with MuseTalk. No LiveTalking or FlashHead installation is claimed here. [Project](https://github.com/lipku/LiveTalking). Existing component/provider/public release questions remain in [USA](USA.md); self-hosting does not establish blanket legal permission.
+Validation: local review and 59 offline Python checks pass; independent security review, staging, long-call soak, mobile and public concurrency qualification remain unavailable. No SQLite migration. Roll back by reverting this code change and restarting; preserve private conversation data and prepared assets.
 
 ## Reproduce
 

@@ -4169,5 +4169,76 @@
     "visual_review": "Five sampled frames per clip show speech-related face changes but arms remain down. Rejected for command-driven body movement; not integrated into app.",
     "timing_scope": "Cold process wall time includes model loading, audio preprocessing, denoising and export. Not a warm service latency or p95.",
     "artifacts": "Ignored generated/local-app/audit/omni-wave-10steps.mp4 and omni-wave-strong.mp4"
+  },
+  "ltx_motion_2026_09_08": {
+    "hardware": "RTX 4060 Ti 16 GB; 48 GB RAM; CPU Kokoro; Cloudflare Qwen",
+    "model": "LTX-Video 2B 0.9.8 distilled FP8; T5-XXL FP8; MuseTalk 1.5",
+    "comfy_revision": "00d34d92fe0afbfbab3893ebbab2d5d70f5e9882",
+    "visual_server_s": {
+      "cold_vp9": 11.486,
+      "warm_vp9": 7.176,
+      "h264_384x576_49f": 3.645,
+      "h264_256x384_57f": 2.948
+    },
+    "integrated_samples": [
+      {
+        "first_playback_s": 7.14,
+        "server_total_s": 9.109,
+        "stalls": 1,
+        "stall_s": 0.54,
+        "face_encode_stride": 1
+      },
+      {
+        "first_playback_s": 5.8,
+        "server_total_s": 6.937,
+        "stalls": 0,
+        "face_encode_stride": 2,
+        "text_s": 0.752,
+        "motion_s": 3.28,
+        "moving_lips_s": 2.428,
+        "audio_ended": true,
+        "audio_muted": false,
+        "video_ended": true
+      }
+    ],
+    "gpu_resident_mib": 12588,
+    "gpu_total_mib": 16380,
+    "quality": "Not accepted: old images differ in identity; hands crop out; camera drifts; one-arm prompt sometimes raises both arms; backward prompt moved forward.",
+    "candidate_image": {
+      "model": "FLUX.2 Klein 4B",
+      "reference": "mira.png",
+      "resolution": [
+        768,
+        1152
+      ],
+      "cold_s": 22.241,
+      "promoted": false
+    },
+    "limits": [
+      "Samples are not p95; speech durations differ",
+      "No physical-speaker or phoneme-alignment qualification",
+      "No pose continuity or arbitrary actions",
+      "Image review must precede video promotion",
+      "No staging or independent review"
+    ],
+    "artifacts": "Ignored generated/local-app/audit/ltx-*",
+    "live_cancellation": {
+      "cancel_s": 0.078,
+      "cancelled_during_live_comfy_job": true,
+      "conversation_unchanged": true,
+      "media_removed": true
+    },
+    "candidate_video": {
+      "reference": "fullbody-candidate.png",
+      "seed": 49,
+      "resolution": [
+        384,
+        576
+      ],
+      "frames": 49,
+      "server_execution_s": 7.414,
+      "timing_scope": "Cold after explicitly unloading ComfyUI for image generation",
+      "review": "One raised hand remains inside frame; camera drifts and feet start to crop. Not promoted."
+    }
   }
 }

@@ -183,7 +183,19 @@ class Application:
                         with self.lock:
                             job["state"] = "rendering"
                             job["chunks"].append(chunk)
-                        metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event, scene, streaming=True)
+                        motion_path = None
+                        motion_metrics = {}
+                        try:
+                            if plan and plan.get("action", "none") != "none":
+                                from .motion import generate
+                                motion_path = self.directory / (filename+"-motion.mp4")
+                                motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path)
+                            metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
+                                                      scene, streaming=True, **({"motion_path":motion_path} if motion_path else {}))
+                            metrics.update(motion_metrics)
+                        finally:
+                            if motion_path:
+                                motion_path.unlink(missing_ok=True)
                         chunk["render"] = metrics
                     check_cancel(event)
                     with self.lock:

@@ -93,13 +93,62 @@ class PortraitRenderer:
         self.mask = cv.resize(mask, (x2-x1, y2-y1))[:, :, None]
         self.portrait, self.box, self.scene = frame, (x1, y1, x2, y2), scene
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False):
+    def motion_frames(self, path, nframes, fps, cancel):
+        """Track the face on generated body footage; never move a static cutout."""
+        cv, np = self.cv, self.np
+        capture = cv.VideoCapture(str(path))
+        source_fps = capture.get(cv.CAP_PROP_FPS)
+        frames = []
+        try:
+            while len(frames) <= 30 * 60:
+                check_cancel(cancel)
+                ok, frame = capture.read()
+                if not ok:
+                    break
+                frames.append(frame)
+        finally:
+            capture.release()
+        if not frames or not 1 <= source_fps <= 60 or len(frames) > 1800:
+            raise RuntimeError("The motion clip is missing or has an invalid duration/frame rate.")
+        height, width = frames[0].shape[:2]
+        detector = cv.FaceDetectorYN.create(str(CACHE / "yunet.onnx"), "", (width, height), .65, .3, 5000)
+        tracked = {}
+        result = []
+        for i in range(nframes):
+            check_cancel(cancel)
+            index = min(len(frames)-1, int(i * source_fps / fps))
+            if index not in tracked:
+                frame = frames[index]
+                _, faces = detector.detect(frame)
+                if faces is None or len(faces) != 1:
+                    raise RuntimeError("The generated movement lost its clear face. Please retry the movement.")
+                face = faces[0]
+                x, y, w, h = map(float, face[:4])
+                mid = float(face[9]) - .04*h
+                x1, y1 = max(0, int(x)), max(0, int(2*mid-(y+h)))
+                x2, y2 = min(width, int(x+w)), min(height, int(y+h+.12*h))
+                if x2 <= x1 or y2 <= y1:
+                    raise RuntimeError("The moving face crop is invalid.")
+                crop = cv.resize(frame[y1:y2,x1:x2], (256,256), interpolation=cv.INTER_LANCZOS4)
+                mask = np.zeros((256,256), np.float32)
+                mx, my = float(face[10]+face[12])/2, float(face[11]+face[13])/2
+                center = (int((mx-x1)/(x2-x1)*256), int((my-y1)/(y2-y1)*256)+5)
+                mouth_width = abs(float(face[12]-face[10]))/(x2-x1)*256
+                cv.ellipse(mask, center, (max(50,min(95,int(mouth_width*.8))),43),0,0,360,1,-1)
+                mask = cv.resize(cv.GaussianBlur(mask,(17,17),0),(x2-x1,y2-y1))[:,:,None]
+                tracked[index] = (frame, (x1,y1,x2,y2), mask, cv.cvtColor(crop,cv.COLOR_BGR2RGB))
+            result.append(tracked[index])
+        return result
+
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2):
         if streaming:
             fps = 20
         cv, np, torch = self.cv, self.np, self.torch
+        if face_encode_stride not in {1,2}:
+            raise ValueError("Face encoding stride must be one or two frames.")
         import soundfile as sf
         from scipy.signal import resample_poly
-        if self.portrait is None or self.scene != scene:
+        if motion_path is None and (self.portrait is None or self.scene != scene):
             self.prepare(scene)
         check_cancel(cancel)
         start = time.perf_counter()
@@ -114,7 +163,10 @@ class PortraitRenderer:
         if nframes > 30 * fps:
             raise ValueError("Visual replies are limited to 30 seconds.")
         inputs = self.features(data, sampling_rate=16000, return_tensors="pt").input_features.to("cuda", self.dtype)
-        height, width = self.portrait.shape[:2]
+        tracking_start = time.perf_counter()
+        movement = self.motion_frames(motion_path, nframes, fps, cancel) if motion_path else None
+        tracking_seconds = time.perf_counter()-tracking_start
+        height, width = (movement[0][0] if movement else self.portrait).shape[:2]
         # Pipe raw frames to one local encoder; no per-frame PNG disk round trips.
         encoding = ["-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll"] if self.encoder == "h264_nvenc" else ["-c:v", "libx264", "-preset", "ultrafast", "-tune", "zerolatency", "-crf", "20", "-threads", "2"]
         delivery = (["-g", "4", "-bf", "0", "-profile:v", "baseline", "-level:v", "3.0",
@@ -142,16 +194,32 @@ class PortraitRenderer:
                     neural_start = time.perf_counter()
                     count = min(batch_size, nframes-offset)
                     conditioning = chunks[offset:offset+count] + self.pe
-                    pred = self.unet(self.latent.expand(count, -1, -1, -1), torch.tensor(0, device="cuda"), encoder_hidden_states=conditioning).sample
+                    if movement:
+                        # Reuse appearance for at most 50ms; body frames, tracking and
+                        # audio-conditioned mouth synthesis still update every frame.
+                        originals = torch.from_numpy(np.stack([item[3] for item in movement[offset:offset+count:face_encode_stride]])).permute(0,3,1,2).to("cuda",self.dtype)/255
+                        masked = originals.clone()
+                        masked[:,:,128:,:] = 0
+                        # Use the posterior mean to avoid random face texture jitter between frames.
+                        a = self.vae.encode(masked*2-1).latent_dist.mode()*self.vae.config.scaling_factor
+                        b = self.vae.encode(originals*2-1).latent_dist.mode()*self.vae.config.scaling_factor
+                        latent = torch.cat((a,b),dim=1).repeat_interleave(face_encode_stride,dim=0)[:count].contiguous(memory_format=torch.channels_last)
+                    else:
+                        latent = self.latent.expand(count, -1, -1, -1)
+                    pred = self.unet(latent, torch.tensor(0, device="cuda"), encoder_hidden_states=conditioning).sample
                     images = self.vae.decode(pred / self.vae.config.scaling_factor).sample
                     images = ((images / 2 + .5).clamp(0, 1).permute(0, 2, 3, 1).float().cpu().numpy() * 255).round().astype("uint8")
                     neural_seconds += time.perf_counter()-neural_start
                     composite_start = time.perf_counter()
-                    for img in images:
-                        x1, y1, x2, y2 = self.box
-                        result = self.portrait.copy()
+                    for local_index, img in enumerate(images):
+                        if movement:
+                            frame, box, mask, _ = movement[offset+local_index]
+                        else:
+                            frame, box, mask = self.portrait, self.box, self.mask
+                        x1, y1, x2, y2 = box
+                        result = frame.copy()
                         patch = cv.resize(img[:, :, ::-1], (x2-x1, y2-y1), interpolation=cv.INTER_LANCZOS4)
-                        result[y1:y2, x1:x2] = (patch * self.mask + result[y1:y2, x1:x2] * (1-self.mask)).astype("uint8")
+                        result[y1:y2, x1:x2] = (patch * mask + result[y1:y2, x1:x2] * (1-mask)).astype("uint8")
                         process.stdin.write(result.tobytes())
                     composite_seconds += time.perf_counter()-composite_start
             process.stdin.close()
@@ -178,4 +246,5 @@ class PortraitRenderer:
                 "torch_peak_reserved_mib": torch.cuda.max_memory_reserved()/1048576,
                 "audio_features_s": features_seconds, "neural_s": neural_seconds,
                 "composite_pipe_s": composite_seconds,
-                "encoder": self.encoder}
+                "encoder": self.encoder, "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
+                "face_encode_stride": face_encode_stride if movement else None}
