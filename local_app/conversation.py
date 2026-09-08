@@ -13,11 +13,12 @@ SCHEMA = {
         "reply": {"type": "string"},
         "presentation": {"type": "string", "enum": ["continue", "text", "voice", "video", "portrait"]},
         "scene": {"type": "string", "enum": ["keep", "mira", "garden", "cafe"]},
+        "action": {"type": "string", "enum": ["none", "closer", "farther", "wave"]},
         "facts": {"type": "array", "maxItems": 2, "items": {
             "type": "object", "additionalProperties": False,
             "properties": {"key": {"type": "string"}, "quote": {"type": "string"}},
             "required": ["key", "quote"]}},
-    }, "required": ["reply", "presentation", "scene", "facts"],
+    }, "required": ["reply", "presentation", "scene", "action", "facts"],
 }
 
 
@@ -38,6 +39,9 @@ def validate_plan(data, user, mode, scene, available):
     if presentation in {"video", "portrait"} and chosen not in available:
         presentation = "text"
         reply = "The picture isn't available yet. We can keep talking here."
+    action = data.get("action", "none")
+    if action not in {"none", "closer", "farther", "wave"}:
+        action = "none"
     # The model may propose only a bounded label and a verbatim excerpt of THIS
     # user turn. It cannot invent facts, write files, issue URLs or run tools.
     facts = []
@@ -49,7 +53,7 @@ def validate_plan(data, user, mode, scene, available):
         if (isinstance(key, str) and re.fullmatch(r"[a-z][a-z0-9_]{0,31}", key)
                 and isinstance(quote, str) and 3 <= len(quote) <= 180 and quote in user):
             facts.append({"key": key, "quote": quote})
-    return {"reply": reply, "presentation": presentation, "scene": chosen, "facts": facts}
+    return {"reply": reply, "presentation": presentation, "scene": chosen, "action": action, "facts": facts}
 
 
 class Conversation:
@@ -76,6 +80,8 @@ class Conversation:
             "video when asked for a video, FaceTime or video call; voice when asked to speak aloud or phone; "
             "text when asked to stop voice/video and just text. Resolve 'show me', 'there', 'do that' from recent conversation. "
             "scene: keep unless the user's conversation asks for another available setting. "
+            "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
+            "These are bounded visual cues; never claim a full body or hand was rendered. "
             "An unavailable setting/body action must be explained briefly; never claim it was generated. "
             "facts: zero to two stable PERSONAL facts explicitly stated by the user in their latest message. "
             "Use stable keys such as user_name, dog_name, piano_day, hobby. quote MUST be a verbatim substring "

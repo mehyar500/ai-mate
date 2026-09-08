@@ -146,7 +146,7 @@ class Application:
                 check_cancel(event)
                 mode, scene = plan["presentation"], plan["scene"]
                 with self.lock:
-                    job["presentation"], job["scene"] = mode, scene
+                    job["presentation"], job["scene"], job["action"] = mode, scene, plan.get("action", "none")
                     job["text"] = plan["reply"]
                     job["metrics"]["first_text_s"] = round(time.perf_counter()-started, 3)
                     if mode == "portrait":

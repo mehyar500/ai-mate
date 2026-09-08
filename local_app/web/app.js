@@ -33,6 +33,7 @@ function setScene(value){
   $("video").poster="/portrait/"+scene+".png";
   $("media-label").textContent=sceneNames[scene]+" · AI portrait";
 }
+function setAction(value="none"){document.querySelector(".visual").dataset.action=value||"none";}
 function resetPlayback(){
   epoch++;queue=[];playing=false;abortMedia?.abort();abortMedia=null;
   for(const media of [$("video"),$("audio")]){media.pause();media.removeAttribute("src");media.load();}
@@ -120,6 +121,7 @@ async function follow(key,node){
       if(["voice","video","text"].includes(job.presentation)){replyMode=job.presentation;controls();}
       if(job.user)node.textContent=job.user;
       if(job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
+      if(job.action)setAction(job.action);
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
       while(consumed<job.chunks.length){queue.push(job.chunks[consumed++]);drain();}
@@ -167,7 +169,7 @@ async function interrupt(){
   else notice("Reply stopped. Type your next message.");
 }
 $("stop").addEventListener("click",interrupt);
-$("sound").addEventListener("click",()=>{soundOn=!soundOn;$("video").muted=!soundOn;$("audio").muted=!soundOn;controls();});
+$("sound").addEventListener("click",async()=>{soundOn=!soundOn;$("video").muted=!soundOn;$("audio").muted=!soundOn;controls();if(soundOn){const media=$("video").hidden?$("audio"):$("video");try{await media.play();notice("Sound enabled.");}catch{notice("Tap Replay to start sound for this reply.");}}});
 function renderFacts(facts=[]){
   $("facts").replaceChildren();
   if(!facts.length){const p=document.createElement("p");p.className="no-facts";p.textContent="No facts saved yet."; $("facts").append(p);}

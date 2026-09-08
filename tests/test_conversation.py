@@ -14,8 +14,9 @@ from local_app.server import Application, Handler, ThreadingHTTPServer
 
 class PlanTests(unittest.TestCase):
     def test_unsupported_action_and_scene_cannot_escape_allowlist(self):
-        plan = validate_plan({"reply":"Hello", "presentation":"execute", "scene":"../../secret", "facts":[]}, "hi", "auto", "mira", ["mira"])
+        plan = validate_plan({"reply":"Hello", "presentation":"execute", "scene":"../../secret", "action":"run_code", "facts":[]}, "hi", "auto", "mira", ["mira"])
         self.assertEqual((plan["presentation"], plan["scene"]), ("text", "mira"))
+        self.assertEqual(plan["action"], "none")
 
     def test_call_continues_and_unavailable_picture_is_not_promised(self):
         data = {"reply":"Hello", "presentation":"continue", "scene":"keep", "facts":[]}

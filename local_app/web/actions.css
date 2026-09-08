@@ -1,0 +1,5 @@
+.visual img,.visual video{transition:transform .7s ease}
+.visual[data-action="closer"] img,.visual[data-action="closer"] video{transform:scale(1.14)}
+.visual[data-action="farther"] img,.visual[data-action="farther"] video{transform:scale(.88)}
+.visual[data-action="wave"] img,.visual[data-action="wave"] video{animation:waveCue 1.1s ease-in-out 2}
+@keyframes waveCue{0%,100%{transform:rotate(0)}35%{transform:rotate(-1.5deg) translateX(-5px)}70%{transform:rotate(1.5deg) translateX(5px)}}
