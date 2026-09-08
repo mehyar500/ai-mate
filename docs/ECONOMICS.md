@@ -66,6 +66,8 @@ Flex can scale to zero, but startup, execution and the idle timeout are billed; 
 
 More system RAM helps keep weights available for offloading; it does not turn the 4060 Ti into a faster GPU. Benchmark a rental before buying a card. For scale, an always-running $0.74/hour worker costs about **$533 per 30 days**, so low utilization can erase subscription margin. Public prices need measured GPU occupancy per delivered call, startup behavior, rejected generations, support/refunds and demand data.
 
+September 8's additional synthetic Cloudflare comparisons total **$0.01443 at published variable list prices for responses with known usage**, including the capability-prompt retest. One timed-out GLM request has unknown billed usage; this is not an invoice. The earlier Aura-2 experiment added $0.01806 nominally. These small tests use existing credentials, do not purchase a plan, and do not establish future production costs. Qwen and local Kokoro remain selected. [Measured comparison](LOCAL_POC.md#cloudflare-comparison--september-8-follow-up).
+
 The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.
 
 | Future monthly offer | Price to test | Earlier direct contribution hypothesis |

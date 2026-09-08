@@ -8,6 +8,8 @@ Apple guideline 1.1.4 excludes overtly sexual/pornographic material. Clothing al
 
 Use StoreKit in-app purchases for the proposed digital subscriptions/credits; Apple Pay is a different product. Implement server-verified transactions, restored entitlements and revocation/refund handling before charging. The US storefront permits external purchase links under current guidelines, but the founder's selected path remains Apple billing. Model and hosting terms still apply independently. [Payment guidelines](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase).
 
+“Apple approved design” can only describe an actual approval. The current web UI follows relevant design guidance with large touch targets, clear call controls and optional captions; it has not undergone App Review or iOS accessibility/device testing. Cloudflare model selection, an age gate or paying Apple's commission does not authorize otherwise excluded content. [Design guidance](https://developer.apple.com/design/tips/), [App Review](https://developer.apple.com/app-store/review/).
+
 ## Deferred explicit web-service review
 
 The material below applies only if a separate explicit web scope is later chosen. It does not describe the native MVP or establish permission for it.

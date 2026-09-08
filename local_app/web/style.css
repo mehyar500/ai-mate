@@ -2,7 +2,7 @@
 *{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;height:100dvh;overflow:hidden}
 button,textarea{font:inherit}
-button{cursor:pointer;border:1px solid transparent;border-radius:100px;padding:11px 18px;font-size:13px;font-weight:550;color:#203122;background:var(--accent);white-space:nowrap}
+button{cursor:pointer;border:1px solid transparent;border-radius:100px;padding:11px 18px;font-size:13px;font-weight:550;color:#203122;background:var(--accent);white-space:nowrap;min-width:44px;min-height:44px}
 button:hover{filter:brightness(.94)}button:disabled{opacity:.45;cursor:default}
 button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #a9d5ab;outline-offset:3px}
 .conversation{position:relative;isolation:isolate;width:100%;height:100dvh;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:#101613}
@@ -17,14 +17,14 @@ h1 span{display:inline-block;font-size:9px;letter-spacing:.4px;border:1px solid 
 .glass{background:#14231bd9;backdrop-filter:blur(18px);border-color:#ffffff24;color:#fff}
 .icon-button{display:inline-grid;place-items:center;width:48px;height:48px;min-width:48px;padding:0}
 .icon-button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-#memory-toggle{width:40px;height:40px;min-width:40px}
+#memory-toggle{width:44px;height:44px;min-width:44px}
 #memory-toggle svg{width:20px;height:20px}
 #mic .mute-slash{display:none}
 #mic[data-muted="true"]{background:#f2f4ef;color:#24342a}
 #mic[data-muted="true"] .mute-slash{display:block}
 .danger{background:#ed4545;color:#fff}
 .mode-tabs{position:absolute;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:2px;padding:4px;border-radius:25px;background:#132019de;backdrop-filter:blur(20px);z-index:4;border:1px solid #ffffff14}
-.mode-tabs button{background:transparent;border-color:transparent;color:#e9eee7;padding:8px 16px;font-size:12px}
+.mode-tabs button{background:transparent;border-color:transparent;color:#e9eee7;padding:8px 16px;font-size:12px;min-height:44px;min-width:44px}
 .mode-tabs button[aria-pressed="true"]{background:#e7edde;color:#203328}
 .mode-tabs button[data-active="true"][aria-pressed="false"]:after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#bee39e;margin-left:5px;vertical-align:middle}
 #unread{display:inline-grid;place-items:center;min-width:16px;height:16px;border-radius:10px;background:#cfddbb;color:#183328;margin-left:3px;font-size:10px}
@@ -40,6 +40,7 @@ h1 span{display:inline-block;font-size:9px;letter-spacing:.4px;border:1px solid 
 #notice:empty{display:none}
 .conversation:not([data-mode="text"]) #notice:not(:empty){padding:8px 14px;border-radius:14px;background:#17251dea;backdrop-filter:blur(12px)}
 .error{color:#ffe1bd!important}
+.captions{margin:0;padding:8px 14px;border-radius:12px;background:#102017ef;color:#fff;font-size:16px;line-height:1.4;max-width:min(520px,calc(100% - 32px));max-height:20dvh;overflow:auto;text-align:center}
 .resume{position:absolute;top:45%;left:50%;transform:translateX(-50%);z-index:5;box-shadow:0 6px 35px #12241daa}
 #active-call{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 24px;padding:12px 14px;border:1px solid #c3e1aa44;border-radius:16px;background:#193428}
 #active-call div{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -73,6 +74,8 @@ dialog::backdrop{background:#0d1918a1;backdrop-filter:blur(5px)}
 dialog h2{font-size:24px;font-weight:550;margin:0}dialog h3{font-size:14px;margin-top:25px}
 dialog p{font-size:13px;line-height:1.6;color:#536458}
 dialog label{display:block;font-size:13px;margin:18px 0 8px}
+.setting-toggle{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.setting-toggle input{width:20px;height:20px;accent-color:#38583e}
 dialog textarea{width:100%;border:1px solid #c8d2c4;border-radius:10px;background:white;padding:10px;color:#24372c;resize:vertical;margin-bottom:10px}
 .quiet{background:transparent;color:#314c39;border-color:#cbd5c7}
 .danger-text{color:#a02929;margin-top:25px}
@@ -97,4 +100,5 @@ details{margin:24px 0 0;font-size:13px}summary{cursor:pointer}
   .conversation[data-mode="video"] .join-call span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   .conversation[data-mode="video"] #notice{max-width:calc(100% - 144px)}
 }
+@media(min-aspect-ratio:4/3){.conversation[data-mode="video"] .mode-tabs{left:22px;top:74px;transform:none}}
 @media(prefers-reduced-motion:reduce){#chat{scroll-behavior:auto}}

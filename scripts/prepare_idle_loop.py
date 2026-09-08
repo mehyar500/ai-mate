@@ -12,6 +12,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
     parser.add_argument('--pose',choices=['base','near'],default='base')
+    parser.add_argument('--candidate',action='store_true',help='Write to audit for review without replacing active footage.')
     args = parser.parse_args()
     source = args.source.resolve()
     allowed = [ROOT/'.cache/local-poc/ComfyUI/output/motion', ROOT/'generated/local-app/audit']
@@ -27,7 +28,8 @@ def main():
     folder = ROOT/'generated/local-app'
     name='fullbody' if args.pose=='base' else 'near'
     reference=folder/('fullbody.png' if args.pose=='base' else 'performance-near.png')
-    out = folder/f'idle-{name}.mp4'
+    out = (folder/'audit'/f'idle-{name}-candidate.mp4') if args.candidate else folder/f'idle-{name}.mp4'
+    out.parent.mkdir(exist_ok=True)
     # Join the final quarter-second to the first; start at that first quarter's end.
     transition = .25
     graph = (f'[0:v]split[a][b];[a]trim=start={transition},setpts=PTS-STARTPTS[main];'
@@ -40,7 +42,7 @@ def main():
     manifest = {'version':1,'scene':'fullbody','pose':args.pose,'model':'LTX-2.3-22B-distilled-FP8',
                 'source_sha256':sha(source),'reference_sha256':sha(reference),
                 'sha256':sha(out),'precomputed':True,'audio':False}
-    (folder/f'idle-{name}.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    out.with_suffix('.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({'output':str(out),'sha256':manifest['sha256'],'requires_output_review':True}))
 
 

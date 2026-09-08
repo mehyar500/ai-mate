@@ -27,6 +27,7 @@
   <button id="resume" class="resume" hidden>Play reply</button>
   <section class="conversation-bottom" aria-label="Messages and call controls">
     <div id="chat" role="log" aria-live="polite" aria-label="Messages"><div class="empty"><h2>A little space for you.</h2><p>Send a message, or call Mira.</p></div></div>
+    <p id="captions" class="captions" hidden aria-label="Mira's speech caption"></p>
     <div id="notice" role="status" aria-live="polite"></div>
     <form id="composer" hidden>
       <label class="sr-only" for="message">Message Mira</label>
@@ -50,6 +51,7 @@
   <div class="dialog-heading"><h2 id="settings-title">Your conversation</h2><button id="close-settings" class="quiet">Close</button></div>
   <p>Mira is an AI companion. Some movements use prepared AI video; speech is generated for your reply. She keeps recent conversation and short facts you share on this computer. Starting a call requests microphone access. Transcribed words and conversation context go to the selected dialogue provider. Your camera stays off.</p>
   <button id="test-sound" class="quiet">Test sound</button>
+  <label class="setting-toggle"><input id="show-captions" type="checkbox"> Show captions in calls</label>
   <h3>Things you've shared</h3><div id="facts"></div>
   <label for="memory">Notes you want to keep</label><textarea id="memory" maxlength="1200" rows="3" placeholder="Anything you'd like Mira to remember…"></textarea>
   <button id="save-memory">Save notes</button>

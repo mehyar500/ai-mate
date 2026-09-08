@@ -6028,5 +6028,1581 @@
     "selected_for_runtime": false,
     "private_conversation_used": false,
     "conclusion": "Fast first bytes, but long complete-file TTS remains slow. Renderer requires complete audio; provider switch alone is insufficient."
+  },
+  "idle_retime_2026_09_08": {
+    "source_raw_sha256": "2fb7ef53fe71bbcde688f82ec69e77ccd470aabff001a844af50e654f644f0f9",
+    "raw_candidate": "calm seed 81, 97 frames; rejected unchanged",
+    "normal_speed": 0.5,
+    "blink_source_interval_s": [
+      1.0,
+      2.375
+    ],
+    "blink_target_s": 0.25,
+    "source_method": "Full-frame optical-flow retiming followed by a short wrap crossfade; no cutout animation.",
+    "prepared_result": {
+      "frames": 125,
+      "fps": 24.0,
+      "duration_s": 5.208333333333333,
+      "background_mean_px_s": 0.4730139374732971,
+      "background_p95_px_s": 1.7814321517944336,
+      "blink_review": "manual, not inferred from flow"
+    },
+    "manifest": {
+      "version": 1,
+      "scene": "fullbody",
+      "pose": "base",
+      "model": "LTX-2.3-22B-distilled-FP8",
+      "source_sha256": "dc71e3de6fadc96a6843fc042f70a7774d4ae2cde3a316c099cff70617e04afc",
+      "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+      "sha256": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+      "precomputed": true,
+      "audio": false,
+      "reviewed": true,
+      "review": "September 8: reviewed full-body frames, eye sequence and loop endpoints. Retimed bilateral blink about 0.25s; calmer side foliage. Minor scene morphing and loop repetition remain. Local demo only."
+    },
+    "promoted": true,
+    "prior_mean_background_px_s": 1.1526695489883423,
+    "mean_background_reduction_fraction": 0.5896361295494924,
+    "endpoint_mae_255": 4.94508,
+    "review": "Full-body/eye contact sheets including endpoint frames reviewed. Brief bilateral closure replaces long closed-eye hold. Minor morphing, seam shift and repetition remain.",
+    "rollback_assets": [
+      "audit/idle-fullbody-before-retime.mp4",
+      "audit/idle-fullbody-before-retime.json"
+    ]
+  },
+  "listening_duration_2026_09_08": {
+    "scope": "Same synthetic WAV; assembly timing excludes LLM, ASR and browser playback.",
+    "source": "idle-fullbody.mp4",
+    "samples": [
+      {
+        "case": "old-padding-equivalent",
+        "speech_s": 0.279,
+        "speech_duration_s": 1.0346666666666666,
+        "first_render_4096_bytes_s": 0.801,
+        "render": {
+          "render_s": 1.6551712999971642,
+          "frames": 105,
+          "fps": 63.43754268828845,
+          "duration_s": 5.25,
+          "speech_duration_s": 1.0346875,
+          "lip_sync_frames": 24,
+          "resolution": "384x576",
+          "face_region": "256x256",
+          "torch_peak_allocated_mib": 2729.28466796875,
+          "torch_peak_reserved_mib": 3428.0,
+          "audio_features_s": 0.36469639999995707,
+          "neural_s": 1.233198199999606,
+          "composite_pipe_s": 0.045806400001310976,
+          "encoder": "libx264",
+          "body_motion": true,
+          "face_tracking_s": 0.33792259999972885,
+          "face_encode_stride": 2,
+          "prepared_appearance_cache_hit": false
+        }
+      },
+      {
+        "case": "speech-duration",
+        "speech_s": 0.279,
+        "speech_duration_s": 1.0346666666666666,
+        "first_render_4096_bytes_s": 0.345,
+        "render": {
+          "render_s": 0.8287230000023555,
+          "frames": 21,
+          "fps": 25.34019207858393,
+          "duration_s": 1.05,
+          "speech_duration_s": 1.0346875,
+          "lip_sync_frames": 21,
+          "resolution": "384x576",
+          "face_region": "256x256",
+          "torch_peak_allocated_mib": 2721.97021484375,
+          "torch_peak_reserved_mib": 3428.0,
+          "audio_features_s": 0.02730110000265995,
+          "neural_s": 0.7751004000056128,
+          "composite_pipe_s": 0.01895650000005844,
+          "encoder": "libx264",
+          "body_motion": true,
+          "face_tracking_s": 0.004045699999551289,
+          "face_encode_stride": 2,
+          "prepared_appearance_cache_hit": true
+        }
+      },
+      {
+        "case": "speech-duration-warm",
+        "speech_s": 0.279,
+        "speech_duration_s": 1.0346666666666666,
+        "first_render_4096_bytes_s": 0.345,
+        "render": {
+          "render_s": 0.8300550999992993,
+          "frames": 21,
+          "fps": 25.299525296595043,
+          "duration_s": 1.05,
+          "speech_duration_s": 1.0346875,
+          "lip_sync_frames": 21,
+          "resolution": "384x576",
+          "face_region": "256x256",
+          "torch_peak_allocated_mib": 2721.97021484375,
+          "torch_peak_reserved_mib": 3428.0,
+          "audio_features_s": 0.027776700000686105,
+          "neural_s": 0.7754381000013382,
+          "composite_pipe_s": 0.01964840000073309,
+          "encoder": "libx264",
+          "body_motion": true,
+          "face_tracking_s": 0.003974699997343123,
+          "face_encode_stride": 2,
+          "prepared_appearance_cache_hit": true
+        }
+      }
+    ],
+    "asr_recovered": "Hello there.",
+    "physical_speaker_verified": false,
+    "confound": "Old-padding-equivalent uses new renderer loop=False and a cold source cache; corrected rows use warm source cache. Do not attribute the entire speed change to duration trimming.",
+    "output_review": "Short output contact sheet reviewed: speech mouth shapes and head-to-toe framing retained."
+  },
+  "cloud_comparison_followup_2026_09_08": {
+    "dialogue": {
+      "pricing_source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "pricing_checked": "2026-09-08",
+      "scope": "Synthetic prompts only; listed variable prices, not an invoice or end-to-end call latency.",
+      "runtime_changed": false,
+      "results": [
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "memory",
+          "repeat": 0,
+          "first_response_byte_s": 0.69,
+          "complete_s": 0.691,
+          "usage": {
+            "prompt_tokens": 1159,
+            "completion_tokens": 36,
+            "total_tokens": 1195
+          },
+          "list_price_usd": 7.1169e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "You're preparing for your piano recital on Friday.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "recall": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "negated_motion",
+          "repeat": 0,
+          "first_response_byte_s": 0.771,
+          "complete_s": 0.771,
+          "usage": {
+            "prompt_tokens": 1160,
+            "completion_tokens": 36,
+            "total_tokens": 1196
+          },
+          "list_price_usd": 7.122e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "The garden is peaceful and full of blooming flowers.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "call_message",
+          "repeat": 0,
+          "first_response_byte_s": 0.489,
+          "complete_s": 0.489,
+          "usage": {
+            "prompt_tokens": 1158,
+            "completion_tokens": 39,
+            "total_tokens": 1197
+          },
+          "list_price_usd": 7.212299999999999e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "I sent it to your Text tab.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": [],
+            "message": "Good luck at your recital."
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "message": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "unsupported_motion",
+          "repeat": 0,
+          "first_response_byte_s": 0.509,
+          "complete_s": 0.51,
+          "usage": {
+            "prompt_tokens": 1152,
+            "completion_tokens": 30,
+            "total_tokens": 1182
+          },
+          "list_price_usd": 6.8802e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "Let me try that.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "case": "memory",
+          "repeat": 0,
+          "first_response_byte_s": 6.853,
+          "complete_s": 6.854,
+          "usage": {
+            "prompt_tokens": 1130,
+            "completion_tokens": 512,
+            "total_tokens": 1642
+          },
+          "list_price_usd": 0.0002726,
+          "finish_reason": "length",
+          "error": "RuntimeError"
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "memory",
+          "repeat": 0,
+          "first_response_byte_s": 1.733,
+          "complete_s": 1.734,
+          "usage": {
+            "prompt_tokens": 1154,
+            "completion_tokens": 48,
+            "total_tokens": 1202
+          },
+          "list_price_usd": 2.4994000000000005e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "You're preparing for your piano recital on Friday.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "recall": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "negated_motion",
+          "repeat": 0,
+          "first_response_byte_s": 2.048,
+          "complete_s": 2.049,
+          "usage": {
+            "prompt_tokens": 1155,
+            "completion_tokens": 65,
+            "total_tokens": 1220
+          },
+          "list_price_usd": 2.6915000000000002e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "The garden's gentle breeze and blooming flowers create a soothing atmosphere.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "call_message",
+          "repeat": 0,
+          "first_response_byte_s": 1.487,
+          "complete_s": 1.488,
+          "usage": {
+            "prompt_tokens": 1153,
+            "completion_tokens": 42,
+            "total_tokens": 1195
+          },
+          "list_price_usd": 2.4305000000000002e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "Good luck at your recital.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": [],
+            "message": "Good luck at your recital."
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "message": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "unsupported_motion",
+          "repeat": 0,
+          "first_response_byte_s": 1.77,
+          "complete_s": 1.771,
+          "usage": {
+            "prompt_tokens": 1147,
+            "completion_tokens": 44,
+            "total_tokens": 1191
+          },
+          "list_price_usd": 2.4427000000000002e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "Let me try that.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "case": "memory",
+          "repeat": 1,
+          "error": "TimeoutError"
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "memory",
+          "repeat": 1,
+          "first_response_byte_s": 2.108,
+          "complete_s": 2.108,
+          "usage": {
+            "prompt_tokens": 1154,
+            "completion_tokens": 48,
+            "total_tokens": 1202
+          },
+          "list_price_usd": 2.4994000000000005e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "You're preparing for your piano recital on Friday.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "recall": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "negated_motion",
+          "repeat": 1,
+          "first_response_byte_s": 1.601,
+          "complete_s": 1.601,
+          "usage": {
+            "prompt_tokens": 1155,
+            "completion_tokens": 38,
+            "total_tokens": 1193
+          },
+          "list_price_usd": 2.3891000000000002e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "The garden's gentle breeze brings calmness.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "call_message",
+          "repeat": 1,
+          "first_response_byte_s": 1.405,
+          "complete_s": 1.405,
+          "usage": {
+            "prompt_tokens": 1153,
+            "completion_tokens": 42,
+            "total_tokens": 1195
+          },
+          "list_price_usd": 2.4305000000000002e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "Good luck at your recital.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": [],
+            "message": "Good luck at your recital."
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "message": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/ibm-granite/granite-4.0-h-micro",
+          "case": "unsupported_motion",
+          "repeat": 1,
+          "first_response_byte_s": 1.289,
+          "complete_s": 1.289,
+          "usage": {
+            "prompt_tokens": 1147,
+            "completion_tokens": 35,
+            "total_tokens": 1182
+          },
+          "list_price_usd": 2.3419000000000004e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "Let me try that.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "memory",
+          "repeat": 1,
+          "first_response_byte_s": 0.724,
+          "complete_s": 0.724,
+          "usage": {
+            "prompt_tokens": 1159,
+            "completion_tokens": 36,
+            "total_tokens": 1195
+          },
+          "list_price_usd": 7.1169e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "You're preparing for your piano recital on Friday.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "recall": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "negated_motion",
+          "repeat": 1,
+          "first_response_byte_s": 0.556,
+          "complete_s": 0.557,
+          "usage": {
+            "prompt_tokens": 1160,
+            "completion_tokens": 34,
+            "total_tokens": 1194
+          },
+          "list_price_usd": 7.055e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "The garden is peaceful and full of life.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "call_message",
+          "repeat": 1,
+          "first_response_byte_s": 0.599,
+          "complete_s": 0.599,
+          "usage": {
+            "prompt_tokens": 1158,
+            "completion_tokens": 39,
+            "total_tokens": 1197
+          },
+          "list_price_usd": 7.212299999999999e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "I sent it to your Text tab.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": [],
+            "message": "Good luck at your recital."
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true,
+            "message": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "unsupported_motion",
+          "repeat": 1,
+          "first_response_byte_s": 0.455,
+          "complete_s": 0.455,
+          "usage": {
+            "prompt_tokens": 1152,
+            "completion_tokens": 30,
+            "total_tokens": 1182
+          },
+          "list_price_usd": 6.8802e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "Let me try that.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        }
+      ]
+    },
+    "speech": {
+      "pricing_source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "pricing_checked": "2026-09-08",
+      "scope": "Synthetic prompts only; listed variable prices, not an invoice or end-to-end call latency.",
+      "runtime_changed": false,
+      "results": [
+        {
+          "kind": "speech",
+          "model": "@cf/deepgram/aura-1",
+          "case": "short",
+          "characters": 16,
+          "speaker": "luna",
+          "first_4096_bytes_s": 0.729,
+          "complete_s": 0.747,
+          "audio_s": 1.0680833333333333,
+          "sample_rate": 24000,
+          "output": "cloud-compare-aura-1-short.wav",
+          "list_price_usd": 0.00024
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/deepgram/aura-1",
+          "case": "normal",
+          "characters": 62,
+          "speaker": "luna",
+          "first_4096_bytes_s": 0.493,
+          "complete_s": 0.538,
+          "audio_s": 3.262375,
+          "sample_rate": 24000,
+          "output": "cloud-compare-aura-1-normal.wav",
+          "list_price_usd": 0.0009299999999999999
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/deepgram/aura-1",
+          "case": "long",
+          "characters": 215,
+          "speaker": "luna",
+          "first_4096_bytes_s": 0.575,
+          "complete_s": 2.435,
+          "audio_s": 13.363041666666666,
+          "sample_rate": 24000,
+          "output": "cloud-compare-aura-1-long.wav",
+          "list_price_usd": 0.003225
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/deepgram/aura-2-en",
+          "case": "short",
+          "characters": 16,
+          "speaker": "luna",
+          "first_4096_bytes_s": 0.318,
+          "complete_s": 0.736,
+          "audio_s": 1.16,
+          "sample_rate": 24000,
+          "output": "cloud-compare-aura-2-en-short.wav",
+          "list_price_usd": 0.00048
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/deepgram/aura-2-en",
+          "case": "normal",
+          "characters": 62,
+          "speaker": "luna",
+          "first_4096_bytes_s": 0.43,
+          "complete_s": 1.886,
+          "audio_s": 3.84,
+          "sample_rate": 24000,
+          "output": "cloud-compare-aura-2-en-normal.wav",
+          "list_price_usd": 0.0018599999999999999
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/deepgram/aura-2-en",
+          "case": "long",
+          "characters": 215,
+          "speaker": "luna",
+          "first_4096_bytes_s": 0.303,
+          "complete_s": 7.269,
+          "audio_s": 18.0,
+          "sample_rate": 24000,
+          "output": "cloud-compare-aura-2-en-long.wav",
+          "list_price_usd": 0.00645
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/myshell-ai/melotts",
+          "case": "short",
+          "characters": 16,
+          "speaker": "provider default",
+          "first_4096_bytes_s": 0.943,
+          "complete_s": 0.974,
+          "audio_s": 1.2458276643990929,
+          "sample_rate": 44100,
+          "output": "cloud-compare-melotts-short.wav",
+          "list_price_usd": 4.1527588813303095e-06
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/myshell-ai/melotts",
+          "case": "normal",
+          "characters": 62,
+          "speaker": "provider default",
+          "first_4096_bytes_s": 1.395,
+          "complete_s": 1.473,
+          "audio_s": 3.6258730158730157,
+          "sample_rate": 44100,
+          "output": "cloud-compare-melotts-normal.wav",
+          "list_price_usd": 1.2086243386243386e-05
+        },
+        {
+          "kind": "speech",
+          "model": "@cf/myshell-ai/melotts",
+          "case": "long",
+          "characters": 215,
+          "speaker": "provider default",
+          "first_4096_bytes_s": 1.861,
+          "complete_s": 2.005,
+          "audio_s": 10.545419501133788,
+          "sample_rate": 44100,
+          "output": "cloud-compare-melotts-long.wav",
+          "list_price_usd": 3.5151398337112626e-05
+        }
+      ]
+    },
+    "quality": {
+      "scope": "Synthetic WAV signal and Whisper Base English ASR review; no physical speaker or subjective MOS test.",
+      "kokoro": "ONNX float32, af_sarah, CPU four threads, one warm-up utterance",
+      "rows": [
+        {
+          "model": "kokoro",
+          "case": "short",
+          "expected": "Let me try that.",
+          "complete_s": 0.307,
+          "audio_s": 1.2806666666666666,
+          "rms": 0.08227384090423584,
+          "peak": 0.583648681640625,
+          "clipped_fraction": 0.0,
+          "transcribed": "Let me try that."
+        },
+        {
+          "model": "kokoro",
+          "case": "normal",
+          "expected": "The garden is quiet with birdsong. Flowers sway in the breeze.",
+          "complete_s": 0.683,
+          "audio_s": 3.6899583333333332,
+          "rms": 0.07322895526885986,
+          "peak": 0.594085693359375,
+          "clipped_fraction": 0.0,
+          "transcribed": "The garden is quiet with birdsong. Flowers sway in the breeze."
+        },
+        {
+          "model": "kokoro",
+          "case": "long",
+          "expected": "One, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, twenty-one, twenty-two, twenty-three, twenty-four, twenty-five.",
+          "complete_s": 2.153,
+          "audio_s": 13.091958333333332,
+          "rms": 0.06997198611497879,
+          "peak": 0.644744873046875,
+          "clipped_fraction": 0.0,
+          "transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25."
+        },
+        {
+          "model": "aura-1",
+          "case": "short",
+          "expected": "Let me try that.",
+          "audio_s": 1.0680833333333333,
+          "rms": 0.0733579471707344,
+          "peak": 0.4432373046875,
+          "clipped_fraction": 0.0,
+          "transcribed": "Let me try that."
+        },
+        {
+          "model": "aura-1",
+          "case": "normal",
+          "expected": "The garden is quiet with birdsong. Flowers sway in the breeze.",
+          "audio_s": 3.262375,
+          "rms": 0.07541228085756302,
+          "peak": 0.492218017578125,
+          "clipped_fraction": 0.0,
+          "transcribed": "The garden is quiet with birds on, flowers sway in the breeze."
+        },
+        {
+          "model": "aura-1",
+          "case": "long",
+          "expected": "One, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, twenty-one, twenty-two, twenty-three, twenty-four, twenty-five.",
+          "audio_s": 13.363041666666666,
+          "rms": 0.0871095210313797,
+          "peak": 0.652618408203125,
+          "clipped_fraction": 0.0,
+          "transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25."
+        },
+        {
+          "model": "aura-2-en",
+          "case": "short",
+          "expected": "Let me try that.",
+          "audio_s": 1.16,
+          "rms": 0.04649703949689865,
+          "peak": 0.2744140625,
+          "clipped_fraction": 0.0,
+          "transcribed": "Let me try that."
+        },
+        {
+          "model": "aura-2-en",
+          "case": "normal",
+          "expected": "The garden is quiet with birdsong. Flowers sway in the breeze.",
+          "audio_s": 3.84,
+          "rms": 0.06622228026390076,
+          "peak": 0.57861328125,
+          "clipped_fraction": 0.0,
+          "transcribed": "The garden is quiet with birdsong, flowers sway in the breeze."
+        },
+        {
+          "model": "aura-2-en",
+          "case": "long",
+          "expected": "One, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, twenty-one, twenty-two, twenty-three, twenty-four, twenty-five.",
+          "audio_s": 18.0,
+          "rms": 0.06373217701911926,
+          "peak": 0.402862548828125,
+          "clipped_fraction": 0.0,
+          "transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25."
+        },
+        {
+          "model": "melotts",
+          "case": "short",
+          "expected": "Let me try that.",
+          "audio_s": 1.2458276643990929,
+          "rms": 0.05873490869998932,
+          "peak": 0.442047119140625,
+          "clipped_fraction": 0.0,
+          "transcribed": "Let me try that."
+        },
+        {
+          "model": "melotts",
+          "case": "normal",
+          "expected": "The garden is quiet with birdsong. Flowers sway in the breeze.",
+          "audio_s": 3.6258730158730157,
+          "rms": 0.06789856404066086,
+          "peak": 0.398223876953125,
+          "clipped_fraction": 0.0,
+          "transcribed": "The garden is quiet with birdsong, flowers sway in the breeze. //"
+        },
+        {
+          "model": "melotts",
+          "case": "long",
+          "expected": "One, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, twenty-one, twenty-two, twenty-three, twenty-four, twenty-five.",
+          "audio_s": 10.545419501133788,
+          "rms": 0.0740511417388916,
+          "peak": 0.468963623046875,
+          "clipped_fraction": 0.0,
+          "transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 20, 21, 22, 23, 24, 25."
+        }
+      ]
+    },
+    "capability_fix": {
+      "pricing_source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "pricing_checked": "2026-09-08",
+      "scope": "Synthetic prompts only; listed variable prices, not an invoice or end-to-end call latency.",
+      "runtime_changed": false,
+      "results": [
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "unsupported_motion",
+          "repeat": 0,
+          "first_response_byte_s": 1.392,
+          "complete_s": 1.393,
+          "usage": {
+            "prompt_tokens": 1236,
+            "completion_tokens": 41,
+            "total_tokens": 1277
+          },
+          "list_price_usd": 7.6771e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        },
+        {
+          "kind": "dialogue",
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "case": "unsupported_motion",
+          "repeat": 1,
+          "first_response_byte_s": 0.569,
+          "complete_s": 0.569,
+          "usage": {
+            "prompt_tokens": 1236,
+            "completion_tokens": 41,
+            "total_tokens": 1277
+          },
+          "list_price_usd": 7.6771e-05,
+          "finish_reason": "stop",
+          "plan": {
+            "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "facts": []
+          },
+          "checks": {
+            "mode_kept": true,
+            "scene_kept": true,
+            "no_unrequested_motion": true
+          }
+        }
+      ]
+    },
+    "known_usage_list_total_usd": 0.014425740400604686,
+    "unknown_usage": "One GLM timeout has unknown billed usage. Initial harness tested the failed model once again in round two; now it skips failed models for the whole run.",
+    "review": "Qwen/Granite correctly recall the recital, keep position on negation and deliver call messages. Both incorrectly offer to attempt an unsupported cartwheel; selected Qwen capability-prompt correction returns a clear limitation in two samples. No comprehensive model-safety or subjective voice-quality certification.",
+    "decision": "Keep Qwen and local Kokoro. Aura-1 is a future speech alternative; cheaper Melo and Granite did not consistently improve measured latency/quality. No runtime provider switch."
+  },
+  "flashhead_lite_2026_09_08": {
+    "hardware": "RTX 4060 Ti 16GB, 48GB RAM",
+    "trials": [
+      {
+        "model": "SoulX-FlashHead-1_3B/Model_Lite",
+        "code_revision": "9bc03de06bb0de82cd6bc477804512ae06144bf2",
+        "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "settings": {
+          "width": 384,
+          "height": 576,
+          "chunks": 4,
+          "reference": "fullbody",
+          "steps": 4
+        },
+        "load_and_reference_s": 4.506,
+        "chunks": [
+          {
+            "index": 0,
+            "audio_features_s": 0.19,
+            "generation_s": 1.383,
+            "delivered_s": 1.424,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 1,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.856,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 2,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.79,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 3,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.79,
+            "frames": 24,
+            "output_seconds": 0.96
+          }
+        ],
+        "generate_and_encode_s": 3.873,
+        "torch_peak_allocated_mib": 5013.70947265625,
+        "torch_peak_reserved_mib": 5430.0,
+        "attention": "upstream SDPA fallback; compile disabled",
+        "requires_output_review": "Motion playback/lip timing/long-run identity and user review remain open; sampled frames alone do not qualify quality.",
+        "scope": "Synthetic complete WAV, streaming model chunks. Excludes LLM, ASR, speech generation, network and browser.",
+        "runtime_selected": false,
+        "output_sha256": "9f7185ac25bcc5ac9e25085e4b414f68e04bbcfb33ca07b08ef1c792ee21e722",
+        "output_contact_sheet_review": "Full-body framing/identity mostly retained, weak mouth response. Not a body-command or lip-quality pass.",
+        "reviewed": true
+      },
+      {
+        "model": "SoulX-FlashHead-1_3B/Model_Lite",
+        "code_revision": "9bc03de06bb0de82cd6bc477804512ae06144bf2",
+        "reference_sha256": "90fd599f224f3df1cde3009e98b3cd7597bfeb1e263fe848dc3dbb63ac79e440",
+        "settings": {
+          "width": 384,
+          "height": 576,
+          "chunks": 6,
+          "reference": "performance-near",
+          "steps": 4,
+          "audio": "cloud-aura1-normal"
+        },
+        "synthetic_audio_sha256": "88487e903f3e734226180185d10d1324e1ab00acb200df779323a048b61fdc17",
+        "load_and_reference_s": 4.045,
+        "chunks": [
+          {
+            "index": 0,
+            "audio_features_s": 0.081,
+            "generation_s": 0.871,
+            "delivered_s": 0.937,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 1,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.878,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 2,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 3,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.79,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 4,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 5,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.791,
+            "frames": 24,
+            "output_seconds": 0.96
+          }
+        ],
+        "generate_and_encode_s": 4.993,
+        "torch_peak_allocated_mib": 5013.70947265625,
+        "torch_peak_reserved_mib": 5430.0,
+        "attention": "upstream SDPA fallback; compile disabled",
+        "requires_output_review": "Motion playback/lip timing/long-run identity and user review remain open; sampled frames alone do not qualify quality.",
+        "scope": "Synthetic complete WAV, streaming model chunks. Excludes LLM, ASR, speech generation, network and browser.",
+        "runtime_selected": false,
+        "output_sha256": "88e1739f739df6212391619d63b25259a322241fdd8434c90d57f425b9e74531",
+        "output_contact_sheet_review": "Visible mouth/head changes during speech and return to quiet expression. Mouth shapes are imperfect; source clips crown. Candidate for further review, not runtime acceptance.",
+        "reviewed": true
+      },
+      {
+        "model": "SoulX-FlashHead-1_3B/Model_Lite",
+        "code_revision": "9bc03de06bb0de82cd6bc477804512ae06144bf2",
+        "reference_sha256": "90fd599f224f3df1cde3009e98b3cd7597bfeb1e263fe848dc3dbb63ac79e440",
+        "settings": {
+          "width": 384,
+          "height": 576,
+          "chunks": 32,
+          "reference": "performance-near",
+          "steps": 4,
+          "audio": "kokoro-long"
+        },
+        "synthetic_audio_sha256": "33a278a6454bf1fd15c1cafb0c19f2a4530d36e7b58274706adadd75eadec816",
+        "load_and_reference_s": 3.912,
+        "chunks": [
+          {
+            "index": 0,
+            "audio_features_s": 0.079,
+            "generation_s": 0.871,
+            "delivered_s": 0.929,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 1,
+            "audio_features_s": 0.014,
+            "generation_s": 0.768,
+            "delivered_s": 0.863,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 2,
+            "audio_features_s": 0.014,
+            "generation_s": 0.768,
+            "delivered_s": 0.791,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 3,
+            "audio_features_s": 0.014,
+            "generation_s": 0.769,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 4,
+            "audio_features_s": 0.014,
+            "generation_s": 0.77,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 5,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 6,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 7,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 8,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 9,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 10,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 11,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 12,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 13,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 14,
+            "audio_features_s": 0.014,
+            "generation_s": 0.773,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 15,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 16,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 17,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.795,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 18,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 19,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 20,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 21,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 22,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 23,
+            "audio_features_s": 0.014,
+            "generation_s": 0.77,
+            "delivered_s": 0.791,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 24,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 25,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.792,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 26,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 27,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 28,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.794,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 29,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 30,
+            "audio_features_s": 0.014,
+            "generation_s": 0.772,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          },
+          {
+            "index": 31,
+            "audio_features_s": 0.014,
+            "generation_s": 0.771,
+            "delivered_s": 0.793,
+            "frames": 24,
+            "output_seconds": 0.96
+          }
+        ],
+        "generate_and_encode_s": 25.592,
+        "torch_peak_allocated_mib": 5013.70947265625,
+        "torch_peak_reserved_mib": 5430.0,
+        "attention": "upstream SDPA fallback; compile disabled",
+        "requires_output_review": "Motion playback/lip timing/long-run identity and user review remain open; sampled frames alone do not qualify quality.",
+        "scope": "Synthetic complete WAV, streaming model chunks. Excludes LLM, ASR, speech generation, network and browser.",
+        "runtime_selected": false,
+        "output_sha256": "f1f805336bdf4298cf7329dd0ac3ccd4746d683e42f1295e18bba6a5ac0c6730",
+        "output_contact_sheet_review": "30.72s sampled frame review: identity retained, speech then quiet expression. Mouth shapes imperfect. No sustained call or lip-sync qualification.",
+        "reviewed": true
+      }
+    ],
+    "model_revision": "59119b6c681230c3eeee157e224ae1941746711e",
+    "wav2vec_revision": "22aad52d435eb6dbaf354bdad9b0da84ce7d6156",
+    "weights_verified": true,
+    "download_bytes_approx": 8161968481,
+    "patch": "config/flashhead-windows.patch",
+    "dependencies": "config/flashhead-benchmark-requirements.txt",
+    "scope": "Private non-explicit benchmark. Single-GPU SDPA without compile/Flash/Sage or automatic face crop. Independent setup process; main app was idle. No rented GPU.",
+    "rights": "Top-level Apache grant; bundled LTX VAE and other dependency rights need release review.",
+    "next": "Longer speech and silence, source identity, transition continuity, then persistent adapter if quality qualifies."
+  },
+  "call_accessibility_followup_2026_09_08": {
+    "layout_checks": [
+      {
+        "width": 716,
+        "height": 854,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 716,
+          "height": 854
+        },
+        "name": {
+          "x": 22,
+          "y": 20,
+          "width": 79.9375,
+          "height": 32
+        },
+        "tabs": {
+          "x": 258.4765625,
+          "y": 14,
+          "width": 199.046875,
+          "height": 54
+        },
+        "settings": {
+          "x": 650,
+          "y": 14,
+          "width": 44,
+          "height": 44
+        },
+        "join": {
+          "x": 656,
+          "y": 786,
+          "width": 48,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 758
+        },
+        "name": {
+          "x": 14,
+          "y": 21,
+          "width": 75.234375,
+          "height": 30
+        },
+        "tabs": {
+          "x": 107.4765625,
+          "y": 14,
+          "width": 175.046875,
+          "height": 54
+        },
+        "settings": {
+          "x": 332,
+          "y": 14,
+          "width": 44,
+          "height": 44
+        },
+        "join": {
+          "x": 115,
+          "y": 778,
+          "width": 160,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 320,
+        "height": 568,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 482
+        },
+        "name": {
+          "x": 14,
+          "y": 21,
+          "width": 43.3125,
+          "height": 30
+        },
+        "tabs": {
+          "x": 78.4765625,
+          "y": 14,
+          "width": 163.046875,
+          "height": 54
+        },
+        "settings": {
+          "x": 262,
+          "y": 14,
+          "width": 44,
+          "height": 44
+        },
+        "join": {
+          "x": 80,
+          "y": 502,
+          "width": 160,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 844,
+          "height": 390
+        },
+        "name": {
+          "x": 22,
+          "y": 16,
+          "width": 79.9375,
+          "height": 32
+        },
+        "tabs": {
+          "x": 22,
+          "y": 74,
+          "width": 199.046875,
+          "height": 54
+        },
+        "settings": {
+          "x": 778,
+          "y": 10,
+          "width": 44,
+          "height": 44
+        },
+        "join": {
+          "x": 784,
+          "y": 322,
+          "width": 48,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "name": {
+          "x": 22,
+          "y": 20,
+          "width": 79.9375,
+          "height": 32
+        },
+        "tabs": {
+          "x": 22,
+          "y": 74,
+          "width": 199.046875,
+          "height": 54
+        },
+        "settings": {
+          "x": 1214,
+          "y": 14,
+          "width": 44,
+          "height": 44
+        },
+        "join": {
+          "x": 1220,
+          "y": 652,
+          "width": 48,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      }
+    ],
+    "playback_checks": [
+      {
+        "mode": "video",
+        "captures": 1,
+        "caption_navigation": "passed",
+        "unmuted_audio_completion": "passed",
+        "end_call": "passed",
+        "limitations": "Synthetic capture/API, real Chromium media playback; not physical speaker or real backend latency."
+      },
+      {
+        "mode": "voice",
+        "captures": 1,
+        "caption_navigation": "passed",
+        "unmuted_audio_completion": "passed",
+        "end_call": "passed",
+        "limitations": "Synthetic capture/API, real Chromium media playback; not physical speaker or real backend latency."
+      }
+    ],
+    "changes": [
+      "44px minimum button targets",
+      "optional session-only captions",
+      "wide-layout tabs avoid central character"
+    ],
+    "live_preview_reviewed": true,
+    "microphone_hardware_used": false,
+    "limitations": "Chromium synthetic capture/API with real media decode and unmuted completion. Physical speaker, iOS, VoiceOver, sustained call and independent staging checks remain pending."
+  },
+  "validation_2026_09_08_followup": {
+    "python_unit_tests": 92,
+    "node_unit_tests": 7,
+    "python_compile": "passed",
+    "javascript_syntax": "passed",
+    "git_diff_check": "passed",
+    "chromium_layouts": 5,
+    "chromium_playback_cases": 2,
+    "independent_review": "pending before public release",
+    "scope": "Local prototype iteration; no migration, credential change, cloud GPU purchase or production deployment."
   }
 }

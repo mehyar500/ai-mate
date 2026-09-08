@@ -18,7 +18,7 @@ In Video call, try **“Come closer.” → “Say hello.” → “Step back.�
 
 Select Call Mira (phone icon on wider screens), or Voice/Video to start microphone input. Calls have mute/end icons and automatic sound; their composer is removed. Text has the message composer and shows messages without ending an active call; Return to call restores the same media elements. “Send me a message saying hello from our call” delivers a separate in-app message with an unread badge. End call releases capture and stops playback. Memory & settings contains facts, notes, diagnostics, the prepared-footage disclosure and Test sound. Camera access is disabled.
 
-The video fills the height when controls fit in the side space. Tall phone views trim side background without cropping the top/bottom of full-body footage; very wide gestures may extend outside that phone crop. Compact tabs and controls replace the technical overlays. At 716x854, the stage increased from 544px to 854px tall (57%); checked layouts at 320x568, 390x844, 716x854, 844x390 and 1280x720 have no horizontal overflow or overlapping header controls. Synthetic browser checks cover denied microphone permission, returning between Text and the active call, and ending the call. These checks do not qualify physical audio or Safari.
+The video fills the height when controls fit in the side space. Tall phone views trim side background without cropping the top/bottom of full-body footage; very wide gestures may extend outside that phone crop. Compact tabs and controls replace the technical overlays. Buttons have at least 44px touch targets; optional call captions are in settings and last for the current page session. At 716x854, the stage increased from 544px to 854px tall (57%). Five Chromium layouts from 320x568 to 1280x720 passed overflow/control-overlap checks. Synthetic calls passed microphone-denial handling, caption visibility across Text/call navigation, unmuted audio completion and ending the call. These checks do not qualify physical audio, VoiceOver or Safari.
 
 ## Models actually used
 
@@ -60,7 +60,7 @@ Scene changes require a current visual request. Talking about a garden does not 
 
 Prepared assets must have an explicit local review flag and matching reference/video hashes. Fixed files: `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png`, plus `idle-fullbody.json/.mp4` and `idle-near.json/.mp4`. They are private generated artifacts, not in Git. Preparation scripts default to unreviewed. Missing/changed/unreviewed assets fall back to the experimental renderer or held portrait; a fresh checkout does not contain the demonstration clips.
 
-Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for at most two short reviewed clips. User speech and generated mouth frames are not cached there.
+Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Ambient reply video now ends with speech instead of forcing a whole idle-loop duration; deliberate approach/return clips still finish their movement. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for at most two short reviewed clips. User speech and generated mouth frames are not cached there.
 
 Successful fresh video captures its final decoded frame as the next reference. Unknown positions disable known-pose loops. The older one-shot reverse cache remains only for an unprepared approach followed immediately by a return. Failed/cancelled generation cannot commit a new pose. Restart clears transient pose/return files and starts at the base pose while preserving conversation. **The server tracks the last generated pose, not the exact frame seen during interrupted playback; mid-motion interruption continuity is still open.**
 
@@ -82,9 +82,44 @@ The paired-motion demonstration is a real improvement, but the requested quality
 
 Output files contain speech, local ASR recovered synthetic test sentences, and the browser completed unmuted playback without media errors. Physical speaker output and subjective phoneme/voice quality still need device testing. Jobs record first text, per-chunk speech generation time, rendering stages, cache hits and completion; the browser separately measures first playback and stalls.
 
-Latest listening review: `benchmark_ltx23.py --idle-style calm` produced candidates in 143.227s (129 frames, seed 80) and 83.033s (97 frames, seed 81). Both kept the eyes closed for roughly one second despite a short bilateral-blink prompt. `review_idle_motion.py` measures side-strip optical flow and creates eye contact sheets; lower flow is not visual acceptance. Neither candidate is active. The fast-foliage/wink complaint remains open; whole-clip slowdown would further lengthen the blink.
+Latest listening review: two raw calm LTX-2.3 candidates held both eyes shut for roughly one second and were rejected unchanged. `retime_idle_motion.py` slows the full frame to half speed while compressing the manually selected blink interval separately to about 0.25s. The reviewed 5.208s prepared result is now active: side-background mean optical flow fell from 1.153 to 0.473px/s (59%), with a brief bilateral blink. This is a measured improvement, not a natural-motion certificate: minor scene morphing, seam movement and repetition remain. The source, settings, reviewed hash and rollback backup are recorded in machine evidence; `prepare_idle_loop.py --candidate` never replaces active footage automatically.
+
+`benchmark_listening_timing.py` used the same synthetic 1.035s greeting. Old-padding-equivalent playback lasted 5.25s; the corrected ambient path lasts 1.05s, removing 4.2s of unnecessary silent reply playback. Warm rendering took 0.83s with first 4KB at 0.345s. The old-equivalent render had a cold appearance cache, so its 1.655s render is not a controlled attribution of all speed gains to this change. Speech creation was 0.279s; LLM, ASR and browser delay are excluded.
 
 `benchmark_cloud_speech.py` makes at most six synthetic requests using the existing Cloudflare authentication, without reading conversation. [Aura-2 English](https://developers.cloudflare.com/workers-ai/models/aura-2-en/) (`@cf/deepgram/aura-2-en`, `luna`) lists $0.03/1,000 input characters. First 4KB arrived in 0.278–0.395s; complete WAVs took 0.750–0.818s for 16 characters, 1.851–1.873s for 62, and 6.014–7.264s for 215. Six listed costs total $0.01758; an earlier 16-character request with an unknown-length WAV header failed local parsing, adding a nominal $0.00048. These are computed list prices, not an invoice. The parser now measures actual PCM length. Cloud speech is **not selected**: first bytes are not usable synchronized video, and long complete-file latency is still poor. Streaming audio would require incremental speech features/rendering, not just changing the provider.
+
+### Cloudflare comparison — September 8 follow-up
+
+The founder authorized API quality/latency comparisons. `benchmark_cloud_comparison.py` uses synthetic notes and the actual dialogue adapter, with bounded requests/tokens and no runtime switch. Eight samples per successful model covered recall, negated movement, in-call message delivery and an unsupported cartwheel. These are whole-response times, not token-stream latency:
+
+| Model | Completion samples | Quality finding |
+|---|---:|---|
+| `@cf/qwen/qwen3-30b-a3b-fp8` | 0.455–0.771s | Correct recall, no negated movement, message delivered; remains selected |
+| `@cf/ibm-granite/granite-4.0-h-micro` | 1.289–2.108s | Same basic decisions, cheaper tokens but slower in this sample |
+| `@cf/zai-org/glm-4.7-flash` | 6.854s truncated; second sample timed out at 30s | Not compatible with the current 512-token/no-think adapter settings; not a general model-quality verdict |
+
+Qwen and Granite both incorrectly said “Let me try that” for a cartwheel while choosing no action. A capability prompt correction makes the selected Qwen explain the limit; two follow-up samples returned the correct explanation. This fixes the observed case, not every possible unsupported request. The harness now stops testing a failed model for the entire run; its initial version repeated GLM once in the second round.
+
+Three identical texts (16/62/215 characters), with one new sample per voice:
+
+| Speech model / voice | Short / normal / long complete audio | Long output duration | Long sample list cost |
+|---|---|---:|---:|
+| Local Kokoro `af_sarah`, four CPU threads, warm | 0.307 / 0.683 / 2.153s | 13.092s | Local electricity |
+| `@cf/deepgram/aura-1`, `luna` | 0.747 / 0.538 / 2.435s | 13.363s | $0.003225 |
+| `@cf/deepgram/aura-2-en`, `luna` | 0.736 / 1.886 / 7.269s | 18.000s | $0.006450 |
+| `@cf/myshell-ai/melotts`, default English voice | 0.974 / 1.473 / 2.005s | 10.545s | $0.000035 |
+
+All twelve WAVs contained non-silent, unclipped signal. Local Whisper recovered the count through 25 for Kokoro/Aura; Aura-1's “birdsong” became “birds on,” and Melo's count transcription repeated 20. These are ASR flags, not proof of which model introduced an error or a subjective listening score. Kokoro stays selected: the cloud alternatives do not consistently beat it, and voice preference is untested. `review_cloud_speech.py` reproduces the local comparison. [Cloudflare list pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) determines nominal costs; the failed GLM timeout has unknown billed usage.
+
+The [hosted catalog](https://developers.cloudflare.com/workers-ai/models/) currently lists 86 entries including deprecated models, speech, recognition and images; no full-body live-video generation entry was identified. Gateway access to external models is a separate provider route. Cloudflare can handle dialogue/speech while graphics stay local; catalog presence is not project/content approval.
+
+### FlashHead Lite local trial
+
+`Soul-AILab/SoulX-FlashHead-1_3B/Model_Lite` now runs locally in an isolated benchmark using PyTorch SDPA, four denoising steps, 384x576, 24 generated frames per 0.96s chunk. The full-body greeting used 5,014MiB peak tensor allocation; its first chunk took 1.424s and later chunks 0.790–0.856s. The close reference with a 3.262s synthetic Aura-1 sentence took 0.937s for the first chunk and 0.790–0.878s thereafter, producing 5.76s in 4.993s including encoding. Model/reference setup was 4.0–4.5s, excluded from chunk times. This establishes short-run local throughput, not end-to-end call latency or sustained p95.
+
+Reviewed output: the full-body mouth barely reacts; the close reference has visible mouth/head motion and smoother whole-face changes, but mouth shapes remain imperfect and the framing clips the crown as the source does. Neither test follows arbitrary body commands. **Not selected in the app.** Next compare longer speech, silence, identity drift and action transitions before adding a persistent renderer. The [authors' 4090 results](https://github.com/Soul-AILab/SoulX-FlashHead) are separate from these measurements. Apache top-level licensing does not settle the bundled LTX VAE/dependency rights for public use.
+
+A follow-up 32-chunk run used the complete 13.092s Kokoro count and then silence: 30.72s of video generated/encoded in 25.592s, 0.929s first chunk, 0.793s median / 0.863s maximum later chunks, about 5GB peak tensor allocation. Sampled frames retained identity through the end and returned to a quiet expression; mouth shapes still look imperfect. This is a 31-second throughput check, not a 30-minute call or a lip-sync acceptance test. Reproduce after the speech review with `benchmark_flashhead.py --reference performance-near --audio kokoro-long --chunks 32`; insufficient output duration now fails instead of truncating the input sentence.
 
 ## Playback, microphone and memory
 
@@ -128,6 +163,8 @@ Base idle uses `--action idle --frames 97 --seed 61 --return-to-reference` with 
 
 For independent fresh-motion comparisons use `benchmark_direct_ltx.py`, `benchmark_ltx_motion.py`, `benchmark_video_assembly.py` and `benchmark_omniavatar.py`. [Hallo-Live](https://github.com/fudan-generative-vision/Hallo-Live) reports 20.38 FPS / 0.94s on **two H200s**; [LightX2V](https://github.com/ModelTC/LightX2V) provides quantization/offload paths. Neither establishes those speeds or command quality on this 4060 Ti.
 
+FlashHead reproduction uses source revision `9bc03de06bb0de82cd6bc477804512ae06144bf2` in `.cache/local-poc/SoulX-FlashHead`, with [Windows patch](../config/flashhead-windows.patch) applied using `git apply --unidiff-zero` in that source checkout. Install [isolated dependencies](../config/flashhead-benchmark-requirements.txt) with pip `--target .cache/flashhead-deps --no-deps`, reusing the configured Torch/scientific runtime. `download_flashhead_benchmark.py` downloads about 8.2GB of pinned, SHA-verified Lite/VAE/Wav2Vec2 weights. Run `benchmark_listening_timing.py` to create the synthetic greeting, then `benchmark_flashhead.py`. The close trial additionally needs `benchmark_cloud_comparison.py speech`, then `benchmark_flashhead.py --reference performance-near --audio cloud-aura1-normal --chunks 6`. Downloads and scripts do not select the model automatically. No private conversation is benchmark input.
+
 Checks:
 
 ```powershell
@@ -141,6 +178,8 @@ git diff --check
 ```
 
 R2 independent security/correctness review, staging, sustained p50/p95, real microphone/speaker testing, interruption continuity and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
+
+Final checks for this revision: 92 Python tests, seven Node tests, Python compile, JavaScript syntax and `git diff --check` passed. `review_call_playback.cjs` additionally runs two real Chromium playback cases with synthetic APIs/capture; it requires Playwright on `NODE_PATH` and the generated close FlashHead fixture. It never starts a physical microphone or reads the real conversation.
 
 ## Cost and next decision
 

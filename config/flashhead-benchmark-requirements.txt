@@ -1,0 +1,11 @@
+# Isolated --target .cache/flashhead-deps; no replacement of app dependencies.
+# Reuse the installed PyTorch 2.11 CUDA runtime and general scientific libraries.
+diffusers==0.34.0
+transformers==4.57.3
+tokenizers==0.22.2
+huggingface-hub==0.36.0
+loguru==0.7.3
+win32-setctime==1.2.0; sys_platform == 'win32'
+pyloudnorm==0.1.1
+einops==0.8.1
+future==1.0.0

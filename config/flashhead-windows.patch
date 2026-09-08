@@ -1,0 +1,42 @@
+diff --git a/flash_head/src/modules/flash_head_model.py b/flash_head/src/modules/flash_head_model.py
+index 989cd7c..1de7390 100755
+--- a/flash_head/src/modules/flash_head_model.py
++++ b/flash_head/src/modules/flash_head_model.py
+@@ -11,6 +11,14 @@ import torch.distributed as dist
+-from xfuser.core.distributed import (
+-    get_sequence_parallel_rank,
+-    get_sequence_parallel_world_size,
+-    get_sp_group,
+-)
+-from xfuser.core.long_ctx_attention import xFuserLongContextAttention
++try:
++    from xfuser.core.distributed import (
++        get_sequence_parallel_rank,
++        get_sequence_parallel_world_size,
++        get_sp_group,
++    )
++    from xfuser.core.long_ctx_attention import xFuserLongContextAttention
++except ModuleNotFoundError:
++    # Single-GPU Windows benchmark uses the upstream SDPA path. Multi-GPU
++    # execution must still fail rather than silently changing parallelism.
++    def _missing_xfuser(*args, **kwargs):
++        raise RuntimeError('This benchmark has no xfuser; use one GPU only.')
++    get_sequence_parallel_rank = get_sequence_parallel_world_size = get_sp_group = _missing_xfuser
++    xFuserLongContextAttention = _missing_xfuser
+@@ -548 +556 @@ class AudioProjModel(ModelMixin, ConfigMixin):
+-        return context_tokens
+\ No newline at end of file
++        return context_tokens
+diff --git a/flash_head/src/pipeline/flash_head_pipeline.py b/flash_head/src/pipeline/flash_head_pipeline.py
+index 6d0b757..4da4503 100644
+--- a/flash_head/src/pipeline/flash_head_pipeline.py
++++ b/flash_head/src/pipeline/flash_head_pipeline.py
+@@ -16 +15,0 @@ from flash_head.utils.utils import match_and_blend_colors_torch, resize_and_cent
+-from flash_head.utils.facecrop import process_image
+@@ -19,2 +18,2 @@ from flash_head.utils.facecrop import process_image
+-COMPILE_MODEL = True
+-COMPILE_VAE = True
++COMPILE_MODEL = False
++COMPILE_VAE = False
+@@ -27,0 +27 @@ def get_cond_image_dict(cond_image_path_or_dir, use_face_crop):
++                from flash_head.utils.facecrop import process_image

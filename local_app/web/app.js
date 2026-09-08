@@ -23,6 +23,12 @@ $('idle-video').addEventListener('error',()=>{idleFailed=true;$('idle-video').hi
 document.addEventListener('visibilitychange',idlePresence);
 let historyOpen=false;
 let viewMode='video',unread=0,micState='off',listenAfter=0,callRequest=0;
+let captionText='';
+function updateCaptions(){
+  $('captions').textContent=captionText;
+  $('captions').hidden=viewMode==='text'||!$('show-captions').checked||!captionText;
+}
+$('show-captions').addEventListener('change',updateCaptions);
 const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
   onState:state=>{if(micState!==state){micState=state;controls();}}});
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
@@ -61,6 +67,7 @@ function controls(){
   $('message').placeholder='Message Mira…';
   $('disclosure').hidden=viewMode!=='text';
   $('disclosure').textContent=replyMode==='text'?'Private conversation':'Call stays active';
+  updateCaptions();
   idlePresence();
 }
 async function api(path,body){
@@ -99,6 +106,7 @@ function holdPicture(){
   picture.hidden=true;
 }
 function resetPlayback(holdFrame=false){
+  captionText='';
   nextIdleURL=undefined;pictureStarted=false;motionRequested=false;
   if(holdFrame)holdPicture();else $("held-frame").hidden=true;
   epoch++;queue=[];playing=false;abortMedia?.abort();abortMedia=null;
@@ -170,11 +178,12 @@ async function drain(){
     }
     media.onplaying=()=>{
       if(mine!==epoch)return;
+      captionText=item.text||'';
       if(item.video){media.hidden=false;$("media-label").textContent=sceneNames[scene]+(item.prepared_motion?" · Prepared motion · live voice":" · Generated video");}
       played();
     };
     media.onwaiting=()=>{if(firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
-    media.onended=()=>{if(mine!==epoch)return;if(item.video)holdPicture();if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
+    media.onended=()=>{if(mine!==epoch)return;captionText='';updateCaptions();if(item.video)holdPicture();if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
     try{
       if(item.stream){
         const supported=await playStream(item,media,controller.signal);
@@ -193,7 +202,7 @@ async function drain(){
     releaseSpeech();
     if(mine===epoch&&objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
   }
-  if(mine===epoch){playing=false;abortMedia=null;settleIdle();listenAfter=performance.now()+450;controls();}
+  if(mine===epoch){playing=false;captionText='';abortMedia=null;settleIdle();listenAfter=performance.now()+450;controls();}
 }
 $("resume").addEventListener("click",async()=>{
   if(lastMedia?.video&&$("video").hidden){const item={...lastMedia,stream:null};resetPlayback(true);queue.push(item);drain();return;}

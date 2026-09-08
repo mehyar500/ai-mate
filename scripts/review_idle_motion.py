@@ -45,8 +45,9 @@ def main():
     x,y,w,h = faces[0][:4]
     # Fixed region makes shifts and asymmetric eyelids visible during review.
     box = (max(0,int(x-.15*w)),max(0,int(y-.15*h)),min(384,int(x+1.15*w)),min(576,int(y+.85*h)))
-    stride = max(1, len(frames)//64)
-    indices = list(range(0,len(frames),stride))[:96]
+    # Include both endpoints even when a clip has 97–127 frames; truncating a
+    # stride-one list hid the final second and the loop seam from review.
+    indices = np.linspace(0,len(frames)-1,min(96,len(frames))).round().astype(int)
     cols = 12
     sheet = Image.new('RGB',(cols*128,((len(indices)+cols-1)//cols)*106),'#242424')
     for k,index in enumerate(indices):
