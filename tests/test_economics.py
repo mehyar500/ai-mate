@@ -46,7 +46,7 @@ class EconomicsTests(unittest.TestCase):
                     calculate(c)
 
     def test_checked_in_report_matches_config(self):
-        self.assertEqual((ROOT / "docs/product/ECONOMICS.md").read_text(encoding="utf-8"), report(load()))
+        self.assertEqual((ROOT / "docs/ECONOMICS.md").read_text(encoding="utf-8"), report(load()))
 
     def test_changed_assumptions_update_report_narrative(self):
         c = load()
@@ -80,11 +80,14 @@ class EconomicsTests(unittest.TestCase):
         c["plans"] = [dict(c["plans"][0], share=1)]
         self.assertNotIn("Together contribution", report(c))
 
+    def test_savings_use_customer_price_not_performer_payout(self):
+        self.assertIn("| Together | $0.278 | 42.1% | 88.4% |", report(load()))
+
     def test_json_cannot_overwrite_markdown(self):
-        before = (ROOT / "docs/product/ECONOMICS.md").read_bytes()
+        before = (ROOT / "docs/ECONOMICS.md").read_bytes()
         result = subprocess.run([sys.executable, str(ROOT / "scripts/economics.py"), "--write", "--json"], capture_output=True)
         self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(before, (ROOT / "docs/product/ECONOMICS.md").read_bytes())
+        self.assertEqual(before, (ROOT / "docs/ECONOMICS.md").read_bytes())
 
 
 if __name__ == "__main__":
