@@ -293,5 +293,3 @@ class CompanionEngine:
             files = sorted([p for p in self.directory.iterdir() if re.fullmatch(r"[a-f0-9]{32}-\d+\.(wav|mp4)", p.name)], key=lambda p: p.stat().st_mtime)
             for path in files[:-100]:
                 path.unlink(missing_ok=True)
-
-
