@@ -1,95 +1,89 @@
 {
   "as_of": "2026-09-07",
   "currency": "USD",
-  "scope": "Proposed non-explicit asynchronous MVP; approvals and performance not established",
-  "rates": {
-    "llm_input_per_million": 0.051,
-    "llm_output_per_million": 0.335,
-    "guard_input_per_million": 0.484,
-    "guard_output_per_million": 0.03,
-    "tts_per_thousand_chars": 0.03,
-    "asr_per_minute": 0.0077,
-    "fal_video_per_output_second": 0.005,
-    "melotts_per_output_minute": 0.0002
-  },
+  "scope": "Adult PWA with self-hosted FlashHead Lite; forecast assumptions, not measured performance or merchant approval",
   "assumptions": {
-    "free_exchanges": 150,
-    "paid_exchanges": 500,
-    "free_user_monthly": 0.25,
-    "paid_text_monthly": 0.6,
-    "support_per_payer": 0.25,
-    "phone_call_minute": 0.05,
-    "video_seconds": 15,
-    "video_accepted_fraction": 0.85,
-    "video_other_per_attempt": 0.01,
-    "buffer_fraction": 0.25,
-    "video_delivered_budget": 0.15,
-    "processor_fraction": 0.03,
-    "refund_loss_fraction": 0.02,
-    "payment_fixed": 0.3,
-    "high_risk_fraction": 0.18,
-    "high_risk_fixed": 0.5,
-    "target_return_on_cost": 3,
-    "free_users_cap": 200,
-    "monthly_fixed": 50,
-    "first_month_setup": 500,
-    "customer_acquisition_cost": 0,
-    "founder_labor_monthly": 0,
-    "new_user_verification_cost": 0,
-    "cohort_payers": 100,
+    "gpu_hour": 0.9,
+    "streams": 2,
+    "occupancy": 0.5,
+    "auxiliary_per_live_minute": 0.005,
+    "transport_per_minute": 0.0008,
+    "contingency": 0.2,
+    "live_minute_floor": 0.025,
+    "phone_minute": 0.015,
+    "clip_cost": 0.1,
+    "paid_messages": 0.4,
+    "support": 0.25,
+    "free_user": 0.15,
+    "free_users": 100,
+    "processor_fraction": 0.12,
+    "loss_fraction": 0.02,
+    "payment_fixed": 0.5,
     "reserve_fraction": 0.1,
-    "gpu_rate_per_second": 0.000553,
-    "custom_video_billed_seconds": 60,
-    "custom_keepwarm_seconds": 0,
-    "custom_other_per_attempt": 0.03,
-    "free_phone_call_minutes": 37.5,
-    "free_voice_input_minutes": 5,
-    "paid_phone_call_minutes": 125
+    "verification_per_new_user": 1,
+    "monthly_fixed": 100,
+    "renderer_open_hours": 120,
+    "setup_technical": 500,
+    "registration": 1950,
+    "legal_setup": 0,
+    "founder_labor": 0,
+    "cac": 0,
+    "payers": 100
   },
   "plans": [
     {
-      "name": "Calls",
-      "price": 9.99,
-      "call_minutes": 10,
-      "videos": 0,
+      "name": "Together",
+      "price": 19.99,
+      "live_minutes": 20,
+      "phone_minutes": 10,
+      "clips": 2,
       "share": 0.25
     },
     {
-      "name": "Calls + Video",
-      "price": 19.99,
-      "call_minutes": 20,
-      "videos": 5,
+      "name": "Closer",
+      "price": 29.99,
+      "live_minutes": 45,
+      "phone_minutes": 20,
+      "clips": 5,
       "share": 0.5
     },
     {
-      "name": "Companion Plus",
-      "price": 29.99,
-      "call_minutes": 30,
-      "videos": 10,
+      "name": "Companion",
+      "price": 39.99,
+      "live_minutes": 75,
+      "phone_minutes": 30,
+      "clips": 8,
       "share": 0.25
     }
   ],
-  "addons": [
+  "packs": [
     {
-      "name": "Video pack",
-      "price": 9.99,
-      "call_minutes": 0,
-      "videos": 8,
-      "support": 0.1
+      "name": "Visual call 30",
+      "price": 14.99,
+      "live_minutes": 30,
+      "phone_minutes": 0,
+      "clips": 0
     },
     {
-      "name": "Phone-call pack",
+      "name": "Visual call 60",
+      "price": 24.99,
+      "live_minutes": 60,
+      "phone_minutes": 0,
+      "clips": 0
+    },
+    {
+      "name": "Voice call 60",
       "price": 14.99,
-      "call_minutes": 30,
-      "videos": 0,
-      "support": 0.1
+      "live_minutes": 0,
+      "phone_minutes": 60,
+      "clips": 0
+    },
+    {
+      "name": "Video messages 10",
+      "price": 14.99,
+      "live_minutes": 0,
+      "phone_minutes": 0,
+      "clips": 10
     }
-  ],
-  "sources": {
-    "fal_model": "https://fal.ai/models/fal-ai/flashhead",
-    "fal_billing": "https://fal.ai/docs/documentation/model-apis/pricing",
-    "cloudflare": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
-    "runware": "https://runware.ai/serverless/compute",
-    "processor": "https://stripe.com/pricing"
-  }
+  ]
 }

@@ -1,20 +1,18 @@
-# AI-mate MVP
+# AI-mate: affordable adult companion PWA
 
-Free text and recorded voice messages; paid phone calls and photorealistic video messages up to 15 seconds. Live video is a later experiment. Recommend an adult-only, non-explicit launch; explicit features require separate approvals and economics.
-
-This is a planning repository and offline calculator, **not a working application**. No inference, checkout or latency benchmark has been completed.
+Free bounded text and recorded voice; paid phone calls, realistic portrait calls and short portrait video messages. Adults only, with age assurance and approved high-risk payments. Default visual prototype: **self-hosted FlashHead Lite on one RTX 4090**, not the previous two-GPU Pro design.
 
 Five active product documents:
 
-1. This README: scope and repository map.
-2. [REPORT](docs/REPORT.md): offer, competition and business decision.
-3. [BUILD](docs/BUILD.md): models, memory, flow and release tests.
-4. [ECONOMICS](docs/ECONOMICS.md): generated prices and sensitivity analysis.
-5. [USA](docs/USA.md): licenses and launch eligibility.
+1. This README: scope.
+2. [REPORT](docs/REPORT.md): product, offers, market and decision.
+3. [BUILD](docs/BUILD.md): researched models, streaming design and POC.
+4. [ECONOMICS](docs/ECONOMICS.md): reproducible costs and stress cases.
+5. [USA](docs/USA.md): provider eligibility and legal path.
 
-`config/economics.json` owns assumptions; `scripts/economics.py` generates economics; `tests/` checks arithmetic. `docs/research/cloudflare-models.json` is reference data. `.env.example` lists planned integration settings, not credentials. Agent/factory records are historical coordination evidence. Superseded plans remain in Git history.
+There is no working application or validated GPU benchmark here. `config/economics.json` owns forecast inputs; `scripts/economics.py` generates the economics; `.env.example` is a planned integration contract. Catalog JSON and agent/factory records are reference/history, not additional product requirements. Earlier expensive plans remain in Git history.
 
-Python 3.11+, standard library only:
+Python 3.11+, no dependencies:
 
 ```powershell
 python scripts/economics.py --write
@@ -23,4 +21,4 @@ python -m compileall -q scripts tests
 git diff --check
 ```
 
-Validate quality and costs, implement free conversation and memory, then approved checkout and paid calls/clips. Keep live video disabled until separately measured.
+First prove a realistic, interruptible portrait conversation for $100–$250 in technical test spending, then fund and pass the separate commercial release gates. No inference purchases, accounts or deployment are authorized by this documentation work.

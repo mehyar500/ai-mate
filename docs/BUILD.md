@@ -1,95 +1,82 @@
-# Build the smallest useful companion
+# Low-cost visual conversation: build contract
 
-This is a proposed implementation contract, not completed software. The runtime must pass provider and state eligibility in [USA](USA.md), then measured quality/cost gates.
+Research-backed architecture, not implemented or benchmarked. Adults-only PWA; approved self-hosted inference is the default for adult traffic. Retain non-explicit mode through the same controls. Do not send adult conversations to fal or assume Cloudflare hosted-model permission.
 
-## Models and rates
+## Model selection
 
-| Stage | Exact model/service | Published rate or planning allowance |
+| Function | Selected model | License/evidence and limitation |
 |---|---|---|
-| Conversation and summaries | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | $0.051/M input, $0.335/M output tokens |
-| Text guard | `@cf/meta/llama-guard-3-8b` | $0.484/M input, $0.03/M output |
-| Original curated portrait | `@cf/black-forest-labs/flux-2-klein-4b` | $0.000287/output 512px tile; 1024px four tiles $0.001148, input charges extra |
-| Free recorded reply | `@cf/myshell-ai/melotts` | $0.0002/generated audio minute |
-| Incoming notes and phone ASR | `@cf/deepgram/flux` | $0.0077/input audio minute |
-| Phone-call speech | `@cf/deepgram/aura-2-en` | $0.03/1,000 characters |
-| Paid portrait clip | fal `fal-ai/flashhead`, FlashHead Lite + bundled ElevenLabs | $0.005/output second; exact ElevenLabs model version not published |
-| Memory | D1 confirmed facts + summary + recent turns | No separate embedding model in MVP |
+| Realistic portrait | Soul-AILab/SoulX-FlashHead-1_3B, Model_Lite | Apache-2.0 model card; authors report 96 FPS/4090. Start 512px, 25 FPS; quality must be evaluated. |
+| Video decoder | VAE_LTX from the FlashHead bundle | Pin exact artifact, upstream license and notices; not interchangeable with Pro's VAE_Wan. |
+| Audio features | facebook/wav2vec2-base-960h | Required by published pipeline; pin weights/license. |
+| Dialogue and summaries | Qwen/Qwen3-8B, non-thinking mode | Apache-2.0; cap context/output. Commercial license does not prove adult dialogue quality or policy fit. |
+| Speech recognition | Systran/faster-whisper-small | CTranslate2 runtime and Whisper-derived weights; audit both; test streaming partial transcripts. |
+| Speech synthesis | hexgrad/Kokoro-82M | Apache-2.0 model; permitted preset voices only. CPU first if latency passes. |
+| Turn detection | snakers4/silero-vad | MIT project; distinguish end-of-turn from brief pauses. |
+| Policy classification | Local meta-llama/Llama-Guard-3-8B candidate plus explicit product rules | Separate Meta license review; benchmark taxonomy and false positives. No claim that a generic guard provides complete adult/age safety. |
+| Original portrait assets | black-forest-labs/FLUX.1-schnell, offline curated | Apache-2.0 card; original fictional adults, provenance checked. Visual identity prepared before calls. |
 
-Sources: [Cloudflare pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/), [MeloTTS](https://developers.cloudflare.com/workers-ai/models/melotts/), [fal schema](https://fal.ai/models/fal-ai/flashhead/api). The catalog snapshot has no video-output model; Cloudflare cannot supply this entire pipeline. Prices do not imply permission for every content category.
+Primary sources: [FlashHead](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B), [bundle files](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B/tree/main), [Qwen](https://huggingface.co/Qwen/Qwen3-8B), [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M), [FLUX](https://huggingface.co/black-forest-labs/FLUX.1-schnell). Audit every actual runtime/weight/voice at its pinned revision. No unlicensed fine-tune or blanket permission claim.
 
-Preview the actual voices: MeloTTS, Aura and fal's bundled voice may sound different. Do not promise identical voice identity across channels. If users reject the mismatch, unify an approved voice pipeline before launch or remove the affected feature.
+Adult scope means the approved lawful adult product, not removing all controls. Test consent, age ambiguity, impersonation, self-harm and forbidden content handling. Off-the-shelf model behavior and realistic explicit imagery are not established here; do not sell an untested capability.
 
-## Infrastructure
+## Alternatives evaluated
 
-Cloudflare Workers serves the web app/API; D1 stores account-scoped memory and entitlements; R2 holds private portrait/clip assets; a Durable Object serializes each account's spending; Queues coordinates jobs; SSE reports progress. Cloudflare Realtime SFU/TURN carries phone audio. Recorded clips use private HTTP delivery, not live WebRTC transport. No user camera in MVP.
+| Candidate | Advantage | Decision |
+|---|---|---|
+| FlashHead Lite | Released streaming model, one consumer GPU, fresh portrait motion | First POC |
+| FlashHead Pro | Higher-quality candidate | Later comparison; two-5090 author real-time configuration is unnecessary for first test |
+| MuseTalk 1.5 | Released commercially usable lip-sync, author 30+ FPS/V100; edits 256px face region | Backup if Lite quality fails; typically relies on prepared source motion. Does not independently generate a new responsive body. No canned-loop default. |
+| EmbodiedHead | Explicit listening/speaking design and live demo | Watchlist: production license/deployable bundle not established in reviewed page |
+| lycui/AvatarForcing (arXiv 2603.14331) | Released checkpoints, one-step streaming research | Commercial license not established in reviewed card; do not confuse with the separate TaekyungKi project |
+| Wan2.2-TI2V-5B | Apache-2.0 general video candidate | Optional later asynchronous scenes; no one-to-two-second live/full-body claim |
+| Quark LiveAvatar/large diffusion clusters | More extensive generation | Exclude from cheap POC |
 
-Use fal's hosted model API first for approved non-explicit clips: no personally rented idle GPU. Its custom serverless hosting has different idle/setup billing. [Model billing](https://fal.ai/docs/documentation/model-apis/pricing), [custom serverless billing](https://fal.ai/docs/documentation/serverless/pricing).
+Sources: [MuseTalk](https://github.com/TMElyralab/MuseTalk), [EmbodiedHead](https://03skyboy.github.io/EmbodiedHead/), [AvatarForcing](https://huggingface.co/lycui/AvatarForcing), [Wan](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B). MuseTalk test assets are research-only even though its model is commercially usable; audit its VAE/detector dependencies separately.
 
-Runware custom compute is an optional beta route, requiring access and a measured container. Candidate weights: `Soul-AILab/SoulX-FlashHead-1_3B` Model_Pro, with `facebook/wav2vec2-base-960h` and the pinned model bundle's required VAE. There is no verified Runware FlashHead endpoint identifier. Budget RTX PRO 6000 at $0.000553/second; model loading classification needs confirmation. Zero active workers can mean zero compute, but storage, Workers, monitoring and held-warm capacity remain billable. [Compute offer](https://runware.ai/serverless/compute).
+## PWA and US topology
 
-## A-to-Z request journey
+HTTPS PWA on Cloudflare Workers; D1 holds account-scoped memory/entitlements, R2 private assets, Durable Objects serialize spending. Cloudflare Realtime SFU/TURN carries Opus audio and H.264 video. Client microphone only; no camera upload or visual understanding in POC. Cache the shell, not intimate transcripts/media, in the service worker.
 
-1. Adult account gate and consent; choose one of three original characters and preview its actual voice. Optional introduction: alias, interests, conversation style and an upcoming event.
-2. Confirm saved facts. First visit knows only supplied information; never scrape personal data or imply omniscience.
-3. Load account-scoped profile, relevant confirmed facts, rolling summary and recent turns. Bound total prompt to 4,096 tokens, including instructions and guard-relevant context.
-4. For a text/voice note, check allowance and length. Transcribe audio, guard input, call Qwen, guard output, stream text. Optionally generate a recorded MeloTTS reply up to 15 seconds. Cache the audio so replay does not regenerate it.
-5. For a paid feature, show exact units/price. Approved hosted checkout creates a server-verified payment event; signed events are deduplicated. Browser redirects never grant credits.
-6. Atomically reserve the call allowance or clip credit and provider budget. Duplicate requests reuse a job ID. Reject insufficient balance before inference.
-7. Phone: establish audio transport, stream ASR, detect turn end, retrieve bounded memory, stream Qwen text into Aura, play audio. Barge-in cancels stale generation. Meter connected seconds; disconnect at exhaustion or inactivity timeout.
-8. Clip: Qwen produces a brief script using only provider-permitted data. Send the original portrait and sanitized script to fal. Do not send the entire history or sensitive facts. Track job status, inspect output and deliver a private expiring URL.
-9. Validate clip identity, lip sync, speech and policy. Charge once on successful delivery; restore user credit on failure. Successful but unusable vendor generations may still cost us. Allow at most two attempts within a job budget.
-10. Save a bounded conversation summary and suggested facts. Confirm meaningful new personal facts before persistent storage. Returning greetings retrieve relevant events and the last topic.
-11. Support correction/deletion, cancellation, refunds and reconciliation. Deleting a fact removes dependent summaries/cached prompts; expired assets are cleaned up.
+Place the renderer and auxiliary inference together in one selected US region. Avoid serial cross-country hops. Start with one US host near the recruited cohort; test both coasts before expanding. WebRTC/PWA does not intrinsically add seconds of latency. Device, RTT, inference and buffering determine response time. [WebKit WebRTC](https://webkit.org/blog/7763/a-closer-look-into-webrtc/), [Safari 26 web apps](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/).
 
-## Memory that earns trust
+Require a user tap to start media, microphone permission, reconnection and a browser fallback. Test installed PWA and ordinary Safari/Chrome separately. Suspend billing on detected media loss; terminate idle/disconnected sessions after a short grace period. Do not promise reliable background/locked-screen video. Use wake-lock where supported, without assuming availability.
 
-Store facts with account ID, source turn, confirmation status, timestamp and optional event date/time zone. Keep an initial eight confirmed facts, a short summary and up to ten recent turns; truncate by token budget, not just turn count. Summarize every ten turns or after a call, within the text budget. Retrieval uses SQL initially.
+## Streaming logic and latency
 
-Example: 'You mentioned an interview Tuesday. How did it go?' If the date is uncertain, ask rather than inventing an outcome. Separate preferences from inferred health, sexuality or other sensitive traits; do not silently infer/store them. Users can export, correct, forget or disable memory. No raw call recording by default. Returning continuity is useful; claiming to know everything is false and intrusive.
+1. Prepare character portrait encoding once. Allocate per-session temporal state; never share memory or frame caches between users.
+2. VAD and partial ASR run while the user speaks. Retrieve confirmed profile/last topic concurrently. Do not wait for a completed recording upload.
+3. After turn end, run bounded non-thinking Qwen. Send the first coherent short phrase to Kokoro while the next phrase is generated.
+4. Generate enough speech samples for the model's native chunk and audio context; TTS can create a second of audio faster than a second of wall time. Avoid arbitrary chunk shortening until quality is tested.
+5. Pass chunk audio through wav2vec2 and FlashHead Lite, decode, hardware-encode frames and push directly to WebRTC with synchronized timestamps.
+6. Keep next-chunk work ahead of playback with a short bounded buffer. On interruption cancel stale audio/video by generation ID and reset state as needed.
+7. During listening generate fresh silent portrait frames at a tested cadence; measure mouth artifacts. Budget continuous rendering rather than assuming free listening or a talking duty-cycle discount.
+8. End at allowance exhaustion, persist a short summary, release capacity, and reconcile billed/fulfilled seconds.
 
-## Cost derivation and latency targets
+The [reference Gradio implementation](https://raw.githubusercontent.com/Soul-AILab/SoulX-FlashHead/main/gradio_app_streaming.py) reads a complete audio file and groups three chunks into MP4 segments. It is not our production transport. The proposed integration removes file/segment waits, but still must implement incremental audio, per-session state and cancellation. FPS measures throughput, not first response or two-session p95 latency.
 
-Free spoken playback: 150 x 15 seconds = 37.5 minutes, about $0.0075 in MeloTTS charges. Five ASR minutes cost $0.0385. At 4,096 input and 100 output tokens per exchange, 150 text exchanges cost about $0.0364 before guards/summaries. Reserve $0.25/free account/month including memory and overhead. Paid 500 exchanges and 125 playback minutes reserve $0.60. These budgets require measurement; no unlimited context or free-user growth.
+Warm latency allocation: endpointing/ASR finalization 200–350ms; first phrase 100–250ms; TTS/audio preparation 100–250ms; first video chunk 250–550ms; encoding/network/playout 100–250ms. Total working budget ~0.75–1.65s, with an end-to-end p95 goal <=2s. These are allocations, not measured percentiles or guarantees. Test one stream first, then two under simultaneous speech. If the model requires more lookahead or load adds queue delay, publish the observed number and reduce admission.
 
-Phone planning example per connected minute: three 4,096-token prompts and 100 total output tokens cost about $0.00066; 450 spoken characters cost $0.0135; one minute ASR $0.0077. Guards, transport, summaries and buffer fit within a proposed $0.05/minute budget, subject to measurement. Thirty minutes uses approximately 368,640 input/3,000 output tokens; sixty uses 737,280/6,000. Listening time still incurs transport and possibly ASR charges.
+Use native chunk sizes first. Do not upscale to 1080p or regenerate backgrounds per turn. Avoid long thinking traces and unbounded conversation prompts. Prefer 512px with good lighting/compression to expensive sharpening that cannot restore missing detail. No client-side neural-renderer dependency in the first PWA.
 
-Phone target: end-of-speech detection 250–500ms, first text 100–300ms, first audio 100–300ms, transport/playback 100–200ms. These are engineering allocations, not vendor SLAs or independently additive p95 values. Require measured end-of-user-speech to first-audible-reply p95 <=1.5 seconds. Measure barge-in separately.
+## Capacity and short clips
 
-A 15-second clip is output duration, not delivery time. Target median <=10 seconds and p95 <=20 seconds from submission to playable result, including first request after idle. fal's example is not a production percentile. The text endpoint determines duration from generated speech: constrain script length, meter actual output duration and trim delivery if needed; trimming does not remove provider charges. Do not advertise fast 15-second delivery before benchmarks pass.
+Author maximum is three Lite streams; forecast two at 50% occupied capacity. A $0.90/hour complete renderer then allocates $0.015/minute. Add $0.005/min auxiliary inference, $0.0008 transport and 20% contingency: approximately $0.025/min. Auxiliary costs are budgets, not evidence that the LLM, guard and two renderers fit/run fast on the same 4090. Use a separate measured auxiliary service if needed and update cost.
 
-Budget $0.15 per usable clip: $0.075 generation + $0.01 other costs, divided by 85% usable rate, plus 25% buffer = $0.125, rounded upward. Reject or restore credit if the promised deadline fails. Do not retry indefinitely. A custom Pro model may be slower even if GPU cost is lower.
+Clip generation reuses portrait and voice; priority is below live jobs. Fifteen output seconds = 375 frames at 25 FPS; 96 FPS implies ~3.9 seconds renderer-only on an otherwise idle benchmark GPU, not end-to-end latency. Budget $0.10 per usable clip including auxiliary work, retries and overhead; target p95 <=15 seconds after warm admission, max two attempts. If live demand prevents that, show the wait before purchase. This is a speaking portrait, not unrestricted action video.
 
-## Later live video, disabled
+## Memory and billing
 
-Candidate: FlashHead Pro + local `Qwen/Qwen3-8B`, `Systran/faster-whisper-small`, `hexgrad/Kokoro-82M`, `snakers4/silero-vad`, required pinned audio encoder/VAE, WebRTC output. Commercial eligibility must include all weights, voices and dependencies. [FlashHead](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B).
+4,096-token total prompt cap; short summary, up to eight confirmed facts and recent turns truncated by tokens. Facts have source/date and optional event timezone. First visit uses optional introductions only. Users confirm, correct, export and delete memory; deletions invalidate derived summaries. Never claim omniscience or infer sensitive traits covertly.
 
-Previous TensorDock scenario: two RTX 5090s at a combined $3.30/hour plus $1.20/hour auxiliary compute; at 50% billable utilization, compute alone is $4.50/30 paid minutes. Prior all-in delivery estimate $5.69 requires remeasurement. Indicative $59 clean / $129 high-risk per 30 minutes must also cover startup, support and overhead. Hourly rentals are not scale-to-zero serverless; do not promise instant calls without paying for warm capacity.
+CCBill hosted checkout is the adult candidate. Server-validate documented events, deduplicate and reconcile; no browser redirect grants credits or invented universal HMAC. Reserve entitlement before inference; meter delivered connected time; restore on failed delivery; show price and timer. Independent review must cover cross-account access, replay, forged age proof, duplicate jobs, refunds and cancellation before release.
 
-Reject the default eight-H100 `Quark-Vision/Live-Avatar` + `Wan-AI/Wan2.2-S2V-14B` route: prior delivery scenario ~$24.69/30 minutes requires roughly $360 price for 300% direct return under 18% fees plus $0.50. Keep it a historical comparison, not MVP infrastructure.
+## Small proof of concept
 
-## Release evidence
+Stage 1: 20–40 rented renderer hours plus auxiliary experiments, storage and network; $100–$250 technical cap, not permission to spend now. Use original clothed adult test portraits to measure the rendering mechanics privately before merchant activation. No training, no public payment collection, no app-store submission.
 
-### Expanded live-call implementation and budget
+Stage 2: one character, microphone, editable memory and live portrait in an HTTPS browser; measure 100 turns and several 30/60-minute calls. Compare one versus two streams, cold start, simultaneous speech, listening, barge-in, iPhone Safari/PWA and Android.
 
-Use FlashHead Pro as the quality-first prototype. The authors report 10.8 FPS on one RTX 4090 and 25+ FPS on two RTX 5090s with SageAttention. These are author benchmarks, not our end-to-end measurements. One large-memory GPU is not automatically an equivalent replacement. [Primary benchmark](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B).
+Stage 3: after host/merchant/state gates, 20 verified adult pilot customers. Acceptance: >=85% usable visual ratings; end-to-end warm p95 <=2s; clip p95 <=15s; full-redemption costs within budget; no severe privacy/billing failures. If it misses, report the measured price/latency and decide whether users accept it before scaling. No fake claims of tested explicit performance.
 
-Live flow: browser microphone -> WebRTC -> streaming ASR -> confirmed memory retrieval -> guarded Qwen response -> streaming speech -> wav2vec2 audio features -> FlashHead Pro plus its required VAE -> hardware video encoding -> synchronized WebRTC audio/video -> browser. Maintain timestamped audio and video queues; cancel stale speech and frames when the user interrupts. Generate fresh listening-state portrait frames rather than replaying a canned loop. Listening still occupies the renderer and is billable. Whether silent/listening motion looks natural is an explicit acceptance test.
-
-For approved non-explicit calls, reuse Cloudflare Qwen/Flux/Aura. For a separately approved self-hosted route, test Qwen3-8B, faster-whisper-small, Kokoro-82M and Silero VAD alongside FlashHead; lower conversational or voice quality may invalidate the substitution. Keep a guard and application policy on both routes. Open weights do not mean unrestricted use.
-
-Target end-of-speech to first synchronized response <=2.5 seconds p95, with <=150ms audio/video skew and sustained >=25 FPS. These are proposed product gates. Video buffering adds delay beyond the phone-only target. Measure 60-minute sessions, reconnects, interruptions and first calls after idle. Startup must be shown separately before the paid timer begins. If startup is unacceptable, pay for warm capacity or offer scheduled calls; zero idle GPU spend and instant guaranteed availability cannot both be assumed.
-
-More complete planning budget, superseding the earlier $5.69 delivery-only estimate: combined GPU/auxiliary $4.50/hour divided by 50% utilization = $4.50 per 30 paid minutes; add $1.50 audio/text/guards allowance and $0.024 WebRTC egress; apply 25% contingency, then add $1/session support/operational allocation: approximately $8.53, rounded to **$8.55/30 minutes**. Use **$17.10/60 minutes** conservatively. Rates, concurrency and utilization are assumptions needing a current US-host quote. Provider egress/storage and startup must fit the allowance or increase the budget.
-
-At 2.128 Mbps aggregate billed egress, 30 minutes uses 0.4788 GB, costing $0.02394 at Cloudflare's $0.05/GB list rate. Do not count the shared free tier as necessary for profitability. [Realtime pricing](https://developers.cloudflare.com/realtime/sfu/pricing/).
-
-| Scenario | Sell 30 / 60 minutes | Modeled total cost including fees | Contribution margin |
-|---|---:|---:|---:|
-| Approved clean, 5% combined fees/losses + $0.30 | $59 / $109 | $11.80 / $22.85 | 80.0% / 79.0% |
-| Approved high-risk, 18% combined fees/losses + $0.50 | $139 / $269 | $34.07 / $66.02 | 75.5% / 75.5% |
-
-These are per-session contribution margins, not company margins or processor quotes. The expanded high-risk recommendation **replaces $129 with $139** for 30 minutes: $129 leaves slightly less than a 300% return under the rounded budget. Before overhead, 300% price floors are ($8.55+$0.30)/(0.25-0.05)=$44.25 clean and ($8.55+$0.50)/(0.25-0.18)=$129.29 high-risk. Unallocated acquisition/legal/fixed costs require additional headroom.
-
-At 25% utilization, the same 30-minute delivery budget rises to about $14.15; at 10%, to $31.03. The proposed prices then miss the 300% target. One $4.50/hour group left running for 720 hours costs $3,240 before other expenses. Start with booked sessions or a narrow availability window, one verified concurrent call per group, and automatic teardown. Do not sell unlimited video or rely on claimed Lite concurrency for Pro capacity.
-
-Test 100 clips across the three characters, first-after-idle and concurrent requests, with actual billed seconds, duration, acceptance and p50/p95 latency. Test phone interruption/disconnect and full allowance redemption. Verify cross-account isolation, deleted memory, forged/replayed payments, duplicate jobs, provider timeout, cancellation, refund ordering and spending caps. Do not enable paid flags until these pass with approved providers. Existing offline tests validate economics only.
+Do not use perpetual idle GPUs in the forecast: 120 scheduled renderer hours/month cost $108 at the node assumption. The calculator adds any uncovered floor rather than double-counting allocated usage. Scale to zero outside pilot hours and show warm-up before charging; reserve warm capacity only from proven demand.
