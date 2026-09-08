@@ -29,18 +29,25 @@ def request(path,body=None):
         raise RuntimeError(error.read().decode('utf-8')[:4000]) from error
 
 
-def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False):
+def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False, silent=False, framing='fullbody'):
     movement={'wave':'She raises her right hand, waves hello once, then lowers it to her side.',
-              'closer':'She walks two small steps toward the fixed camera, becoming larger in the frame.',
+              'closer':'She walks two small steps straight toward the stationary camera, then stops close to it. Her face and upper body become substantially larger. Her lower legs naturally leave the bottom of the frame as she approaches. She finishes in a relaxed waist-up view, facing the camera.',
               'farther':'She walks two small steps backward away from the fixed camera, becoming smaller in the frame.',
               'idle':'She stands comfortably in the same place throughout, facing the camera. Her feet stay planted and her arms rest beside her hips. She breathes gently, blinks and briefly softens her smile. A soft breeze moves loose strands of hair and the leaves behind her.'}[action]
-    speech = (' Her lips stay softly closed as she listens quietly. The audio is quiet garden ambience.' if action == 'idle' else
+    speech = (' Her lips stay softly closed. The audio is quiet garden ambience.' if action == 'idle' or silent else
               ' She looks at the camera and says in a clear, natural female voice, "Hi there, I am Mira." '
               'Her lips and facial expression match her spoken words. The audio contains her voice and very faint garden ambience, with no music.')
     prompt=('A realistic video of the adult woman in the reference image, standing in the same garden. '
-            'The camera remains stationary, with no zoom, pan or cut. Her entire body and both shoes remain visible. '
+            'The camera remains stationary, with no zoom, pan or cut. '
             +movement+speech+' The paving and garden layout stay in place. '
             'Natural overcast daylight, detailed skin, consistent face, clothing and hairstyle.')
+    if action=='idle' and framing=='close':
+        prompt=('A photographic close-up portrait video of the adult woman in the reference image. '
+                'She stays at exactly the same distance from the fixed camera, with her head the same size in the frame. '
+                'The only visible movement is one natural blink: her eyelids close fully and open again. '
+                'Her chin, nose, shoulders and relaxed closed lips stay in the same positions. '
+                'A light breeze moves fine strands of her hair. The garden remains in the same '
+                'position. Detailed natural skin, soft daylight, continuous steady close-up, quiet garden ambience.')
     node=lambda kind,**inputs:dict(class_type=kind,inputs=inputs)
     graph = {
         '1':node('CheckpointLoaderSimple',ckpt_name=CHECKPOINT),
@@ -83,6 +90,9 @@ def main():
     parser.add_argument('--device',choices=['cpu','default'],default='cpu')
     parser.add_argument('--action',choices=['wave','closer','farther','idle'],default='wave')
     parser.add_argument('--return-to-reference',action='store_true',help='Add end-pose guidance before combining audio/video latents.')
+    parser.add_argument('--silent',action='store_true',help='Generate movement with quiet ambience; app speech is added separately.')
+    parser.add_argument('--reference-path',type=Path,help='Reviewed app-owned PNG; defaults to the full-body reference.')
+    parser.add_argument('--framing',choices=['fullbody','close'],default='fullbody')
     parser.add_argument('--timeout',type=int,default=900)
     args=parser.parse_args()
     if any(n<128 or n%32 for n in (args.width,args.height)) or not 9<=args.frames<=241 or args.frames%8!=1:
@@ -91,13 +101,15 @@ def main():
         if not (COMFY/'models'/folder/name).is_file():raise SystemExit('Finish the pinned LTX-2.3 download first.')
     state=request('/queue')
     if state.get('queue_running') or state.get('queue_pending'):raise SystemExit('Wait for an idle motion engine.')
-    original=ROOT/'generated/local-app/fullbody.png'
+    original=(args.reference_path or ROOT/'generated/local-app/fullbody.png').resolve()
+    if original.parent != (ROOT/'generated/local-app').resolve() or original.suffix != '.png' or not original.is_file():
+        parser.error('The reference must be an existing reviewed app-owned PNG.')
     tag='ltx23-'+uuid.uuid4().hex
     source=COMFY/'input'/(tag+'.png');shutil.copyfile(original,source)
-    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference)
+    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference,args.silent,args.framing)
     graph['21']['inputs']['filename_prefix']='motion/'+tag
     audit=ROOT/'generated/local-app/audit';audit.mkdir(exist_ok=True)
-    evidence={'model':CHECKPOINT,'encoder':ENCODER,'settings':vars(args),'source_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),
+    evidence={'model':CHECKPOINT,'encoder':ENCODER,'settings':{k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},'source_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),
               'workflow_source':'https://github.com/Comfy-Org/workflow_templates/blob/main/templates/video_ltx2_3_i2v.json',
               'graph':graph,'promoted_to_demo':False}
     destination=audit/(tag+'.json');destination.write_text(json.dumps(evidence,indent=2)+'\n')

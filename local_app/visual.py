@@ -4,6 +4,8 @@ Inference equations follow TMElyralab/MuseTalk (MIT, Copyright 2024 Tencent).
 The local adapter uses a fixed reviewed crop and feathered mask, avoiding the
 upstream training/pose stack. Dependencies and model licenses remain separate.
 """
+from collections import OrderedDict
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -115,30 +117,49 @@ class PortraitRenderer:
         finally:
             capture.release()
 
-    def motion_frames(self, path, nframes, fps, cancel, lip_frames=None):
+    def motion_frames(self, path, nframes, fps, cancel, lip_frames=None, loop=False, reuse=False):
         """Track the face on generated body footage; never move a static cutout."""
         cv, np = self.cv, self.np
-        capture = cv.VideoCapture(str(path))
-        source_fps = capture.get(cv.CAP_PROP_FPS)
-        frames = []
-        try:
-            while len(frames) <= 30 * 60:
-                check_cancel(cancel)
-                ok, frame = capture.read()
-                if not ok:
-                    break
-                frames.append(frame)
-        finally:
-            capture.release()
+        check_cancel(cancel)
+        if not hasattr(self, '_motion_cache'):
+            self._motion_cache = OrderedDict()
+        key = hashlib.sha256(path.read_bytes()).digest() if reuse and path.stat().st_size <= 40_000_000 else None
+        cached = self._motion_cache.get(key) if key else None
+        self.motion_cache_hit = cached is not None
+        if cached:
+            self._motion_cache.move_to_end(key)
+            frames, source_fps = cached['frames'], cached['fps']
+        else:
+            capture = cv.VideoCapture(str(path))
+            source_fps = capture.get(cv.CAP_PROP_FPS)
+            frames = []
+            try:
+                while len(frames) <= 30 * 60:
+                    check_cancel(cancel)
+                    ok, frame = capture.read()
+                    if not ok:
+                        break
+                    frames.append(frame)
+            finally:
+                capture.release()
         if not frames or not 1 <= source_fps <= 60 or len(frames) > 1800:
             raise RuntimeError("The motion clip is missing or has an invalid duration/frame rate.")
         height, width = frames[0].shape[:2]
+        # Cache only short, reviewed, speech-free source footage. At most two
+        # 384x576/144-frame entries; no generated mouths or user audio survives.
+        if not cached and key and len(frames) <= 144 and width*height <= 384*576:
+            cached = {'frames':frames, 'fps':source_fps, 'tracked':{}, 'latents':{}}
+            self._motion_cache[key] = cached
+            while len(self._motion_cache) > 2:
+                self._motion_cache.popitem(last=False)
+        self._appearance_latents = cached['latents'] if cached else None
         detector = cv.FaceDetectorYN.create(str(CACHE / "yunet.onnx"), "", (width, height), .65, .3, 5000)
-        tracked = {}
+        tracked = cached['tracked'] if cached else {}
         result = []
         for i in range(nframes):
             check_cancel(cancel)
-            index = min(len(frames)-1, int(i * source_fps / fps))
+            position = int(i * source_fps / fps)
+            index = position % len(frames) if loop else min(len(frames)-1, position)
             if lip_frames is not None and i >= lip_frames:
                 result.append((frames[index], None, None, None))
                 continue
@@ -165,7 +186,7 @@ class PortraitRenderer:
             result.append(tracked[index])
         return result
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2):
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False):
         if streaming:
             fps = 20
         cv, np, torch = self.cv, self.np, self.torch
@@ -206,7 +227,7 @@ class PortraitRenderer:
         inputs = self.features(data, sampling_rate=16000, return_tensors="pt").input_features.to("cuda", self.dtype)
         tracking_start = time.perf_counter()
         lip_frames = min(nframes, math.ceil((speech_duration+.15)*fps/batch_size)*batch_size) if motion_path else nframes
-        movement = self.motion_frames(motion_path, nframes, fps, cancel, lip_frames) if motion_path else None
+        movement = self.motion_frames(motion_path, nframes, fps, cancel, lip_frames, loop=loop_motion, reuse=reuse_motion) if motion_path else None
         tracking_seconds = time.perf_counter()-tracking_start
         height, width = (movement[0][0] if movement else self.portrait).shape[:2]
         # Pipe raw frames to one local encoder; no per-frame PNG disk round trips.
@@ -248,13 +269,22 @@ class PortraitRenderer:
                     if movement:
                         # Reuse appearance for at most 50ms; body frames, tracking and
                         # audio-conditioned mouth synthesis still update every frame.
-                        originals = torch.from_numpy(np.stack([item[3] for item in movement[offset:offset+count:face_encode_stride]])).permute(0,3,1,2).to("cuda",self.dtype)/255
-                        masked = originals.clone()
-                        masked[:,:,128:,:] = 0
-                        # Use the posterior mean to avoid random face texture jitter between frames.
-                        a = self.vae.encode(masked*2-1).latent_dist.mode()*self.vae.config.scaling_factor
-                        b = self.vae.encode(originals*2-1).latent_dist.mode()*self.vae.config.scaling_factor
-                        latent = torch.cat((a,b),dim=1).repeat_interleave(face_encode_stride,dim=0)[:count].contiguous(memory_format=torch.channels_last)
+                        crops = [item[3] for item in movement[offset:offset+count:face_encode_stride]]
+                        appearance = self._appearance_latents
+                        missing = [crop for crop in crops if appearance is None or id(crop) not in appearance]
+                        if missing:
+                            originals = torch.from_numpy(np.stack(missing)).permute(0,3,1,2).to("cuda",self.dtype)/255
+                            masked = originals.clone()
+                            masked[:,:,128:,:] = 0
+                            # Posterior means keep cached appearance deterministic.
+                            a = self.vae.encode(masked*2-1).latent_dist.mode()*self.vae.config.scaling_factor
+                            b = self.vae.encode(originals*2-1).latent_dist.mode()*self.vae.config.scaling_factor
+                            encoded = torch.cat((a,b),dim=1)
+                            if appearance is not None:
+                                for crop, value in zip(missing, encoded):
+                                    appearance[id(crop)] = value.unsqueeze(0).clone()
+                        latent = torch.cat([appearance[id(crop)] for crop in crops]) if appearance is not None else encoded
+                        latent = latent.repeat_interleave(face_encode_stride,dim=0)[:count].contiguous(memory_format=torch.channels_last)
                     else:
                         latent = self.latent.expand(count, -1, -1, -1)
                     pred = self.unet(latent, torch.tensor(0, device="cuda"), encoder_hidden_states=conditioning).sample
@@ -300,4 +330,5 @@ class PortraitRenderer:
                 "audio_features_s": features_seconds, "neural_s": neural_seconds,
                 "composite_pipe_s": composite_seconds,
                 "encoder": self.encoder, "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
-                "face_encode_stride": face_encode_stride if movement else None}
+                "face_encode_stride": face_encode_stride if movement else None,
+                "prepared_appearance_cache_hit": self.motion_cache_hit if movement else False}

@@ -44,6 +44,34 @@ def direct_motion_plan(user, available):
             'decision_source':'direct_command'}
 
 
+def scene_change_requested(user, target):
+    """Require a current visual request before replacing the camera setting.
+
+    The model still resolves destinations and references. Merely mentioning a
+    place in conversation must not discard the last successful body pose.
+    """
+    places = {'mira': r'(?:living room|home)', 'garden': r'garden',
+              'cafe': r'(?:caf[eé]|coffee shop)', 'fullbody': r'(?:full[ -]?body|head to toe)'}
+    if target not in places:
+        return False
+    start = r"(?:^|[.!?;,]\s*|\b(?:and|then)\s+)(?:please\s+|(?:can|could|would|will) (?:you|we|I)\s+)?"
+    request = (r"(?:show(?: me)?|see|let me see|I(?:'d| would) like to see|I want to see|back to|"
+               r"let(?:'s| us) (?:talk|sit|meet)|"
+               r"(?:let(?:'s| us)\s+)?(?:go|move|switch|change|head|take me))\b[^.!?;]{0,45}\b")
+    destination = places[target] + r'\b'
+    if re.search(start + request + destination, user, re.I):
+        return True
+    # Resolve a destination offered in recent conversation, without treating
+    # "tell me about there" or "don't go there" as a visual transition.
+    if re.search(start + r"(?:let(?:'s| us) go|go|take me|show me)(?:\s+(?:over|to))?\s+(?:there|that)(?:[.!?]|$)", user, re.I):
+        return True
+    if re.search(start + r'(?:show me|let me see)(?:\s+it)?[.!?]?$', user, re.I):
+        return True
+    if re.search(start + r'send(?: me)? (?:a |the )?(?:video|picture|photo) from there[.!?]?$', user, re.I):
+        return True
+    return target == 'fullbody' and bool(re.search(start + r'(?:stand up|move around)\b', user, re.I))
+
+
 def validate_plan(data, user, mode, scene, available):
     if not isinstance(data, dict):
         raise ValueError("The conversation model returned an invalid response. Please retry.")
@@ -58,6 +86,8 @@ def validate_plan(data, user, mode, scene, available):
     chosen = data.get("scene")
     if chosen not in available:
         chosen = scene if scene in available else (available[0] if available else "mira")
+    elif chosen != scene and scene in available and not scene_change_requested(user, chosen):
+        chosen = scene
     if presentation in {"video", "portrait"} and chosen not in available:
         presentation = "text"
         reply = "The picture isn't available yet. We can keep talking here."
@@ -160,6 +190,8 @@ class Conversation:
             "Do not claim to physically travel. Don't mention implementation details unless asked. "
             "presentation: use the current selected mode. Resolve 'show me', 'there', 'do that' from recent conversation. "
             "scene: keep unless the user's conversation asks for another available setting. "
+            "Garden and fullbody are views of the same garden. Describing a walk, flowers or this garden "
+            "must keep the current scene and framing; only an explicit visual change selects another scene. "
             "Choose fullbody when the user asks to see your full body, stand up, move around or show an action. "
             "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
             "Default action is none. Never repeat an earlier action just because it is in history. "
@@ -179,7 +211,10 @@ class Conversation:
             'Message delivery example: user says "Send me a message saying hello from our call", '
             'output {"reply":"I sent it to your Text tab.","message":"Hello from our call.","presentation":"continue","scene":"keep","action":"none","facts":[]}. '
             'The reply field must contain your actual spoken answer, not a type definition. '
-            "\nCurrent app state (trusted capabilities): " + json.dumps({"mode": mode, "scene": scene, "available_scenes": available})
+            "Visual pose 'near' means the companion is currently in close view; 'base' means the original full-body pose. "
+            "Unknown means position has not been matched to a reviewed pose. Do not claim a different current framing. "
+            "\nCurrent app state (trusted capabilities): " + json.dumps({"mode": mode, "scene": scene, "available_scenes": available,
+                "visual_pose":snapshot.get('visual_pose','unknown') if snapshot.get('visual_pose') in {'base','near','portrait','unknown'} else 'unknown'})
         )
         headers = {"Content-Type": "application/json"}
         if self.provider == "hermes":

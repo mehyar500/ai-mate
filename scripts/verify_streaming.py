@@ -18,7 +18,7 @@ def main():
         with urllib.request.urlopen(urllib.request.Request(base+path,data=data,headers=headers),timeout=10) as response:
             return json.load(response)
     started=time.perf_counter()
-    key=request("/api/turn",{"text":"In a video reply, give me two short sentences about growing tomatoes in a small garden.","mode":"video","scene":"garden"})["id"]
+    key=request("/api/turn",{"text":"In a video reply, give me two short sentences about growing tomatoes in a small garden.","mode":"video","scene":initial['scene']})["id"]
     try:
         for _ in range(300):
             job=request("/api/jobs/"+key)
@@ -42,6 +42,8 @@ def main():
         assert state["turns"]==initial["turns"],"Cancellation changed conversation"
         assert state["memory"]==initial["memory"],"Cancellation changed notes"
         assert state.get("facts",[])==initial.get("facts",[]),"Cancellation saved facts"
+        assert state['scene']==initial['scene'],"Cancellation changed the scene"
+        assert state.get('idle_video')==initial.get('idle_video'),"Cancellation changed the listening pose"
         files=list(Path("generated/local-app").glob(key+"-*"))
         assert not files,"Cancelled media was retained"
         evidence={"first_4096_bytes_s":round(first_byte_s,3),"state_when_bytes_arrived":before["state"],

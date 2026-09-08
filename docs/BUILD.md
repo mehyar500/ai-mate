@@ -8,7 +8,7 @@ The local app binds to `127.0.0.1:8765`. Text, Voice call and Video call accept 
 
 Cloudflare is configured using API key plus email. MiniMax and Ollama remain optional adapters. Three startup settings are read from private `.env`; the model adapters pin the actual graphics/voice choices. No production payment flags or pretend deployment controls are configured.
 
-For the original full-body pose, the engine can load a hash-matched, reviewed LTX-2.3 listening loop prepared offline. Browser playback between replies uses no diffusion; ordinary speech applies MuseTalk to that moving footage. A pose-changing command disables the base loop and preserves its generated final frame. This bounded prepared-motion path improves ordinary-call latency without claiming arbitrary real-time video generation.
+The engine loads hash-matched, reviewed LTX-2.3 approach/return clips and listening loops for full-body and close views. Ordinary speech applies new MuseTalk lips to the appropriate loop; longer replies repeat its body footage. The browser keeps idle motion visible during buffering and selects the destination loop after playback. A bounded cache reuses source appearance, never generated user speech. Unknown poses use held frames. These prepared movements improve latency for a limited set of actions; arbitrary real-time generation remains unresolved.
 
 Use the founder's existing RTX 4060 Ti (16,380 MiB reported VRAM) and about 47.7 GiB system RAM. This is an inventory result, not an inference benchmark. Run a loopback-only server and browser UI with a synthetic profile, local SQLite/file memory and an explicit reset/delete control. No public model endpoint, user signup, customer payment, camera upload or production scheduler.
 

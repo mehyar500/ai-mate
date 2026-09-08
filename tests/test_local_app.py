@@ -252,16 +252,20 @@ class HTTPTests(unittest.TestCase):
 
     def test_idle_route_requires_loaded_asset_and_preserves_http_boundaries(self):
         self.assertEqual(self.request('/idle/fullbody.mp4')[0],404)
+        self.assertEqual(self.request('/idle/near.mp4')[0],404)
         video=Path(self.tmp.name)/'idle-fullbody.mp4';video.write_bytes(b'0123456789')
         self.app.idle_video=video
+        self.app.near_idle_video=video
         try:
-            status,body,headers=self.request('/idle/fullbody.mp4',headers={'Range':'bytes=2-5'})
-            self.assertEqual((status,body),(206,b'2345'))
-            self.assertEqual(headers['Cache-Control'],'no-store')
-            self.assertEqual(self.request('/idle/fullbody.mp4',headers={'Origin':'https://evil.example'})[0],403)
+            for route in ['/idle/fullbody.mp4','/idle/near.mp4']:
+                status,body,headers=self.request(route,headers={'Range':'bytes=2-5'})
+                self.assertEqual((status,body),(206,b'2345'))
+                self.assertEqual(headers['Cache-Control'],'no-store')
+                self.assertEqual(self.request(route,headers={'Origin':'https://evil.example'})[0],403)
             self.assertEqual(self.request('/idle/memory.sqlite3')[0],404)
         finally:
             self.app.idle_video=None
+            self.app.near_idle_video=None
 
 
 if __name__ == "__main__":

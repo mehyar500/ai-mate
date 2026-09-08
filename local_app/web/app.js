@@ -6,14 +6,19 @@ let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=fal
 let replyMode="video",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let soundOn=true;
 let idleURL=null,idleFailed=false,idleSuppressed=false;
+let nextIdleURL=undefined,pictureStarted=false,motionRequested=false;
+function settleIdle(){
+  if(nextIdleURL!==undefined){idleURL=nextIdleURL;nextIdleURL=undefined;idleSuppressed=!idleURL;}
+  pictureStarted=false;
+}
 function idlePresence(){
   const video=$('idle-video');
-  const visible=ready&&connected&&!document.hidden&&viewMode==='video'&&replyMode==='video'&&scene==='fullbody'&&idleURL&&!idleFailed&&!idleSuppressed&&!playing;
+  const visible=ready&&connected&&!document.hidden&&viewMode==='video'&&replyMode==='video'&&scene==='fullbody'&&idleURL&&!idleFailed&&!idleSuppressed&&!pictureStarted;
   if(!visible){video.pause();video.hidden=true;return;}
   if(video.getAttribute('src')!==idleURL)video.src=idleURL;
   video.muted=true;video.hidden=false;$('held-frame').hidden=true;
   if(video.paused)video.play().then(()=>{if(video.hidden||document.hidden)video.pause();}).catch(()=>{if(!video.hidden)idleFailed=true;video.hidden=true;});
-  $('media-label').textContent='Full-body garden · Prepared listening loop';
+  $('media-label').textContent=(idleURL.includes('/near.')?'Garden close view':'Full-body garden')+' · Prepared listening loop';
 }
 $('idle-video').addEventListener('error',()=>{idleFailed=true;$('idle-video').hidden=true;});
 document.addEventListener('visibilitychange',idlePresence);
@@ -87,6 +92,7 @@ function holdPicture(){
   picture.hidden=true;
 }
 function resetPlayback(holdFrame=false){
+  nextIdleURL=undefined;pictureStarted=false;motionRequested=false;
   if(holdFrame)holdPicture();else $("held-frame").hidden=true;
   epoch++;queue=[];playing=false;abortMedia?.abort();abortMedia=null;
   for(const media of [$("video"),$("audio")]){media.pause();media.removeAttribute("src");media.load();}
@@ -94,6 +100,7 @@ function resetPlayback(holdFrame=false){
   $("video").hidden=true;$("resume").hidden=true;setScene(scene);controls();
 }
 function played(){
+  if(!$("video").hidden){pictureStarted=true;if(motionRequested)idleSuppressed=true;}
   $('idle-video').pause();$('idle-video').hidden=true;
   if(!$("video").hidden)$("held-frame").hidden=true;
   if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}
@@ -143,7 +150,7 @@ async function drain(){
     const item=queue.shift();lastMedia=item;$("replay").hidden=false;
     const media=item.video?$("video"):$("audio");
     const speech=item.video?$("audio"):media;
-    if(item.video){media.hidden=false;media.muted=true;$("media-label").textContent=sceneNames[scene]+" · Generated video";}
+    if(item.video){media.hidden=true;media.muted=true;}
     speech.muted=!soundOn;speech.volume=1;
     const controller=new AbortController();abortMedia=controller;
     let releaseSpeech=()=>{};
@@ -154,7 +161,11 @@ async function drain(){
         notice(error.name==="NotAllowedError"?"Tap Play reply to enable voice.":"Voice playback failed. Try Replay or Test sound.",true);
       }});
     }
-    media.onplaying=played;
+    media.onplaying=()=>{
+      if(mine!==epoch)return;
+      if(item.video){media.hidden=false;$("media-label").textContent=sceneNames[scene]+(item.prepared_motion?" · Prepared motion · live voice":" · Generated video");}
+      played();
+    };
     media.onwaiting=()=>{if(firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
     media.onended=()=>{if(mine!==epoch)return;if(item.video)holdPicture();if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
     try{
@@ -175,7 +186,7 @@ async function drain(){
     releaseSpeech();
     if(mine===epoch&&objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
   }
-  if(mine===epoch){playing=false;abortMedia=null;listenAfter=performance.now()+450;controls();}
+  if(mine===epoch){playing=false;abortMedia=null;settleIdle();listenAfter=performance.now()+450;controls();}
 }
 $("resume").addEventListener("click",async()=>{
   if(lastMedia?.video&&$("video").hidden){const item={...lastMedia,stream:null};resetPlayback(true);queue.push(item);drain();return;}
@@ -190,7 +201,7 @@ async function follow(key,node){
       const job=await api("/api/jobs/"+key);if(active!==key)return;
       if(job.user)node.textContent=job.user;
       if(!pendingStop&&job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
-      if(job.action){setAction(job.action);if(job.action!=='none')idleSuppressed=true;}
+      if(job.action){setAction(job.action);motionRequested=job.action!=='none';}
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
       if(job.state==='done'&&job.message&&!shownMessage){bubble(job.message,'assistant sent-message');shownMessage=true;if(viewMode!=='text')unread++;controls();}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
@@ -200,6 +211,7 @@ async function follow(key,node){
       else if(job.state==="rendering"&&!playing)notice("Connecting the picture…");
       else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
       if(["done","failed","cancelled"].includes(job.state)){
+        if(job.state==='done'&&job.presentation==='video'){nextIdleURL=job.idle_video||null;if(!playing&&!queue.length)settleIdle();}
         if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Speak again or type.");}
         else if(job.state==="failed"){notice(job.error,true);if(!replyNode)bubble("That reply couldn't finish. Please try again.","assistant");}
         else if(job.state==="cancelled")notice("Stopped. You can talk or type now.");
@@ -301,7 +313,8 @@ async function boot(){
         if(firstBoot||restarted){renderHistory(data.turns);setScene(data.scene||"mira");firstBoot=false;}
         if(restarted){idleSuppressed=false;idleFailed=false;resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
       }
-      const state=await api("/api/status");ready=state.ready;hasVideo=state.visual_loaded;provider=state.provider;idleURL=state.idle_video||null;
+      const state=await api("/api/status");ready=state.ready;hasVideo=state.visual_loaded;provider=state.provider;
+      if(!active&&!playing&&!submitting&&!state.busy)idleURL=state.idle_video||null;
       if(state.app_version!=="0.2"){ready=false;$("connection").textContent="Server update needed";notice("Restart the local server to finish this update.",true);controls();await sleep(1500);continue;}
       if(!active&&!submitting)busy=state.busy;
       $("connection").textContent=state.error?"Models unavailable":!ready?"Preparing Mira…":provider==="ollama"?"On your computer":"Hosted conversation · local video";

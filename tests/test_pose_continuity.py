@@ -1,6 +1,7 @@
 """State/lifecycle checks; neural image quality is tested separately on the GPU."""
 from pathlib import Path
 import tempfile
+import threading
 import time
 import unittest
 from unittest.mock import patch, Mock
@@ -35,6 +36,7 @@ class FakeModels:
         self.visual=FakeVisual()
 
     def plan(self, snapshot, text, mode, scene, available, event):
+        self.last_snapshot=snapshot
         return {'reply':'Hello','presentation':'video','scene':scene,'action':text if text in {'wave','closer','farther'} else 'none','facts':[]}
 
     def load_visual(self):
@@ -157,6 +159,94 @@ class PoseTests(unittest.TestCase):
         job=self.reply('hello')
         self.assertNotIn('motion_source',job['chunks'][0]['render'])
         self.assertTrue(asset.exists())
+
+    def install_performance(self):
+        folder=Path(self.temp.name)
+        for name in ['closer','farther','idle-base','idle-near']:
+            (folder/(name+'.mp4')).write_bytes(name.encode())
+        self.app.idle_video=folder/'idle-base.mp4'
+        self.app.near_idle_video=folder/'idle-near.mp4'
+        self.app.performance={('base','closer'):{'path':folder/'closer.mp4','to':'near'},
+                              ('near','farther'):{'path':folder/'farther.mp4','to':'base'}}
+
+    def test_reviewed_pose_survives_conversation_before_return(self):
+        self.install_performance()
+        closer=self.reply('closer')
+        self.assertEqual(closer['prepared_pose'],'near')
+        self.assertEqual(closer['idle_video'],'/idle/near.mp4')
+        self.assertEqual(closer['chunks'][0]['render']['motion_source'],'reviewed_prepared_transition')
+        self.assertIsNone(self.app.return_motion)
+        hello=self.reply('hello')
+        self.assertEqual(hello['chunks'][0]['render']['motion_source'],'prepared_listening_loop')
+        self.assertEqual(hello['prepared_pose'],'near')
+        self.assertEqual(self.app.models.last_snapshot['visual_pose'],'near')
+        self.assertNotIn('visual_pose',self.app.store.snapshot())
+        farther=self.reply('farther')
+        self.assertEqual(farther['prepared_pose'],'base')
+        self.assertEqual(farther['idle_video'],'/idle/fullbody.mp4')
+        self.generate.assert_not_called();self.reverse.assert_not_called()
+
+    def test_failed_or_reset_transition_cannot_commit_a_prepared_pose(self):
+        self.install_performance()
+        self.visual.fail=True
+        self.assertEqual(self.reply('closer')['state'],'failed')
+        self.assertEqual(self.app.performance_state,'base')
+        self.visual.fail=False;self.visual.after_capture=self.app.reset
+        self.assertEqual(self.reply('closer')['state'],'cancelled')
+        self.assertEqual(self.app.performance_state,'base')
+        self.assertIsNone(self.app.pose)
+
+    def test_unreviewed_action_invalidates_known_pose(self):
+        self.install_performance()
+        self.reply('closer')
+        self.reply('wave')
+        self.assertIsNone(self.app.performance_state)
+        self.assertIsNone(self.app.status()['idle_video'])
+        self.reply('farther')
+        self.assertEqual(self.generate.call_count,2)
+
+    def test_only_listening_footage_loops_beyond_source_duration(self):
+        from local_app.visual import PortraitRenderer
+        class Frame:
+            shape=(2,2,3)
+        frames=[Frame() for _ in range(4)]
+        renderer=PortraitRenderer.__new__(PortraitRenderer)
+        renderer.cv=Mock();renderer.np=Mock()
+        capture=renderer.cv.VideoCapture.return_value
+        capture.get.return_value=2
+        for looping,expected in [(False,[0,1,2,3,3,3]),(True,[0,1,2,3,0,1])]:
+            capture.read.side_effect=[(True,f) for f in frames]+[(False,None)]
+            result=renderer.motion_frames(Path('fixture.mp4'),6,2,threading.Event(),lip_frames=0,loop=looping)
+            self.assertEqual([frames.index(row[0]) for row in result],expected)
+
+    def test_prepared_frame_cache_is_content_based_bounded_and_opt_in(self):
+        from local_app.visual import PortraitRenderer
+        class Frame:
+            shape=(2,2,3)
+        renderer=PortraitRenderer.__new__(PortraitRenderer)
+        renderer.cv=Mock();renderer.np=Mock()
+        capture=renderer.cv.VideoCapture.return_value
+        capture.get.return_value=2
+        event=threading.Event()
+        folder=Path(self.temp.name)
+        def read(name, content, reuse=True):
+            path=folder/name;path.write_bytes(content)
+            capture.read.side_effect=[(True,Frame()),(True,Frame()),(False,None)]
+            renderer.motion_frames(path,2,2,event,lip_frames=0,reuse=reuse)
+        read('first.mp4',b'base')
+        self.assertFalse(renderer.motion_cache_hit)
+        read('copy.mp4',b'base')
+        self.assertTrue(renderer.motion_cache_hit)
+        self.assertEqual(renderer.cv.VideoCapture.call_count,1)
+        read('copy.mp4',b'changed')
+        self.assertFalse(renderer.motion_cache_hit)
+        read('third.mp4',b'near')
+        self.assertEqual(len(renderer._motion_cache),2)
+        read('first.mp4',b'base')
+        self.assertFalse(renderer.motion_cache_hit)  # Oldest content was evicted.
+        read('first.mp4',b'base',reuse=False)
+        self.assertFalse(renderer.motion_cache_hit)
+        self.assertIsNone(renderer._appearance_latents)
 
 
 if __name__=='__main__':

@@ -24,6 +24,14 @@ class IdleAssetTests(unittest.TestCase):
             self.assertIsNone(load_reviewed_idle(folder))
             video.write_bytes(b'video');(folder/'fullbody.png').write_bytes(b'new identity')
             self.assertIsNone(load_reviewed_idle(folder))
+            (folder/'performance-near.png').write_bytes(b'reference')
+            near=folder/'idle-near.mp4';near.write_bytes(b'video')
+            manifest['pose']='near'
+            (folder/'idle-near.json').write_text(json.dumps(manifest))
+            self.assertEqual(load_reviewed_idle(folder,'near'),near)
+            (folder/'performance-near.png').write_bytes(b'new near reference')
+            self.assertIsNone(load_reviewed_idle(folder,'near'))
+            self.assertIsNone(load_reviewed_idle(folder,'unknown'))
 
     def test_missing_or_malformed_manifest_falls_back(self):
         with tempfile.TemporaryDirectory() as temp:

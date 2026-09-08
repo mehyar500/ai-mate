@@ -79,8 +79,9 @@ class Handler(BaseHTTPRequestHandler):
             file = self.app.directory / path.rsplit("/", 1)[-1]
             if file.exists():
                 return self.respond(200, file.read_bytes(), "image/png")
-        if re.fullmatch(r"/media/[a-f0-9]{32}-\d+\.(wav|mp4)", path) or (path == '/idle/fullbody.mp4' and self.app.idle_video):
-            file = self.app.idle_video if path == '/idle/fullbody.mp4' else self.app.directory / path.rsplit("/", 1)[-1]
+        idle_asset = {'/idle/fullbody.mp4':self.app.idle_video, '/idle/near.mp4':self.app.near_idle_video}.get(path)
+        if re.fullmatch(r"/media/[a-f0-9]{32}-\d+\.(wav|mp4)", path) or idle_asset:
+            file = idle_asset or self.app.directory / path.rsplit("/", 1)[-1]
             if file.exists():
                 data = file.read_bytes()
                 mime = "video/mp4" if file.suffix == ".mp4" else "audio/wav"

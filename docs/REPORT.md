@@ -11,17 +11,18 @@ The shared flow lives in `local_app/engine.py`. Private `.env` contains implemen
 ## Evidence and gaps
 
 - Direct body generation took 4.50s at 384x576, 3.19s at 320x480 and 2.00s at 256x384 in warm samples. The fastest moved both hands; these times exclude the rest of the call.
-- Browser approach playback began in 5.29s. Immediately returning along that generated path in reverse began in 1.82s, with new speech and zero buffer stalls. This is bounded reuse, not general fresh backward generation.
-- A reviewed LTX-2.3 listening loop now supplies blinking and foliage motion at the original standing pose. A voiced greeting over it began in 2.08s with zero stalls and returned to the loop. Position-changing turns disable it to avoid snapping back. It is prepared footage, not continuous fresh diffusion.
-- Fresh LTX-2.3 joint audio/video took 144.97s cold and 21.45s with cached text conditioning. Its wave looked more coherent but included unwanted subtitle-like marks. A later LTX-2B closer trial took 8.52s to playback and made her appear smaller; command accuracy remains unreliable.
-- 81 Python checks pass, including idle asset/hash/HTTP boundaries, pose/return cancellation and real CPU reversal of synthetic video. Seven Node checks pass. Final checks accompany each commit.
+- Reviewed approach → greeting → return began browser playback in **1.72s / 2.16s / 1.83s**, with zero stalls and completed unmuted audio. The final-build approach/return check took **2.61s / 2.68s**, also with no stalls. Prepared transitions now survive intervening conversation, with a blinking listening loop at both full-body and close positions.
+- New speech and lips are generated over prepared footage. A bounded source-appearance cache reduces repeated tracking/encoding; long replies loop the body instead of freezing. The scene guard now prevents garden descriptions from discarding a close view.
+- A **13.092s** spoken count took **9.97s to start / 23.489s server completion**, with two stalls before caching. A warm-cache repeat took **9.54s / 19.680s**, with no stalls; rendering improved from 15.943s to 11.182s. That starting delay remains unacceptable for a call. Another 6.155s reply began in 4.23s with no stalls. These are samples, not p95 or universal two-second latency.
+- LTX-2.3 successfully prepared the approach in 146.429s cold. Several close-idle prompts failed review before a blink-only guided clip worked. Its fresh joint audio/video remains too slow for live replacement; arbitrary LTX-2B commands still fail direction/framing. Prepared motion is disclosed.
+- **89 Python / seven Node checks pass**. A real streaming cancellation completed in 0.328s, preserving conversation and the listening pose and removing cancelled media. Unmuted browser completion is not confirmation of physical speaker output.
 
-Continuous visual presence, reliable arbitrary motion, identity/lips, acoustic device testing and sustained p95 latency remain open. This is not production-ready.
+Longer replies now retain visual motion, but short loops repeat and approach frames have visible blur. Reliable arbitrary motion, interruption-aware pose continuity, identity/lips, acoustic device testing and sustained p95 latency remain open. This is not production-ready.
 
 ## Budget and next work
 
 The founder is the only engineer. Electricity planning is $6/$1.80/$1.80 for three months, plus one $75 contingency: $84.60, rounded to a $100 ceiling. These power assumptions are unmeasured. No cloud GPU or Apple membership was purchased. [ECONOMICS](ECONOMICS.md) covers optional rentals and Apple-fee scenarios.
 
-Qualify idle/streaming movement, then compare inexpensive larger GPUs if needed. Native playback and StoreKit are later implementation work; [BUILD](BUILD.md) and [USA](USA.md) define scope. Interest is not revenue; funding is not guaranteed.
+Next: reduce whole-reply speech preparation, repair interrupted-playback pose state, then qualify sustained call latency and compare larger GPUs if necessary. Native playback and StoreKit are later implementation work; [BUILD](BUILD.md) and [USA](USA.md) define scope. Interest is not revenue; funding is not guaranteed.
 
 The founder authorized direct main work on local engine/UI/adapters, related scripts/configuration/tests and existing product documents. Preserve SQLite memory and credentials. R2 independent security/correctness review, staging and public-release evidence remain pending, owned by the founder before launch. Rollback uses reviewed code reverts.

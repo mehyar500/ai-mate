@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
+    parser.add_argument('--pose',choices=['base','near'],default='base')
     args = parser.parse_args()
     source = args.source.resolve()
     allowed = [ROOT/'.cache/local-poc/ComfyUI/output/motion', ROOT/'generated/local-app/audit']
@@ -24,7 +25,9 @@ def main():
     if not 2 <= duration <= 8 or (video['width'],video['height']) != (384,576):
         parser.error('The reviewed loop must be 384x576 and 2–8 seconds.')
     folder = ROOT/'generated/local-app'
-    out = folder/'idle-fullbody.mp4'
+    name='fullbody' if args.pose=='base' else 'near'
+    reference=folder/('fullbody.png' if args.pose=='base' else 'performance-near.png')
+    out = folder/f'idle-{name}.mp4'
     # Join the final quarter-second to the first; start at that first quarter's end.
     transition = .25
     graph = (f'[0:v]split[a][b];[a]trim=start={transition},setpts=PTS-STARTPTS[main];'
@@ -34,10 +37,10 @@ def main():
                     '-filter_complex',graph,'-map','[v]','-an','-c:v','libx264','-preset','fast',
                     '-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(out)],check=True,timeout=30)
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-    manifest = {'version':1,'scene':'fullbody','model':'LTX-2.3-22B-distilled-FP8',
-                'source_sha256':sha(source),'reference_sha256':sha(folder/'fullbody.png'),
+    manifest = {'version':1,'scene':'fullbody','pose':args.pose,'model':'LTX-2.3-22B-distilled-FP8',
+                'source_sha256':sha(source),'reference_sha256':sha(reference),
                 'sha256':sha(out),'precomputed':True,'audio':False}
-    (folder/'idle-fullbody.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    (folder/f'idle-{name}.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({'output':str(out),'sha256':manifest['sha256'],'requires_output_review':True}))
 
 

@@ -59,6 +59,10 @@ class CompanionEngine:
         self.pose = None  # (scene, private PNG), committed only after successful video completion.
         from .idle import load_reviewed_idle
         self.idle_video = load_reviewed_idle(self.directory)
+        self.near_idle_video = load_reviewed_idle(self.directory, 'near')
+        from .performance import load_reviewed_performance
+        self.performance = load_reviewed_performance(self.directory)
+        self.performance_state = 'base'
         self.return_motion = None  # One approach, valid until the next successful video turn.
         for path in self.directory.glob('*-pose.png'):
             if re.fullmatch(r'[a-f0-9]{32}-\d+-pose\.png',path.name):
@@ -90,6 +94,15 @@ class CompanionEngine:
             self.error = "Local model startup failed. Check the terminal and model setup."
             print(f"Startup error: {type(error).__name__}: {error}", flush=True)
 
+    def listening_asset(self, scene, pose):
+        if scene != 'fullbody':
+            return None
+        return self.idle_video if pose == 'base' else self.near_idle_video if pose == 'near' else None
+
+    def listening_url(self):
+        asset = self.listening_asset(self.scene, self.performance_state)
+        return '/idle/near.mp4' if asset and self.performance_state == 'near' else '/idle/fullbody.mp4' if asset else None
+
     def status(self):
         with self.lock:
             return {"app_version": "0.2", "ready": self.ready, "error": self.error, "busy": self.busy,
@@ -97,7 +110,7 @@ class CompanionEngine:
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
                     "visual_error": self.visual_error,
                     "scene": self.scene,
-                    "idle_video": "/idle/fullbody.mp4" if self.idle_video and self.scene == 'fullbody' and self.pose is None else None,
+                    "idle_video": self.listening_url(),
                     "provider": getattr(getattr(self.models, "conversation", None), "provider", "ollama"),
                     "scenes": [s for s in ["mira", "garden", "cafe", "fullbody"] if (self.directory / (s+".png")).exists()],
                     **self.store.snapshot()}
@@ -141,6 +154,7 @@ class CompanionEngine:
             self.cancel()
             self.store.reset()
             self.scene = "mira"
+            self.performance_state = 'base'
             if self.pose:
                 self.pose[1].unlink(missing_ok=True)
                 self.pose = None
@@ -168,6 +182,7 @@ class CompanionEngine:
         started = time.perf_counter()
         pose_candidate = None
         return_candidate = None
+        performance_candidate = None
         try:
             if raw is not None:
                 text = self.models.transcribe(raw)
@@ -183,7 +198,9 @@ class CompanionEngine:
             plan = None
             if hasattr(self.models, "plan"):
                 available = [s for s in ("mira", "garden", "cafe", "fullbody") if (self.directory/(s+".png")).exists()]
-                plan = self.models.plan(self.store.snapshot(), text, mode, scene, available, event)
+                context = self.store.snapshot()
+                context['visual_pose'] = (self.performance_state or 'unknown') if self.scene == 'fullbody' else 'portrait'
+                plan = self.models.plan(context, text, mode, scene, available, event)
                 check_cancel(event)
                 selected_mode = mode
                 mode, scene = (mode if mode in {"text", "voice", "video"} else plan["presentation"]), plan["scene"]
@@ -205,7 +222,11 @@ class CompanionEngine:
                 renderer = self.models.load_visual()
                 with self.lock:
                     pose_reference = self.pose[1] if self.pose and self.pose[0] == scene else None
-                renderer.prepare(scene, **({"reference_path":pose_reference} if pose_reference else {}))
+                    performance_candidate = self.performance_state if scene == self.scene else 'base'
+                    listening_video = self.listening_asset(scene, performance_candidate)
+                    prepared_transition = self.performance.get((performance_candidate, plan.get('action'))) if scene == 'fullbody' and plan else None
+                if not prepared_transition and not (listening_video and (not plan or plan.get('action','none') == 'none')):
+                    renderer.prepare(scene, **({"reference_path":pose_reference} if pose_reference else {}))
                 check_cancel(event)
             with self.lock:
                 job["state"] = "thinking"
@@ -222,10 +243,14 @@ class CompanionEngine:
                     index = len(parts) - 1
                     filename = f"{key}-{index}"
                     audio_path = self.directory / (filename + ".wav")
+                    speech_started = time.perf_counter()
                     audio_duration = self.models.speech(phrase, audio_path)
+                    speech_seconds = round(time.perf_counter()-speech_started, 3)
                     check_cancel(event)
-                    chunk = {"index": index, "text": phrase, "audio": "/media/"+filename+".wav", "duration_s": audio_duration}
+                    chunk = {"index": index, "text": phrase, "audio": "/media/"+filename+".wav", "duration_s": audio_duration,
+                             "speech_s":speech_seconds}
                     if mode == "video":
+                        chunk['prepared_motion'] = bool(prepared_transition or (listening_video and (not plan or plan.get('action','none') == 'none')))
                         chunk["video"] = "/media/"+filename+".mp4"
                         chunk["stream"] = "/api/streams/"+filename+".mp4"
                         with self.lock:
@@ -240,22 +265,31 @@ class CompanionEngine:
                                 motion_path = self.directory / (filename+"-motion.mp4")
                                 with self.lock:
                                     previous_approach = self.return_motion[1] if self.return_motion and self.return_motion[0] == scene else None
-                                if plan['action'] == 'farther' and previous_approach and pose_reference:
+                                if prepared_transition:
+                                    shutil.copyfile(prepared_transition['path'], motion_path)
+                                    performance_candidate = prepared_transition['to']
+                                    motion_metrics = {'action':plan['action'], 'motion_source':'reviewed_prepared_transition',
+                                                      'fresh_body_generation':False, 'target_pose':performance_candidate}
+                                elif plan['action'] == 'farther' and previous_approach and pose_reference:
+                                    performance_candidate = None
                                     motion_metrics = reverse_approach(previous_approach, motion_path, event)
                                 else:
+                                    performance_candidate = None
                                     motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path,
                                                               reference_path=pose_reference)
-                                if plan['action'] == 'closer':
+                                if plan['action'] == 'closer' and not prepared_transition:
                                     return_candidate = self.directory / (filename+'-return.mp4')
                                     shutil.copyfile(motion_path, return_candidate)
-                            elif self.idle_video and scene == 'fullbody' and pose_reference is None:
+                            elif listening_video:
                                 motion_path = self.directory / (filename+'-motion.mp4')
-                                shutil.copyfile(self.idle_video, motion_path)
+                                shutil.copyfile(listening_video, motion_path)
                                 prepared_idle = True
                                 motion_metrics = {'motion_source':'prepared_listening_loop', 'fresh_body_generation':False}
                             metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
-                                                      scene, streaming=True, **({"motion_path":motion_path} if motion_path else {}))
+                                                      scene, streaming=True, **({"motion_path":motion_path, "loop_motion":prepared_idle,
+                                                          "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
                             metrics.update(motion_metrics)
+                            metrics['looped_prepared_body'] = prepared_idle
                             if not prepared_idle and (motion_path or pose_reference) and hasattr(renderer,"capture_last_frame"):
                                 pose_candidate = self.directory / (filename+"-pose.png")
                                 renderer.capture_last_frame(self.directory/(filename+".mp4"),pose_candidate)
@@ -282,6 +316,10 @@ class CompanionEngine:
                 if plan:
                     self.store.learn(plan["facts"])
                     job["remembered"] = plan["facts"]
+                if mode == 'video':
+                    self.performance_state = performance_candidate
+                elif self.scene != scene:
+                    self.performance_state = 'base'
                 self.scene = scene
                 self.store.set_scene(scene)
                 if mode == 'video' or (self.return_motion and self.return_motion[0] != scene):
@@ -298,6 +336,8 @@ class CompanionEngine:
                     self.pose[1].unlink(missing_ok=True)
                     self.pose = None
                 job["metrics"]["total_s"] = round(time.perf_counter()-started, 3)
+                job['prepared_pose'] = self.performance_state
+                job['idle_video'] = self.listening_url()
                 job["state"] = "done"
         except Cancelled:
             with self.lock:

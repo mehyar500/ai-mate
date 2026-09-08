@@ -14,6 +14,22 @@ from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
 class PlanTests(unittest.TestCase):
+    def test_scene_mentions_preserve_current_view_but_visual_requests_can_change_it(self):
+        available=['mira','garden','cafe','fullbody']
+        data={'reply':'The garden is peaceful.','presentation':'video','scene':'garden','action':'none','facts':[]}
+        for text in ['Describe a peaceful walk in this garden in two sentences.',
+                     'Tell me about the garden.', "Don't go to the garden.",
+                     'Could you describe the garden?', 'I remember the garden.']:
+            self.assertEqual(validate_plan(data,text,'video','fullbody',available)['scene'],'fullbody')
+        for text in ["Let's go to the garden.", 'Please show me the garden.',
+                     'Could you show me the garden?', 'Take me there.', "Let's go there.",
+                     'Back to the garden.', 'Show me.', 'Send a video from there.']:
+            self.assertEqual(validate_plan(data,text,'video','mira',available)['scene'],'garden')
+        for text in ['Show me your full body.', 'Please stand up.', 'Come closer.']:
+            self.assertEqual(validate_plan({**data,'scene':'fullbody'},text,'video','garden',available)['scene'],'fullbody')
+        self.assertEqual(validate_plan({**data,'scene':'cafe'},"Let's go to the coffee shop.",'video','garden',available)['scene'],'cafe')
+        self.assertEqual(validate_plan({**data,'scene':'cafe'},"Let's talk in the café.",'video','garden',available)['scene'],'cafe')
+
     def test_unrequested_stale_action_is_discarded_but_contextual_repeat_is_allowed(self):
         data={'reply':'The garden is peaceful.','presentation':'video','scene':'fullbody','action':'wave','facts':[]}
         for text in ['Tell me two sentences about a peaceful walk in the garden.', 'How are you?', 'What were we discussing?']:
