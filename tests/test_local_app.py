@@ -250,6 +250,19 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request("/media/"+name,headers={"Range":"bytes=50-"})[0],416)
         self.assertEqual(self.request("/media/"+name,headers={"Range":"bytes=8-2"})[0],416)
 
+    def test_finished_phrase_stream_ends_while_next_phrase_is_rendering(self):
+        key = 'e'*32
+        name = key + '-0.mp4'
+        (Path(self.tmp.name)/name).write_bytes(b'complete-first-phrase')
+        self.app.jobs[key] = {'state':'rendering', 'cancel':threading.Event(),
+                             'chunks':[{'stream':'/api/streams/'+name, 'complete':True}]}
+        try:
+            status, body, _ = self.request('/api/streams/'+name, headers={'X-Local-Token':self.app.token})
+            self.assertEqual((status, body), (200, b'complete-first-phrase'))
+            self.assertEqual(self.app.jobs[key]['state'], 'rendering')
+        finally:
+            self.app.jobs.pop(key)
+
     def test_idle_route_requires_loaded_asset_and_preserves_http_boundaries(self):
         self.assertEqual(self.request('/idle/fullbody.mp4')[0],404)
         self.assertEqual(self.request('/idle/near.mp4')[0],404)

@@ -7604,5 +7604,250 @@
     "chromium_playback_cases": 2,
     "independent_review": "pending before public release",
     "scope": "Local prototype iteration; no migration, credential change, cloud GPU purchase or production deployment."
+  },
+  "speech_phrase_pipeline_2026_09_08": {
+    "scope": "Isolated synthetic database, ASR and planner; real Kokoro, MuseTalk, fMP4 HTTP and Chromium playback; no cloud request or physical microphone.",
+    "selection": "Phrases, one-ahead CPU TTS, batch 8 selected in the local app.",
+    "cases": [
+      {
+        "label": "whole",
+        "metrics": "First playback: 4.10s from Send. Buffer waits: 0 (0.00s). Server completed: 14.89s.",
+        "speech_seconds": 13.091958333333332,
+        "parts": 1,
+        "video_gaps_s": [],
+        "audio_transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25.",
+        "video_sha256": [
+          "239afea9d8381c744fc488eb58c2ed2c1050698644d5bcc4b632b061e74fbfde"
+        ],
+        "scope": "Synthetic ASR/planner; real CPU TTS, GPU renderer, HTTP/MSE and browser audio. No physical speaker test."
+      },
+      {
+        "label": "phrases",
+        "metrics": "First playback: 2.33s from Send. Buffer waits: 0 (0.00s). Server completed: 14.71s.",
+        "speech_seconds": 12.787958333333334,
+        "parts": 3,
+        "video_gaps_s": [
+          0.5757000000029802,
+          0.014600000001490088
+        ],
+        "audio_transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25.",
+        "video_sha256": [
+          "d7eb887607d2c595b7f219ecf4c46ae1b1bd4e334cff1ca8e1185e800a22392c",
+          "20b22d9f91889aa2a32d19f28a9b6e2a63f7c42c199f2fd03abb252461273265",
+          "0f830729b21a07fff5d56c05ab5c61d9993e95c412143ab141395e6c246f3bd8"
+        ],
+        "scope": "Synthetic ASR/planner; real CPU TTS, GPU renderer, HTTP/MSE and browser audio. No physical speaker test."
+      },
+      {
+        "label": "phrases-b16",
+        "metrics": "First playback: 2.36s from Send. Buffer waits: 3 (0.94s). Server completed: 14.58s.",
+        "speech_seconds": 12.787958333333334,
+        "parts": 3,
+        "video_gaps_s": [
+          0.014500000000000846,
+          0.017800000000745442
+        ],
+        "audio_transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25.",
+        "video_sha256": [
+          "a0bc7c8c4dbff9321d0c508df34e08b2ac9ce9d83b71be7339cfd0bfa4b4cad2",
+          "bfb3c04c90347412d68780f69afd7c17e441bcaa3e58e90e8c755245170ac4ca",
+          "7c1dd68f84a0ab7f0044bb43ea1e04093b7c4c1ad5b19dc42b60e14d5bfaceab"
+        ],
+        "scope": "Synthetic ASR/planner; real CPU TTS, GPU renderer, HTTP/MSE and browser audio. No physical speaker test."
+      },
+      {
+        "label": "phrases-approach",
+        "metrics": "First playback: 2.66s from Send. Buffer waits: 0 (0.00s). Between phrases: 1.01s. Server completed: 15.63s.",
+        "speech_seconds": 12.778,
+        "parts": 3,
+        "video_gaps_s": [
+          0.9872000000029795,
+          0.018299999997021033
+        ],
+        "audio_transcribed": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25.",
+        "video_sha256": [
+          "d3700d1ba06ada881040afe262940127aa46663418e8e86341a206c4f622751f",
+          "c15d47ada2d651580bac84cf865019082503917b64500ff7ee0e2e107839f479",
+          "03c5b894659aec2a1048217393b5af705b9da14d3b4885f9893c8e1374eba1b6"
+        ],
+        "scope": "Synthetic ASR/planner; real CPU TTS, GPU renderer, HTTP/MSE and browser audio. No physical speaker test."
+      }
+    ],
+    "rejected_first_attempt": {
+      "events": [
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 2.52239999999851,
+          "currentTime": 0,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "playing",
+          "at": 2.52279999999702,
+          "currentTime": 0,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "ended",
+          "at": 6.599799999997019,
+          "currentTime": 4.042,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "waiting",
+          "at": 6.60479999999702,
+          "currentTime": 4.040785,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 14.933099999997765,
+          "currentTime": 4.092675,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "ended",
+          "at": 14.99379999999702,
+          "currentTime": 4.092675,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "waiting",
+          "at": 15.00689999999851,
+          "currentTime": 0,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 15.010799999997019,
+          "currentTime": 9.6e-05,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "playing",
+          "at": 15.011,
+          "currentTime": 0,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "ended",
+          "at": 21.37989999999851,
+          "currentTime": 6.34,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "ended",
+          "at": 21.451599999997764,
+          "currentTime": 6.392675,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "waiting",
+          "at": 21.45889999999851,
+          "currentTime": 0,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 21.463,
+          "currentTime": 8.2e-05,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "playing",
+          "at": 21.46389999999851,
+          "currentTime": 0,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "ended",
+          "at": 23.90989999999851,
+          "currentTime": 2.405958,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "ended",
+          "at": 24.024599999997765,
+          "currentTime": 2.492675,
+          "muted": true,
+          "volume": 1
+        }
+      ],
+      "metrics": "First playback: 2.32s from Send. Buffer waits: 3 (8.34s). Server completed: 14.72s.",
+      "audio": {
+        "ended": true,
+        "muted": false
+      },
+      "chunks": 3,
+      "notice": "",
+      "label": "phrases",
+      "pageErrors": []
+    },
+    "runtime_fixes": [
+      "Preserve complete reply beyond two phrases",
+      "Perform the requested body action once",
+      "Continue body-loop source phase",
+      "Close each fMP4 when its phrase completes",
+      "Join TTS before cancellation cleanup"
+    ],
+    "limits": [
+      "No real ASR/planner latency in this comparison",
+      "Not p50/p95 or a long-call soak",
+      "0.576s normal and 0.987s approach phrase gap observed",
+      "Mouth artifacts and prepared-loop repetition remain",
+      "Generated pose is not interrupted displayed pose"
+    ],
+    "visual_review": "Full-body and approach contact sheets inspected: frame/identity broadly retained, near-source crown cropped, mouth artifacts remain.",
+    "tests": {
+      "python": 103,
+      "node": 7
+    },
+    "live_startup": {
+      "ready": true,
+      "busy": false,
+      "startup_s": 11.639,
+      "error": null,
+      "visual_error": null
+    },
+    "checks": [
+      "103 Python checks",
+      "7 Node checks",
+      "Python compile",
+      "JavaScript syntax",
+      "git diff --check",
+      "2 synthetic API/microphone Chromium call/caption regressions",
+      "4 real-media isolated pipeline comparisons"
+    ]
   }
 }

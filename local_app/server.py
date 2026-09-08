@@ -133,7 +133,11 @@ class Handler(BaseHTTPRequestHandler):
                     current = self.app.jobs.get(key)
                     if not current or current["cancel"].is_set() or current["state"] in {"failed", "cancelled"}:
                         return
-                    done = current["state"] == "done"
+                    # Each phrase is a separate fMP4 stream. Waiting for the
+                    # entire reply prevents MSE from ending this completed clip.
+                    done = current["state"] == "done" or any(
+                        c.get('stream') == '/api/streams/' + filename and c.get('complete') is True
+                        for c in current['chunks'])
                 if file.exists():
                     # Open only during each read so Windows can remove cancelled files.
                     with file.open("rb") as source:

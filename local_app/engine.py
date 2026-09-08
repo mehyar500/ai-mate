@@ -183,6 +183,8 @@ class CompanionEngine:
         pose_candidate = None
         return_candidate = None
         performance_candidate = None
+        speech_prefetch = None
+        candidate_poses = set()
         try:
             if raw is not None:
                 text = self.models.transcribe(raw)
@@ -231,26 +233,42 @@ class CompanionEngine:
             with self.lock:
                 job["state"] = "thinking"
             parts = []
-            phrases = [plan["reply"]] if plan else self.models.stream_reply(messages_for(self.store.snapshot(), text), event)
+            from .speech import SpeechPrefetch, speech_phrases
+            if plan:
+                phrases = speech_phrases(plan['reply']) if mode != 'text' else [plan['reply']]
+            else:
+                phrases = self.models.stream_reply(messages_for(self.store.snapshot(), text), event)
+            if plan and mode != 'text':
+                speech_prefetch = SpeechPrefetch(self.models, phrases, self.directory, key, event)
+            listening_offset = 0.0
             for phrase in phrases:
                 check_cancel(event)
                 parts.append(phrase)
                 with self.lock:
-                    job["text"] = " ".join(parts)
+                    job["text"] = plan['reply'] if plan else " ".join(parts)
                     job["metrics"].setdefault("first_text_s", round(time.perf_counter()-started, 3))
                     job["state"] = "speaking" if mode != "text" else "thinking"
                 if mode != "text":
                     index = len(parts) - 1
                     filename = f"{key}-{index}"
                     audio_path = self.directory / (filename + ".wav")
-                    speech_started = time.perf_counter()
-                    audio_duration = self.models.speech(phrase, audio_path)
-                    speech_seconds = round(time.perf_counter()-speech_started, 3)
+                    if speech_prefetch:
+                        audio_path, audio_duration, speech_seconds = speech_prefetch.take(index)
+                    else:
+                        speech_started = time.perf_counter()
+                        audio_duration = self.models.speech(phrase, audio_path)
+                        speech_seconds = round(time.perf_counter()-speech_started, 3)
                     check_cancel(event)
                     chunk = {"index": index, "text": phrase, "audio": "/media/"+filename+".wav", "duration_s": audio_duration,
                              "speech_s":speech_seconds}
                     if mode == "video":
-                        chunk['prepared_motion'] = bool(prepared_transition or (listening_video and (not plan or plan.get('action','none') == 'none')))
+                        action = plan.get('action', 'none') if plan and index == 0 else 'none'
+                        if index:
+                            prepared_transition = None
+                            listening_video = self.listening_asset(scene, performance_candidate)
+                            if not listening_video:
+                                renderer.prepare(scene, **({'reference_path': pose_reference} if pose_reference else {}))
+                        chunk['prepared_motion'] = bool(prepared_transition or (listening_video and action == 'none'))
                         chunk["video"] = "/media/"+filename+".mp4"
                         chunk["stream"] = "/api/streams/"+filename+".mp4"
                         with self.lock:
@@ -260,7 +278,7 @@ class CompanionEngine:
                         motion_metrics = {}
                         prepared_idle = False
                         try:
-                            if plan and plan.get("action", "none") != "none":
+                            if action != 'none':
                                 from .motion import generate, reverse_approach
                                 motion_path = self.directory / (filename+"-motion.mp4")
                                 with self.lock:
@@ -287,23 +305,35 @@ class CompanionEngine:
                                 motion_metrics = {'motion_source':'prepared_listening_loop', 'fresh_body_generation':False}
                             metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
                                                       scene, streaming=True, **({"motion_path":motion_path, "loop_motion":prepared_idle,
+                                                          "motion_start_s":listening_offset if prepared_idle else 0,
                                                           "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
                             metrics.update(motion_metrics)
                             metrics['looped_prepared_body'] = prepared_idle
+                            if prepared_idle:
+                                listening_offset += metrics.get('duration_s', audio_duration)
+                            else:
+                                listening_offset = 0.0
                             if not prepared_idle and (motion_path or pose_reference) and hasattr(renderer,"capture_last_frame"):
+                                previous_candidate = pose_candidate
                                 pose_candidate = self.directory / (filename+"-pose.png")
+                                candidate_poses.add(pose_candidate)
                                 renderer.capture_last_frame(self.directory/(filename+".mp4"),pose_candidate)
                                 metrics["continues_previous_pose"] = bool(pose_reference)
+                                pose_reference = pose_candidate
+                                if previous_candidate:
+                                    previous_candidate.unlink(missing_ok=True)
                         finally:
                             if motion_path:
                                 motion_path.unlink(missing_ok=True)
-                        chunk["render"] = metrics
                     check_cancel(event)
                     with self.lock:
+                        if mode == 'video':
+                            chunk['render'] = metrics
+                        chunk['complete'] = True
                         if mode != "video":
                             job["chunks"].append(chunk)
                         job["metrics"].setdefault("first_media_ready_s", round(time.perf_counter()-started, 3))
-                if len(parts) >= 2:
+                if not plan and len(parts) >= 2:
                     break
             if not parts:
                 raise RuntimeError("The model did not return a complete reply. Please retry.")
@@ -340,6 +370,8 @@ class CompanionEngine:
                 job['idle_video'] = self.listening_url()
                 job["state"] = "done"
         except Cancelled:
+            if speech_prefetch:
+                speech_prefetch.close()
             with self.lock:
                 job["state"] = "cancelled"
                 job["chunks"] = []
@@ -356,9 +388,16 @@ class CompanionEngine:
             # details in the local job response, never in persistent logs.
             print(f"Reply failed: {type(error).__name__}", flush=True)
         finally:
+            if speech_prefetch:
+                speech_prefetch.close()
+                published = {item['audio'].rsplit('/', 1)[-1] for item in job['chunks']}
+                for candidate in self.directory.glob(key + '-*.wav'):
+                    if candidate.name not in published:
+                        candidate.unlink(missing_ok=True)
             with self.lock:
-                if pose_candidate and (not self.pose or self.pose[1] != pose_candidate):
-                    pose_candidate.unlink(missing_ok=True)
+                for candidate in candidate_poses:
+                    if not self.pose or self.pose[1] != candidate:
+                        candidate.unlink(missing_ok=True)
                 if return_candidate and (not self.return_motion or self.return_motion[1] != return_candidate):
                     return_candidate.unlink(missing_ok=True)
                 self.busy = False

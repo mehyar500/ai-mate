@@ -129,8 +129,10 @@ class PortraitRenderer:
         finally:
             capture.release()
 
-    def motion_frames(self, path, nframes, fps, cancel, lip_frames=None, loop=False, reuse=False):
+    def motion_frames(self, path, nframes, fps, cancel, lip_frames=None, loop=False, reuse=False, start_s=0):
         """Track the face on generated body footage; never move a static cutout."""
+        if not math.isfinite(start_s) or start_s < 0:
+            raise ValueError('Motion offset must be finite and nonnegative.')
         cv, np = self.cv, self.np
         check_cancel(cancel)
         if not hasattr(self, '_motion_cache'):
@@ -170,7 +172,7 @@ class PortraitRenderer:
         result = []
         for i in range(nframes):
             check_cancel(cancel)
-            position = int(i * source_fps / fps)
+            position = int((start_s + i / fps) * source_fps + 1e-7)
             index = position % len(frames) if loop else min(len(frames)-1, position)
             if lip_frames is not None and i >= lip_frames:
                 result.append((frames[index], None, None, None))
@@ -198,7 +200,7 @@ class PortraitRenderer:
             result.append(tracked[index])
         return result
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False):
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0):
         if streaming:
             fps = 20
         cv, np, torch = self.cv, self.np, self.torch
@@ -236,7 +238,7 @@ class PortraitRenderer:
         inputs = self.features(data, sampling_rate=16000, return_tensors="pt").input_features.to("cuda", self.dtype)
         tracking_start = time.perf_counter()
         lip_frames = min(nframes, math.ceil((speech_duration+.15)*fps/batch_size)*batch_size) if motion_path else nframes
-        movement = self.motion_frames(motion_path, nframes, fps, cancel, lip_frames, loop=loop_motion, reuse=reuse_motion) if motion_path else None
+        movement = self.motion_frames(motion_path, nframes, fps, cancel, lip_frames, loop=loop_motion, reuse=reuse_motion, start_s=motion_start_s) if motion_path else None
         tracking_seconds = time.perf_counter()-tracking_start
         height, width = (movement[0][0] if movement else self.portrait).shape[:2]
         # Pipe raw frames to one local encoder; no per-frame PNG disk round trips.
@@ -340,4 +342,5 @@ class PortraitRenderer:
                 "composite_pipe_s": composite_seconds,
                 "encoder": self.encoder, "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
                 "face_encode_stride": face_encode_stride if movement else None,
-                "prepared_appearance_cache_hit": self.motion_cache_hit if movement else False}
+                "prepared_appearance_cache_hit": self.motion_cache_hit if movement else False,
+                "motion_start_s": motion_start_s}

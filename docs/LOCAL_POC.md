@@ -45,13 +45,15 @@ Open weights do not automatically establish commercial rights. MuseTalk's model 
 ```text
 typed input / opt-in mic -> local ASR if needed
     -> direct supported command OR Cloudflare conversation plan
+    -> calls: short speech phrases; prepare one CPU TTS phrase ahead
     -> Text: text only; Voice call: new Kokoro speech
     -> Video call:
          base + closer -> reviewed approach -> near
          near + farther -> reviewed reverse -> base
          conversation at base/near -> corresponding listening footage
          other supported action -> experimental LTX-2B generation
-       -> track face -> new MuseTalk lips -> streamed video + synchronized speech
+       -> requested action once, then continue the destination pose/loop phase
+       -> track face -> new MuseTalk lips -> one fMP4/WAV stream per phrase
     -> successful server completion: conversation, facts, message and generated pose
     -> completed browser playback: switch to the matching listening loop
 ```
@@ -81,6 +83,21 @@ These are individual local samples, not p95, guarantees or comparable measuremen
 The paired-motion demonstration is a real improvement, but the requested quality is not accepted: loops repeat, scene identity differs across older portraits, fingers and mouth detail remain soft, and new movements can ignore instructions. A 13.092s spoken count before appearance caching took **9.97s to playback**, **23.489s server completion**, and stalled twice; short greetings alone do not qualify long calls. Later cache measurements are recorded in the machine evidence and REPORT.
 
 Output files contain speech, local ASR recovered synthetic test sentences, and the browser completed unmuted playback without media errors. Physical speaker output and subjective phoneme/voice quality still need device testing. Jobs record first text, per-chunk speech generation time, rendering stages, cache hits and completion; the browser separately measures first playback and stalls.
+
+### Speech pipeline — September 8 measured revision
+
+The engine now preserves the full planned reply across short phrases (first target 72 characters, later 120), prepares one CPU TTS phrase ahead while rendering, performs a body command once, and advances the prepared loop's source time. Punctuation/word boundaries are preserved. Cancellation joins in-flight TTS before clearing media; incomplete replies do not commit memory. Each completed phrase closes its own fMP4 response. Previously the response stayed open until the whole job finished, causing an 8.34s stall in the first segmented experiment; that regression is fixed and covered by an HTTP test.
+
+| Same 215-character count | First browser playback | Server complete | Stalls within clips | Largest gap between clips |
+|---|---:|---:|---:|---:|
+| Whole reply, batch 8 | 4.10s | 14.89s | 0 | N/A |
+| Three phrases, batch 8 — selected | 2.33s | 14.71s | 0 | 0.576s |
+| Three phrases, batch 16 — rejected | 2.36s | 14.58s | 3 / 0.94s | 0.018s |
+| Three phrases plus approach, batch 8 | 2.66s | 15.63s | 0 | 0.987s |
+
+These are single local samples with **synthetic ASR and planner**, real Kokoro/MuseTalk/HTTP/MSE, and unmuted Chromium audio. Add real recognition and dialogue time for a real call. They are not p50/p95 or directly comparable with earlier differently loaded runs. Local Whisper recovered 1–25 in every concatenated speech output. Contact sheets retained full-body framing and the close destination, but the prepared approach visibly blurs/ghosts, the close source crops the crown, and mouth artifacts remain. Gap time is now reported separately from buffer stalls; faster start does not establish seamless playback.
+
+Reproduce in two terminals: `.\.venv\Scripts\python.exe scripts/serve_phrase_benchmark.py [--whole | --batch-size 16 | --action closer]`, then `node scripts/review_phrase_playback.cjs <whole|phrases|phrases-b16|phrases-approach>` with Playwright on `NODE_PATH`. This dedicated loopback server uses port 8766, a separate synthetic database and reviewed media copies; it never reads the live conversation, makes a cloud call or opens a physical microphone. It shuts down after browser completion or a 150s observation window. `review_phrase_outputs.py` produces transcripts and contact sheets. Audit media stay local; sanitized results/hashes are in the machine evidence.
 
 Latest listening review: two raw calm LTX-2.3 candidates held both eyes shut for roughly one second and were rejected unchanged. `retime_idle_motion.py` slows the full frame to half speed while compressing the manually selected blink interval separately to about 0.25s. The reviewed 5.208s prepared result is now active: side-background mean optical flow fell from 1.153 to 0.473px/s (59%), with a brief bilateral blink. This is a measured improvement, not a natural-motion certificate: minor scene morphing, seam movement and repetition remain. The source, settings, reviewed hash and rollback backup are recorded in machine evidence; `prepare_idle_loop.py --candidate` never replaces active footage automatically.
 
@@ -198,7 +215,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, sustained p50/p95, real microphone/speaker testing, interruption continuity and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Final checks for this revision: 97 Python tests, seven Node tests, Python compile, JavaScript syntax and `git diff --check` passed. The five new Gateway checks cover missing/invalid balance, positive/empty balance, blocked redirects, sensitive-response redaction and HTTP failure without retry. `check_cloud_gateway.py` returned HTTP 200 with key/email and `not_positive` credits; inference and account mutation remained disabled. No memory schema or live runtime changed. `review_call_playback.cjs` additionally runs two real Chromium playback cases with synthetic APIs/capture; it requires Playwright on `NODE_PATH` and the generated close FlashHead fixture. It never starts a physical microphone or reads the real conversation.
+Final checks for this revision: 103 Python tests, seven Node tests, Python compile, JavaScript syntax and `git diff --check` passed. Added phrase tests cover complete speech, one-ahead synthesis, one-time action, loop phase, cancellation cleanup and per-phrase HTTP completion. No memory schema changed. The Gateway check remains read-only. `review_call_playback.cjs` covers voice/video playback and captions with synthetic APIs/capture; `review_phrase_playback.cjs` separately exercises the real isolated rendering pipeline. Neither starts a physical microphone or reads the live conversation.
 
 ## Cost and next decision
 

@@ -32,6 +32,7 @@ $('show-captions').addEventListener('change',updateCaptions);
 const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
   onState:state=>{if(micState!==state){micState=state;controls();}}});
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
+let partEndedAt=null,phraseGapSeconds=0;
 const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
 function controls(){
@@ -106,6 +107,7 @@ function holdPicture(){
   picture.hidden=true;
 }
 function resetPlayback(holdFrame=false){
+  partEndedAt=null;phraseGapSeconds=0;
   captionText='';
   nextIdleURL=undefined;pictureStarted=false;motionRequested=false;
   if(holdFrame)holdPicture();else $("held-frame").hidden=true;
@@ -115,15 +117,16 @@ function resetPlayback(holdFrame=false){
   $("video").hidden=true;$("resume").hidden=true;setScene(scene);controls();
 }
 function played(){
+  if(partEndedAt!==null){phraseGapSeconds+=(performance.now()-partEndedAt)/1000;partEndedAt=null;}
   if(!$("video").hidden){pictureStarted=true;if(motionRequested)idleSuppressed=true;}
   $('idle-video').pause();$('idle-video').hidden=true;
   if(!$("video").hidden)$("held-frame").hidden=true;
   if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}
   if(firstPlayed===null){firstPlayed=(performance.now()-lastStart)/1000;updateMetrics();}
-  $("resume").hidden=true;updateMetrics();controls();
+  $("resume").hidden=true;if(!$("notice").classList.contains('error'))notice('');updateMetrics();controls();
 }
 function updateMetrics(){
-  $("metrics").textContent=(firstPlayed===null?"Playback hasn't started.":"First playback: "+firstPlayed.toFixed(2)+"s from Send.")+" Buffer waits: "+stalls+" ("+waitingSeconds.toFixed(2)+"s)."+(lastServerSeconds===null?"":" Server completed: "+lastServerSeconds.toFixed(2)+"s.");
+  $("metrics").textContent=(firstPlayed===null?"Playback hasn't started.":"First playback: "+firstPlayed.toFixed(2)+"s from Send.")+" Buffer waits: "+stalls+" ("+waitingSeconds.toFixed(2)+"s). Between phrases: "+phraseGapSeconds.toFixed(2)+"s."+(lastServerSeconds===null?"":" Server completed: "+lastServerSeconds.toFixed(2)+"s.");
 }
 function waitEvent(target,name,signal,timeout=45000){
   return new Promise((resolve,reject)=>{
@@ -169,6 +172,7 @@ async function drain(){
     speech.muted=false;speech.volume=1;
     const controller=new AbortController();abortMedia=controller;
     let releaseSpeech=()=>{};
+    let itemStarted=false;
     if(item.video&&item.audio){
       speech.src=item.audio;speech.load();
       releaseSpeech=synchronizeSpeech(media,speech,{signal:controller.signal,onBlocked:error=>{
@@ -178,12 +182,13 @@ async function drain(){
     }
     media.onplaying=()=>{
       if(mine!==epoch)return;
+      itemStarted=true;
       captionText=item.text||'';
       if(item.video){media.hidden=false;$("media-label").textContent=sceneNames[scene]+(item.prepared_motion?" · Prepared motion · live voice":" · Generated video");}
       played();
     };
-    media.onwaiting=()=>{if(firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
-    media.onended=()=>{if(mine!==epoch)return;captionText='';updateCaptions();if(item.video)holdPicture();if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
+    media.onwaiting=()=>{if(itemStarted&&firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
+    media.onended=()=>{if(mine!==epoch)return;partEndedAt=performance.now();captionText='';updateCaptions();if(item.video)holdPicture();if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
     try{
       if(item.stream){
         const supported=await playStream(item,media,controller.signal);

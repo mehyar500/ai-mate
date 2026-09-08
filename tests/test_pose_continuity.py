@@ -248,6 +248,23 @@ class PoseTests(unittest.TestCase):
         self.assertFalse(renderer.motion_cache_hit)
         self.assertIsNone(renderer._appearance_latents)
 
+    def test_next_phrase_continues_the_listening_loop_phase(self):
+        from local_app.visual import PortraitRenderer
+        class Frame:
+            shape = (2, 2, 3)
+        frames = [Frame() for _ in range(4)]
+        renderer = PortraitRenderer.__new__(PortraitRenderer)
+        renderer.cv = Mock(); renderer.np = Mock()
+        capture = renderer.cv.VideoCapture.return_value
+        capture.get.return_value = 2
+        capture.read.side_effect = [(True, f) for f in frames] + [(False, None)]
+        rows = renderer.motion_frames(Path('fixture.mp4'), 4, 2, threading.Event(),
+                                      lip_frames=0, loop=True, start_s=1.5)
+        self.assertEqual([frames.index(row[0]) for row in rows], [3, 0, 1, 2])
+        for offset in [-1, float('nan'), float('inf')]:
+            with self.assertRaises(ValueError):
+                renderer.motion_frames(Path('fixture.mp4'), 4, 2, threading.Event(), start_s=offset)
+
 
 if __name__=='__main__':
     unittest.main()
