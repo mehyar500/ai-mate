@@ -2,7 +2,7 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#19231f"><link rel="icon" href="/icon.svg"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/actions.css"><title>Mira · AI-mate</title></head>
 <body>
-<main class="conversation" aria-label="Conversation with Mira">
+<main class="conversation" data-mode="video" aria-label="Conversation with Mira">
   <div class="visual" aria-label="Companion view">
     <img id="portrait" src="/portrait/mira.png" alt="Mira, a fictional adult AI companion">
     <video id="idle-video" muted loop playsinline hidden aria-label="Prepared AI listening loop"></video>
@@ -11,45 +11,49 @@
     <div class="shade"></div>
   </div>
   <header>
-    <div><h1>Mira <span>AI companion</span></h1><p id="connection" role="status">Connecting…</p></div>
-    <button id="memory-toggle" class="glass" aria-haspopup="dialog">Memory & settings</button>
+    <div><h1>Mira <span>AI</span></h1></div>
+    <button id="memory-toggle" class="glass icon-button" aria-label="Memory and settings" title="Memory and settings" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg></button>
   </header>
   <nav class="mode-tabs" aria-label="Conversation mode">
     <button id="mode-text" class="glass" aria-pressed="false">Text <span id="unread" hidden></span></button>
-    <button id="mode-voice" class="glass" aria-pressed="false">Voice call</button>
-    <button id="mode-video" class="glass" aria-pressed="true">Video call</button>
+    <button id="mode-voice" class="glass" aria-pressed="false">Voice</button>
+    <button id="mode-video" class="glass" aria-pressed="true">Video</button>
   </nav>
   <aside id="active-call" hidden aria-label="Ongoing call">
     <div><strong id="active-call-title">Video call active</strong><span id="active-call-status" role="status">Mic off</span></div>
     <button id="return-call">Return to video call</button>
   </aside>
   <div id="voice-view" hidden><img src="/portrait/mira.png" alt="Mira"><p id="voice-caption">Voice call with Mira</p></div>
-  <div class="scene-note"><span id="media-label">Living room · AI portrait</span><span id="call-state"></span></div>
   <button id="resume" class="resume" hidden>Play reply</button>
   <section class="conversation-bottom" aria-label="Messages and call controls">
-    <div id="chat" role="log" aria-live="polite" aria-label="Messages"><div class="empty"><h2>A little space for you.</h2><p>Type here, or open a call and enable your microphone.</p></div></div>
+    <div id="chat" role="log" aria-live="polite" aria-label="Messages"><div class="empty"><h2>A little space for you.</h2><p>Send a message, or call Mira.</p></div></div>
     <div id="notice" role="status" aria-live="polite"></div>
-    <form id="composer">
+    <form id="composer" hidden>
       <label class="sr-only" for="message">Message Mira</label>
       <textarea id="message" maxlength="1000" rows="1" placeholder="Message Mira…"></textarea>
       <button type="submit" id="send" disabled>Send</button>
     </form>
     <div class="call-controls">
-      <div class="call-actions"><button id="mic" class="glass" aria-pressed="false">Enable mic</button><button id="sound" class="glass">Sound on</button><button id="stop" class="glass" hidden>Interrupt</button><button id="end-call" class="danger">End call</button></div>
+      <button id="join-call" class="join-call" aria-label="Call Mira" title="Call Mira" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 3 3 5-2 2a14 14 0 0 0 6 6l2-2 5 3-1 4C10 23 1 14 3 4z"/></svg><span>Call Mira</span></button>
+      <div class="call-actions">
+        <button id="mic" class="glass icon-button" aria-pressed="false" aria-label="Mute microphone" title="Mute microphone" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M9 22h6"/><path class="mute-slash" d="m3 3 18 18"/></svg></button>
+        <button id="stop" class="glass icon-button" aria-label="Interrupt reply" title="Interrupt reply" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+        <button id="end-call" class="danger icon-button" aria-label="End call" title="End call" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15v-4c5-5 13-5 18 0v4l-5-1v-3a12 12 0 0 0-8 0v3z"/></svg></button>
+      </div>
       <button id="replay" class="subtle" hidden>Replay</button>
       <button id="history-toggle" class="subtle" hidden aria-expanded="false" aria-controls="chat">Show messages</button>
     </div>
-    <p id="disclosure" class="disclosure">AI-generated video · Enable mic or type to talk</p>
+    <p id="disclosure" class="disclosure">Private conversation</p>
   </section>
 </main>
 <dialog id="settings" aria-labelledby="settings-title">
   <div class="dialog-heading"><h2 id="settings-title">Your conversation</h2><button id="close-settings" class="quiet">Close</button></div>
-  <p>Mira keeps recent conversation and short facts you share on this computer. Microphone audio is processed locally only after you enable it. Transcribed words and conversation context go to the selected dialogue provider. Your camera stays off.</p>
+  <p>Mira is an AI companion. Some movements use prepared AI video; speech is generated for your reply. She keeps recent conversation and short facts you share on this computer. Starting a call requests microphone access. Transcribed words and conversation context go to the selected dialogue provider. Your camera stays off.</p>
   <button id="test-sound" class="quiet">Test sound</button>
   <h3>Things you've shared</h3><div id="facts"></div>
   <label for="memory">Notes you want to keep</label><textarea id="memory" maxlength="1200" rows="3" placeholder="Anything you'd like Mira to remember…"></textarea>
   <button id="save-memory">Save notes</button>
-  <details><summary>Connection & prototype limits</summary><p id="provider-note">Dialogue, voice and video run locally.</p><p>Choose Text, Voice call or Video call. Enable mic for hands-free turns, or type during a call. Listening pauses while Mira replies; use Interrupt to speak sooner. Messages requested in a call arrive in Text without ending the call. Wave and distance commands generate experimental body movement with speech; other video replies use the current portrait or pose. Movement quality and direction are not yet reliable.</p><p id="metrics">No reply measured yet.</p><p>Memories are model-selected excerpts, not verified facts. Removing a fact does not erase it from recent conversation. Clear all to erase both.</p></details>
+  <details><summary>Connection & prototype limits</summary><p id="connection" role="status">Connecting…</p><p id="media-label"></p><p id="call-state"></p><p id="provider-note">Dialogue, voice and video run locally.</p><p>Calls use your microphone; Text has the message composer. Listening pauses while Mira replies; use Interrupt to speak sooner. Messages requested in a call arrive in Text without ending the call. Movement quality and direction are still experimental.</p><p id="metrics">No reply measured yet.</p><p>Memories are model-selected excerpts, not verified facts. Removing a fact does not erase it from recent conversation. Clear all to erase both.</p></details>
   <button id="reset" class="quiet danger-text">Clear all conversation & memory</button>
 </dialog>
 <audio id="audio" hidden></audio>

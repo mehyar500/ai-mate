@@ -4,7 +4,7 @@ The founder's September 8 revision targets an **Apple-native, non-explicit compa
 
 ## What runs
 
-The existing RTX 4060 Ti 16GB / 48GB RAM PC runs one local companion. Text, Voice call and Video call share memory. Calls accept typing or an opt-in microphone, can deliver a separate message to Text, and continue across tab changes. Cloudflare plans replies; CPU Kokoro/Whisper and GPU LTX/MuseTalk produce media. No camera, signup, checkout or public deployment.
+The existing RTX 4060 Ti 16GB / 48GB RAM PC runs one local companion. Text, Voice call and Video call share memory. Calls use microphone input, can deliver a separate message to Text, and continue across tab changes. Call controls are mute/end icons; the composer stays in Text. Cloudflare plans replies; CPU Kokoro/Whisper and GPU LTX/MuseTalk produce media. No camera, signup, checkout or public deployment.
 
 The shared flow lives in `local_app/engine.py`. Private `.env` contains implemented startup choices. [LOCAL_POC](LOCAL_POC.md) is the technical source for models, reproductions and measurements.
 
@@ -16,6 +16,9 @@ The shared flow lives in `local_app/engine.py`. Private `.env` contains implemen
 - A **13.092s** spoken count took **9.97s to start / 23.489s server completion**, with two stalls before caching. A warm-cache repeat took **9.54s / 19.680s**, with no stalls; rendering improved from 15.943s to 11.182s. That starting delay remains unacceptable for a call. Another 6.155s reply began in 4.23s with no stalls. These are samples, not p95 or universal two-second latency.
 - LTX-2.3 successfully prepared the approach in 146.429s cold. Several close-idle prompts failed review before a blink-only guided clip worked. Its fresh joint audio/video remains too slow for live replacement; arbitrary LTX-2B commands still fail direction/framing. Prepared motion is disclosed.
 - **89 Python / seven Node checks pass**. A real streaming cancellation completed in 0.328s, preserving conversation and the listening pose and removing cancelled media. Unmuted browser completion is not confirmation of physical speaker output.
+- The latest UI gives the character 854px of height at the 716x854 preview, up from 544px. Side controls, compact tabs and phone framing retain head and feet. Five synthetic Chromium viewport checks passed, including microphone denial and call/Text navigation; the live desktop preview was also visually reviewed.
+- Two calmer LTX-2.3 idle candidates reduced measured side-background flow but held both eyes shut for about a second. Neither replaced the active footage; the founder's wink/fast-foliage complaint remains open. Prompting alone did not control blink duration.
+- Six synthetic [Cloudflare Aura-2](https://developers.cloudflare.com/workers-ai/models/aura-2-en/) speech calls delivered their first 4KB in 0.278–0.395s, but complete long WAVs took 6.014–7.264s. The existing renderer needs the complete speech track, so switching providers alone would not solve long-reply latency. Kokoro remains selected; nominal benchmark spend was about $0.018 including one initial parser failure, before any free allocation.
 
 Longer replies now retain visual motion, but short loops repeat and approach frames have visible blur. Reliable arbitrary motion, interruption-aware pose continuity, identity/lips, acoustic device testing and sustained p95 latency remain open. This is not production-ready.
 

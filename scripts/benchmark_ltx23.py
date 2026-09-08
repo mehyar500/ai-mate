@@ -29,7 +29,7 @@ def request(path,body=None):
         raise RuntimeError(error.read().decode('utf-8')[:4000]) from error
 
 
-def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False, silent=False, framing='fullbody'):
+def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False, silent=False, framing='fullbody', idle_style='original'):
     movement={'wave':'She raises her right hand, waves hello once, then lowers it to her side.',
               'closer':'She walks two small steps straight toward the stationary camera, then stops close to it. Her face and upper body become substantially larger. Her lower legs naturally leave the bottom of the frame as she approaches. She finishes in a relaxed waist-up view, facing the camera.',
               'farther':'She walks two small steps backward away from the fixed camera, becoming smaller in the frame.',
@@ -48,6 +48,18 @@ def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu',
                 'Her chin, nose, shoulders and relaxed closed lips stay in the same positions. '
                 'A light breeze moves fine strands of her hair. The garden remains in the same '
                 'position. Detailed natural skin, soft daylight, continuous steady close-up, quiet garden ambience.')
+    if action=='idle' and idle_style=='calm':
+        view = ('Her full body and both shoes remain in exactly the same place in the frame. '
+                if framing=='fullbody' else 'Her face stays exactly the same size and position in the close view. ')
+        prompt=('A quiet photographic video of the adult woman in the reference image listening to a friend. '
+                'The camera is completely fixed. '+view+
+                'She maintains attentive eye contact with both eyes open throughout, except for one '
+                'split-second reflex blink lasting just one fifth of a second. The left and right eyelids '
+                'close and reopen simultaneously. Her gaze immediately returns to the camera. '
+                'Her lips rest closed and her head stays level. '
+                'Only very subtle breathing moves her shoulders. Her hair rests naturally against her sweater. '
+                'It is a completely windless day in a sheltered garden. All leaves, twigs and branches '
+                'remain stationary throughout the shot. Natural real-time speed, quiet garden ambience, steady soft daylight.')
     node=lambda kind,**inputs:dict(class_type=kind,inputs=inputs)
     graph = {
         '1':node('CheckpointLoaderSimple',ckpt_name=CHECKPOINT),
@@ -93,6 +105,7 @@ def main():
     parser.add_argument('--silent',action='store_true',help='Generate movement with quiet ambience; app speech is added separately.')
     parser.add_argument('--reference-path',type=Path,help='Reviewed app-owned PNG; defaults to the full-body reference.')
     parser.add_argument('--framing',choices=['fullbody','close'],default='fullbody')
+    parser.add_argument('--idle-style',choices=['original','calm'],default='original')
     parser.add_argument('--timeout',type=int,default=900)
     args=parser.parse_args()
     if any(n<128 or n%32 for n in (args.width,args.height)) or not 9<=args.frames<=241 or args.frames%8!=1:
@@ -106,7 +119,7 @@ def main():
         parser.error('The reference must be an existing reviewed app-owned PNG.')
     tag='ltx23-'+uuid.uuid4().hex
     source=COMFY/'input'/(tag+'.png');shutil.copyfile(original,source)
-    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference,args.silent,args.framing)
+    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference,args.silent,args.framing,args.idle_style)
     graph['21']['inputs']['filename_prefix']='motion/'+tag
     audit=ROOT/'generated/local-app/audit';audit.mkdir(exist_ok=True)
     evidence={'model':CHECKPOINT,'encoder':ENCODER,'settings':{k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},'source_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),

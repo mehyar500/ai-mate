@@ -3,8 +3,7 @@ import {Microphone} from './microphone.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
-let replyMode="video",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
-let soundOn=true;
+let replyMode="text",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let idleURL=null,idleFailed=false,idleSuppressed=false;
 let nextIdleURL=undefined,pictureStarted=false,motionRequested=false;
 function settleIdle(){
@@ -23,7 +22,7 @@ function idlePresence(){
 $('idle-video').addEventListener('error',()=>{idleFailed=true;$('idle-video').hidden=true;});
 document.addEventListener('visibilitychange',idlePresence);
 let historyOpen=false;
-let viewMode='video',unread=0,micState='off',listenAfter=0;
+let viewMode='video',unread=0,micState='off',listenAfter=0,callRequest=0;
 const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
   onState:state=>{if(micState!==state){micState=state;controls();}}});
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
@@ -31,29 +30,37 @@ const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
 function controls(){
   $("send").disabled=!ready||busy;
-  $("stop").hidden=!busy&&!playing;
+  $("stop").hidden=viewMode==='text'||(!busy&&!playing);
   $("reset").disabled=submitting;
-  const listening={off:'Mic off · type to talk',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Listening resumes after the reply',listening:'Listening · speak naturally',disconnected:'Microphone disconnected'};
-  $("call-state").textContent=playing?(firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?'Text conversation':listening[micState];
-  $("sound").textContent=soundOn?"Sound on":"Sound off";
+  const listening={off:'Microphone muted',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Mira is replying',listening:'Listening',disconnected:'Microphone disconnected'};
+  $("call-state").textContent=playing?(firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
   $("history-toggle").hidden=true;
   document.querySelector('.conversation').dataset.mode=viewMode;
   for(const mode of ['text','voice','video'])$('mode-'+mode).setAttribute('aria-pressed',String(viewMode===mode));
   for(const mode of ['voice','video'])$('mode-'+mode).dataset.active=replyMode===mode?'true':'false';
-  $('mic').hidden=replyMode==='text';$('mic').disabled=!ready;
-  $('mic').textContent=microphone.pending?'Cancel mic':microphone.enabled?'Mute mic':'Enable mic';
-  $('mic').setAttribute('aria-pressed',String(microphone.enabled));
-  $('end-call').hidden=replyMode==='text';$('sound').hidden=viewMode==='text'&&replyMode==='text';
+  $('mic').hidden=viewMode==='text'||replyMode==='text';$('mic').disabled=!ready;
+  const micLabel=microphone.pending?'Cancel microphone request':microphone.enabled?'Mute microphone':'Unmute microphone';
+  $('mic').setAttribute('aria-label',micLabel);$('mic').title=micLabel;
+  $('mic').setAttribute('aria-pressed',String(!microphone.enabled));
+  $('mic').dataset.muted=String(!microphone.enabled);
+  $('end-call').hidden=viewMode==='text'||replyMode==='text';
+  document.querySelector('.call-actions').hidden=replyMode==='text';
+  $('join-call').hidden=viewMode==='text'||replyMode!=='text';$('join-call').disabled=!ready;
+  const joinLabel=ready?'Call Mira':connected?'Getting ready…':'Connecting…';
+  $('join-call').querySelector('span').textContent=joinLabel;
+  $('join-call').setAttribute('aria-label',joinLabel);$('join-call').title=joinLabel;
+  $('composer').hidden=viewMode!=='text';
   $('voice-view').hidden=viewMode!=='voice';$('voice-caption').textContent=$('call-state').textContent;
   $('active-call').hidden=viewMode!=='text'||replyMode==='text';
   $('active-call-title').textContent=(replyMode==='video'?'Video':'Voice')+' call active';
   $('active-call-status').textContent=$('call-state').textContent;
   $('return-call').textContent='Return to '+(replyMode==='video'?'video':'voice')+' call';
   if(viewMode==='voice')$('media-label').textContent='Voice call';
-  $('replay').hidden=!lastMedia||(lastMedia.video?'video':'voice')!==viewMode||busy;
+  $('replay').hidden=true;
   $('unread').hidden=!unread;$('unread').textContent=String(unread);
-  $('message').placeholder=viewMode==='text'?'Message Mira…':'Type to Mira during the call…';
-  $('disclosure').textContent=viewMode==='text'?(replyMode==='text'?'Private local conversation':'Call stays active · return using the call tab'):'AI-generated '+(viewMode==='video'?'video':'voice')+' · Listening pauses during replies';
+  $('message').placeholder='Message Mira…';
+  $('disclosure').hidden=viewMode!=='text';
+  $('disclosure').textContent=replyMode==='text'?'Private conversation':'Call stays active';
   idlePresence();
 }
 async function api(path,body){
@@ -147,11 +154,11 @@ async function drain(){
   if(playing||!queue.length)return;
   playing=true;controls();const mine=epoch;
   while(queue.length&&mine===epoch){
-    const item=queue.shift();lastMedia=item;$("replay").hidden=false;
+    const item=queue.shift();lastMedia=item;
     const media=item.video?$("video"):$("audio");
     const speech=item.video?$("audio"):media;
     if(item.video){media.hidden=true;media.muted=true;}
-    speech.muted=!soundOn;speech.volume=1;
+    speech.muted=false;speech.volume=1;
     const controller=new AbortController();abortMedia=controller;
     let releaseSpeech=()=>{};
     if(item.video&&item.audio){
@@ -212,9 +219,9 @@ async function follow(key,node){
       else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
       if(["done","failed","cancelled"].includes(job.state)){
         if(job.state==='done'&&job.presentation==='video'){nextIdleURL=job.idle_video||null;if(!playing&&!queue.length)settleIdle();}
-        if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Speak again or type.");}
+        if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Please speak again.");}
         else if(job.state==="failed"){notice(job.error,true);if(!replyNode)bubble("That reply couldn't finish. Please try again.","assistant");}
-        else if(job.state==="cancelled")notice("Stopped. You can talk or type now.");
+        else if(job.state==="cancelled")notice(replyMode==='text'?"Stopped. You can send another message.":"Stopped. You can speak now.");
         else if($("resume").hidden){notice(job.remembered?.length?"Saved what you shared. You can review it in Memory.":"");}
         lastServerSeconds=job.metrics.total_s??null;updateMetrics();
         break;
@@ -250,23 +257,30 @@ async function interrupt(){
   resetPlayback(true);
   if(submitting){pendingStop=true;return;}
   if(active){try{await api("/api/cancel",{id:active});notice("Stopping…");}catch(error){notice(error.message,true);}}
-  else notice("Reply stopped. Type your next message.");
+  else notice(replyMode==='text'?"Reply stopped. Send another message when you're ready.":"Reply stopped. You can speak now.");
 }
 $("stop").addEventListener("click",interrupt);
 $('mic').addEventListener('click',async()=>{
   if(microphone.enabled||microphone.pending){microphone.stop();return;}
   try{await microphone.start();}catch(error){notice(error.message,true);}controls();
 });
+async function startCall(mode){
+  if(!ready)return;
+  const request=++callRequest,changed=replyMode!==mode;
+  if(changed)microphone.stop();
+  replyMode=mode;viewMode=mode;controls();
+  if(changed){await interrupt();if(request!==callRequest)return;}
+  notice();
+  try{await microphone.start();}catch(error){notice(error.message,true);}controls();
+}
 for(const mode of ['text','voice','video'])$('mode-'+mode).addEventListener('click',async()=>{
-  if(mode!=='text'&&replyMode!==mode){
-    microphone.stop();await interrupt();replyMode=mode;
-  }
+  if(mode!=='text'&&replyMode!==mode&&ready){await startCall(mode);return;}
   viewMode=mode;if(mode==='text')unread=0;controls();notice();
   if(mode==='text')$('chat').scrollTop=$('chat').scrollHeight;
 });
-$('end-call').addEventListener('click',async()=>{microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
+$('join-call').addEventListener('click',()=>startCall(viewMode==='voice'?'voice':'video'));
+$('end-call').addEventListener('click',async()=>{callRequest++;microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
 $('return-call').addEventListener('click',()=>{if(replyMode!=='text'){viewMode=replyMode;controls();notice();}});
-$("sound").addEventListener("click",()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;controls();});
 $("history-toggle").addEventListener("click",()=>{
   historyOpen=!historyOpen;
   document.querySelector(".conversation").dataset.history=historyOpen?"open":"closed";
@@ -301,9 +315,9 @@ $("close-settings").addEventListener("click",()=>$("settings").close());
 $("save-memory").addEventListener("click",async()=>{try{await api("/api/memory",{memory:$("memory").value});$("settings").close();notice("Notes saved.");}catch(error){notice(error.message,true);}});
 $("reset").addEventListener("click",async()=>{
   if(!confirm("Erase this local conversation, saved facts and generated replies? Prepared pictures remain."))return;
-  try{microphone.stop();replyMode=viewMode="text";unread=0;resetPlayback();await api("/api/reset",{});active=null;busy=false;lastMedia=null;$("replay").hidden=true;$("chat").replaceChildren();$("memory").value="";renderFacts();$("settings").close();setScene("mira");notice("Conversation and memory cleared.");controls();}catch(error){notice(error.message,true);}
+  try{callRequest++;microphone.stop();replyMode=viewMode="text";unread=0;resetPlayback();await api("/api/reset",{});active=null;busy=false;lastMedia=null;$("replay").hidden=true;$("chat").replaceChildren();$("memory").value="";renderFacts();$("settings").close();setScene("mira");notice("Conversation and memory cleared.");controls();}catch(error){notice(error.message,true);}
 });
-window.addEventListener("pagehide",()=>{microphone.stop();abortMedia?.abort();});
+window.addEventListener("pagehide",()=>{callRequest++;microphone.stop();abortMedia?.abort();});
 async function boot(){
   for(;;){
     try{

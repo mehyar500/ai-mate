@@ -5662,5 +5662,371 @@
         "physical_speakers_verified": false
       }
     ]
+  },
+  "call_ui_2026_09_08": {
+    "source_commit": "c09b87e",
+    "scope": [
+      "local_app/web/app.js",
+      "local_app/web/index.html",
+      "local_app/web/style.css",
+      "local_app/web/microphone.mjs"
+    ],
+    "request": "Voice-only call controls, separate Text composer, maximize character view and remove technical overlays.",
+    "previous_desktop_stage_height_px": 544,
+    "viewport_checks": [
+      {
+        "width": 716,
+        "height": 854,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 716,
+          "height": 854
+        },
+        "name": {
+          "x": 22,
+          "y": 18,
+          "width": 79.9375,
+          "height": 32
+        },
+        "tabs": {
+          "x": 258.4765625,
+          "y": 14,
+          "width": 199.046875,
+          "height": 44
+        },
+        "settings": {
+          "x": 654,
+          "y": 14,
+          "width": 40,
+          "height": 40
+        },
+        "join": {
+          "x": 656,
+          "y": 786,
+          "width": 48,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 758
+        },
+        "name": {
+          "x": 14,
+          "y": 19,
+          "width": 75.234375,
+          "height": 30
+        },
+        "tabs": {
+          "x": 107.4765625,
+          "y": 14,
+          "width": 175.046875,
+          "height": 44
+        },
+        "settings": {
+          "x": 336,
+          "y": 14,
+          "width": 40,
+          "height": 40
+        },
+        "join": {
+          "x": 115,
+          "y": 778,
+          "width": 160,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 320,
+        "height": 568,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 482
+        },
+        "name": {
+          "x": 14,
+          "y": 19,
+          "width": 43.3125,
+          "height": 30
+        },
+        "tabs": {
+          "x": 78.4765625,
+          "y": 14,
+          "width": 163.046875,
+          "height": 44
+        },
+        "settings": {
+          "x": 266,
+          "y": 14,
+          "width": 40,
+          "height": 40
+        },
+        "join": {
+          "x": 80,
+          "y": 502,
+          "width": 160,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 844,
+        "height": 390,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 844,
+          "height": 390
+        },
+        "name": {
+          "x": 22,
+          "y": 14,
+          "width": 79.9375,
+          "height": 32
+        },
+        "tabs": {
+          "x": 322.4765625,
+          "y": 10,
+          "width": 199.046875,
+          "height": 44
+        },
+        "settings": {
+          "x": 782,
+          "y": 10,
+          "width": 40,
+          "height": 40
+        },
+        "join": {
+          "x": 784,
+          "y": 322,
+          "width": 48,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "stage": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "name": {
+          "x": 22,
+          "y": 18,
+          "width": 79.9375,
+          "height": 32
+        },
+        "tabs": {
+          "x": 540.4765625,
+          "y": 14,
+          "width": 199.046875,
+          "height": 44
+        },
+        "settings": {
+          "x": 1218,
+          "y": 14,
+          "width": 40,
+          "height": 40
+        },
+        "join": {
+          "x": 1220,
+          "y": 652,
+          "width": 48,
+          "height": 48
+        },
+        "overflow": false,
+        "permission_denial_and_navigation": "passed"
+      }
+    ],
+    "checks": {
+      "python_unittest": {
+        "passed": 89
+      },
+      "node_tests": {
+        "passed": 7
+      },
+      "compileall": "passed",
+      "node_syntax": "passed",
+      "git_diff_check": "passed"
+    },
+    "live_desktop_visual_review": "passed; head and feet visible, no main-page technical copy",
+    "limits": [
+      "Chromium fixtures isolate layout and permission-denial checks from real audio and conversation.",
+      "Phone crop can exclude very wide gestures.",
+      "Physical audio and mobile Safari remain unqualified."
+    ],
+    "migration": "None; existing SQLite conversation preserved.",
+    "review": "Self-review only; independent R2 review and staging remain release gates."
+  },
+  "calm_idle_review_2026_09_08": {
+    "candidates": [
+      {
+        "settings": {
+          "width": 384,
+          "height": 576,
+          "frames": 129,
+          "seed": 80,
+          "device": "cpu",
+          "action": "idle",
+          "return_to_reference": true,
+          "silent": true,
+          "reference_path": null,
+          "framing": "fullbody",
+          "idle_style": "calm",
+          "timeout": 300
+        },
+        "total_s": 143.227,
+        "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "prompt": "A quiet photographic video of the adult woman in the reference image listening to a friend. The camera is completely fixed. Her full body and both shoes remain in exactly the same place in the frame. She keeps a relaxed face with both eyes open. Once during the shot, both upper eyelids briefly close together and immediately open together: one quick, symmetrical, ordinary blink. Both eyes then stay open and attentive. Her lips rest closed and her head stays level. Only very subtle breathing moves her shoulders. Her hair rests naturally against her sweater. The air is nearly still. Trees and shrubs stay in place; only a few leaf tips drift very slowly and almost imperceptibly. Natural real-time speed, quiet garden ambience, steady soft daylight.",
+        "visual_metrics": {
+          "frames": 129,
+          "fps": 24.0,
+          "duration_s": 5.375,
+          "background_mean_px_s": 0.9152580499649048,
+          "background_p95_px_s": 3.218838691711426,
+          "blink_review": "manual, not inferred from flow"
+        },
+        "review": "Rejected: bilateral eyes remain closed for roughly one second. Background drift remains.",
+        "promoted": false
+      },
+      {
+        "settings": {
+          "width": 384,
+          "height": 576,
+          "frames": 97,
+          "seed": 81,
+          "device": "cpu",
+          "action": "idle",
+          "return_to_reference": true,
+          "silent": true,
+          "reference_path": null,
+          "framing": "fullbody",
+          "idle_style": "calm",
+          "timeout": 300
+        },
+        "total_s": 83.033,
+        "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "prompt": "A quiet photographic video of the adult woman in the reference image listening to a friend. The camera is completely fixed. Her full body and both shoes remain in exactly the same place in the frame. She maintains attentive eye contact with both eyes open throughout, except for one split-second reflex blink lasting just one fifth of a second. The left and right eyelids close and reopen simultaneously. Her gaze immediately returns to the camera. Her lips rest closed and her head stays level. Only very subtle breathing moves her shoulders. Her hair rests naturally against her sweater. It is a completely windless day in a sheltered garden. All leaves, twigs and branches remain stationary throughout the shot. Natural real-time speed, quiet garden ambience, steady soft daylight.",
+        "visual_metrics": {
+          "frames": 97,
+          "fps": 24.0,
+          "duration_s": 4.041666666666667,
+          "background_mean_px_s": 0.8748947381973267,
+          "background_p95_px_s": 3.156459093093872,
+          "blink_review": "manual, not inferred from flow"
+        },
+        "review": "Rejected: bilateral eyes remain closed for roughly one second. Background drift remains.",
+        "promoted": false
+      }
+    ],
+    "baseline": {
+      "frames": 91,
+      "fps": 24.0,
+      "duration_s": 3.7916666666666665,
+      "background_mean_px_s": 1.1526695489883423,
+      "background_p95_px_s": 3.695770740509033,
+      "blink_review": "manual, not inferred from flow"
+    },
+    "note": "Raw candidates versus prepared baseline; optical flow does not certify blink realism or scene stability. Active footage unchanged."
+  },
+  "cloud_speech_comparison_2026_09_08": {
+    "cases": [
+      {
+        "case": "short",
+        "repeat": 0,
+        "model": "@cf/deepgram/aura-2-en",
+        "speaker": "luna",
+        "first_4096_bytes_s": 0.395,
+        "complete_s": 0.818,
+        "audio_s": 1.24,
+        "characters": 16,
+        "list_price_usd": 0.00048,
+        "content_type": "audio/mpeg"
+      },
+      {
+        "case": "normal",
+        "repeat": 0,
+        "model": "@cf/deepgram/aura-2-en",
+        "speaker": "luna",
+        "first_4096_bytes_s": 0.29,
+        "complete_s": 1.851,
+        "audio_s": 4.08,
+        "characters": 62,
+        "list_price_usd": 0.00186,
+        "content_type": "audio/mpeg"
+      },
+      {
+        "case": "long",
+        "repeat": 0,
+        "model": "@cf/deepgram/aura-2-en",
+        "speaker": "luna",
+        "first_4096_bytes_s": 0.357,
+        "complete_s": 7.264,
+        "audio_s": 17.6,
+        "characters": 215,
+        "list_price_usd": 0.00645,
+        "content_type": "audio/mpeg"
+      },
+      {
+        "case": "short",
+        "repeat": 1,
+        "model": "@cf/deepgram/aura-2-en",
+        "speaker": "luna",
+        "first_4096_bytes_s": 0.331,
+        "complete_s": 0.75,
+        "audio_s": 1.2,
+        "characters": 16,
+        "list_price_usd": 0.00048,
+        "content_type": "audio/mpeg"
+      },
+      {
+        "case": "normal",
+        "repeat": 1,
+        "model": "@cf/deepgram/aura-2-en",
+        "speaker": "luna",
+        "first_4096_bytes_s": 0.376,
+        "complete_s": 1.873,
+        "audio_s": 3.84,
+        "characters": 62,
+        "list_price_usd": 0.00186,
+        "content_type": "audio/mpeg"
+      },
+      {
+        "case": "long",
+        "repeat": 1,
+        "model": "@cf/deepgram/aura-2-en",
+        "speaker": "luna",
+        "first_4096_bytes_s": 0.278,
+        "complete_s": 6.014,
+        "audio_s": 14.72,
+        "characters": 215,
+        "list_price_usd": 0.00645,
+        "content_type": "audio/mpeg"
+      }
+    ],
+    "source": "https://developers.cloudflare.com/workers-ai/models/aura-2-en/",
+    "price_usd_per_1000_characters": 0.03,
+    "nominal_total_including_initial_parser_failure_usd": 0.01806,
+    "initial_failure": "One 16-character request returned streaming WAV with unknown-length header; parser now reads actual PCM length.",
+    "selected_for_runtime": false,
+    "private_conversation_used": false,
+    "conclusion": "Fast first bytes, but long complete-file TTS remains slow. Renderer requires complete audio; provider switch alone is insufficient."
   }
 }

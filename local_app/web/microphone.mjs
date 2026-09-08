@@ -35,7 +35,7 @@ export class Microphone {
   constructor({onTurn,onState,canListen}){this.onTurn=onTurn;this.onState=onState;this.canListen=canListen;this.generation=0;this.enabled=false;this.pending=false;}
   async start(){
     if(this.enabled||this.pending)return;
-    if(!globalThis.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw Error('Microphone needs localhost or HTTPS and a supported browser. You can still type.');
+    if(!globalThis.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw Error('Microphone needs localhost or HTTPS and a supported browser. Text chat is available in the Text tab.');
     this.pending=true;const generation=++this.generation;this.onState('permission');
     let stream,context;
     try{
@@ -58,7 +58,7 @@ export class Microphone {
       stream?.getTracks().forEach(t=>t.stop());if(context&&context.state!=='closed')await context.close();
       if(generation!==this.generation)return;
       this.enabled=false;this.onState('off');
-      throw Error(error.name==='NotAllowedError'?'Microphone permission was denied. Enable it in browser settings or keep typing.':error.name==='NotFoundError'?'No microphone found. Connect one or keep typing.':'Microphone could not start. Check your input device and retry.');
+      throw Error(error.name==='NotAllowedError'?'Microphone permission was denied. Allow it in browser settings and tap Unmute to retry. Text chat is available in the Text tab.':error.name==='NotFoundError'?'No microphone found. Connect one and tap Unmute to retry, or open Text chat.':'Microphone could not start. Check your input device and tap Unmute to retry.');
     }finally{if(generation===this.generation)this.pending=false;}
   }
   stop(){

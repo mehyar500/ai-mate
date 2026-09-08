@@ -4,7 +4,7 @@ A single-user local app is implemented under `local_app/`. This document separat
 
 ## Active scope: local proof before remote inference
 
-The local app binds to `127.0.0.1:8765`. Text, Voice call and Video call accept typing; calls also accept opt-in microphone turns. Camera access is disabled. `local_app/engine.py` owns the shared turn flow, cancellation and memory. Cloudflare Qwen selects a bounded plan; CPU Kokoro makes speech; LTX body video and MuseTalk lips run on the local GPU. Picture fragments and a synchronized WAV reach the browser during rendering. Exact timings, failures and candidate comparisons live in LOCAL_POC.
+The local app binds to `127.0.0.1:8765`. Text has the composer; Voice and Video calls request microphone access when started, with mute/end icons and automatic sound playback. Opening Text keeps an existing call connected. Video uses the full height when controls fit beside it; tall phones trim side background to retain head-to-toe framing. Camera access is disabled. `local_app/engine.py` owns the shared turn flow, cancellation and memory. Cloudflare Qwen selects a bounded plan; CPU Kokoro makes speech; LTX body video and MuseTalk lips run on the local GPU. Picture fragments and a synchronized WAV reach the browser during rendering. Exact timings, failures and candidate comparisons live in LOCAL_POC.
 
 Cloudflare is configured using API key plus email. MiniMax and Ollama remain optional adapters. Three startup settings are read from private `.env`; the model adapters pin the actual graphics/voice choices. No production payment flags or pretend deployment controls are configured.
 
