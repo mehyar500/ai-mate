@@ -23,11 +23,18 @@ from scripts.benchmark_cloud_speech import CASES
 
 class SyntheticModels(Models):
     action = 'none'
+    interruption = False
     def plan(self, snapshot, text, mode, scene, available, event):
+        if self.interruption:
+            action = 'closer' if text == 'approach' else 'farther' if text == 'return' else 'none'
+            reply = CASES['long'] if action == 'closer' else 'I am right here. The garden is peaceful.'
+            return {'reply': reply, 'presentation': mode, 'scene': 'fullbody', 'action': action, 'facts': []}
         return {'reply': CASES['long'], 'presentation': mode, 'scene': 'fullbody',
                 'action': self.action, 'facts': []}
 
     def transcribe(self, raw):
+        if self.interruption:
+            return {b'\x01': 'approach', b'\x02': 'hello', b'\x03': 'return'}[raw]
         return 'Please count from one to twenty-five.'
 
 
@@ -36,12 +43,16 @@ def main():
     parser.add_argument('--whole', action='store_true')
     parser.add_argument('--batch-size', type=int, choices=[8, 16], default=8)
     parser.add_argument('--action', choices=['none', 'closer'], default='none')
+    parser.add_argument('--interruption', action='store_true')
+    parser.add_argument('--trial', choices=['early', 'middle'], default='early')
     args = parser.parse_args()
     label = 'whole' if args.whole else 'phrases'
     if args.batch_size != 8:
         label += '-b' + str(args.batch_size)
     if args.action == 'closer':
         label += '-approach'
+    if args.interruption:
+        label = 'interruption' + ('-middle' if args.trial == 'middle' else '')
     folder = ROOT / 'generated/local-app/audit' / ('speech-' + label)
     folder.mkdir(parents=True, exist_ok=True)
     for name in ['fullbody.png', 'performance-near.png', 'performance-closer.mp4',
@@ -54,6 +65,7 @@ def main():
     app.scene = 'fullbody'
     app.models = SyntheticModels()
     app.models.action = args.action
+    app.models.interruption = args.interruption
     renderer = app.models.load_visual()
     renderer.render = partial(renderer.render, batch_size=args.batch_size)
     audio = folder/'warm.wav'
@@ -76,7 +88,13 @@ def main():
         done.unlink(missing_ok=True)
         deadline = time.monotonic() + 150
         try:
+            saved_stop = False
             while time.monotonic() < deadline and not done.exists():
+                if args.interruption and not saved_stop:
+                    with app.lock:
+                        if app.pose and app.pose[1].name.startswith('playback-'):
+                            shutil.copyfile(app.pose[1], folder/'interrupted-pose.png')
+                            saved_stop = True
                 time.sleep(.2)
             app.cancel()
             while app.busy:

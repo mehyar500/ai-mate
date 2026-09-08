@@ -6,6 +6,7 @@ let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=fal
 let replyMode="text",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let idleURL=null,idleFailed=false,idleSuppressed=false;
 let nextIdleURL=undefined,pictureStarted=false,motionRequested=false;
+let stopping=false,displayedPlayback=null,frameCallback=null;
 function settleIdle(){
   if(nextIdleURL!==undefined){idleURL=nextIdleURL;nextIdleURL=undefined;idleSuppressed=!idleURL;}
   pictureStarted=false;
@@ -29,14 +30,14 @@ function updateCaptions(){
   $('captions').hidden=viewMode==='text'||!$('show-captions').checked||!captionText;
 }
 $('show-captions').addEventListener('change',updateCaptions);
-const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
+const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!stopping&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
   onState:state=>{if(micState!==state){micState=state;controls();}}});
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
 let partEndedAt=null,phraseGapSeconds=0;
 const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
 function controls(){
-  $("send").disabled=!ready||busy;
+  $("send").disabled=!ready||busy||stopping;
   $("stop").hidden=viewMode==='text'||(!busy&&!playing);
   $("reset").disabled=submitting;
   const listening={off:'Microphone muted',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Mira is replying',listening:'Listening',disconnected:'Microphone disconnected'};
@@ -107,6 +108,8 @@ function holdPicture(){
   picture.hidden=true;
 }
 function resetPlayback(holdFrame=false){
+  if(frameCallback!==null){$('video').cancelVideoFrameCallback?.(frameCallback);frameCallback=null;}
+  displayedPlayback=null;
   partEndedAt=null;phraseGapSeconds=0;
   captionText='';
   nextIdleURL=undefined;pictureStarted=false;motionRequested=false;
@@ -185,6 +188,16 @@ async function drain(){
       itemStarted=true;
       captionText=item.text||'';
       if(item.video){media.hidden=false;$("media-label").textContent=sceneNames[scene]+(item.prepared_motion?" · Prepared motion · live voice":" · Generated video");}
+      if(item.video){
+        displayedPlayback={id:item.jobId,playback:{index:item.index,time_s:media.currentTime}};
+        const track=(_now,frame)=>{
+          if(mine!==epoch||lastMedia!==item)return;
+          displayedPlayback={id:item.jobId,playback:{index:item.index,time_s:frame.mediaTime}};
+          frameCallback=media.requestVideoFrameCallback(track);
+        };
+        if(frameCallback!==null)media.cancelVideoFrameCallback?.(frameCallback);
+        if(media.requestVideoFrameCallback)frameCallback=media.requestVideoFrameCallback(track);
+      }
       played();
     };
     media.onwaiting=()=>{if(itemStarted&&firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
@@ -226,13 +239,13 @@ async function follow(key,node){
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
       if(job.state==='done'&&job.message&&!shownMessage){bubble(job.message,'assistant sent-message');shownMessage=true;if(viewMode!=='text')unread++;controls();}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
-      while(!pendingStop&&consumed<job.chunks.length){queue.push(job.chunks[consumed++]);drain();}
+      while(!pendingStop&&consumed<job.chunks.length){queue.push({...job.chunks[consumed++],jobId:key});drain();}
       if(job.state==="thinking")notice("Mira is thinking…");
       else if(job.state==="transcribing")notice("Listening to your message…");
       else if(job.state==="rendering"&&!playing)notice("Connecting the picture…");
       else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
       if(["done","failed","cancelled"].includes(job.state)){
-        if(job.state==='done'&&job.presentation==='video'){nextIdleURL=job.idle_video||null;if(!playing&&!queue.length)settleIdle();}
+        if(!pendingStop&&job.state==='done'&&job.presentation==='video'){nextIdleURL=job.idle_video||null;if(!playing&&!queue.length)settleIdle();}
         if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Please speak again.");}
         else if(job.state==="failed"){notice(job.error,true);if(!replyNode)bubble("That reply couldn't finish. Please try again.","assistant");}
         else if(job.state==="cancelled")notice(replyMode==='text'?"Stopped. You can send another message.":"Stopped. You can speak now.");
@@ -246,7 +259,7 @@ async function follow(key,node){
   finally{if(active===key){active=null;busy=false;controls();}}
 }
 async function submit(text,raw=null,inputMode=null){
-  if(busy||!ready||(!raw&&!text.trim()))return;
+  if(busy||stopping||!ready||(!raw&&!text.trim()))return;
   resetPlayback(true);lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
   pendingStop=false;submitting=true;busy=true;controls();
   const node=bubble(raw?"Listening…":text,"user");
@@ -266,11 +279,27 @@ async function submit(text,raw=null,inputMode=null){
 $("composer").addEventListener("submit",e=>{e.preventDefault();submit($("message").value);});
 $("message").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit($("message").value);}});
 async function interrupt(){
+  if(stopping)return;
   pendingStop=true;
+  const position=displayedPlayback?.id?structuredClone(displayedPlayback):null;
+  // Older browsers report the current playback clock instead of presented frames.
+  if(position&&!$('video').requestVideoFrameCallback&&!$('video').hidden)position.playback.time_s=$('video').currentTime;
+  const key=position?.id||active;
+  if(position)idleSuppressed=true;
   if(active||submitting)lastMedia=null;
   resetPlayback(true);
+  const mine=epoch;
   if(submitting){pendingStop=true;return;}
-  if(active){try{await api("/api/cancel",{id:active});notice("Stopping…");}catch(error){notice(error.message,true);}}
+  if(key){
+    stopping=true;controls();
+    try{
+      const result=await api('/api/cancel',position||{id:key});
+      if(mine!==epoch)return;
+      if(result.pose_preserved){idleURL=result.idle_video||null;idleSuppressed=!idleURL;}
+      notice(result.warning||'Reply stopped. You can speak now.',Boolean(result.warning));
+    }catch(error){if(mine===epoch)notice(error.message,true);}
+    finally{stopping=false;listenAfter=performance.now()+450;controls();}
+  }
   else notice(replyMode==='text'?"Reply stopped. Send another message when you're ready.":"Reply stopped. You can speak now.");
 }
 $("stop").addEventListener("click",interrupt);

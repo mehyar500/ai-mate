@@ -7849,5 +7849,118 @@
       "2 synthetic API/microphone Chromium call/caption regressions",
       "4 real-media isolated pipeline comparisons"
     ]
+  },
+  "playback_continuity_2026_09_08": {
+    "samples": [
+      {
+        "case": "interruption",
+        "stop": {
+          "ok": true,
+          "pose_preserved": true,
+          "time_s": 0.8426757812500001,
+          "source_time_s": 0.8,
+          "idle_video": null,
+          "prepared_pose": null,
+          "capture_s": 0.136
+        },
+        "approach_state": "cancelled",
+        "held_vs_saved_channel_mae_0_255": 1.333081657503858,
+        "page_errors": [],
+        "turns": {
+          "ordinary": {
+            "state": "done",
+            "action": "none",
+            "prepared_pose": null,
+            "server_s": 2.814,
+            "browser_metrics": null,
+            "transition_start_s": null
+          },
+          "return": {
+            "state": "done",
+            "action": "farther",
+            "prepared_pose": "base",
+            "server_s": 3.861,
+            "browser_metrics": null,
+            "transition_start_s": 2.2
+          }
+        },
+        "sha256": {
+          "browser-results.json": "7c339d4fe4284067b4f924d0d52ab8b7599ceb8638eeab97b5cf0d106cb516f5",
+          "engine-results.json": "072cae5eafbbb6a3df5c00e74b122de5938b0d739e3df23988e5b1042062ef51",
+          "browser-held.png": "63c1e92547f77611ca762e66bc5f34dad2f78a53291f9a378509b687ce55d287",
+          "interrupted-pose.png": "9b1edca25abd35fc60b737755a470b82c69a130699c9250b60452667acd5efff",
+          "stopped-screen.png": "9bbc88e25ebd5ab701a406414b7039e9c9a2a4601b881e06749ec9b50cb509f4",
+          "reply-from-stopped-pose.png": "dc379edfeeeb350ee74ee36d83a4473b4774a11b1ae3b83c9962fa74560cd1d7",
+          "return-from-stopped-pose.png": "14cef088d647b4cffb44ab6f4e0ee94305103ff05792af68103ef221ff545a16"
+        }
+      },
+      {
+        "case": "interruption-middle",
+        "stop": {
+          "ok": true,
+          "pose_preserved": true,
+          "time_s": 1.6426757812500001,
+          "source_time_s": 1.6,
+          "idle_video": null,
+          "prepared_pose": null,
+          "capture_s": 0.094
+        },
+        "approach_state": "cancelled",
+        "held_vs_saved_channel_mae_0_255": 1.4107048128858024,
+        "page_errors": [],
+        "turns": {
+          "ordinary": {
+            "state": "done",
+            "action": "none",
+            "prepared_pose": null,
+            "server_s": 2.841,
+            "browser_metrics": "First playback: 1.46s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 2.84s.",
+            "transition_start_s": null
+          },
+          "return": {
+            "state": "done",
+            "action": "closer",
+            "prepared_pose": "near",
+            "server_s": 14.631,
+            "browser_metrics": "First playback: 1.84s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.68s. Server completed: 14.63s.",
+            "transition_start_s": 1.6
+          }
+        },
+        "sha256": {
+          "browser-results.json": "28564448f876ac694f7884d596c88637fd3fb1cf04c8bd35894f089d13cc2b13",
+          "engine-results.json": "1c4cd65dba6ae8a07f796c093029f052de4e5d7e119e215a2be0c84bc21d70b8",
+          "browser-held.png": "c1381cbbe19e6049621948eb0621b9f8823d3cf3e86c1a56334dd5c66b86f7aa",
+          "interrupted-pose.png": "15461decf6b29f254423f25252fb48831638ccd65c263750335babc4685cdccc",
+          "stopped-screen.png": "9fa6500410313f54412fc16a5889b1d8db78bf0505ca4f625bbd290be6abad9c",
+          "reply-from-stopped-pose.png": "d60ab284e31ae7878a2acd20b5eb1d31fb9f953c3c6a451286eb162ef33529ed",
+          "return-from-stopped-pose.png": "9423f22849dcc5b6c4b1ce7e6996ad3b4515ea9755988bd2409e0462924fc4bb"
+        }
+      }
+    ],
+    "limits": [
+      "Synthetic ASR and planner; real CPU Kokoro, GPU MuseTalk, HTTP, MSE and browser cancellation.",
+      "Two stop positions, not p50/p95, arbitrary movement acceptance or acoustic device testing.",
+      "Low image difference checks saved position, not facial realism. Mouth artifacts and crop remain.",
+      "First two harness attempts awaited the whole submit promise; they stopped in phrase 2 and did not qualify mid-motion interruption."
+    ],
+    "source_commit": "f4f320c",
+    "runtime": "CPU Kokoro af_sarah, MuseTalk streaming batch 8 at 384x576/20fps, reviewed LTX movement, RTX 4060 Ti 16GB",
+    "tests": {
+      "python": 114,
+      "node": 7,
+      "independent_review": "pending before public release",
+      "staging": "not provisioned",
+      "python_compile": "passed",
+      "javascript_syntax": "passed",
+      "git_diff_check": "passed",
+      "synthetic_browser_voice_video_regression": "2 passed"
+    },
+    "api_changes": "Optional authenticated cancel playback index/time; only engine-owned video. No provider configuration or database migration.",
+    "live_preview": {
+      "ready": true,
+      "startup_s": 14.039,
+      "stale_playback_http": 409,
+      "conversation_database_unchanged_at_restart": true
+    }
   }
 }

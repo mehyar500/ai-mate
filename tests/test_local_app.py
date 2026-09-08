@@ -241,6 +241,16 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(self.request(path)[0], 404)
         self.assertEqual(self.request("/api/status")[0], 403)
 
+    def test_playback_stop_keeps_auth_origin_and_descriptor_boundaries(self):
+        body = json.dumps({'id': 'f'*32, 'playback': {'index': 0, 'time_s': .5}}).encode()
+        headers = {'X-Local-Token': self.app.token, 'Content-Type': 'application/json'}
+        self.assertEqual(self.request('/api/cancel', body, {'Content-Type': 'application/json'})[0], 403)
+        self.assertEqual(self.request('/api/cancel', body, {**headers, 'Origin': 'https://evil.example'})[0], 403)
+        self.assertEqual(self.request('/api/cancel', body, headers)[0], 409)
+        bad = json.dumps({'id': 'f'*32, 'playback': {'index': 0, 'time_s': 0, 'path': '../memory.sqlite3'}}).encode()
+        self.assertEqual(self.request('/api/cancel', bad, headers)[0], 400)
+        self.assertEqual(self.request('/api/cancel', b'{}', headers)[0], 200)
+
     def test_video_range_and_invalid_seek(self):
         name = "a"*32 + "-0.mp4"
         (Path(self.tmp.name)/name).write_bytes(b"0123456789")

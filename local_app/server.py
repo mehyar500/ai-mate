@@ -183,8 +183,7 @@ class Handler(BaseHTTPRequestHandler):
                 key = self.app.submit(body.get("text"), body.get("mode", "voice"), body.get("scene", "mira"))
                 return self.respond(202, {"id": key})
             if path == "/api/cancel":
-                self.app.cancel(body.get("id"))
-                return self.respond(200, {"ok": True})
+                return self.respond(200, self.app.cancel(body.get("id"), body.get("playback")))
             if path == "/api/memory":
                 self.app.store.remember(body.get("memory"))
                 return self.respond(200, {"ok": True})

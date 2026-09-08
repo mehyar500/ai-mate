@@ -49,6 +49,8 @@ class CompanionEngine:
         self.lock = threading.RLock()
         self.jobs = {}
         self.busy = False
+        self.playback_pending = False
+        self.generation = 0
         self.models = None
         self.ready = False
         self.error = None
@@ -63,12 +65,16 @@ class CompanionEngine:
         from .performance import load_reviewed_performance
         self.performance = load_reviewed_performance(self.directory)
         self.performance_state = 'base'
+        self.visual_cursor = None  # Partial progress along the reviewed base -> near footage.
         self.return_motion = None  # One approach, valid until the next successful video turn.
         for path in self.directory.glob('*-pose.png'):
             if re.fullmatch(r'[a-f0-9]{32}-\d+-pose\.png',path.name):
                 path.unlink(missing_ok=True)
         for path in self.directory.glob('*-return.mp4'):
             if re.fullmatch(r'[a-f0-9]{32}-\d+-return\.mp4', path.name):
+                path.unlink(missing_ok=True)
+        for path in self.directory.glob('playback-*'):
+            if re.fullmatch(r'playback-[a-f0-9]{32}\.(mp4|png)', path.name):
                 path.unlink(missing_ok=True)
 
     def warm(self):
@@ -105,7 +111,7 @@ class CompanionEngine:
 
     def status(self):
         with self.lock:
-            return {"app_version": "0.2", "ready": self.ready, "error": self.error, "busy": self.busy,
+            return {"app_version": "0.2", "ready": self.ready, "error": self.error, "busy": self.busy or self.playback_pending,
                     "startup_s": self.startup_s,
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
                     "visual_error": self.visual_error,
@@ -125,13 +131,15 @@ class CompanionEngine:
         with self.lock:
             if not self.ready:
                 raise RuntimeError("The local models are still loading or unavailable.")
-            if self.busy:
+            if self.busy or self.playback_pending:
                 raise BlockingIOError("One reply is already running. Stop it or wait.")
             self.busy = True
+            self.generation += 1
             key = uuid.uuid4().hex
             event = threading.Event()
             self.jobs[key] = {"id": key, "state": "transcribing" if raw else "thinking", "text": "", "user": text,
-                              "chunks": [], "metrics": {}, "cancel": event, "error": None}
+                              "chunks": [], "metrics": {}, "cancel": event, "error": None,
+                              "_generation": self.generation, "_playback": {}}
             while len(self.jobs) > 20:
                 self.jobs.pop(next(iter(self.jobs)))
             threading.Thread(target=self.run, args=(key, text, mode, scene, raw), daemon=True).start()
@@ -141,20 +149,92 @@ class CompanionEngine:
         with self.lock:
             if key not in self.jobs:
                 raise KeyError("Reply not found.")
-            return copy.deepcopy({k: v for k, v in self.jobs[key].items() if k != "cancel"})
+            return copy.deepcopy({k: v for k, v in self.jobs[key].items() if k != "cancel" and not k.startswith('_')})
 
-    def cancel(self, key=None):
+    def cancel(self, key=None, playback=None):
+        if playback is not None:
+            return self.stop_playback(key, playback)
         with self.lock:
             for job_id, job in self.jobs.items():
                 if key is None or key == job_id:
                     job["cancel"].set()
+        return {'ok': True}
+
+    def stop_playback(self, key, playback):
+        from .playback import capture_playback_frame, stopped_pose, validate_playback
+        index, seconds = validate_playback(playback)
+        if not isinstance(key, str) or not re.fullmatch(r'[a-f0-9]{32}', key):
+            raise ValueError('Invalid reply identifier.')
+        snapshot = self.directory / ('playback-' + uuid.uuid4().hex + '.mp4')
+        candidate = snapshot.with_suffix('.png')
+        with self.lock:
+            job = self.jobs.get(key)
+            if not job or job.get('_generation') != self.generation:
+                raise BlockingIOError('This playback belongs to an older reply.')
+            if self.playback_pending:
+                raise BlockingIOError('Playback is already stopping.')
+            if '_stopped' in job:
+                return copy.deepcopy(job['_stopped'])
+            metadata = job['_playback'].get(index)
+            if metadata is None:
+                raise ValueError('That video part is not registered.')
+            source = self.directory / f'{key}-{index}.mp4'
+            self.playback_pending = True
+            generation = self.generation
+        started = time.perf_counter()
+        try:
+            # Copy before cancellation can remove the file. Keep this short local
+            # read under the lock shared with reset and the generation worker.
+            with self.lock:
+                try:
+                    with source.open('rb') as incoming:
+                        data = incoming.read(40_000_001)
+                    if not 0 < len(data) <= 40_000_000:
+                        raise ValueError('Playback snapshot is unavailable.')
+                    snapshot.write_bytes(data)
+                finally:
+                    job['cancel'].set()
+            actual = capture_playback_frame(snapshot, candidate, seconds)
+            source_time = actual['frame'] / metadata['fps']
+            pose, cursor = stopped_pose(metadata, source_time)
+            with self.lock:
+                if generation != self.generation:
+                    return {'ok': True, 'pose_preserved': False, 'superseded': True}
+                previous = self.pose
+                self.pose = (metadata['scene'], candidate)
+                self.scene = metadata['scene']
+                self.store.set_scene(self.scene)
+                self.performance_state, self.visual_cursor = pose, cursor
+                if previous and previous[1] != candidate:
+                    previous[1].unlink(missing_ok=True)
+                if self.return_motion:
+                    self.return_motion[1].unlink(missing_ok=True)
+                    self.return_motion = None
+                result = {'ok': True, 'pose_preserved': True, 'time_s': actual['time_s'],
+                          'source_time_s': source_time,
+                          'idle_video': self.listening_url(), 'prepared_pose': pose,
+                          'capture_s': round(time.perf_counter() - started, 3)}
+                job['_stopped'] = result
+                job['metrics']['playback_stop'] = {k: v for k, v in result.items() if k != 'ok'}
+                return copy.deepcopy(result)
+        except (OSError, ValueError, RuntimeError):
+            return {'ok': True, 'pose_preserved': False,
+                    'warning': 'Reply stopped, but its position could not be saved. Please retry the movement.'}
+        finally:
+            with self.lock:
+                snapshot.unlink(missing_ok=True)
+                if not self.pose or self.pose[1] != candidate:
+                    candidate.unlink(missing_ok=True)
+                self.playback_pending = False
 
     def reset(self):
         with self.lock:
             self.cancel()
+            self.generation += 1
             self.store.reset()
             self.scene = "mira"
             self.performance_state = 'base'
+            self.visual_cursor = None
             if self.pose:
                 self.pose[1].unlink(missing_ok=True)
                 self.pose = None
@@ -183,6 +263,7 @@ class CompanionEngine:
         pose_candidate = None
         return_candidate = None
         performance_candidate = None
+        cursor_candidate = None
         speech_prefetch = None
         candidate_poses = set()
         try:
@@ -225,8 +306,12 @@ class CompanionEngine:
                 with self.lock:
                     pose_reference = self.pose[1] if self.pose and self.pose[0] == scene else None
                     performance_candidate = self.performance_state if scene == self.scene else 'base'
+                    cursor_candidate = self.visual_cursor if scene == self.scene else None
                     listening_video = self.listening_asset(scene, performance_candidate)
                     prepared_transition = self.performance.get((performance_candidate, plan.get('action'))) if scene == 'fullbody' and plan else None
+                    if scene == 'fullbody' and cursor_candidate is not None and plan:
+                        origin = 'base' if plan.get('action') == 'closer' else 'near'
+                        prepared_transition = self.performance.get((origin, plan.get('action')))
                 if not prepared_transition and not (listening_video and (not plan or plan.get('action','none') == 'none')):
                     renderer.prepare(scene, **({"reference_path":pose_reference} if pose_reference else {}))
                 check_cancel(event)
@@ -277,6 +362,7 @@ class CompanionEngine:
                         motion_path = None
                         motion_metrics = {}
                         prepared_idle = False
+                        motion_start = 0.0
                         try:
                             if action != 'none':
                                 from .motion import generate, reverse_approach
@@ -284,15 +370,23 @@ class CompanionEngine:
                                 with self.lock:
                                     previous_approach = self.return_motion[1] if self.return_motion and self.return_motion[0] == scene else None
                                 if prepared_transition:
+                                    if cursor_candidate is not None:
+                                        from .playback import video_duration
+                                        fraction = cursor_candidate if prepared_transition['to'] == 'near' else 1 - cursor_candidate
+                                        motion_start = fraction * video_duration(prepared_transition['path'])
                                     shutil.copyfile(prepared_transition['path'], motion_path)
                                     performance_candidate = prepared_transition['to']
+                                    cursor_candidate = None
                                     motion_metrics = {'action':plan['action'], 'motion_source':'reviewed_prepared_transition',
-                                                      'fresh_body_generation':False, 'target_pose':performance_candidate}
+                                                      'fresh_body_generation':False, 'target_pose':performance_candidate,
+                                                      'transition_start_s': motion_start}
                                 elif plan['action'] == 'farther' and previous_approach and pose_reference:
                                     performance_candidate = None
+                                    cursor_candidate = None
                                     motion_metrics = reverse_approach(previous_approach, motion_path, event)
                                 else:
                                     performance_candidate = None
+                                    cursor_candidate = None
                                     motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path,
                                                               reference_path=pose_reference)
                                 if plan['action'] == 'closer' and not prepared_transition:
@@ -303,9 +397,13 @@ class CompanionEngine:
                                 shutil.copyfile(listening_video, motion_path)
                                 prepared_idle = True
                                 motion_metrics = {'motion_source':'prepared_listening_loop', 'fresh_body_generation':False}
+                            with self.lock:
+                                job['_playback'][index] = {'scene': scene, 'pose': performance_candidate,
+                                    'cursor': cursor_candidate, 'transition': prepared_transition,
+                                    'start_s': motion_start, 'fps': 20}
                             metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
                                                       scene, streaming=True, **({"motion_path":motion_path, "loop_motion":prepared_idle,
-                                                          "motion_start_s":listening_offset if prepared_idle else 0,
+                                                          "motion_start_s":listening_offset if prepared_idle else motion_start,
                                                           "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
                             metrics.update(motion_metrics)
                             metrics['looped_prepared_body'] = prepared_idle
@@ -348,8 +446,10 @@ class CompanionEngine:
                     job["remembered"] = plan["facts"]
                 if mode == 'video':
                     self.performance_state = performance_candidate
+                    self.visual_cursor = cursor_candidate
                 elif self.scene != scene:
                     self.performance_state = 'base'
+                    self.visual_cursor = None
                 self.scene = scene
                 self.store.set_scene(scene)
                 if mode == 'video' or (self.return_motion and self.return_motion[0] != scene):

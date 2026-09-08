@@ -15,13 +15,15 @@ import time
 from .models import CACHE, ROOT, check_cancel
 
 
-def motion_duration(speech_seconds, source_frames, source_fps, *, loop=False):
+def motion_duration(speech_seconds, source_frames, source_fps, *, loop=False, start_s=0):
     """Ambient footage follows speech; deliberate gestures must finish."""
     if not math.isfinite(speech_seconds) or not 0 < speech_seconds <= 30:
         raise ValueError("Visual replies need nonempty speech of at most 30 seconds.")
     if not 1 <= source_fps <= 60 or not 1 <= source_frames <= 1800:
         raise RuntimeError("The generated movement has invalid timing.")
-    duration = speech_seconds if loop else max(speech_seconds, source_frames/source_fps)
+    if not math.isfinite(start_s) or start_s < 0 or (not loop and start_s > source_frames/source_fps):
+        raise ValueError('Invalid movement starting position.')
+    duration = speech_seconds if loop else max(speech_seconds, source_frames/source_fps - start_s)
     if duration > 30:
         raise ValueError("Visual replies are limited to 30 seconds.")
     return duration
@@ -227,7 +229,7 @@ class PortraitRenderer:
                 source_frames = probe.get(cv.CAP_PROP_FRAME_COUNT)
             finally:
                 probe.release()
-            duration = motion_duration(speech_duration, source_frames, source_fps, loop=loop_motion)
+            duration = motion_duration(speech_duration, source_frames, source_fps, loop=loop_motion, start_s=motion_start_s)
             # Finish gestures, but do not keep the mic paused for a whole ambient
             # loop after a short sentence. Its silent playback resumes in the UI.
             samples = math.ceil(math.ceil(duration*fps)/fps*16000)

@@ -15,11 +15,13 @@ class FakeVisual:
         self.count=0
         self.fail=False
         self.after_capture=lambda: None
+        self.render_options=[]
 
     def prepare(self, scene, reference_path=None):
         self.prepared.append(reference_path.read_bytes() if reference_path else None)
 
     def render(self, audio, destination, event, scene, **kwargs):
+        self.render_options.append(kwargs)
         if self.fail:
             raise RuntimeError('Synthetic renderer failure')
         self.count+=1
@@ -185,6 +187,25 @@ class PoseTests(unittest.TestCase):
         self.assertEqual(farther['prepared_pose'],'base')
         self.assertEqual(farther['idle_video'],'/idle/fullbody.mp4')
         self.generate.assert_not_called();self.reverse.assert_not_called()
+
+    def test_partial_pose_survives_speech_then_continues_or_reverses(self):
+        self.install_performance()
+        self.app.scene = 'fullbody'
+        for command, offset, destination in [('closer', 1.2, 'near'), ('farther', 1.8, 'base')]:
+            self.app.performance_state = None
+            self.app.visual_cursor = .4
+            pose = Path(self.temp.name)/'stopped.png'; pose.write_bytes(b'stopped pose')
+            self.app.pose = ('fullbody', pose)
+            ordinary = self.reply('hello')
+            self.assertEqual(ordinary['state'], 'done')
+            self.assertEqual(self.app.visual_cursor, .4)
+            with patch('local_app.playback.video_duration', return_value=3):
+                movement = self.reply(command)
+            self.assertEqual(movement['state'], 'done', movement.get('error'))
+            self.assertAlmostEqual(self.visual.render_options[-1]['motion_start_s'], offset)
+            self.assertEqual(self.app.performance_state, destination)
+            self.assertIsNone(self.app.visual_cursor)
+        self.generate.assert_not_called(); self.reverse.assert_not_called()
 
     def test_failed_or_reset_transition_cannot_commit_a_prepared_pose(self):
         self.install_performance()
