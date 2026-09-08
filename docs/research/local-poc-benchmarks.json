@@ -3998,5 +3998,141 @@
       "visual_loaded": true,
       "startup_s": 21.669
     }
+  },
+  "text_video_revision_2026_09_08": {
+    "source_commit": "cd38325",
+    "scope": "Text commands to streamed video and voice; microphone and camera disabled",
+    "ui": "One viewport with portrait, scrolling captions and composer; no per-turn format or scene selector",
+    "delivery": "20 FPS H264/AAC fragmented MP4; 200ms fragments; approximately 400ms initial buffer",
+    "provider": "Local Qwen3.5 9B active; optional MiniMax adapter not live-tested or configured",
+    "offline_tests": 52,
+    "browser_samples": {
+      "run1": {
+        "metrics": "First playback: 2.63s from Send. Buffer waits: 0 (0.00s). Server completed: 4.64s.",
+        "videoError": null,
+        "videoTime": 3.358666,
+        "videoVisible": true
+      },
+      "run2": {
+        "metrics": "First playback: 2.56s from Send. Buffer waits: 0 (0.00s). Server completed: 4.07s.",
+        "scene": "Garden \u00b7 Generated video",
+        "videoError": null,
+        "videoTime": 2.782666,
+        "videoVisible": true
+      },
+      "run3": {
+        "metrics": "First playback: 2.34s from Send. Buffer waits: 0 (0.00s). Server completed: 3.89s.",
+        "videoError": null,
+        "videoTime": 2.803999,
+        "videoVisible": true
+      }
+    },
+    "synthetic_context_cases": [
+      {
+        "user": "My name is Jordan and my dog is named Piper.",
+        "reply": "Nice to meet you, Jordan, and hello to Piper!",
+        "presentation": "text",
+        "scene": "mira",
+        "facts": [
+          {
+            "key": "user_name",
+            "quote": "My name is Jordan"
+          },
+          {
+            "key": "dog_name",
+            "quote": "my dog is named Piper"
+          }
+        ],
+        "seconds": 1.898
+      },
+      {
+        "user": "What is my dog called?",
+        "reply": "Your dog is named Piper.",
+        "presentation": "text",
+        "scene": "mira",
+        "facts": [],
+        "seconds": 1.18
+      },
+      {
+        "user": "My piano lesson is Friday.",
+        "reply": "Got it, your piano lesson is on Friday.",
+        "presentation": "text",
+        "scene": "mira",
+        "facts": [
+          {
+            "key": "piano_day",
+            "quote": "My piano lesson is Friday."
+          }
+        ],
+        "seconds": 1.122
+      },
+      {
+        "user": "Actually, my piano lesson moved to Tuesday.",
+        "reply": "Okay, your piano lesson is now on Tuesday.",
+        "presentation": "text",
+        "scene": "mira",
+        "facts": [
+          {
+            "key": "piano_day",
+            "quote": "Actually, my piano lesson moved to Tuesday."
+          }
+        ],
+        "seconds": 1.425
+      },
+      {
+        "user": "What day is my piano lesson?",
+        "reply": "Your piano lesson is on Tuesday.",
+        "presentation": "text",
+        "scene": "mira",
+        "facts": [],
+        "seconds": 0.906
+      },
+      {
+        "user": "Show me a picture of you in the cafe.",
+        "reply": "Here is a picture of me in the cafe.",
+        "presentation": "portrait",
+        "scene": "cafe",
+        "facts": [],
+        "seconds": 0.958
+      },
+      {
+        "user": "Send me a short video from there.",
+        "reply": "Here is a short video from the cafe.",
+        "presentation": "video",
+        "scene": "cafe",
+        "facts": [],
+        "seconds": 0.932
+      },
+      {
+        "user": "Just text now. What should I call you?",
+        "reply": "You can call me Mira.",
+        "presentation": "text",
+        "scene": "cafe",
+        "facts": [],
+        "seconds": 0.872
+      }
+    ],
+    "stream_cancellation": {
+      "first_4096_bytes_s": 3.86,
+      "state_when_bytes_arrived": "rendering",
+      "cancel_s": 0.329,
+      "conversation_unchanged": true,
+      "media_removed": true
+    },
+    "limits": [
+      "Not full FaceTime; static head/body",
+      "No current microphone capture",
+      "No long-call streaming soak or public concurrency qualification",
+      "No measured phoneme alignment",
+      "No hosted API credentials or live hosted benchmark"
+    ],
+    "corrections": [
+      "Initial 20 FPS sample played at 2.36s but had one buffer wait; increased initial buffering",
+      "Original preview played video off screen and LLM denied image capability",
+      "Noise handling failed during discarded microphone experiment"
+    ],
+    "review": "Local code review, offline checks, live browser and HTTP checks; no independent security reviewer or staging available",
+    "migration": "Adds bounded facts and app_state SQLite tables, preserving original notes and turns; previous code ignores added tables; no public deployment",
+    "rollback": "Revert this change and restart local server; preserve private SQLite file and prepared assets"
   }
 }

@@ -122,6 +122,7 @@ class JobTests(unittest.TestCase):
         result = self.wait(key)
         self.assertEqual(result["state"], "failed")
         self.assertIn("No speech", result["error"])
+        self.assertEqual(result["error_code"], "no_speech")
         self.assertEqual(self.app.store.snapshot()["turns"], [])
 
     def test_reset_clears_media_from_previous_process_but_keeps_portraits(self):

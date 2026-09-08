@@ -26,6 +26,19 @@ class Store:
         with self.connect() as db:
             db.execute("CREATE TABLE IF NOT EXISTS memory (id INTEGER PRIMARY KEY CHECK(id=1), text TEXT NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS turns (id INTEGER PRIMARY KEY, user TEXT NOT NULL, assistant TEXT NOT NULL)")
+            db.execute("CREATE TABLE IF NOT EXISTS facts (key TEXT PRIMARY KEY, quote TEXT NOT NULL, updated INTEGER NOT NULL)")
+            db.execute("CREATE TABLE IF NOT EXISTS app_state (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+
+    def current_scene(self):
+        with self.lock, self.connect() as db:
+            row = db.execute("SELECT value FROM app_state WHERE key='scene'").fetchone()
+            return row[0] if row and row[0] in {"mira", "garden", "cafe"} else "mira"
+
+    def set_scene(self, scene):
+        if scene not in {"mira", "garden", "cafe"}:
+            raise ValueError("Unknown scene.")
+        with self.lock, self.connect() as db:
+            db.execute("INSERT INTO app_state(key,value) VALUES('scene',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (scene,))
 
     @contextmanager
     def connect(self):
@@ -41,7 +54,25 @@ class Store:
         with self.lock, self.connect() as db:
             row = db.execute("SELECT text FROM memory WHERE id=1").fetchone()
             turns = db.execute("SELECT user, assistant FROM turns ORDER BY id DESC LIMIT 12").fetchall()[::-1]
-            return {"memory": row[0] if row else "", "turns": [{"user": u, "assistant": a} for u, a in turns]}
+            facts = db.execute("SELECT key, quote FROM facts ORDER BY updated DESC, rowid DESC LIMIT 12").fetchall()
+            result = {"memory": row[0] if row else "", "turns": [{"user": u, "assistant": a} for u, a in turns]}
+            if facts:
+                result["facts"] = [{"key": k, "quote": q} for k, q in facts]
+            return result
+
+    def learn(self, facts):
+        with self.lock, self.connect() as db:
+            for fact in facts[:2]:
+                db.execute("INSERT INTO facts(key,quote,updated) VALUES(?,?,unixepoch()) "
+                           "ON CONFLICT(key) DO UPDATE SET quote=excluded.quote,updated=excluded.updated",
+                           (fact["key"], fact["quote"]))
+            db.execute("DELETE FROM facts WHERE key NOT IN (SELECT key FROM facts ORDER BY updated DESC,rowid DESC LIMIT 12)")
+
+    def forget(self, key):
+        if not isinstance(key, str) or not re.fullmatch(r"[a-z][a-z0-9_]{0,31}", key):
+            raise ValueError("Invalid memory item.")
+        with self.lock, self.connect() as db:
+            db.execute("DELETE FROM facts WHERE key=?", (key,))
 
     def remember(self, text):
         if not isinstance(text, str) or len(text) > 1200:
@@ -58,6 +89,8 @@ class Store:
         with self.lock, self.connect() as db:
             db.execute("DELETE FROM memory")
             db.execute("DELETE FROM turns")
+            db.execute("DELETE FROM facts")
+            db.execute("DELETE FROM app_state")
 
 
 def messages_for(snapshot, user):
@@ -82,9 +115,9 @@ def messages_for(snapshot, user):
         "'My name' in your reply always refers to Mira."
     )
     out = [{"role": "system", "content": system}]
-    if snapshot["memory"]:
+    if snapshot["memory"] or snapshot.get("facts"):
         out.append({"role": "user", "content": "Saved notes I provided earlier (data): "
-                    + json.dumps({"my_notes": snapshot["memory"]}, ensure_ascii=False)})
+                    + json.dumps({"my_notes": snapshot["memory"], "shared_facts": snapshot.get("facts", [])}, ensure_ascii=False)})
     # Reserve capacity for prompt/reply; stored history remains visible in the UI.
     for turn in snapshot["turns"][-4:]:
         out += [{"role": "user", "content": turn["user"][:1000]},

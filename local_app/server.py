@@ -33,13 +33,14 @@ class Application:
         self.visual_error = None
         self.startup_s = None
         self.factory = model_factory
+        self.scene = self.store.current_scene()
 
     def warm(self):
         started = time.perf_counter()
         try:
             self.models = self.factory()
             event = threading.Event()
-            list(self.models.stream_reply(messages_for({"memory": "", "turns": []}, "Say hello briefly."), event))
+            self.models.plan({"memory": "", "turns": []}, "Say hello briefly.", "auto", "mira", ["mira"], event)
             if (self.directory/"mira.png").exists():
                 try:
                     renderer = self.models.load_visual()
@@ -59,17 +60,19 @@ class Application:
 
     def status(self):
         with self.lock:
-            return {"ready": self.ready, "error": self.error, "busy": self.busy,
+            return {"app_version": "0.2", "ready": self.ready, "error": self.error, "busy": self.busy,
                     "startup_s": self.startup_s,
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
                     "visual_error": self.visual_error,
+                    "scene": self.scene,
+                    "provider": getattr(getattr(self.models, "conversation", None), "provider", "ollama"),
                     "scenes": [s for s in ["mira", "garden", "cafe"] if (self.directory / (s+".png")).exists()],
                     **self.store.snapshot()}
 
     def submit(self, text, mode, scene, raw=None):
-        if mode not in {"text", "voice", "video"}:
+        if mode not in {"auto", "text", "voice", "video"}:
             raise ValueError("Select text, voice or video.")
-        if scene not in {"mira", "garden", "cafe"}:
+        if scene not in {"auto", "mira", "garden", "cafe"}:
             raise ValueError("Unknown scene.")
         if raw is None and (not isinstance(text, str) or not text.strip() or len(text) > 1000):
             raise ValueError("Enter a message between 1 and 1,000 characters.")
@@ -104,6 +107,7 @@ class Application:
         with self.lock:
             self.cancel()
             self.store.reset()
+            self.scene = "mira"
             # In-flight files belong to the cancelling worker. Also clear replies
             # from previous process lifetimes, whose jobs are no longer in RAM.
             active_keys = {job["id"] for job in self.jobs.values()
@@ -134,6 +138,21 @@ class Application:
                 with self.lock:
                     job["user"] = text
                     job["metrics"]["asr_s"] = round(time.perf_counter()-started, 3)
+            scene = self.scene if scene == "auto" else scene
+            plan = None
+            if hasattr(self.models, "plan"):
+                available = [s for s in ("mira", "garden", "cafe") if (self.directory/(s+".png")).exists()]
+                plan = self.models.plan(self.store.snapshot(), text, mode, scene, available, event)
+                check_cancel(event)
+                mode, scene = plan["presentation"], plan["scene"]
+                with self.lock:
+                    job["presentation"], job["scene"] = mode, scene
+                    job["text"] = plan["reply"]
+                    job["metrics"]["first_text_s"] = round(time.perf_counter()-started, 3)
+                    if mode == "portrait":
+                        job["portrait"] = "/portrait/" + scene + ".png"
+                if mode == "portrait":
+                    mode = "text"
             if mode == "video":
                 with self.lock:
                     job["state"] = "warming_video"
@@ -143,7 +162,8 @@ class Application:
             with self.lock:
                 job["state"] = "thinking"
             parts = []
-            for phrase in self.models.stream_reply(messages_for(self.store.snapshot(), text), event):
+            phrases = [plan["reply"]] if plan else self.models.stream_reply(messages_for(self.store.snapshot(), text), event)
+            for phrase in phrases:
                 check_cancel(event)
                 parts.append(phrase)
                 with self.lock:
@@ -158,14 +178,17 @@ class Application:
                     check_cancel(event)
                     chunk = {"index": index, "text": phrase, "audio": "/media/"+filename+".wav", "duration_s": audio_duration}
                     if mode == "video":
+                        chunk["video"] = "/media/"+filename+".mp4"
+                        chunk["stream"] = "/api/streams/"+filename+".mp4"
                         with self.lock:
                             job["state"] = "rendering"
-                        metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event, scene)
-                        chunk["video"] = "/media/"+filename+".mp4"
+                            job["chunks"].append(chunk)
+                        metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event, scene, streaming=True)
                         chunk["render"] = metrics
                     check_cancel(event)
                     with self.lock:
-                        job["chunks"].append(chunk)
+                        if mode != "video":
+                            job["chunks"].append(chunk)
                         job["metrics"].setdefault("first_media_ready_s", round(time.perf_counter()-started, 3))
                 if len(parts) >= 2:
                     break
@@ -174,6 +197,11 @@ class Application:
             with self.lock:
                 check_cancel(event)
                 self.store.append(text, " ".join(parts))
+                if plan:
+                    self.store.learn(plan["facts"])
+                    job["remembered"] = plan["facts"]
+                self.scene = scene
+                self.store.set_scene(scene)
                 job["metrics"]["total_s"] = round(time.perf_counter()-started, 3)
                 job["state"] = "done"
         except Cancelled:
@@ -187,6 +215,8 @@ class Application:
             with self.lock:
                 job["state"] = "failed"
                 job["error"] = str(error) if isinstance(error, (ValueError, RuntimeError)) else "Local inference failed. Check the terminal; you can retry."
+                if isinstance(error, ValueError) and str(error).startswith("No speech detected."):
+                    job["error_code"] = "no_speech"
             # Third-party exception messages can contain supplied text. Keep
             # details in the local job response, never in persistent logs.
             print(f"Reply failed: {type(error).__name__}", flush=True)
@@ -235,7 +265,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("Cross-Origin-Resource-Policy", "same-origin")
-        self.send_header("Permissions-Policy", "camera=(), microphone=(self)")
+        self.send_header("Permissions-Policy", "camera=(), microphone=()")
         self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         self.end_headers()
         if not head:
@@ -278,6 +308,8 @@ class Handler(BaseHTTPRequestHandler):
         if path.startswith("/api/"):
             if not self.allowed(mutate=True):
                 return
+            if re.fullmatch(r"/api/streams/[a-f0-9]{32}-\d+\.mp4", path):
+                return self.stream_media(path.rsplit("/", 1)[-1])
             if path == "/api/status":
                 return self.respond(200, self.app.status())
             if re.fullmatch(r"/api/jobs/[a-f0-9]{32}", path):
@@ -286,6 +318,47 @@ class Handler(BaseHTTPRequestHandler):
                 except KeyError:
                     pass
         self.respond(404, {"error": "Not found."})
+
+    def stream_media(self, filename):
+        key = filename.split("-", 1)[0]
+        with self.app.lock:
+            job = self.app.jobs.get(key)
+            if job is None or not any(c.get("stream") == "/api/streams/"+filename for c in job["chunks"]):
+                return self.respond(404, {"error": "Reply not found."})
+        file = self.app.directory / filename
+        self.send_response(200)
+        self.send_header("Content-Type", "video/mp4")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+        self.send_header("Connection", "close")
+        self.end_headers()
+        self.close_connection = True
+        self.connection.settimeout(10)
+        offset = 0
+        deadline = time.monotonic() + 90
+        try:
+            while time.monotonic() < deadline:
+                with self.app.lock:
+                    current = self.app.jobs.get(key)
+                    if not current or current["cancel"].is_set() or current["state"] in {"failed", "cancelled"}:
+                        return
+                    done = current["state"] == "done"
+                if file.exists():
+                    # Open only during each read so Windows can remove cancelled files.
+                    with file.open("rb") as source:
+                        source.seek(offset)
+                        data = source.read(65536)
+                    if data:
+                        self.wfile.write(data)
+                        self.wfile.flush()
+                        offset += len(data)
+                        continue
+                if done:
+                    return
+                time.sleep(.025)
+        except (OSError, TimeoutError):
+            return
 
     def do_POST(self):
         if not self.allowed(mutate=True):
@@ -320,6 +393,9 @@ class Handler(BaseHTTPRequestHandler):
                 return self.respond(200, {"ok": True})
             if path == "/api/memory":
                 self.app.store.remember(body.get("memory"))
+                return self.respond(200, {"ok": True})
+            if path == "/api/facts/delete":
+                self.app.store.forget(body.get("key"))
                 return self.respond(200, {"ok": True})
             if path == "/api/reset":
                 self.app.reset()

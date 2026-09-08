@@ -93,7 +93,9 @@ class PortraitRenderer:
         self.mask = cv.resize(mask, (x2-x1, y2-y1))[:, :, None]
         self.portrait, self.box, self.scene = frame, (x1, y1, x2, y2), scene
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8):
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False):
+        if streaming:
+            fps = 20
         cv, np, torch = self.cv, self.np, self.torch
         import soundfile as sf
         from scipy.signal import resample_poly
@@ -115,10 +117,13 @@ class PortraitRenderer:
         height, width = self.portrait.shape[:2]
         # Pipe raw frames to one local encoder; no per-frame PNG disk round trips.
         encoding = ["-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll"] if self.encoder == "h264_nvenc" else ["-c:v", "libx264", "-preset", "ultrafast", "-tune", "zerolatency", "-crf", "20", "-threads", "2"]
+        delivery = (["-g", "4", "-bf", "0", "-profile:v", "baseline", "-level:v", "3.0",
+                     "-movflags", "+frag_keyframe+empty_moov+default_base_moof", "-frag_duration", "200000", "-flush_packets", "1"]
+                    if streaming else ["-movflags", "+faststart"])
         command = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24",
                    "-s", f"{width}x{height}", "-r", str(fps), "-i", "pipe:0", "-i", str(audio_path),
                    *encoding, "-pix_fmt", "yuv420p",
-                   "-c:a", "aac", "-shortest", "-movflags", "+faststart", str(destination)]
+                   "-c:a", "aac", "-shortest", *delivery, str(destination)]
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE,
                                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         try:
@@ -129,7 +134,7 @@ class PortraitRenderer:
                 hidden = hidden[:, :max(1, int(len(data) / 16000 * 50))]
                 hidden = torch.cat((torch.zeros_like(hidden[:, :4]), hidden,
                                     torch.zeros((1, 24, 5, 384), device="cuda", dtype=self.dtype)), dim=1)
-                chunks = torch.cat([hidden[:, i*2:i*2+10] for i in range(nframes)], dim=0).reshape(nframes, 50, 384)
+                chunks = torch.cat([hidden[:, int(i*50/fps):int(i*50/fps)+10] for i in range(nframes)], dim=0).reshape(nframes, 50, 384)
                 torch.cuda.synchronize()
                 features_seconds = time.perf_counter()-start
                 for offset in range(0, nframes, batch_size):

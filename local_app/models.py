@@ -25,6 +25,8 @@ def check_cancel(event):
 
 class Models:
     def __init__(self):
+        from .conversation import Conversation
+        self.conversation = Conversation(LLM)
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
         os.environ["ONNX_PROVIDER"] = "CPUExecutionProvider"
@@ -40,6 +42,9 @@ class Models:
         self.asr = WhisperModel(str(CACHE / "asr-base-en"), device="cpu", compute_type="int8", cpu_threads=4, num_workers=1, local_files_only=True)
         self.tts.create("Hello there.", voice="af_sarah", speed=1, lang="en-us")
         self.visual = None
+
+    def plan(self, snapshot, user, mode, scene, available, cancel):
+        return self.conversation.plan(snapshot, user, mode, scene, available, cancel)
 
     def stream_reply(self, messages, cancel, options=None):
         settings = {"num_ctx": 4096, "num_predict": 100, "temperature": 0.5, "presence_penalty": 0.0}
