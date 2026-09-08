@@ -73,6 +73,15 @@ Current browser captures and synthetic traces are under ignored `generated/local
 
 ## What is still missing for FaceTime
 
+### Full-body motion decision (September 2026)
+
+The current 16 GB RTX 4060 Ti cannot run an unrestricted, photorealistic full-body video generator at call latency. The strongest open candidates split into two groups:
+
+* **SoulX-FlashHead Lite** is the best local low-latency talking-avatar candidate, but it remains a head/upper-body model. Its published 96 FPS result is on an RTX 4090, not this card. [Repository](https://github.com/Soul-AILab/SoulX-FlashHead)
+* **Tencent MimicMotion 1.1** accepts pose guidance and can create body actions such as waving, walking and sitting, but its own README reports about 20 minutes for a 35-second clip on an RTX 4090 and approximately 16 GB VRAM. It is a prepared-clip generator, not a FaceTime renderer. [Repository](https://github.com/Tencent/MimicMotion)
+
+The practical path is a hybrid: generate a small library of full-body action clips offline with MimicMotion, select clips from text commands, and use FlashHead or a lighter facial layer for close-up speech. This gives realistic movement and voice while the library is bounded. It does not provide arbitrary instant body actions. The app should not claim otherwise until a body model is benchmarked on this exact GPU.
+
 A responsive phone-shaped interface and incremental lip-sync are progress, but they do not create natural head/body movement or full-duplex conversation. The current demo is explicitly text input with generated audiovisual replies. Long-lived WebRTC tracks, acoustic echo handling, semantic turn detection, real barge-in, browser/mobile recovery and a motion-capable portrait model still require work. Switching the LLM alone does not add those capabilities.
 
 For a public motion-model evaluation, **SoulX-FlashHead Model_Lite** is the next credible candidate: the code/model card declare Apache-2.0 and the authors report up to 96 generated FPS on one RTX 4090. Those results are not measurements on this 4060 Ti; first-frame delay, VRAM, voice alignment and quality need a separate test. The Pro variant's reported 10.8 FPS on one 4090 is unsuitable as this machine's assumed realtime path. Audit its VAE/audio dependencies and asset rights separately. [Repository](https://github.com/Soul-AILab/SoulX-FlashHead), [weights](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B).
