@@ -1,6 +1,8 @@
-# AI-mate: scene-ready adult PWA
+# AI-mate: adult-first companion PWA
 
-A fictional adult companion with editable memory, opt-in check-ins, bounded free text/recorded voice, paid calls, and scene preparation before visual calls. Target roughly 60% direct contribution margin and positive cash after overhead, not a 300–500% return.
+**Lawful consensual adult content is a mandatory launch requirement. If the intended adult experience cannot be delivered within accepted model, host and payment terms, the product does not launch.** This decision supersedes earlier suggestions to launch a non-explicit substitute.
+
+A fictional adult companion with editable memory, opt-in check-ins, bounded free text/recorded voice, paid calls, and scene preparation before visual calls. Target roughly 60% direct contribution margin and positive cash after overhead. First validate adult capability and provider eligibility; then build the commercial experience around the verified route.
 
 Five active product documents:
 

@@ -1,7 +1,7 @@
 {
   "as_of": "2026-09-07",
   "currency": "USD",
-  "scope": "Scene-ready adult PWA; realistic margins, one inference provider, startup and cash budgets",
+  "scope": "Adult content is mandatory for launch; all prices depend on validated adult capability, approved providers and measured fulfillment cost",
   "assumptions": {
     "gpu_hour": 0.9,
     "streams": 1,

@@ -2,6 +2,10 @@
 
 The launch scope is original fictional adults, lawful consensual adult content, clear AI disclosure and verified access. Models' commercial licenses, provider policies, card-network rules and US law are distinct. None of the providers has approved this project yet.
 
+**Adult-service eligibility is a selection criterion, not a post-launch check.** Request acceptance for the actual explicit-content service, including generation, storage, private delivery, visual calls and billing. Do not describe it merely as a generic chatbot to obtain approval. A host accepting stored content does not automatically approve model APIs or every underlying provider.
+
+The launch cannot proceed as a non-explicit substitute when adult eligibility fails. The founder's decision is to stop, find a permitted adult route, or explicitly change scope. Keep adult flags disabled until evidence is complete; disabled deployment flags do not mean adult content is optional in the product requirements.
+
 ## Processor shortlist
 
 | Processor | Public evidence | Decision |

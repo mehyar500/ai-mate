@@ -75,7 +75,7 @@ def calculate(c):
 
 def report(c):
     a=c["assumptions"];d=calculate(c)
-    rows=["# Scene-ready PWA economics","",f"USD, checked {c['as_of']}. Generated from [config](../config/economics.json). No benchmark, binding provider quote or customer forecast. Full allowance redemption; before income tax.",
+    rows=["# Adult-first PWA economics","",f"USD, checked {c['as_of']}. Generated from [config](../config/economics.json). {c['scope']}. No benchmark, binding provider quote or customer forecast. Full allowance redemption; before income tax. No paid tier launches until its included adult modalities pass the REPORT requirements.",
           "","## Unit delivery and payment assumptions","",
           f"Renderer node \u0024{a['gpu_hour']:.2f}/hour, {a['streams']} concurrent stream, {a['occupancy']:.0%} occupancy. Renderer allocation \u0024{d['renderer_minute']:.3f}/connected minute; transport, contingency and floor produce \u0024{d['live_minute']:.3f}/visual minute. A separate warm auxiliary GPU pool costs \u0024{d['aux_fixed']:.0f}/month and is counted below. One provider does not mean one GPU holds every model.",
           f"Voice-only \u0024{a['phone_minute']:.2f}/minute; accepted portrait video \u0024{a['clip_cost']:.2f}; photo \u0024{a['photo_cost']:.2f}; prepared scene \u0024{a['scene_cost']:.2f}. Paid text/recorded voice/check-ins/memory \u0024{a['paid_messages']:.2f}/month plus \u0024{a['support']:.2f} support allowance. These are budgets requiring measured acceptance/retry costs.",
@@ -122,7 +122,7 @@ def report(c):
     rows += ["",f"At the assumed plan mix, first-month expense break-even is about {thresholds['first_profit']} payers; cash break-even after the modeled hold is about {thresholds['cash_after_reserve']}. Fractions in plan mix are expectations; actual sales mix changes these thresholds. A waitlist is not collected revenue. No sales, settlement date or profit is guaranteed.",
              "","## Stress cases at configured cohort","",
              "| Change | Funding before receipts | First-month profit |","|---|---:|---:|"]
-    for label,updates in [("Quote-dependent $600 registration",dict(registration=600)),("No internal API fee but $1 vendor fallback",dict(verification_per_new_user=1)),("25% renderer occupancy",dict(occupancy=.25)),("CAC $5",dict(cac=5)),("Legal budget $3,000",dict(legal_setup=3000)),("Founder pay $3,000",dict(founder_labor=3000))]:
+    for label,updates in [("Adult photo/scene/clip costs double",dict(photo_cost=a['photo_cost']*2,scene_cost=a['scene_cost']*2,clip_cost=a['clip_cost']*2)),("Adult visual delivery budget doubles",dict(live_minute_floor=d['live_minute']*2)),("Quote-dependent $600 registration",dict(registration=600)),("No internal API fee but $1 vendor fallback",dict(verification_per_new_user=1)),("25% renderer occupancy",dict(occupancy=.25)),("CAC $5",dict(cac=5)),("Legal budget $3,000",dict(legal_setup=3000)),("Founder pay $3,000",dict(founder_labor=3000))]:
         x=copy.deepcopy(c);x["assumptions"].update(updates);z=calculate(x)
         rows.append(f"| {label} | \u0024{z['funding_before_receipts']:.2f} | \u0024{z['first_profit']:.2f} |")
     rows+=["","The $600 registration scenario is an illustrative USD allowance for a lower-fee approved quote, not a verified EUR conversion or proof that Verotel Basic supports this visual-call business. Its public chart lists EUR 500 annual registration but excludes webcam billing on Basic and has additional recurring fees; confirm full scope.",

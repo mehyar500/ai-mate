@@ -2,17 +2,27 @@
 
 No app has been implemented here. This document specifies a measured prototype and release gates.
 
+## First milestone: adult viability
+
+Adult-content support is mandatory. Before building the product around any checkpoint, evaluate its intended lawful adult use under an accepted hosting arrangement. Existing model names are candidates, not an adult-ready deployment manifest. Do not infer adult capability from Apache/MIT licensing, a general image demo or portrait FPS.
+
+Use a versioned evaluation rubric covering allowed adult dialogue/voice, intended adult imagery/scenes, consistent fictional adult identity, and the specific clips/call behavior to be sold. Record checkpoint revision, applicable terms, usable-output rate, inappropriate refusals of allowed requests, harmful-output handling, actual billed time and p50/p95 latency. No explicit prompts or generated media are stored in these public planning documents.
+
+Proposed quality gate: at least 85% usable results across the founder-defined supported categories, with no unresolved severe age/consent/privacy failures. A finite test does not prove universal safety. Report modality-level results separately; approve adult images and adult video separately. Budget all rejected attempts. Model rights and provider acceptance must pass even when the images look convincing.
+
+If Qwen, Klein or another candidate cannot support the intended adult scope, reassess the licensed checkpoint and platform before implementation. Do not remove provider safeguards, treat a noncommercial fine-tune as commercial, or replace the business with a clean-only launch. General scene generation and FlashHead talking portraits do not establish full-body explicit video generation. Until evidence exists, that capability is unresolved.
+
 ## Models and one-provider deployment
 
 | Stage | Model | Role and constraint |
 |---|---|---|
-| Conversation, event extraction, summaries and scene planning | Qwen/Qwen3-8B, non-thinking mode | Bounded dialogue, structured outputs; verify adult product suitability |
+| Conversation, event extraction, summaries and scene planning | Qwen/Qwen3-8B, non-thinking mode | Candidate only: bounded dialogue and structured outputs; intended adult behavior unverified |
 | Speech recognition | Systran/faster-whisper-small | Incremental ASR; audit runtime and weight licenses |
 | Speech synthesis | hexgrad/Kokoro-82M | Consistent permitted preset voice across messages, calls and clips |
 | End-of-turn detection | snakers4/silero-vad | Distinguish pauses from completed turns |
-| Character-in-scene image/edit | black-forest-labs/FLUX.2-klein-4B | Reference-guided scene preparation; Apache-2.0 candidate, ~13GB model-card memory claim |
+| Character-in-scene image/edit | black-forest-labs/FLUX.2-klein-4B | Candidate only: reference-guided editing and Apache-2.0 card do not prove required adult imagery |
 | Image consistency challenger | Qwen/Qwen-Image-Edit-2511 | Evaluate only if Klein identity fails; larger/slower deployment may need a different GPU |
-| Live portrait and recorded portrait clip | Soul-AILab/SoulX-FlashHead-1_3B, Model_Lite | Fresh generated portrait motion; 512px/25FPS target |
+| Live portrait and recorded portrait clip | Soul-AILab/SoulX-FlashHead-1_3B, Model_Lite | Candidate only: portrait motion; adult scene preservation and supported framing must be tested |
 | Video dependencies | VAE_LTX bundle and facebook/wav2vec2-base-960h | Pin exact revisions and all licenses |
 | Screening | Local Llama-Guard-3-8B candidate plus application rules and human escalation | Generic model does not prove complete age/content safety |
 

@@ -1,8 +1,27 @@
-# Scene-ready companion: commercial plan
+# Adult-first companion: commercial plan
 
 Research checked September 7, 2026. The new objective is a useful product with roughly 60% direct contribution margin, enough cash to fulfill purchases, and controlled startup spending. A large markup on GPU seconds is not company profit.
 
+## Mandatory product decision
+
+**Adult content is the primary product requirement, not a future add-on. No adult capability means no commercial launch.** Preserve non-explicit interactions as a user preference within the adult service, not a replacement business. All accounts must pass the accepted adult-access flow before using restricted content.
+
+The intended offer includes lawful consensual adult text/voice, adult images and scenes, and adult-compatible clips/visual calls wherever those features are sold. Each advertised modality must be demonstrated; a clothed portrait demo does not prove explicit image or video capability. Do not market a talking portrait as arbitrary full-body action generation.
+
+First spend goes to an **adult viability gate**, before a polished PWA, elaborate proactive features or merchant registration. Confirm intended-use eligibility, model/checkpoint rights, actual intended-content quality, consistency, latency and delivered cost. If no candidate passes, stop at the capped experiment and report the missing capability. Do not silently substitute a non-explicit product or route to an incompatible provider.
+
+| Requirement | Evidence required before launch | Current status |
+|---|---|---|
+| ADULT-01: intended content works | Reviewed capability results for every advertised text/audio/image/video feature, including consistency and usability | Not demonstrated |
+| ADULT-02: permitted commercial route | Exact checkpoint/dependency licenses plus host and processor acceptance for the complete adult service | Not established |
+| ADULT-03: controlled adult access | Accepted age-assurance method, reviewed state availability, consent/privacy/reporting controls | Not implemented |
+| ADULT-04: affordable fulfillment | Actual billed cost, retries/rejections and latency on the approved adult workload | Forecast only |
+
+Founder owns the content/business specification and approvals; engineer owns capability and cost evidence. The founder must explicitly approve any later reduction in launch scope. No adult request is promised without limits: minors/age ambiguity, nonconsensual imagery, exploitation and real-person impersonation remain excluded.
+
 ## Product and pricing
+
+All prices and allowances below are **conditional adult-product hypotheses**. Activate a tier only when every included adult modality passes the requirements above; revise its cost before sale if the validated model needs more compute or retries. A paid bundle must not contain an unvalidated video entitlement.
 
 Free, verified pilot accounts: 150 text replies/month, max five/day; optional recorded replies up to 15 seconds; five incoming voice-note minutes; one original adult portrait and editable memory. Cap 25 free accounts initially. Paid plans provide 500 text replies with recorded playback. Opt-in check-ins count within these reply limits.
 
@@ -71,10 +90,10 @@ Planning estimate for an experienced founder/engineer actively reviewing AI-writ
 
 | Milestone | Engineering estimate | Evidence needed |
 |---|---|---|
-| One-character private scene/call demo | 3–5 working days | Real browser audio/video, identity and latency measurements |
+| Adult viability and one-character private demo | 3–5 working days for initial evidence, not assured success | Intended-content capability, license/host fit, identity and latency measurements |
 | Integrated PWA alpha | 2–4 weeks cumulative | Auth, editable memory, job lifecycle, check-ins, billing sandbox |
 | Limited paid pilot | 4–8 weeks cumulative | Device tests, security review, accepted age flow, provider/merchant release gates |
 
 Processor/legal review timing is external and may extend the schedule. Off-the-shelf internal age estimation is not automatically compliant; a robust in-house identity system can add weeks. Estimate 80–160 hands-on engineering hours for the alpha and 160–320 for a narrow paid pilot, with overlap; these are uncertain, unpaid-founder assumptions. The $100 tooling allowance is not an asserted GPT-6 API price. Record actual spend and usage limits.
 
-POC stop condition: if scene identity or warm response latency fails after the capped experiment, do not expand scope or incur registration merely to continue experimenting. Successful tests authorize a business decision, not automatic production release.
+POC stop condition: if required adult capability, commercial rights, host eligibility, scene identity or warm response latency remains unresolved after the capped experiment, stop and reassess before further spending. Do not incur registration merely to continue experimenting. Successful tests inform a business decision, not automatic production release.

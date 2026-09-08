@@ -1,6 +1,6 @@
-# Scene-ready PWA economics
+# Adult-first PWA economics
 
-USD, checked 2026-09-07. Generated from [config](../config/economics.json). No benchmark, binding provider quote or customer forecast. Full allowance redemption; before income tax.
+USD, checked 2026-09-07. Generated from [config](../config/economics.json). Adult content is mandatory for launch; all prices depend on validated adult capability, approved providers and measured fulfillment cost. No benchmark, binding provider quote or customer forecast. Full allowance redemption; before income tax. No paid tier launches until its included adult modalities pass the REPORT requirements.
 
 ## Unit delivery and payment assumptions
 
@@ -62,6 +62,8 @@ At the assumed plan mix, first-month expense break-even is about 237 payers; cas
 
 | Change | Funding before receipts | First-month profit |
 |---|---:|---:|
+| Adult photo/scene/clip costs double | $6072.00 | $-2957.82 |
+| Adult visual delivery budget doubles | $6108.25 | $-2994.07 |
 | Quote-dependent $600 registration | $4568.25 | $-1454.07 |
 | No internal API fee but $1 vendor fallback | $6030.75 | $-2916.57 |
 | 25% renderer occupancy | $6074.81 | $-2960.63 |
