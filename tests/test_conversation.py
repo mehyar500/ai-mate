@@ -48,7 +48,7 @@ class PlanTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory)/'.env'
             source.write_text('CLOUDFLARE_ACCOUNT_ID='+'a'*32+'\nCLOUDFLARE_API_KEY=test-secret\nCLOUDFLARE_EMAIL=test@example.test\nUNRELATED_SECRET=ignored\n')
-            env = {'AI_MATE_LLM_PROVIDER':'cloudflare','AI_MATE_ENV_FILE':str(source)}
+            env = {'AI_MATE_LLM_PROVIDER':'cloudflare','AI_MATE_ENV_FILE':str(source), 'CLOUDFLARE_API_TOKEN':'stale-token'}
             response = {'choices':[{'message':{'content':json.dumps({'reply':'Hello','action':'none','facts':[]})}}]}
             with patch.dict(os.environ, env, clear=True), patch('urllib.request.urlopen', return_value=io.BytesIO(json.dumps(response).encode())) as network:
                 model = Conversation('local')
@@ -61,6 +61,14 @@ class PlanTests(unittest.TestCase):
                 self.assertNotIn(b'ignored',request.data)
                 self.assertEqual(plan['reply'],'Hello')
                 self.assertIn('/ai/v1/chat/completions',request.full_url)
+
+    def test_cloudflare_key_without_email_does_not_fall_back_to_token(self):
+        env = {'AI_MATE_LLM_PROVIDER':'cloudflare', 'CLOUDFLARE_ACCOUNT_ID':'a'*32,
+               'CLOUDFLARE_API_KEY':'test-secret', 'CLOUDFLARE_API_TOKEN':'stale-token'}
+        with patch.dict(os.environ, env, clear=True), patch('urllib.request.urlopen') as network:
+            with self.assertRaisesRegex(ValueError, 'CLOUDFLARE_EMAIL'):
+                Conversation('local')
+            network.assert_not_called()
 
     def test_cloudflare_missing_auth_or_invalid_account_never_sends_request(self):
         with patch.dict(os.environ, {'AI_MATE_LLM_PROVIDER':'cloudflare'}, clear=True), patch('urllib.request.urlopen') as network:

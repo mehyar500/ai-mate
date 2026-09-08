@@ -83,10 +83,12 @@ class Conversation:
             self.account = values.get("CLOUDFLARE_ACCOUNT_ID", "")
             if not re.fullmatch(r"[a-fA-F0-9]{32}", self.account):
                 raise ValueError("Configure a valid CLOUDFLARE_ACCOUNT_ID for Cloudflare dialogue.")
-            if values.get("CLOUDFLARE_API_TOKEN"):
-                self.cf_headers = {"Authorization": "Bearer " + values["CLOUDFLARE_API_TOKEN"]}
-            elif values.get("CLOUDFLARE_API_KEY") and values.get("CLOUDFLARE_EMAIL"):
+            if values.get("CLOUDFLARE_API_KEY"):
+                if not values.get("CLOUDFLARE_EMAIL"):
+                    raise ValueError("CLOUDFLARE_EMAIL is required with CLOUDFLARE_API_KEY.")
                 self.cf_headers = {"X-Auth-Key": values["CLOUDFLARE_API_KEY"], "X-Auth-Email": values["CLOUDFLARE_EMAIL"]}
+            elif values.get("CLOUDFLARE_API_TOKEN"):
+                self.cf_headers = {"Authorization": "Bearer " + values["CLOUDFLARE_API_TOKEN"]}
             else:
                 raise ValueError("Configure a Cloudflare API token, or API key and email, in the selected credential file.")
 
