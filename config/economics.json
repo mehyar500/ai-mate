@@ -1,112 +1,95 @@
 {
   "as_of": "2026-09-07",
   "currency": "USD",
-  "sources": {
-    "cloudflare_ai": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
-    "cloudflare_sfu": "https://developers.cloudflare.com/realtime/sfu/pricing/",
-    "processor_registration": "https://ccbill.com/pricing",
-    "gpu_reference_not_quote": "https://www.tensordock.com/"
-  },
-  "published_rates": {
+  "scope": "Proposed non-explicit asynchronous MVP; approvals and performance not established",
+  "rates": {
     "llm_input_per_million": 0.051,
     "llm_output_per_million": 0.335,
     "guard_input_per_million": 0.484,
     "guard_output_per_million": 0.03,
-    "streaming_asr_per_minute": 0.0077,
-    "tts_per_thousand_characters": 0.03,
-    "sfu_per_gb": 0.05
+    "tts_per_thousand_chars": 0.03,
+    "asr_per_minute": 0.0077,
+    "fal_video_per_output_second": 0.005,
+    "melotts_per_output_minute": 0.0002
   },
-  "assumptions_not_vendor_quotes": {
-    "gpu_per_hour": 18,
-    "vm_extras_per_hour": 0.5,
-    "billable_utilization": 0.5,
-    "concurrent_calls_per_group": 1,
-    "call_turns_per_minute": 3,
-    "call_input_tokens_per_turn": 4096,
-    "call_output_tokens_per_minute": 100,
-    "tts_characters_per_minute": 450,
-    "aggregate_sfu_egress_mbps": 2.128,
-    "call_misc_per_minute": 0.001,
-    "variable_cost_buffer": 0.25,
-    "chat_input_tokens": 2048,
-    "chat_output_tokens": 120,
-    "guard_input_tokens_per_exchange": 1024,
-    "guard_output_tokens_per_exchange": 64,
-    "free_monthly_messages": 900,
-    "paid_monthly_messages": 2000,
-    "local_adult_text_per_message_including_safety": 0.0015,
-    "profile_storage_asset_monthly": 0.12,
-    "support_per_payer_monthly": 0.75,
-    "processor_fraction": 0.15,
-    "processor_fixed_per_payment": 0.5,
-    "refund_chargeback_loss_fraction": 0.03,
-    "reserve_fraction": 0.1,
-    "age_check_per_user": 1.0,
-    "cohort_new_payers": 100,
-    "cohort_new_free_users": 500,
-    "monthly_fixed_excluding_gpu": 250.0,
-    "clip_gpu_seconds_per_attempt": 120,
-    "clip_success_fraction": 0.8,
-    "clip_other_per_delivered": 0.35,
-    "clip_pack_price": 9.99,
-    "clips_per_pack": 5,
-    "topup_price": 89,
-    "topup_minutes": 30,
+  "assumptions": {
+    "free_exchanges": 150,
+    "paid_exchanges": 500,
+    "free_user_monthly": 0.25,
+    "paid_text_monthly": 0.6,
+    "support_per_payer": 0.25,
+    "phone_call_minute": 0.05,
+    "video_seconds": 15,
+    "video_accepted_fraction": 0.85,
+    "video_other_per_attempt": 0.01,
+    "buffer_fraction": 0.25,
+    "video_delivered_budget": 0.15,
+    "processor_fraction": 0.03,
+    "refund_loss_fraction": 0.02,
+    "payment_fixed": 0.3,
+    "high_risk_fraction": 0.18,
+    "high_risk_fixed": 0.5,
+    "target_return_on_cost": 3,
+    "free_users_cap": 200,
+    "monthly_fixed": 50,
+    "first_month_setup": 500,
+    "customer_acquisition_cost": 0,
+    "founder_labor_monthly": 0,
+    "new_user_verification_cost": 0,
     "cohort_payers": 100,
-    "cohort_free_users": 500,
-    "clip_worker_per_hour": 1.2,
-    "adult_aux_per_hour": 1.2
-  },
-  "competitor_reference": {
-    "name": "Chaturbate",
-    "customer_wire_usd_per_token": 0.08,
-    "wire_minimum_purchase_usd": 250,
-    "performer_usd_per_token": 0.05,
-    "private_tokens_per_minute": [
-      6,
-      18,
-      30,
-      60,
-      90
-    ],
-    "buyer_source": "https://support.chaturbate.com/hc/en-us/articles/360036511091-How-do-I-buy-tokens",
-    "performer_source": "https://support.chaturbate.com/hc/en-us/articles/360037125852-How-do-I-convert-my-tokens",
-    "private_source": "https://support.chaturbate.com/hc/en-us/articles/360048401752-Show-Types"
+    "reserve_fraction": 0.1,
+    "gpu_rate_per_second": 0.000553,
+    "custom_video_billed_seconds": 60,
+    "custom_keepwarm_seconds": 0,
+    "custom_other_per_attempt": 0.03,
+    "free_phone_call_minutes": 37.5,
+    "free_voice_input_minutes": 5,
+    "paid_phone_call_minutes": 125
   },
   "plans": [
     {
-      "name": "Close",
-      "monthly_price": 99,
-      "live_minutes": 30,
+      "name": "Calls",
+      "price": 9.99,
+      "call_minutes": 10,
+      "videos": 0,
+      "share": 0.25
+    },
+    {
+      "name": "Calls + Video",
+      "price": 19.99,
+      "call_minutes": 20,
+      "videos": 5,
       "share": 0.5
     },
     {
-      "name": "Together",
-      "monthly_price": 179,
-      "live_minutes": 60,
-      "share": 0.5
+      "name": "Companion Plus",
+      "price": 29.99,
+      "call_minutes": 30,
+      "videos": 10,
+      "share": 0.25
     }
   ],
-  "video_scenarios": [
+  "addons": [
     {
-      "name": "FlashHead Lite: 1 RTX 4090, quality challenger",
-      "gpu_hour": 0.35,
-      "extras_hour": 0.2
+      "name": "Video pack",
+      "price": 9.99,
+      "call_minutes": 0,
+      "videos": 8,
+      "support": 0.1
     },
     {
-      "name": "FlashHead Pro: 2 RTX 5090, quote assumption",
-      "gpu_hour": 3,
-      "extras_hour": 0.3
-    },
-    {
-      "name": "Quark LiveAvatar: 5 H100 billed, availability unverified",
-      "gpu_hour": 11.25,
-      "extras_hour": 0.5
-    },
-    {
-      "name": "Quark LiveAvatar: 8 H100 billed, conservative baseline",
-      "gpu_hour": 18,
-      "extras_hour": 0.5
+      "name": "Phone-call pack",
+      "price": 14.99,
+      "call_minutes": 30,
+      "videos": 0,
+      "support": 0.1
     }
-  ]
+  ],
+  "sources": {
+    "fal_model": "https://fal.ai/models/fal-ai/flashhead",
+    "fal_billing": "https://fal.ai/docs/documentation/model-apis/pricing",
+    "cloudflare": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+    "runware": "https://runware.ai/serverless/compute",
+    "processor": "https://stripe.com/pricing"
+  }
 }

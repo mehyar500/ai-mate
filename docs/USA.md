@@ -1,5 +1,15 @@
 # What is required for a US launch
 
+## MVP routing decision
+
+Recommend a genuinely non-explicit adult-only pilot. Free voice messages do not imply unrestricted content. [fal's AUP](https://fal.ai/legal/acceptable-use-policy) prohibits sexually explicit content and restricts sensitive personal data: route only permitted, sanitized scripts and original portraits, never full intimate histories. If sanitization cannot preserve a permitted request, decline that clip. Do not bypass provider filters.
+
+[Runware custom compute](https://runware.ai/serverless/compute) is a beta candidate, not approved infrastructure. Its [terms](https://runware.ai/terms) and actual underlying model licenses still govern use; obtain eligibility for the complete service and any resale arrangement. Scale-to-zero does not mean all hosting costs disappear. No unrestricted adult GPU route is confirmed.
+
+Ordinary payment fees in ECONOMICS are assumptions for an approved clean business, not a Stripe quote or approval. Disclose the full business and future adult plans; do not disguise sales or split routing to evade underwriting. If a processor requires high-risk pricing, use that scenario and revise offers. Adult merchant registration, legal review and verification can exceed the $500 pilot setup ceiling; obtain actual quotes before spending or selling.
+
+All features remain disabled pending their applicable gates. The controls below describe potential adult expansion as well as the MVP; state-specific applicability must be reviewed rather than assuming every adult-content rule applies identically to a clean service.
+
 **There is no verified “anything goes, legal everywhere” stack.** The proposed scope is original fictional adults and consensual content. Exclude minors/age ambiguity, coercion, exploitation, nonconsensual imagery and real-person impersonation. A commercial model license does not grant permission for every use.
 
 | Decision | Evidence / action before launch |

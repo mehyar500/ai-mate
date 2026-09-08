@@ -1,10 +1,9 @@
-"""Offline planning scenarios. No API calls, billing or credentials."""
+"""Offline asynchronous companion economics; no API calls or billing."""
 import argparse
 import copy
 import json
 import math
 from pathlib import Path
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -13,132 +12,99 @@ def load():
 
 
 def validate(c):
-    a, rates, plans = c["assumptions_not_vendor_quotes"], c["published_rates"], c["plans"]
-    for group in (a, rates):
+    for group in (c["rates"], c["assumptions"]):
         for key, value in group.items():
-            if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value) or value < 0:
-                raise ValueError(f"{key} must be a finite nonnegative number")
-    for key in ("billable_utilization", "clip_success_fraction"):
-        if not 0 < a[key] <= 1:
-            raise ValueError(f"{key} must be in (0, 1]")
-    for key in ("processor_fraction", "refund_chargeback_loss_fraction", "reserve_fraction"):
-        if a[key] > 1:
-            raise ValueError(f"{key} cannot exceed 1")
-    if a["concurrent_calls_per_group"] < 1 or a["clips_per_pack"] < 1 or a["topup_minutes"] <= 0:
-        raise ValueError("Capacity and pack sizes must be positive")
-    if not plans or not math.isclose(sum(p["share"] for p in plans), 1):
-        raise ValueError("Plan shares must sum to 1")
-    for p in plans:
-        if not all(not isinstance(p[k], bool) and isinstance(p[k], (int, float)) and math.isfinite(p[k]) and p[k] >= 0 for k in ("monthly_price", "live_minutes", "share")) or p["monthly_price"] == 0 or p["live_minutes"] == 0:
-            raise ValueError("Invalid paid plan")
-    if a["cohort_new_free_users"] > a["cohort_free_users"] or a["cohort_new_payers"] > a["cohort_payers"]:
-        raise ValueError("New users cannot exceed cohort totals")
-    b = c["competitor_reference"]
-    values = [b[k] for k in ("customer_wire_usd_per_token", "wire_minimum_purchase_usd", "performer_usd_per_token")] + b["private_tokens_per_minute"]
-    if not all(not isinstance(v, bool) and isinstance(v, (int, float)) and math.isfinite(v) and v > 0 for v in values):
-        raise ValueError("Competitor rates must be finite positive numbers")
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+                raise ValueError(f"{key} must be finite and nonnegative")
+    a = c["assumptions"]
+    if not 0 < a["video_accepted_fraction"] <= 1:
+        raise ValueError("Acceptance must be in (0, 1]")
+    if a["processor_fraction"] + a["refund_loss_fraction"] >= 1 or a["high_risk_fraction"] >= 1 or a["reserve_fraction"] > 1:
+        raise ValueError("Invalid payment fraction")
+    for p in c["plans"] + c["addons"]:
+        for k, v in p.items():
+            if k != "name" and (isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0):
+                raise ValueError("Invalid plan")
+        if p["price"] <= 0:
+            raise ValueError("Price must be positive")
+    if not c["plans"] or not math.isclose(sum(p["share"] for p in c["plans"]), 1):
+        raise ValueError("Plan shares must sum to one")
+
+
+def price_floor(nonpercentage_cost, fee_fraction, return_on_cost=3):
+    # Revenue = (1+return)*all costs, including percentage-based fees.
+    denominator = 1/(1+return_on_cost) - fee_fraction
+    return nonpercentage_cost/denominator if denominator > 0 else None
 
 
 def calculate(c):
     validate(c)
-    a, r = c["assumptions_not_vendor_quotes"], c["published_rates"]
-    llm_min = (a["call_turns_per_minute"] * a["call_input_tokens_per_turn"] * r["llm_input_per_million"] + a["call_output_tokens_per_minute"] * r["llm_output_per_million"]) / 1e6
-    media_min = a["aggregate_sfu_egress_mbps"] * 60 / 8000 * r["sfu_per_gb"]
-    gpu_min = (a["gpu_per_hour"] + a["vm_extras_per_hour"]) / (60 * a["billable_utilization"] * a["concurrent_calls_per_group"])
-    local_min = (gpu_min + media_min + a["call_misc_per_minute"]) * (1 + a["variable_cost_buffer"])
-    # Hosted conversation is additional to GPU video rendering.
-    managed_voice = (llm_min + r["streaming_asr_per_minute"] + a["tts_characters_per_minute"] / 1000 * r["tts_per_thousand_characters"] + media_min + a["call_misc_per_minute"]) * (1 + a["variable_cost_buffer"])
-    guard_per_exchange = (a["guard_input_tokens_per_exchange"] * r["guard_input_per_million"] + a["guard_output_tokens_per_exchange"] * r["guard_output_per_million"]) / 1e6
-    managed_voice += guard_per_exchange * a["call_turns_per_minute"] * (1 + a["variable_cost_buffer"])
-    managed_avatar = managed_voice + gpu_min * (1 + a["variable_cost_buffer"])
-    chat = (a["chat_input_tokens"] * r["llm_input_per_million"] + a["chat_output_tokens"] * r["llm_output_per_million"] + a["guard_input_tokens_per_exchange"] * r["guard_input_per_million"] + a["guard_output_tokens_per_exchange"] * r["guard_output_per_million"]) / 1e6
-    free = chat * a["free_monthly_messages"] + a["profile_storage_asset_monthly"]
-    paid_text = max(chat, a["local_adult_text_per_message_including_safety"]) * a["paid_monthly_messages"] + a["profile_storage_asset_monthly"]
-
-    def net(price):
-        return price * (1 - a["processor_fraction"] - a["refund_chargeback_loss_fraction"]) - a["processor_fixed_per_payment"]
-
-    plans = []
+    a, r = c["assumptions"], c["rates"]
+    video_model = (a["video_seconds"]*r["fal_video_per_output_second"] + a["video_other_per_attempt"]) / a["video_accepted_fraction"] * (1+a["buffer_fraction"])
+    video_cost = max(video_model, a["video_delivered_budget"])
+    custom = ((a["custom_video_billed_seconds"]+a["custom_keepwarm_seconds"])*a["gpu_rate_per_second"]+a["custom_other_per_attempt"])/a["video_accepted_fraction"]*(1+a["buffer_fraction"])
+    fee = a["processor_fraction"]+a["refund_loss_fraction"]
+    plans=[]
     for p in c["plans"]:
-        cost = paid_text + p["live_minutes"] * managed_avatar + a["support_per_payer_monthly"]
-        contribution = net(p["monthly_price"]) - cost
-        plans.append(dict(p, variable_cost=cost, contribution=contribution, contribution_margin=contribution / p["monthly_price"], cash_before_fixed=contribution - p["monthly_price"] * a["reserve_fraction"]))
-    avg = sum(p["share"] * p["contribution"] for p in plans)
-    gross = a["cohort_payers"] * sum(p["share"] * p["monthly_price"] for p in plans)
-    surplus = a["cohort_payers"] * avg - a["cohort_free_users"] * free - a["monthly_fixed_excluding_gpu"]
-    clip = (a["clip_worker_per_hour"] * a["clip_gpu_seconds_per_attempt"] / 3600 / a["clip_success_fraction"] + a["clip_other_per_delivered"]) * (1 + a["variable_cost_buffer"])
-    return dict(render_transport_per_minute=local_min, gpu_per_minute=gpu_min, media_per_minute=media_min, managed_llm_per_minute=llm_min, managed_voice_per_minute=managed_voice, managed_avatar_per_minute=managed_avatar, free_user_monthly=free, paid_text_monthly=paid_text, plans=plans, weighted_contribution=avg, cohort_gross=gross, cohort_surplus=surplus, cohort_cash_before_age_and_tax=surplus - gross * a["reserve_fraction"], cohort_first_month_age_cost=(a["cohort_new_payers"] + a["cohort_new_free_users"]) * a["age_check_per_user"], break_even_payers=math.ceil((a["monthly_fixed_excluding_gpu"] + a["cohort_free_users"] * free) / avg) if avg > 0 else None, clip_cost=clip, clip_pack_contribution=net(a["clip_pack_price"]) - a["clips_per_pack"] * clip, topup_contribution=net(a["topup_price"]) - a["topup_minutes"] * managed_avatar)
+        delivery=a["paid_text_monthly"]+a["support_per_payer"]+p["call_minutes"]*a["phone_call_minute"]+p["videos"]*video_cost
+        total=delivery+fee*p["price"]+a["payment_fixed"]
+        high=delivery+a["high_risk_fraction"]*p["price"]+a["high_risk_fixed"]
+        plans.append(dict(p,delivery=delivery,total=total,profit=p["price"]-total,margin=1-total/p["price"],return_on_cost=(p["price"]-total)/total,high_risk_total=high,price_floor=price_floor(delivery+a["payment_fixed"],fee,a["target_return_on_cost"])))
+    arpu=sum(p["share"]*p["price"] for p in plans)
+    unit=sum(p["share"]*p["total"] for p in plans)
+    high_unit=sum(p["share"]*p["high_risk_total"] for p in plans)
+    fixed=a["monthly_fixed"]+a["free_users_cap"]*a["free_user_monthly"]+a["founder_labor_monthly"]
+    first_fixed=fixed+a["first_month_setup"]+a["free_users_cap"]*a["new_user_verification_cost"]
+    variable=unit+a["customer_acquisition_cost"]+a["new_user_verification_cost"]
+    n=a["cohort_payers"]
+    revenue=n*arpu
+    costs=n*variable+first_fixed
+    headroom=arpu/(1+a["target_return_on_cost"])-variable
+    contribution=arpu-variable
+    addons=[]
+    for p in c["addons"]:
+        cost=p["call_minutes"]*a["phone_call_minute"]+p["videos"]*video_cost+p["support"]+fee*p["price"]+a["payment_fixed"]
+        addons.append(dict(p,cost=cost,profit=p["price"]-cost,return_on_cost=(p["price"]-cost)/cost))
+    return dict(plans=plans,addons=addons,video_formula_cost=video_model,video_budget=video_cost,custom_video_cost=custom,arpu=arpu,unit_cost=unit,high_risk_unit_cost=high_unit,first_fixed=first_fixed,recurring_fixed=fixed,revenue=revenue,first_cost=costs,first_profit=revenue-costs,first_return=(revenue-costs)/costs if costs else None,cash_after_reserve=revenue-costs-revenue*a["reserve_fraction"],break_even=math.ceil(first_fixed/contribution) if contribution>0 else None,target_payers=math.ceil(first_fixed/headroom) if headroom>0 else None)
 
 
 def report(c):
-    a,d=c["assumptions_not_vendor_quotes"],calculate(c)
-    b=c["competitor_reference"]
-    tokens=a["call_turns_per_minute"]*a["call_input_tokens_per_turn"]
-    rows=["# Prices, costs and savings", "", f"USD, {c['as_of']}. Generated from [config](../config/economics.json); assumptions, not measured earnings.", "",
-        f"Free: portrait, {a['free_monthly_messages']:g} clean exchanges/month, daily ceiling {math.ceil(a['free_monthly_messages']/30)}, prerecorded voice sample. Paid: {a['paid_monthly_messages']:g} exchanges/month plus calls below. Adult service only in approved states and advertised hours.", "",
-        "| Plan | Monthly price | Minutes | Full-use contribution | Margin before fixed costs |", "|---|---:|---:|---:|---:|"]
+    a,d=c["assumptions"],calculate(c)
+    rows=["# Asynchronous MVP economics", "", f"USD; checked {c['as_of']}. Generated from [config](../config/economics.json). Proposed non-explicit launch, not measured results. A 300% return on total cost means a 75% margin. All outputs below are before income tax; founder labor and verification default to zero and must be priced before claiming economic profit.", "", "## Allowances and unit economics", "", f"Free: {a['free_exchanges']} exchanges/month, 5/day, one curated portrait; cap {a['free_users_cap']} free accounts. Paid: {a['paid_exchanges']} text exchanges/month. Text replies can also be played as free voice messages (up to 15 seconds each); free uploaded voice notes have a separate five-minute input cap. Paid voice allowance below means connected phone-call minutes, including listening; video allowance is delivered clips up to {a['video_seconds']} seconds.", "", "| Plan | Price/month | Phone-call min | Clips | Direct cost incl. payment | Contribution | Return on direct cost |", "|---|---:|---:|---:|---:|---:|---:|"]
     for p in d["plans"]:
-        rows.append(f"| {p['name']} | ${p['monthly_price']:.2f} | {p['live_minutes']} | ${p['contribution']:.2f} | {p['contribution_margin']:.1%} |")
-    rows += ["",f"Top-up ${a['topup_price']:.2f}/{a['topup_minutes']} minutes. Clip pack ${a['clip_pack_price']:.2f}/{a['clips_per_pack']} delivered videos. Minutes include listening. No rollover/automatic overage; disclose expiry, pause pilot deductions on degradation, restore failed clips.", "",
-        "## Our call cost", "", "| Route | Cost/min | 30 min | 60 min |", "|---|---:|---:|---:|"]
-    for name,key in (("GPU rendering + transport only (no conversation)","render_transport_per_minute"),("Cloudflare conversation only (no video)","managed_voice_per_minute"),("Cloudflare conversation + 8-GPU video baseline","managed_avatar_per_minute")):
-        v=d[key]
-        rows.append(f"| {name} | ${v:.4f} | ${v*30:.2f} | ${v*60:.2f} |")
-    rows += ["",f"Assumed (${a['gpu_per_hour']:.2f} GPU + ${a['vm_extras_per_hour']:.2f} VM extras)/hour; {a['billable_utilization']:.0%} utilization; {a['concurrent_calls_per_group']:g} call per allocated GPU group. Add ${d['media_per_minute']:.6f}/minute media, ${a['call_misc_per_minute']:.3f} other cost, {a['variable_cost_buffer']:.0%} contingency. Video GPU price is the TOTAL allocated group, not one card. Baseline pays for eight H100s even if five execute the model. No spare-card concurrency saving is assumed.",
-        f"Hosted context: {tokens:,.0f} input tokens/minute; thirty minutes {tokens*30:,.0f} input + {a['call_output_tokens_per_minute']*30:,.0f} output; sixty {tokens*60:,.0f} + {a['call_output_tokens_per_minute']*60:,.0f}. Repeated history counts. Speech: {a['tts_characters_per_minute']:g} characters/minute. [AI prices](https://developers.cloudflare.com/workers-ai/platform/pricing/), [SFU prices](https://developers.cloudflare.com/realtime/sfu/pricing/).", "",
-        "| Utilization | Complete clean call cost/min | 60 min |", "|---|---:|---:|"]
-    for u in (.1,.2,.5):
-        v=copy.deepcopy(c); v["assumptions_not_vendor_quotes"]["billable_utilization"]=u
-        cost=calculate(v)["managed_avatar_per_minute"]
-        rows.append(f"| {u:.0%} | ${cost:.4f} | ${cost*60:.2f} |")
-    rows += ["",f"Always-warm VM at assumed rates: ${(a['gpu_per_hour']+a['vm_extras_per_hour'])*720:.2f}/30 days; do not count again alongside idle allocation. Free text ${d['free_user_monthly']:.2f}/user/month; paid text ${d['paid_text_monthly']:.2f}. Separate adult-text worker must cover loading/idle/safety within ${a['local_adult_text_per_message_including_safety']:.4f}/exchange. Scheduled service, not unbudgeted 24/7 capacity.", "",
-        "## Earnings are conditional", "",
-        f"Fee assumptions: {a['processor_fraction']:.0%} + ${a['processor_fixed_per_payment']:.2f}/payment, {a['refund_chargeback_loss_fraction']:.0%} refund/dispute loss, {a['reserve_fraction']:.0%} withheld reserve; support ${a['support_per_payer_monthly']:.2f}/payer; fixed ${a['monthly_fixed_excluding_gpu']:.2f}/month; verification ${a['age_check_per_user']:.2f}/new free or paid account. Reserve affects cash, not profit.",
-        f"Configured {a['cohort_payers']:g}-payer/{a['cohort_free_users']:g}-free cohort: revenue ${d['cohort_gross']:.2f}; surplus ${d['cohort_surplus']:.2f}; cash after reserve and ${d['cohort_first_month_age_cost']:.2f} age checks: ${d['cohort_cash_before_age_and_tax']-d['cohort_first_month_age_cost']:.2f}. Excludes salary, acquisition, legal and tax.",
-        "[CCBill](https://ccbill.com/pricing) fees need a quote; applicable $1,450–$1,950 annual card registration is amortized in fixed costs but payable upfront. Actual verification pricing also needs a quote.",
-        f"Clip assumption: {a['clip_gpu_seconds_per_attempt']:g} allocated GPU seconds/attempt, {a['clip_success_fraction']:.0%} success, ${a['clip_other_per_delivered']:.2f} other cost plus contingency: ${d['clip_cost']:.2f}/delivered clip. Include load/idle/retries. Separate clip worker costs ${a['clip_worker_per_hour']:.2f}/hour; it does not use the live cluster. Speed and realism are unproved.", "",
-        "## Chaturbate in dollars", "",
-        f"Wire buyer ${b['customer_wire_usd_per_token']:.2f}/token with **${b['wire_minimum_purchase_usd']:g} funding minimum**; performer ${b['performer_usd_per_token']:.2f}/token. Card prices not verified. [Buyer]({b['buyer_source']}), [performer]({b['performer_source']}).", "",
-        "| Tokens/min | Buyer $/min | Performer $/min | Buyer 30 / 60 min | Performer 30 / 60 min |", "|---|---:|---:|---:|---:|"]
-    for rate in b["private_tokens_per_minute"]:
-        buy=rate*b["customer_wire_usd_per_token"]; pay=rate*b["performer_usd_per_token"]
-        rows.append(f"| {rate} | ${buy:.2f} | ${pay:.2f} | ${buy*30:.2f} / ${buy*60:.2f} | ${pay*30:.2f} / ${pay*60:.2f} |")
-    rows += ["", "Rate examples, not averages; the wire minimum still applies. Tips/taxes/minimum durations change spending. Gross spread is not platform profit. [Show rules]("+b["private_source"]+"), [listed categories](https://chaturbate.com/support/).", "",
-        "| Our full-use offer | Buyer $/min | Cheaper than 6 tokens/min | Cheaper than 30 tokens/min |", "|---|---:|---:|---:|"]
-    for name,rate in [(p["name"],p["monthly_price"]/p["live_minutes"]) for p in d["plans"]]+[("Top-up",a["topup_price"]/a["topup_minutes"])]:
-        rows.append(f"| {name} | ${rate:.3f} | {(1-rate/(6*b['customer_wire_usd_per_token']))*100:.1f}% | {(1-rate/(30*b['customer_wire_usd_per_token']))*100:.1f}% |")
-    rows += ["", "Savings assume all minutes used and the wire valuation. Low use can make subscriptions more expensive; public streams may be free. ChatGPT prices and product differences: [REPORT](REPORT.md).",
-        "Prices above are a premium feasibility scenario, not approved offers. Require measured call cost and at least 50% recurring contribution after actual fees. Cinematic clips target p95 <=120s and cost <=$0.50, both unproved. See BUILD for quality and streaming gates.", ""]
-    rows += ["## Video alternatives: same conversation stack", "", "All costs below include hosted conversation, transport, idle allocation and contingency. Hardware prices are assumptions except advertised starting prices; H100 performance must be reproduced rather than inferred from H800 results.", "", "| Renderer hardware scenario | Cost/min | 30 min | 60 min |", "|---|---:|---:|---:|"]
-    for scenario in c["video_scenarios"]:
-        v = copy.deepcopy(c)
-        v["assumptions_not_vendor_quotes"].update(gpu_per_hour=scenario["gpu_hour"], vm_extras_per_hour=scenario["extras_hour"])
-        value = calculate(v)["managed_avatar_per_minute"]
-        rows.append(f"| {scenario['name']} | ${value:.4f} | ${30*value:.2f} | ${60*value:.2f} |")
-    adult = d["render_transport_per_minute"] + a["adult_aux_per_hour"] / (60*a["billable_utilization"]) * (1+a["variable_cost_buffer"])
-    rows += ["", f"Conditional adult route replaces hosted conversation with a separate ${a['adult_aux_per_hour']:.2f}/hour speech/language/safety worker: ${adult:.4f}/min, ${adult*30:.2f}/30 min, ${adult*60:.2f}/60 min. One simultaneous call, same utilization; throughput and provider eligibility unproved. The cheaper of these routes must not subsidize an unmeasured expensive route.", "", "50% contribution price floor = (call cost + monthly text/support + fixed payment fee) / (1 - processing fraction - refund fraction - 0.50). Acquisition, salaries, legal work and taxes still reduce profit.", ""]
+        rows.append(f"| {p['name']} | ${p['price']:.2f} | {p['call_minutes']} | {p['videos']} | ${p['total']:.2f} | ${p['profit']:.2f} | {p['return_on_cost']:.1%} |")
+    rows += ["",f"Budgets: ${a['phone_call_minute']:.2f}/connected phone-call minute, ${d['video_budget']:.2f}/delivered clip, ${a['paid_text_monthly']:.2f}/payer text, free voice playback and memory, ${a['support_per_payer']:.2f}/payer support. Ordinary-processing scenario: {a['processor_fraction']:.0%} processing/platform allowance + {a['refund_loss_fraction']:.0%} refund/loss + ${a['payment_fixed']:.2f}/transaction; no merchant approval assumed.", "", "| Optional prepaid pack | Price | Direct cost | Return on direct cost |", "|---|---:|---:|---:|"]
+    for p in d["addons"]:
+        rows.append(f"| {p['name']}: {p['videos']} clips / {p['call_minutes']} phone-call min | ${p['price']:.2f} | ${p['cost']:.2f} | {p['return_on_cost']:.1%} |")
+    rows += ["", "These are contribution returns, not company profit. Budget full redemption; do not count unused credits as the business model. Reserve unfulfilled service costs and refunds. No annual prepaid plan or automatic overage in the pilot.", "", "## Generation cost and speed", "",f"fal FlashHead: {a['video_seconds']} output seconds x ${c['rates']['fal_video_per_output_second']:.3f} = ${a['video_seconds']*c['rates']['fal_video_per_output_second']:.3f} vendor price. Add ${a['video_other_per_attempt']:.2f}/attempt, divide by {a['video_accepted_fraction']:.0%} usable-output rate and add {a['buffer_fraction']:.0%}: ${d['video_formula_cost']:.3f}; reserve at least ${d['video_budget']:.2f}. Rejected successful generations cost us; vendor server errors have different billing treatment. Hosted text endpoint bundles its own speech; do not charge Aura again for the same video.", f"Custom Runware scenario: {a['custom_video_billed_seconds']} runtime + {a['custom_keepwarm_seconds']} warm seconds x ${a['gpu_rate_per_second']:.6f}/GPU-second, plus ${a['custom_other_per_attempt']:.2f}/attempt, same acceptance/buffer = ${d['custom_video_cost']:.3f}. This is an unbenchmarked alternative, not an available endpoint or an adult approval. Count model loading if the contract meters it. Zero workers means zero compute; held-warm and reserved workers cost money.", "[fal model](https://fal.ai/models/fal-ai/flashhead), [billing](https://fal.ai/docs/documentation/model-apis/pricing), [Runware compute](https://runware.ai/serverless/compute). Fifteen-second output duration is not turnaround time. Require measured p95 <=20 seconds from submit to playable result before advertising fast delivery.", "", "## First month: cash operating scenarios", "", f"Assume the configured plan mix, {a['free_users_cap']} free accounts, ${a['monthly_fixed']:.2f} recurring fixed cost, ${a['first_month_setup']:.2f} setup/benchmark cost, ${a['customer_acquisition_cost']:.2f} acquisition per payer, ${a['founder_labor_monthly']:.2f} founder labor and ${a['new_user_verification_cost']:.2f} per new free/paid user. Setup is a spending ceiling to test, not a quote for building a production app or US legal review.", "", "| Payers | Revenue | First-month modeled cost | Profit/loss | Return on cost |", "|---|---:|---:|---:|---:|"]
+    for n in (20,100,600):
+        v=copy.deepcopy(c);v["assumptions"]["cohort_payers"]=n;x=calculate(v)
+        rows.append(f"| {n} | ${x['revenue']:.2f} | ${x['first_cost']:.2f} | ${x['first_profit']:.2f} | {x['first_return']:.1%} |")
+    rows += ["", f"Break-even: {d['break_even']} mixed-plan payers; 300% first-month return: {d['target_payers']} payers under these assumptions. Revenue is earned only as promised service is delivered; cash collection alone is not profit. All scenarios budget full monthly allowance consumption.", "", "| Stress at configured payer count | Profit/loss | 300% target payer count |", "|---|---:|---:|"]
+    for label,updates in (("Paid acquisition $5",dict(customer_acquisition_cost=5)),("Verification $1/new account",dict(new_user_verification_cost=1)),("Founder labor $3,000",dict(founder_labor_monthly=3000)),("No setup charge (later month, same new-payer assumption)",dict(first_month_setup=0)),("High-risk fees",dict(processor_fraction=a["high_risk_fraction"],refund_loss_fraction=0,payment_fixed=a["high_risk_fixed"]))):
+        v=copy.deepcopy(c);v["assumptions"].update(updates);x=calculate(v)
+        rows.append(f"| {label} | ${x['first_profit']:.2f} | {x['target_payers'] if x['target_payers'] is not None else 'Impossible at this mix and unit cost'} |")
+    rows += ["",f"An assumed {a['reserve_fraction']:.0%} payment reserve reduces configured first-month available cash to ${d['cash_after_reserve']:.2f}; it is not an expense. Provider prepaid balances, settlement delays and refund liabilities require working capital even when profit is positive.", "", "Formula: price floor = (delivery + fixed payment fee + allocated overhead/acquisition) / (0.25 - percentage fees/losses). If the denominator is nonpositive, 300% return is impossible. No sales or price is guaranteed. Do not rely on unquoted ordinary fees for adult business.", "", "## Later FaceTime-style video calls", "", "Keep disabled in the first month. FlashHead Pro on a quoted TensorDock two-5090 group plus local Qwen3-8B/Whisper/Kokoro: prior modeled $5.69/30 minutes at 50% utilization. At high-risk 18% fees + $0.50, direct 300% floor is ($5.69 + $0.50)/0.07 = about $88.46, before support/startup/overhead. Model $59/30 minutes for an approved clean service with ordinary fees, or $129/30 minutes under the high-risk fee scenario. Both require their own warm-up, support and overhead budget; validate actual cost and demand first. Quark LiveAvatar + Wan2.2-S2V-14B with eight rented H100s costs about $24.69/30 minutes; same direct floor about $359.89. Reject this as the default product. Prices are scenarios, not live offers.", ""]
     return "\n".join(rows)
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--write", action="store_true", help="Regenerate the pricing document")
-    parser.add_argument("--json", action="store_true", help="Print numeric baseline results")
-    parser.add_argument("--utilization", type=float, help="Override baseline for a sensitivity check")
-    args = parser.parse_args()
-    if args.write and args.json:
-        parser.error("--write creates Markdown; use --json separately")
-    c = load()
-    if args.utilization is not None:
-        c["assumptions_not_vendor_quotes"]["billable_utilization"] = args.utilization
-    if args.write and args.utilization is not None:
-        parser.error("Persist assumption changes in config before regenerating docs")
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--write",action="store_true")
+    parser.add_argument("--json",action="store_true")
+    parser.add_argument("--payers",type=int)
+    args=parser.parse_args()
+    if args.write and (args.json or args.payers is not None):
+        parser.error("Persist config first; --write cannot combine with overrides or --json")
+    c=load()
+    if args.payers is not None:
+        c["assumptions"]["cohort_payers"]=args.payers
     try:
-        output = json.dumps(calculate(c), indent=2) if args.json else report(c)
+        output=json.dumps(calculate(c),indent=2) if args.json else report(c)
     except ValueError as error:
         parser.error(str(error))
     if args.write:
-        (ROOT / "docs/ECONOMICS.md").write_text(output, encoding="utf-8")
+        (ROOT/"docs/ECONOMICS.md").write_text(output,encoding="utf-8")
         print("Updated docs/ECONOMICS.md")
     else:
         print(output)

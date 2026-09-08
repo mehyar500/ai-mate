@@ -3,105 +3,88 @@ import math
 import subprocess
 import sys
 import unittest
-from scripts.economics import calculate, load, report, ROOT
+from scripts.economics import calculate, load, report, price_floor, ROOT
 
 
 class EconomicsTests(unittest.TestCase):
-    def test_gpu_idle_and_sfu_units(self):
-        d = calculate(load())
-        self.assertAlmostEqual(d["gpu_per_minute"], 18.5 / 60 / 0.5)
-        self.assertAlmostEqual(d["media_per_minute"], 2.128 * 1e6 * 60 / 8 / 1e9 * 0.05)
-
-    def test_full_prompt_is_billed_each_turn(self):
-        d = calculate(load())
-        self.assertAlmostEqual(d["managed_llm_per_minute"], (3 * 4096 * .051 + 100 * .335) / 1e6)
-
-    def test_reserve_changes_cash_not_contribution(self):
+    def test_video_seconds_and_retry_cost(self):
         c = load()
-        baseline = calculate(c)
-        c["assumptions_not_vendor_quotes"]["reserve_fraction"] = 0
+        d = calculate(c)
+        self.assertAlmostEqual(d['video_formula_cost'], .125)
+        self.assertAlmostEqual(d['video_budget'], .15)
+        c['assumptions']['video_accepted_fraction'] = .4
+        self.assertGreater(calculate(c)['video_budget'], d['video_budget'])
+
+    def test_warm_compute_is_billed_only_on_custom_route(self):
+        c = load()
+        before = calculate(c)
+        c['assumptions']['custom_keepwarm_seconds'] = 600
         after = calculate(c)
-        self.assertEqual(baseline["cohort_surplus"], after["cohort_surplus"])
-        self.assertAlmostEqual(after["cohort_cash_before_age_and_tax"] - baseline["cohort_cash_before_age_and_tax"], baseline["cohort_gross"] * .1)
+        self.assertGreater(after['custom_video_cost'], before['custom_video_cost'])
+        self.assertEqual(after['video_budget'], before['video_budget'])
 
-    def test_low_utilization_can_make_sales_loss_making(self):
+    def test_full_allowances_and_payment_fees(self):
+        d = calculate(load())
+        self.assertAlmostEqual(d['plans'][1]['total'], .60 + .25 + 20*.05 + 5*.15 + 19.99*.05 + .30)
+        self.assertAlmostEqual(d['addons'][1]['cost'], 30*.05 + .1 + 14.99*.05 + .30)
+
+    def test_return_is_not_margin(self):
+        self.assertAlmostEqual(price_floor(1, .05), 5)
+        self.assertIsNone(price_floor(1, .25))
+        for p in calculate(load())['plans']:
+            self.assertAlmostEqual(p['return_on_cost'], p['margin']/(1-p['margin']))
+
+    def test_first_month_scenarios(self):
         c = load()
-        c["assumptions_not_vendor_quotes"]["billable_utilization"] = .1
-        d = calculate(c)
-        self.assertLess(d["plans"][1]["contribution"], 0)
-        self.assertLess(d["cohort_surplus"], 0)
+        for n, profitable, target in [(20, False, False), (100, True, False), (600, True, True)]:
+            c['assumptions']['cohort_payers'] = n
+            d = calculate(c)
+            self.assertEqual(d['first_profit'] > 0, profitable)
+            self.assertEqual(d['first_return'] >= 3, target)
 
-    def test_failed_clips_cost_money(self):
+    def test_target_threshold(self):
         c = load()
-        baseline = calculate(c)
-        c["assumptions_not_vendor_quotes"]["clip_success_fraction"] = 1
-        self.assertLess(calculate(c)["clip_cost"], baseline["clip_cost"])
+        n = calculate(c)['target_payers']
+        c['assumptions']['cohort_payers'] = n
+        self.assertGreaterEqual(calculate(c)['first_return'], 3)
+        c['assumptions']['cohort_payers'] = n-1
+        self.assertLess(calculate(c)['first_return'], 3)
 
-    def test_invalid_cost_inputs_rejected(self):
-        for key, value in (("billable_utilization", 0), ("billable_utilization", 1.1), ("clip_success_fraction", 0), ("gpu_per_hour", -1), ("gpu_per_hour", math.nan), ("reserve_fraction", 2), ("concurrent_calls_per_group", 0)):
-            with self.subTest(key=key, value=value):
-                c = copy.deepcopy(load())
-                c["assumptions_not_vendor_quotes"][key] = value
-                with self.assertRaises(ValueError):
-                    calculate(c)
-
-    def test_checked_in_report_matches_config(self):
-        self.assertEqual((ROOT / "docs/ECONOMICS.md").read_text(encoding="utf-8"), report(load()))
-
-    def test_changed_assumptions_update_report_narrative(self):
+    def test_acquisition_can_prevent_target(self):
         c = load()
-        a = c["assumptions_not_vendor_quotes"]
-        a["call_turns_per_minute"] = 1
-        a["gpu_per_hour"] = 2
-        a["billable_utilization"] = .25
-        a["processor_fraction"] = .2
-        a["clips_per_pack"] = 7
-        result = report(c)
-        self.assertIn("122,880 input + 3,000 output", result)
-        self.assertIn("245,760 + 6,000", result)
-        self.assertNotIn("368,640", result)
-        self.assertIn("($2.00 GPU + $0.50 VM extras)", result)
-        self.assertIn("25% utilization", result)
-        self.assertIn("20% + $0.50/payment", result)
-        self.assertIn("$9.99/7 delivered videos", result)
+        c['assumptions']['customer_acquisition_cost'] = 5
+        self.assertIsNone(calculate(c)['target_payers'])
 
-    def test_free_and_paid_age_checks_are_counted(self):
+    def test_verification_counts_free_and_paid(self):
         c = load()
-        self.assertEqual(calculate(c)["cohort_first_month_age_cost"], 600)
-        c["assumptions_not_vendor_quotes"]["cohort_new_free_users"] = 0
-        self.assertEqual(calculate(c)["cohort_first_month_age_cost"], 100)
+        before = calculate(c)
+        c['assumptions']['new_user_verification_cost'] = 1
+        self.assertAlmostEqual(calculate(c)['first_cost'] - before['first_cost'], 300)
 
-    def test_chaturbate_buyer_and_performer_are_distinct(self):
-        result = report(load())
-        self.assertIn("| 30 | $2.40 | $1.50 | $72.00 / $144.00 | $45.00 / $90.00 |", result)
-
-    def test_report_supports_one_plan(self):
+    def test_reserve_changes_cash_not_profit(self):
         c = load()
-        c["plans"] = [dict(c["plans"][0], share=1)]
-        self.assertNotIn("Together contribution", report(c))
+        before = calculate(c)
+        c['assumptions']['reserve_fraction'] = 0
+        after = calculate(c)
+        self.assertEqual(before['first_profit'], after['first_profit'])
+        self.assertAlmostEqual(after['cash_after_reserve']-before['cash_after_reserve'], before['revenue']*.1)
 
-    def test_savings_use_customer_price_not_performer_payout(self):
-        self.assertIn("| Together | $2.983 | -521.5% | -24.3% |", report(load()))
+    def test_invalid_inputs(self):
+        for key, value in [('video_accepted_fraction', 0), ('video_accepted_fraction', 2), ('cohort_payers', -1), ('phone_call_minute', math.nan), ('reserve_fraction', 2)]:
+            c = copy.deepcopy(load())
+            c['assumptions'][key] = value
+            with self.assertRaises(ValueError):
+                calculate(c)
 
-    def test_plan_includes_conversation_and_rendering(self):
-        c = load()
-        d = calculate(c)
-        p = d["plans"][0]
-        self.assertAlmostEqual(p["variable_cost"], d["paid_text_monthly"] + 30*d["managed_avatar_per_minute"] + .75)
-        self.assertGreater(d["managed_avatar_per_minute"], d["render_transport_per_minute"])
+    def test_report_matches_config(self):
+        self.assertEqual((ROOT/'docs/ECONOMICS.md').read_text(encoding='utf-8'), report(load()))
 
-    def test_clip_cost_does_not_use_live_cluster(self):
-        c = load()
-        before = calculate(c)["clip_cost"]
-        c["assumptions_not_vendor_quotes"]["gpu_per_hour"] = 100
-        self.assertEqual(before, calculate(c)["clip_cost"])
-
-    def test_json_cannot_overwrite_markdown(self):
-        before = (ROOT / "docs/ECONOMICS.md").read_bytes()
-        result = subprocess.run([sys.executable, str(ROOT / "scripts/economics.py"), "--write", "--json"], capture_output=True)
+    def test_json_cannot_overwrite_report(self):
+        before = (ROOT/'docs/ECONOMICS.md').read_bytes()
+        result = subprocess.run([sys.executable, str(ROOT/'scripts/economics.py'), '--write', '--json'], capture_output=True)
         self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(before, (ROOT / "docs/ECONOMICS.md").read_bytes())
+        self.assertEqual(before, (ROOT/'docs/ECONOMICS.md').read_bytes())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

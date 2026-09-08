@@ -1,14 +1,26 @@
-# Amorien
+# AI-mate MVP
 
-**Five active product documents, including this page.** Everything else is code, configuration, reference data or agent operating records.
+Free text and recorded voice messages; paid phone calls and photorealistic video messages up to 15 seconds. Live video is a later experiment. Recommend an adult-only, non-explicit launch; explicit features require separate approvals and economics.
 
-1. [Decision report](docs/REPORT.md) — what we can build, what differs from ChatGPT, and whether it can make money.
-2. [Prices and comparisons](docs/ECONOMICS.md) — costs, customer prices, Chaturbate payouts and percentage savings.
-3. [Build](docs/BUILD.md) — exact models, infrastructure, onboarding and first test.
-4. [US launch](docs/USA.md) — commercial licenses, provider eligibility, payment and age checks.
+This is a planning repository and offline calculator, **not a working application**. No inference, checkout or latency benchmark has been completed.
 
-**Target: photorealistic continuously generated video, with no motion-loop or mouth-only animation approach.** Cloudflare handles the app and clean conversation; Quark LiveAvatar and the cheaper FlashHead Pro challenger require a measured GPU proof.
+Five active product documents:
 
-Status: plan and tested offline calculator; realistic live calls have **not** been demonstrated. No production deployment or adult-provider approval exists yet.
+1. This README: scope and repository map.
+2. [REPORT](docs/REPORT.md): offer, competition and business decision.
+3. [BUILD](docs/BUILD.md): models, memory, flow and release tests.
+4. [ECONOMICS](docs/ECONOMICS.md): generated prices and sensitivity analysis.
+5. [USA](docs/USA.md): licenses and launch eligibility.
 
-Run `python -m unittest discover -s tests -v`. Change assumptions in [config/economics.json](config/economics.json), then run `python scripts/economics.py --write`. Planned keys are in [.env.example](.env.example); actual `.env` stays private. Superseded plans remain in Git history.
+`config/economics.json` owns assumptions; `scripts/economics.py` generates economics; `tests/` checks arithmetic. `docs/research/cloudflare-models.json` is reference data. `.env.example` lists planned integration settings, not credentials. Agent/factory records are historical coordination evidence. Superseded plans remain in Git history.
+
+Python 3.11+, standard library only:
+
+```powershell
+python scripts/economics.py --write
+python -m unittest discover -s tests -v
+python -m compileall -q scripts tests
+git diff --check
+```
+
+Validate quality and costs, implement free conversation and memory, then approved checkout and paid calls/clips. Keep live video disabled until separately measured.
