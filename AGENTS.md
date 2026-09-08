@@ -1,8 +1,8 @@
 # AGENTS.md — Repository Operating Contract
 
-This file is copied into each SaaS repository and then completed with repository-specific facts. The project-specific file outranks a role's general preferences.
+These are AI-mate's repository-specific working instructions. Use native Hermes profiles and tools for coordination.
 
-Every role also follows [.agents/contracts/agent-operating-system.md](.agents/contracts/agent-operating-system.md). It supplies the shared heavy-reasoning loop, model capability floor, typed handoffs, spawn policy, coding discipline, skill factory, and project/Kanban invariant. A role file adds specialist authority; it cannot weaken this contract.
+Follow the assigned native Hermes profile for role ownership, concise communication and model fallbacks. Repository requirements and user instructions remain authoritative.
 
 ## Instruction order
 
@@ -52,49 +52,17 @@ A task is complete only when:
 
 ## Model and data routing
 
-Use logical routes from `.factory/routing.yaml`, not provider names in permanent role prompts. Before a route is used, record actual provider/model, quota/health result, reasoning level, context bundle version, and source commit.
-
-The default route is direct Codex OAuth, `gpt-5.6-terra`, Hermes reasoning medium. The first fallback is a healthy, verified Claude reasoning route through OmniRoute. Hephaestus Frontier Builder uses this frontier pool for difficult code and high-risk vertical slices; Forgehand Builder and Minimax Steward are reserved for bounded work after the contract is accepted. An author and reviewer should use different provider families for consequential changes.
-
-Use [.factory/routing.yaml](.factory/routing.yaml) for current route candidates; no external pool is claimed verified. Every discovered model may be selected explicitly after its probes pass; unclassified catalog rows are probationary and never a silent fallback. The UI/UX studio uses Ariadne UX, Vitruvius Experience, Mies Interface, Lumen Design, Vesalius Accessibility, and Raphael Motion with visual Gemini/Claude routes and independent accessibility review.
-
-Send the minimum context required. Redact secrets, tokens, direct identifiers, customer records, and production data. Check provider data-handling terms before sending sensitive material. The inventory marks Cursor Fable as NO ZDR; keep data-sensitive work on approved routes unless a human explicitly accepts the policy.
+Use the active Hermes profile configuration and its native fallback_providers. Do not use a repository router or hard-coded provider entitlement claims. Preserve task context before handoff. If a fallback cannot meet the task capability, collect evidence or pause that decision rather than waive acceptance criteria. Keep credentials and private data out of artifacts.
 
 ## Hermes and OpenCode division
 
 Hermes owns intent, gate state, routing, budget, decomposition, and final synthesis. OpenCode creates bounded workers in isolated worktrees and returns commits/results. GitHub and CI enforce the policy. No worker is allowed to reinterpret a product decision or widen its scope.
 
-## Project intake invariant
+## Native project coordination
 
-The Conductor first reads the persistent founder profile and obtains the minimum
-project facts. Casual support and the one-time founder interview remain outside
-Kanban. Before assigning any worker in a sustained venture, new folder, or
-cloned repository, run `scripts/register-project-kanban.ps1` from the default
-Hermes Foundry home. The script calls native `hermes project` and
-`hermes kanban`; it creates or reuses the project and bound board and adds G0–G6
-starter cards with named role owners. If registration fails, record
-`.factory/INTAKE_BLOCKED.md` and stop assignment until the same command
-succeeds. This rule applies to Hermes, OpenCode, and any future agent adapter.
+Hot Zero coordinates sustained work through the existing native project and board `ai-mate-a2f6103`. Discuss ideas in native Bot Mode rooms; create or assign tasks when scope is agreed. Use native Kanban tools; no registration script, duplicate board, mandatory G0-G6 template or custom router is required. Each committed task has an owner, scope, acceptance criteria and evidence.
 
-## Required project structure
-
-```text
-SOUL.md
-AGENTS.md
-.agents/roles/
-.agents/contracts/
-.agents/gates/
-.factory/PROJECT_STATE.md
-.factory/routing.yaml
-.factory/gates/
-.factory/handoffs/
-docs/research/
-docs/product/
-docs/design/
-docs/architecture/
-docs/trust/
-docs/operations/
-```
+The existing `.factory/PROJECT_STATE.md`, handoffs and gate records are historical project evidence, not an orchestration engine. Preserve and consult relevant decisions; use current profile configuration for routing. New project documentation belongs under docs/.
 
 ## Stop and escalate
 

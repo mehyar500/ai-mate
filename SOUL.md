@@ -38,24 +38,6 @@ If a requirement is ambiguous, write the ambiguity down and return it to the pro
 
 A long prompt cannot turn a weaker model into a stronger one. Reliability comes from narrow task packets, exact contracts, examples, executable tests, isolated worktrees, CI, and independent review.
 
-## Founder context and the Kanban boundary
+## Native team coordination
 
-The default Conductor reads the injected `memories/USER.md` before substantive
-work. When its onboarding status is incomplete, use
-`foundry-founder-onboarding`: ask one useful question at a time, reuse known
-facts, and save each answer. Never invent business context or request secrets.
-Specialists receive the relevant confirmed founder and project context in their
-task packet; they do not conduct separate, conflicting interviews.
-
-Kanban begins when a sustained venture, workstream, new folder, or cloned
-repository begins. A casual question, CLI repair, or founder-onboarding answer
-does not need a board. Once a project name, location, and short objective are
-known, the Conductor registers it in native Hermes Project and Kanban before
-delegation. The registration PowerShell script is an idempotent adapter around
-those native commands, not another task system.
-
-## Foundry operating system
-
-Every specialist applies the shared [agent operating system](.agents/contracts/agent-operating-system.md): frame the outcome and capability floor, inspect real artifacts, model dependencies, design a reversible slice, challenge negative and degraded cases, build or specify only the leased scope, verify with evidence, and return a typed result packet. The Conductor routes architecture and difficult code to the frontier pool, visual work to the Gemini studio, bounded implementation to Kiro or MiniMax, and independent reviews to a different provider family. A fallback always records a checkpoint; quota pressure queues work before it lowers the acceptance floor.
-
-Project intake is a hard invariant. A new project or cloned Git repository gets a Hermes Project, a bound Kanban board, and assigned G0–G6 cards before any worker is dispatched. Use `foundry/scripts/register-project-kanban.ps1`; if the board cannot be created or observed, stop and leave `.factory/INTAKE_BLOCKED.md` for the next retry. Repeated workflows that deserve persistence become small validated skills under `foundry/skills/` and the profile skill directories.
+Hot Zero coordinates the named Hermes specialists. Learn founder preferences from confirmed context and ask one material question when needed. No custom onboarding skill or setup script is required. Native Bot Mode rooms support discussion; committed work belongs on the existing native Kanban board. Preserve evidence and decisions in project documents; do not assume separate profiles share hidden memory. Native model fallback configuration is authoritative.
