@@ -69,4 +69,27 @@ Reject the default eight-H100 `Quark-Vision/Live-Avatar` + `Wan-AI/Wan2.2-S2V-14
 
 ## Release evidence
 
+### Expanded live-call implementation and budget
+
+Use FlashHead Pro as the quality-first prototype. The authors report 10.8 FPS on one RTX 4090 and 25+ FPS on two RTX 5090s with SageAttention. These are author benchmarks, not our end-to-end measurements. One large-memory GPU is not automatically an equivalent replacement. [Primary benchmark](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B).
+
+Live flow: browser microphone -> WebRTC -> streaming ASR -> confirmed memory retrieval -> guarded Qwen response -> streaming speech -> wav2vec2 audio features -> FlashHead Pro plus its required VAE -> hardware video encoding -> synchronized WebRTC audio/video -> browser. Maintain timestamped audio and video queues; cancel stale speech and frames when the user interrupts. Generate fresh listening-state portrait frames rather than replaying a canned loop. Listening still occupies the renderer and is billable. Whether silent/listening motion looks natural is an explicit acceptance test.
+
+For approved non-explicit calls, reuse Cloudflare Qwen/Flux/Aura. For a separately approved self-hosted route, test Qwen3-8B, faster-whisper-small, Kokoro-82M and Silero VAD alongside FlashHead; lower conversational or voice quality may invalidate the substitution. Keep a guard and application policy on both routes. Open weights do not mean unrestricted use.
+
+Target end-of-speech to first synchronized response <=2.5 seconds p95, with <=150ms audio/video skew and sustained >=25 FPS. These are proposed product gates. Video buffering adds delay beyond the phone-only target. Measure 60-minute sessions, reconnects, interruptions and first calls after idle. Startup must be shown separately before the paid timer begins. If startup is unacceptable, pay for warm capacity or offer scheduled calls; zero idle GPU spend and instant guaranteed availability cannot both be assumed.
+
+More complete planning budget, superseding the earlier $5.69 delivery-only estimate: combined GPU/auxiliary $4.50/hour divided by 50% utilization = $4.50 per 30 paid minutes; add $1.50 audio/text/guards allowance and $0.024 WebRTC egress; apply 25% contingency, then add $1/session support/operational allocation: approximately $8.53, rounded to **$8.55/30 minutes**. Use **$17.10/60 minutes** conservatively. Rates, concurrency and utilization are assumptions needing a current US-host quote. Provider egress/storage and startup must fit the allowance or increase the budget.
+
+At 2.128 Mbps aggregate billed egress, 30 minutes uses 0.4788 GB, costing $0.02394 at Cloudflare's $0.05/GB list rate. Do not count the shared free tier as necessary for profitability. [Realtime pricing](https://developers.cloudflare.com/realtime/sfu/pricing/).
+
+| Scenario | Sell 30 / 60 minutes | Modeled total cost including fees | Contribution margin |
+|---|---:|---:|---:|
+| Approved clean, 5% combined fees/losses + $0.30 | $59 / $109 | $11.80 / $22.85 | 80.0% / 79.0% |
+| Approved high-risk, 18% combined fees/losses + $0.50 | $139 / $269 | $34.07 / $66.02 | 75.5% / 75.5% |
+
+These are per-session contribution margins, not company margins or processor quotes. The expanded high-risk recommendation **replaces $129 with $139** for 30 minutes: $129 leaves slightly less than a 300% return under the rounded budget. Before overhead, 300% price floors are ($8.55+$0.30)/(0.25-0.05)=$44.25 clean and ($8.55+$0.50)/(0.25-0.18)=$129.29 high-risk. Unallocated acquisition/legal/fixed costs require additional headroom.
+
+At 25% utilization, the same 30-minute delivery budget rises to about $14.15; at 10%, to $31.03. The proposed prices then miss the 300% target. One $4.50/hour group left running for 720 hours costs $3,240 before other expenses. Start with booked sessions or a narrow availability window, one verified concurrent call per group, and automatic teardown. Do not sell unlimited video or rely on claimed Lite concurrency for Pro capacity.
+
 Test 100 clips across the three characters, first-after-idle and concurrent requests, with actual billed seconds, duration, acceptance and p50/p95 latency. Test phone interruption/disconnect and full allowance redemption. Verify cross-account isolation, deleted memory, forged/replayed payments, duplicate jobs, provider timeout, cancellation, refund ordering and spending caps. Do not enable paid flags until these pass with approved providers. Existing offline tests validate economics only.

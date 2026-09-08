@@ -35,7 +35,7 @@ Cloudflare hosts the app, memory, text and audio. Hosted **fal-ai/flashhead** su
 
 Hosted requests avoid renting our own idle GPU. **Runware Serverless Compute** is a custom-model beta candidate: RTX PRO 6000 at published $0.000553/GPU-second, about $1.99/hour. Access, intended-use approval and speed remain unconfirmed. Held-warm/reserved workers cost money. An assumed 60 billed seconds gives about $0.093/clip including other costs and retry buffer; this is not a benchmark or a ready FlashHead endpoint. [Compute](https://runware.ai/serverless/compute), [terms](https://runware.ai/terms).
 
-Keep live video disabled. Later test FlashHead Pro with indicative $59/30 minutes for an approved clean service or $129/30 under high-risk fees. Exclude these sales from MVP forecasts. The heavy eight-H100 LiveAvatar route is too costly for the default product.
+Keep live video disabled. Later test FlashHead Pro with indicative $59/30 minutes for an approved clean service or $139/30 under high-risk fees. Exclude these sales from MVP forecasts. The heavy eight-H100 LiveAvatar route is too costly for the default product.
 
 ## Competition and switching
 

@@ -2,6 +2,21 @@
 
 ## MVP routing decision
 
+## Platform shortlist for live video
+
+| Platform | Intended job | US launch condition |
+|---|---|---|
+| Cloudflare Workers, D1, R2, Realtime SFU/TURN | App, memory, assets, WebRTC | Review developer/model terms and data processing; global routing is not a US-only residency guarantee. Hosted AI permission is separate from infrastructure permission. |
+| TensorDock US host | Prototype two-5090 FlashHead Pro renderer and auxiliary inference | Confirm paired hardware, networking, price, underlying host agreement and the complete intended business in writing. Current AUP is not blanket adult-business approval. |
+| Runware custom compute | Alternative scale-to-zero custom container | Beta access, equivalent real-time performance, US-region selection, session transport and intended-use approval must be established. Not a confirmed fallback. |
+| fal | Existing non-explicit short clips | No explicit-content routing. This is not the selected self-hosted live-video runtime. |
+| Stripe | Candidate clean-service checkout | Merchant eligibility/underwriting first; explicit sexual-content business is prohibited. Ordinary pricing must not be assumed for an ineligible business. |
+| CCBill | Candidate adult-service checkout | AI-companion acceptance, card-network obligations, fees, reserves and registration quoted and approved first. |
+| Yoti | Hosted age assurance where required | Confirm state-appropriate method and contract; retain minimal proof, not raw identity documents. |
+| Resend | Neutral sign-in and receipts | Confirm whole-business AUP eligibility; never include intimate histories in mail. |
+
+This list describes a conditional route to launch, not a legal certification. US hosting alone does not determine legality. Founder must obtain a current review covering applicable state AI-companion duties, age assurance, privacy/biometrics, recurring billing, synthetic-media rights and any adult-content obligations. Original fictional adults and licensed preset voices reduce impersonation risk; they do not waive these obligations. Start only in reviewed states. No provider accounts or approvals have been obtained by this work.
+
 Recommend a genuinely non-explicit adult-only pilot. Free voice messages do not imply unrestricted content. [fal's AUP](https://fal.ai/legal/acceptable-use-policy) prohibits sexually explicit content and restricts sensitive personal data: route only permitted, sanitized scripts and original portraits, never full intimate histories. If sanitization cannot preserve a permitted request, decline that clip. Do not bypass provider filters.
 
 [Runware custom compute](https://runware.ai/serverless/compute) is a beta candidate, not approved infrastructure. Its [terms](https://runware.ai/terms) and actual underlying model licenses still govern use; obtain eligibility for the complete service and any resale arrangement. Scale-to-zero does not mean all hosting costs disappear. No unrestricted adult GPU route is confirmed.
