@@ -1,5 +1,11 @@
 # US adult PWA: eligibility and costs
 
+**Current stage is a founder-operated private prototype and fundraising demonstration, with no customer billing or public adult access.** The founder can show a non-explicit product preview using synthetic profiles. The commercial launch conditions below remain deferred requirements; they are not waived by calling something a demo.
+
+No merchant registration or processor integration is purchased now because payments are disabled. No public age-service subscription is purchased because the prototype is not a public adult service. Do not accept payments through a prohibited route or expose an adult beta to avoid those costs. Before any external restricted-content session, determine the applicable access, age, content, consent and provider conditions; manual invitations alone do not establish an exemption. A public preview does not prove adult capability or legal clearance.
+
+The founder may perform source/terms research and build an internal synthetic-data prototype without automatically buying the previous paid-launch legal/security packages. If the intended activity requires specialist advice or permission that is not available within the cap, stop that activity or obtain separately funded advice. The current $100 local planning cap is not a universal compliance budget, legal opinion, insurance policy or authorization to receive investment funds. Local neutral benchmarks do not qualify intended adult output; see [LOCAL_POC](LOCAL_POC.md).
+
 The launch scope is original fictional adults, lawful consensual adult content, clear AI disclosure and verified access. Models' commercial licenses, provider policies, card-network rules and US law are distinct. None of the providers has approved this project yet.
 
 **Adult-service eligibility is a selection criterion, not a post-launch check.** Request acceptance for the actual explicit-content service, including generation, storage, private delivery, visual calls and billing. Do not describe it merely as a generic chatbot to obtain approval. A host accepting stored content does not automatically approve model APIs or every underlying provider.
@@ -59,7 +65,7 @@ Runware custom compute is an alternative requiring access, model/container suppo
 | dphn/Dolphin3.0-Mistral-24B | Public repository has no declared license tag or separate license file in the checked metadata. | Exact fine-tune license unresolved; base-model rights alone are insufficient evidence. [Card](https://huggingface.co/dphn/Dolphin3.0-Mistral-24B). |
 | Sao10K/L3.3-70B-Euryale-v2.3 | Roleplay training is documented, but repository tags `llama3` while its stated base is Llama 3.3; no separate license file found. | Defer: resolve applicable Meta and fine-tune terms; 70B is also outside the cheap baseline. No adult-quality benchmark established here. [Card](https://huggingface.co/Sao10K/L3.3-70B-Euryale-v2.3). |
 
-TensorDock remains a candidate, not an approved adult host. Its AUP also has a written-permission provision for selling/reselling or exploiting the service; confirm how that applies to this commercial application. No account application, provider contact, model-weight download or paid inference was performed. This review establishes documented terms and unresolved questions, not a legal opinion that a particular output or nationwide service is lawful.
+TensorDock remains a candidate, not an approved adult host. Its AUP also has a written-permission provision for selling/reselling or exploiting the service; confirm how that applies to this commercial application. No account application, provider contact or paid inference was performed. Small model downloads and neutral local benchmarks are documented separately in LOCAL_POC. This review establishes documented terms and unresolved questions, not a legal opinion that a particular output or nationwide service is lawful.
 
 ## Can age assurance be internal?
 

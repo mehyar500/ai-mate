@@ -1,6 +1,38 @@
 {
   "as_of": "2026-09-07",
   "currency": "USD",
+  "active_stage": "local_poc",
+  "poc": {
+    "local_kw": 0.3,
+    "electricity_per_kwh": 0.2,
+    "fallback_gpu_hour": 0.6,
+    "large_gpu_hour": 2.5,
+    "storage_monthly": 0,
+    "incremental_tools_monthly": 0,
+    "web_monthly": 0,
+    "contingency": 75,
+    "quarter_cap": 100,
+    "months": [
+      {
+        "name": "M1 build/demo",
+        "local_hours": 100,
+        "fallback_hours": 0,
+        "large_hours": 0
+      },
+      {
+        "name": "M2 demos",
+        "local_hours": 30,
+        "fallback_hours": 0,
+        "large_hours": 0
+      },
+      {
+        "name": "M3 demos",
+        "local_hours": 30,
+        "fallback_hours": 0,
+        "large_hours": 0
+      }
+    ]
+  },
   "scope": "Adult content is mandatory for launch; all prices depend on validated adult capability, approved providers and measured fulfillment cost",
   "assumptions": {
     "gpu_hour": 0.9,
@@ -53,9 +85,33 @@
   "launch": {
     "settlement_lag_months": 1,
     "months": [
-      {"name": "M1 build", "payers": 0, "new_payers": 0, "free_users": 25, "new_free": 25, "aux_hours": 120, "renderer_open_hours": 0},
-      {"name": "M2 pilot", "payers": 50, "new_payers": 50, "free_users": 25, "new_free": 0, "aux_hours": 720, "renderer_open_hours": 120},
-      {"name": "M3 pilot", "payers": 150, "new_payers": 110, "free_users": 25, "new_free": 0, "aux_hours": 720, "renderer_open_hours": 120}
+      {
+        "name": "M1 build",
+        "payers": 0,
+        "new_payers": 0,
+        "free_users": 25,
+        "new_free": 25,
+        "aux_hours": 120,
+        "renderer_open_hours": 0
+      },
+      {
+        "name": "M2 pilot",
+        "payers": 50,
+        "new_payers": 50,
+        "free_users": 25,
+        "new_free": 0,
+        "aux_hours": 720,
+        "renderer_open_hours": 120
+      },
+      {
+        "name": "M3 pilot",
+        "payers": 150,
+        "new_payers": 110,
+        "free_users": 25,
+        "new_free": 0,
+        "aux_hours": 720,
+        "renderer_open_hours": 120
+      }
     ]
   },
   "plans": [

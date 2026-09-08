@@ -1,6 +1,20 @@
-# Scene-ready PWA: implementation contract
+# Founder demo and future PWA implementation
 
 No app has been implemented here. This document specifies a measured prototype and release gates.
+
+## Active scope: local proof before remote inference
+
+The detailed active experiment is [LOCAL_POC](LOCAL_POC.md), the additional document requested by the founder. It supersedes any cloud fallback in the earlier demo plan. Use no remote inference until the founder changes this decision. Benchmark scripts now exist; there is still no complete application or visual-call integration.
+
+Use the founder's existing RTX 4060 Ti (16,380 MiB reported VRAM) and about 47.7 GiB system RAM. This is an inventory result, not an inference benchmark. Run a loopback-only server and browser UI with a synthetic profile, local SQLite/file memory and an explicit reset/delete control. No public model endpoint, user signup, customer payment, camera upload or production scheduler.
+
+Start with the explicitly pinned Qwen3-4B-Instruct-2507 Q4_K_M for dialogue and Kokoro-82M CPU speech; faster-whisper-small is the later microphone candidate. Runtime caches consume memory beyond weights. FLUX.2 Klein 4B's card reports roughly 13GB VRAM, so test it alone for scenes rather than assuming it coexists with dialogue/rendering. Small dialogue/speech weights were downloaded for local neutral benchmarks; see LOCAL_POC for actual results. Large Wan rentals are deferred.
+
+Demo memory should genuinely persist across a restart. Keep three permitted, original photorealistic scenes and label reused/prepared assets. A manually triggered check-in can show the proposed interaction if it is labeled as manual. Don't implement vector search, automatic pushes, subscriptions or production WebRTC just to demonstrate the concept. The founder operates a local live demo or shows an honest recording; the public preview remains non-explicit.
+
+Log only synthetic-test metrics: model revision, host/device, actual billed hours, prompt/output token counts, first audio delay, job completion delay, accepted/rejected result and whether content was live or prepared. Include a cold run and failed/cancelled job; show p50/p95 with sample counts instead of quoting author FPS as product latency. Never imply a prerecorded clip is a live call or that prepared delivery speed equals generation speed.
+
+The first demo proves the interaction and selected measured components. Adult commercial capability, provider acceptance and full live visual calling remain separately unresolved. The sections below retain the model/license evidence and future paid-service contract; their always-on capacity, 25-user free cohort and paid entitlements are **deferred**, not current POC requirements. Source requirements ADULT-01 through ADULT-04 still apply before that launch.
 
 ## First milestone: adult viability
 
@@ -14,7 +28,7 @@ If Qwen, Klein or another candidate cannot support the intended adult scope, rea
 
 ## Model evidence checked September 7, 2026
 
-This is a current availability and terms review, not a claim that every listed model was released in 2026. RealVisXL and Magnum are older releases still available. No inference was run. No reviewed source establishes this project's complete adult experience, delivery cost or US deployment eligibility. Author claims, general demonstrations and a measured product acceptance test are different evidence levels. An NSFW label alone does not specify the supported content or quality.
+This catalog is a source-based availability and terms review, not a claim that every listed model was released in 2026. RealVisXL and Magnum are older releases still available. Separate neutral local dialogue/speech benchmarks are recorded in LOCAL_POC. No reviewed source establishes this project's complete adult experience, delivery cost or US deployment eligibility. Author claims, general demonstrations and a measured product acceptance test are different evidence levels. An NSFW label alone does not specify the supported content or quality.
 
 | Component / exact model | Evidence found | License and decision |
 |---|---|---|
@@ -34,7 +48,7 @@ Audit snapshot: RealVisXL V5.0 revision `ac93e0dda1f6d448cae19bbfab8c5e720a5e48b
 
 FlashHead Lite requires special attention: its authors identify an LTX-Video VAE dependency, while Lightricks' current policy expressly restricts explicit content. The exact VAE provenance and applicable historical/current terms have not been established; do not automatically apply a top-level Apache tag to that component or assume a policy applies retroactively. This is an unresolved release gate. Excluded models and terms are listed in [USA](USA.md).
 
-## One-provider deployment hypothesis
+## Deferred commercial deployment hypothesis
 
 Use one selected TensorDock US provider for the inference services. Keep a warm dialogue/audio pool; launch/stop the scene and renderer worker separately. Forecast one visual session per renderer until full-pipeline tests prove concurrency. Load image editing before the call, release it, then initialize FlashHead rather than assuming image and video models coexist within 24GB.
 

@@ -1,0 +1,484 @@
+{
+  "local_date": "2026-09-07",
+  "time_zone": "America/New_York",
+  "scope": "Neutral local component tests only. No ASR, portrait renderer, video, WebRTC, production app or adult-capability validation.",
+  "versions": {
+    "kokoro-onnx": "0.6.1",
+    "onnxruntime": "1.29.0",
+    "numpy": "2.5.3",
+    "soundfile": "0.14.0",
+    "phonemizer": "3.4.0"
+  },
+  "dialogue_4b": {
+    "measured_at": "2026-09-08T03:56:11.237304+00:00",
+    "model": "qwen3:4b-instruct-2507-q4_K_M",
+    "context_tokens": 4096,
+    "sample_count": 10,
+    "test_scope": "Neutral short-reply local LLM only; not audio, video, adult quality, or end-to-end call latency",
+    "cold": {
+      "first_token_s": 1.8720114000025205,
+      "first_sentence_s": 1.9453713000402786,
+      "total_s": 1.9566384000354446,
+      "output_tokens": 8,
+      "input_tokens": 56,
+      "tokens_per_second": 93.78663540445487,
+      "model_load_s": 1.8053038,
+      "reply": "What time is the gardening class?"
+    },
+    "warm": {
+      "first_token_s": {
+        "p50": 0.05200169997988269,
+        "p95": 0.06251069996505976
+      },
+      "first_sentence_s": {
+        "p50": 0.1197140000294894,
+        "p95": 0.18473189999349415
+      },
+      "total_s": {
+        "p50": 0.1842496999888681,
+        "p95": 0.285906899953261
+      },
+      "tokens_per_second": {
+        "p50": 97.37317144419394,
+        "p95": 104.6285034200442
+      }
+    },
+    "samples": [
+      {
+        "first_token_s": 0.0557909999624826,
+        "first_sentence_s": 0.1212206999771297,
+        "total_s": 0.13219420000677928,
+        "output_tokens": 8,
+        "input_tokens": 56,
+        "tokens_per_second": 104.6285034200442,
+        "model_load_s": 0.0021696,
+        "reply": "What time is the gardening class?"
+      },
+      {
+        "first_token_s": 0.05441469996003434,
+        "first_sentence_s": 0.08988089999184012,
+        "total_s": 0.285906899953261,
+        "output_tokens": 22,
+        "input_tokens": 51,
+        "tokens_per_second": 94.98357215945151,
+        "model_load_s": 0.0026355,
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615"
+      },
+      {
+        "first_token_s": 0.06251069996505976,
+        "first_sentence_s": 0.18473189999349415,
+        "total_s": 0.19571810000343248,
+        "output_tokens": 13,
+        "input_tokens": 53,
+        "tokens_per_second": 97.51926078539957,
+        "model_load_s": 0.0023051,
+        "reply": "What type of pasta and sauce do you want to use?"
+      },
+      {
+        "first_token_s": 0.04631499998504296,
+        "first_sentence_s": 0.15735019999556243,
+        "total_s": 0.1683002999634482,
+        "output_tokens": 12,
+        "input_tokens": 56,
+        "tokens_per_second": 98.15388893887466,
+        "model_load_s": 0.0028683,
+        "reply": "My fictional demo calendar features a piano lesson on Friday."
+      },
+      {
+        "first_token_s": 0.05182849999982864,
+        "first_sentence_s": 0.07582289999118075,
+        "total_s": 0.2500430999789387,
+        "output_tokens": 19,
+        "input_tokens": 55,
+        "tokens_per_second": 95.89276161059463,
+        "model_load_s": 0.0024281,
+        "reply": "Great choice! Twenty minutes of reading is a perfect, focused way to enjoy and grow."
+      },
+      {
+        "first_token_s": 0.05200169997988269,
+        "first_sentence_s": 0.1197140000294894,
+        "total_s": 0.13094420003471896,
+        "output_tokens": 8,
+        "input_tokens": 56,
+        "tokens_per_second": 101.34792743488394,
+        "model_load_s": 0.0022172,
+        "reply": "What time is the gardening class?"
+      },
+      {
+        "first_token_s": 0.05455959995742887,
+        "first_sentence_s": 0.08978219999698922,
+        "total_s": 0.2855882999720052,
+        "output_tokens": 22,
+        "input_tokens": 51,
+        "tokens_per_second": 95.22325525026403,
+        "model_load_s": 0.0022774,
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615"
+      },
+      {
+        "first_token_s": 0.05107929999940097,
+        "first_sentence_s": 0.17334780003875494,
+        "total_s": 0.1842496999888681,
+        "output_tokens": 13,
+        "input_tokens": 53,
+        "tokens_per_second": 97.37317144419394,
+        "model_load_s": 0.0022568,
+        "reply": "What type of pasta and sauce do you want to use?"
+      },
+      {
+        "first_token_s": 0.05715870001586154,
+        "first_sentence_s": 0.16840239998418838,
+        "total_s": 0.17930119996890426,
+        "output_tokens": 12,
+        "input_tokens": 56,
+        "tokens_per_second": 98.19324430479183,
+        "model_load_s": 0.0025003,
+        "reply": "My fictional demo calendar features a piano lesson on Friday."
+      },
+      {
+        "first_token_s": 0.047850699978880584,
+        "first_sentence_s": 0.06945339997764677,
+        "total_s": 0.24361809995025396,
+        "output_tokens": 19,
+        "input_tokens": 55,
+        "tokens_per_second": 96.96895462363287,
+        "model_load_s": 0.0023659,
+        "reply": "Great choice! Twenty minutes of reading is a perfect, focused way to enjoy and grow."
+      }
+    ],
+    "gpu_snapshot": "NVIDIA GeForce RTX 4060 Ti, 16380 MiB, 3161 MiB, 595.97",
+    "resident_models": {
+      "models": [
+        {
+          "name": "qwen3:4b-instruct-2507-q4_K_M",
+          "model": "qwen3:4b-instruct-2507-q4_K_M",
+          "size": 3178149969,
+          "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen3",
+            "families": [
+              "qwen3"
+            ],
+            "parameter_size": "4.0B",
+            "quantization_level": "Q4_K_M"
+          },
+          "expires_at": "2026-09-08T00:01:11.1931034-04:00",
+          "size_vram": 3178149969,
+          "context_length": 4096
+        }
+      ]
+    }
+  },
+  "dialogue_1_5b": {
+    "model": "qwen2.5:1.5b",
+    "context_tokens": 4096,
+    "sample_count": 10,
+    "test_scope": "Neutral short-reply local LLM only; not audio, video, adult quality, or end-to-end call latency",
+    "cold": {
+      "first_token_s": 4.23459659999935,
+      "first_sentence_s": 4.329281299957074,
+      "total_s": 4.334237999981269,
+      "output_tokens": 20,
+      "input_tokens": 56,
+      "tokens_per_second": 200.43695255657335,
+      "model_load_s": 4.1756876,
+      "reply": "What is your interest level in gardening, and do you have any specific questions about the class?"
+    },
+    "warm": {
+      "first_token_s": {
+        "p50": 0.02761879999889061,
+        "p95": 0.040224900003522635
+      },
+      "first_sentence_s": {
+        "p50": 0.09748430002946407,
+        "p95": 0.12662930000806227
+      },
+      "total_s": {
+        "p50": 0.10238070000195876,
+        "p95": 0.13197410001885146
+      },
+      "tokens_per_second": {
+        "p50": 216.12976431049202,
+        "p95": 235.26951429915823
+      }
+    },
+    "samples": [
+      {
+        "first_token_s": 0.01484730001538992,
+        "first_sentence_s": 0.10088510002242401,
+        "total_s": 0.10587899998063222,
+        "output_tokens": 20,
+        "input_tokens": 56,
+        "tokens_per_second": 219.44743136781585,
+        "model_load_s": 0.0021245,
+        "reply": "What is your interest level in gardening, and do you have any specific questions about the class?"
+      },
+      {
+        "first_token_s": 0.01675990002695471,
+        "first_sentence_s": 0.08664090000092983,
+        "total_s": 0.09179299999959767,
+        "output_tokens": 16,
+        "input_tokens": 51,
+        "tokens_per_second": 213.28498873588654,
+        "model_load_s": 0.0021395,
+        "reply": "The walk was refreshing, and I'm looking forward to the next one."
+      },
+      {
+        "first_token_s": 0.028796200000215322,
+        "first_sentence_s": 0.11783719999948516,
+        "total_s": 0.12281299999449402,
+        "output_tokens": 20,
+        "input_tokens": 53,
+        "tokens_per_second": 212.96986476413588,
+        "model_load_s": 0.0024727,
+        "reply": "What type of pasta do you prefer, and what sauce would you like to serve it with?"
+      },
+      {
+        "first_token_s": 0.040224900003522635,
+        "first_sentence_s": 0.09073569998145103,
+        "total_s": 0.0957598999957554,
+        "output_tokens": 12,
+        "input_tokens": 56,
+        "tokens_per_second": 216.20063418852695,
+        "model_load_s": 0.0021754,
+        "reply": "The fictional demo calendar shows a piano lesson on Friday."
+      },
+      {
+        "first_token_s": 0.02895479998551309,
+        "first_sentence_s": 0.09775279997847974,
+        "total_s": 0.1026791000040248,
+        "output_tokens": 16,
+        "input_tokens": 55,
+        "tokens_per_second": 217.21422753190333,
+        "model_load_s": 0.0026757,
+        "reply": "Absolutely, reading for twenty minutes is a great way to start your day!"
+      },
+      {
+        "first_token_s": 0.038122400001157075,
+        "first_sentence_s": 0.12662930000806227,
+        "total_s": 0.13197410001885146,
+        "output_tokens": 20,
+        "input_tokens": 56,
+        "tokens_per_second": 213.80770135340276,
+        "model_load_s": 0.0027501,
+        "reply": "What is your interest level in gardening, and do you have any specific questions about the class?"
+      },
+      {
+        "first_token_s": 0.02761879999889061,
+        "first_sentence_s": 0.09748430002946407,
+        "total_s": 0.10238070000195876,
+        "output_tokens": 16,
+        "input_tokens": 51,
+        "tokens_per_second": 213.9809824401856,
+        "model_load_s": 0.0023152,
+        "reply": "The walk was refreshing, and I'm looking forward to the next one."
+      },
+      {
+        "first_token_s": 0.014854400011245161,
+        "first_sentence_s": 0.10238990001380444,
+        "total_s": 0.10771140002179891,
+        "output_tokens": 20,
+        "input_tokens": 53,
+        "tokens_per_second": 216.12976431049202,
+        "model_load_s": 0.002439,
+        "reply": "What type of pasta do you prefer, and what sauce would you like to serve it with?"
+      },
+      {
+        "first_token_s": 0.021477700036484748,
+        "first_sentence_s": 0.07116940000560135,
+        "total_s": 0.07606769999256358,
+        "output_tokens": 12,
+        "input_tokens": 56,
+        "tokens_per_second": 219.9897338124221,
+        "model_load_s": 0.0061816,
+        "reply": "The fictional demo calendar shows a piano lesson on Friday."
+      },
+      {
+        "first_token_s": 0.037409799988381565,
+        "first_sentence_s": 0.07079739996697754,
+        "total_s": 0.07581670000217855,
+        "output_tokens": 9,
+        "input_tokens": 55,
+        "tokens_per_second": 235.26951429915823,
+        "model_load_s": 0.0024204,
+        "reply": "Sure, make it a productive read!"
+      }
+    ],
+    "gpu_snapshot": "NVIDIA GeForce RTX 4060 Ti, 16380 MiB, 1241 MiB, 595.97",
+    "resident_models": {
+      "models": [
+        {
+          "name": "qwen2.5:1.5b",
+          "model": "qwen2.5:1.5b",
+          "size": 1166236712,
+          "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+          "details": {
+            "parent_model": "",
+            "format": "gguf",
+            "family": "qwen2",
+            "families": [
+              "qwen2"
+            ],
+            "parameter_size": "1.5B",
+            "quantization_level": "Q4_K_M"
+          },
+          "expires_at": "2026-09-07T23:59:27.6499843-04:00",
+          "size_vram": 1166236712,
+          "context_length": 4096
+        }
+      ]
+    }
+  },
+  "speech_cpu": {
+    "model": "Kokoro-82M ONNX v1.0",
+    "voice": "af_sarah",
+    "runtime": "CPU ONNX Runtime",
+    "load_s": 0.8450054000131786,
+    "samples": [
+      {
+        "text": "How did your gardening class go today?",
+        "generation_s": 0.5630827000131831,
+        "audio_s": 2.0573333333333332,
+        "realtime_factor": 0.27369541478281745,
+        "sample_rate": 24000
+      },
+      {
+        "text": "That sounds like a pleasant way to spend the afternoon.",
+        "generation_s": 0.5075885999831371,
+        "audio_s": 2.9432916666666666,
+        "realtime_factor": 0.17245609931617506,
+        "sample_rate": 24000
+      },
+      {
+        "text": "You mentioned a piano lesson on Friday. Are you looking forward to it?",
+        "generation_s": 0.6249170999508351,
+        "audio_s": 4.064,
+        "realtime_factor": 0.15376897144459525,
+        "sample_rate": 24000
+      },
+      {
+        "text": "What would you like to cook for dinner tonight?",
+        "generation_s": 0.3839191000442952,
+        "audio_s": 2.0472916666666667,
+        "realtime_factor": 0.18752535669203388,
+        "sample_rate": 24000
+      },
+      {
+        "text": "Welcome back. We can pick up where we left off.",
+        "generation_s": 0.468584300018847,
+        "audio_s": 2.7472916666666665,
+        "realtime_factor": 0.1705622689080508,
+        "sample_rate": 24000
+      }
+    ],
+    "scope": "Whole-utterance generation only; excludes ASR, LLM, streaming first audio, video and playback"
+  },
+  "voice_reply_default_threads": {
+    "measured_at": "2026-09-08T03:56:23.156821+00:00",
+    "model": "qwen3:4b-instruct-2507-q4_K_M",
+    "voice": "af_sarah",
+    "warmup": true,
+    "samples": [
+      {
+        "text": "What time is the gardening class?",
+        "llm_s": 0.11415470001520589,
+        "tts_s": 0.36736249999376014,
+        "ready_s": 0.48151720000896603,
+        "audio_s": 1.918
+      },
+      {
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615",
+        "llm_s": 0.26285250001819804,
+        "tts_s": 1.2375127000268549,
+        "ready_s": 1.500365200045053,
+        "audio_s": 4.468
+      },
+      {
+        "text": "What type of pasta and sauce do you want to use?",
+        "llm_s": 0.2190690000425093,
+        "tts_s": 1.9048962999950163,
+        "ready_s": 2.1239653000375256,
+        "audio_s": 2.8466666666666667
+      },
+      {
+        "text": "My fictional demo calendar has a piano lesson on Friday.",
+        "llm_s": 0.3480762999970466,
+        "tts_s": 2.327935700013768,
+        "ready_s": 2.6760120000108145,
+        "audio_s": 3.711291666666667
+      },
+      {
+        "text": "Great choice! Twenty minutes of reading is a perfect, focused way to enjoy and grow.",
+        "llm_s": 0.4655802000197582,
+        "tts_s": 2.8569246999686584,
+        "ready_s": 3.3225048999884166,
+        "audio_s": 5.140625
+      }
+    ],
+    "ready_p50_s": 2.1239653000375256,
+    "ready_p95_s": 3.3225048999884166,
+    "scope": "Typed short prompt to complete speech waveform in memory. Sequential LLM + CPU TTS; no ASR, video, WebRTC, playback, or persistent memory app."
+  },
+  "voice_reply_four_threads": {
+    "measured_at": "2026-09-08T03:57:15.181411+00:00",
+    "model": "qwen3:4b-instruct-2507-q4_K_M",
+    "voice": "af_sarah",
+    "tts_threads": 4,
+    "warmup": true,
+    "samples": [
+      {
+        "text": "What time is the gardening class?",
+        "llm_s": 0.11089249997166917,
+        "tts_s": 0.404773699992802,
+        "ready_s": 0.5156661999644712,
+        "audio_s": 1.918
+      },
+      {
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615",
+        "llm_s": 0.26429610000923276,
+        "tts_s": 1.4020240999525413,
+        "ready_s": 1.666320199961774,
+        "audio_s": 4.468
+      },
+      {
+        "text": "What type of pasta and sauce do you want to use?",
+        "llm_s": 0.18553960003191605,
+        "tts_s": 1.3153726999880746,
+        "ready_s": 1.5009123000199907,
+        "audio_s": 2.8466666666666667
+      },
+      {
+        "text": "My fictional demo calendar has a piano lesson on Friday.",
+        "llm_s": 0.15157640003599226,
+        "tts_s": 1.6294343000045046,
+        "ready_s": 1.7810107000404969,
+        "audio_s": 3.711291666666667
+      },
+      {
+        "text": "Great choice! Twenty minutes of reading is a perfect, focused way to enjoy and grow.",
+        "llm_s": 0.23096660000737756,
+        "tts_s": 2.1231598000158556,
+        "ready_s": 2.354126400023233,
+        "audio_s": 5.140625
+      }
+    ],
+    "ready_p50_s": 1.666320199961774,
+    "ready_p95_s": 2.354126400023233,
+    "scope": "Typed short prompt to complete speech waveform in memory. Sequential LLM + CPU TTS; no ASR, video, WebRTC, playback, or persistent memory app."
+  },
+  "speech_files": {
+    "kokoro-v1.0.onnx": {
+      "bytes": 325505369,
+      "sha256": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a"
+    },
+    "voices-v1.0.bin": {
+      "bytes": 28214398,
+      "sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d"
+    }
+  },
+  "rejected_trials": [
+    "qwen3:4b resolved to thinking-only variant and did not return a valid short answer within 64 tokens. Not counted as conversational performance.",
+    "kokoro-onnx 0.5.0 failed speed input dtype; 0.6.1 succeeded."
+  ]
+}

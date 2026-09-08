@@ -3,9 +3,47 @@ import math
 import subprocess
 import sys
 import unittest
-from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, ROOT
+from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, demo_forecast, ROOT
 
 class EconomicsTests(unittest.TestCase):
+    def test_demo_budget_includes_power_and_single_buffer(self):
+        d=demo_forecast(load())
+        self.assertEqual(d['months'][0]['expense'],6)
+        self.assertAlmostEqual(d['months'][1]['expense'],1.8)
+        self.assertAlmostEqual(d['expense'],9.6)
+        self.assertAlmostEqual(d['funding'],84.6)
+        self.assertEqual(d['first_demo_funding'],81)
+        self.assertTrue(d['within_cap'])
+
+    def test_demo_rate_overrun_is_visible(self):
+        c=load();c['poc']['incremental_tools_monthly']=10
+        d=demo_forecast(c)
+        self.assertAlmostEqual(d['funding'],114.6)
+        self.assertFalse(d['within_cap'])
+        self.assertLess(d['headroom'],0)
+
+    def test_demo_is_independent_of_deferred_commercial_costs(self):
+        c=load();before=demo_forecast(c)
+        c['assumptions'].update(registration=10000,founder_labor=5000,payers=500)
+        self.assertEqual(demo_forecast(c),before)
+
+    def test_demo_optional_spend_can_be_removed(self):
+        c=load();c['poc']['incremental_tools_monthly']=10
+        c['poc']['incremental_tools_monthly']=0
+        self.assertAlmostEqual(demo_forecast(c)['funding'],84.6)
+        c['poc']['contingency']=0
+        d=demo_forecast(c)
+        self.assertEqual(d['expense'],d['funding'])
+
+    def test_demo_invalid_inputs(self):
+        for key,value in [('local_kw',-1),('quarter_cap',True),('fallback_gpu_hour',math.nan)]:
+            c=load();c['poc'][key]=value
+            with self.assertRaises(ValueError): demo_forecast(c)
+        c=load();c['poc']['months'][0]['local_hours']=-1
+        with self.assertRaises(ValueError): demo_forecast(c)
+        c=load();c['poc']['months']=[]
+        with self.assertRaises(ValueError): demo_forecast(c)
+
     def test_renderer_capacity_and_idle_allocation(self):
         d=calculate(load())
         self.assertAlmostEqual(d["renderer_minute"],.90/(60*1*.5))

@@ -2,19 +2,20 @@
 
 **Lawful consensual adult content is a mandatory launch requirement. If the intended adult experience cannot be delivered within accepted model, host and payment terms, the product does not launch.** This decision supersedes earlier suggestions to launch a non-explicit substitute.
 
-A fictional adult companion with editable memory, opt-in check-ins, bounded free text/recorded voice, paid calls, and scene preparation before visual calls. Target roughly 60% direct contribution margin and positive cash after overhead. First validate adult capability and provider eligibility; then build the commercial experience around the verified route.
+**Current stage: a local proof of concept on the founder's RTX 4060 Ti, 16GB VRAM and 48GB RAM. No remote inference before local validation.** The founder is the only engineer. Keep a $100 planning cap for the quarter, including a $75 contingency pool; estimated additional electricity is $9.60 for 160 hours. Public adult access and customer billing are deferred.
 
-Five active product documents:
+Six active product documents, including the newly requested local POC plan:
 
 1. This README: scope.
-2. [REPORT](docs/REPORT.md): offer, launch budget and development estimate.
+2. [REPORT](docs/REPORT.md): small demo scope, founder build path and funding evidence.
 3. [BUILD](docs/BUILD.md): models, scene flow, memory, PWA and measurements.
 4. [ECONOMICS](docs/ECONOMICS.md): generated costs, funding and sensitivity.
 5. [USA](docs/USA.md): commercial licenses, hosting, US release conditions and age assurance.
+6. [LOCAL_POC](docs/LOCAL_POC.md): local hardware allocation, benchmark commands, measured findings and the visual-call experiment.
 
-Private inference candidate: a selected TensorDock US host, subject to full-business acceptance. Cloudflare serves the web/control plane, media transport and eligible neutral AI tasks; an approved processor handles payments. One inference provider does not mean one model or one GPU. Self-hosting does not override licenses or establish nationwide legality.
+Use the existing computer and loopback services only for current inference. Model downloads use internet access. TensorDock/Cloudflare are deferred deployment candidates; no payment processor is needed for this unpaid stage. Self-hosting does not override licenses or establish nationwide legality.
 
-This is documentation and an offline calculator, not a working app. No production account, paid inference, deployment or processor approval has been created. Earlier plans remain in Git history. Catalog JSON and agent/factory files are reference/history.
+This repository contains documentation, an offline calculator and local component benchmark scripts, not a working PWA or validated visual-call app. Local model tests use synthetic neutral prompts. No production account, paid inference, deployment or processor approval has been created. Earlier plans remain in Git history. Catalog JSON and agent/factory files are reference/history.
 
 Python 3.11+, standard library:
 
@@ -25,4 +26,4 @@ python -m compileall -q scripts tests
 git diff --check
 ```
 
-Keep the first private POC within $250 technical spending after funding authorization. The illustrated build month plus two paid pilot months needs $12,096.50 before relying on customer payouts, including a $1,500 buffer and unquoted review allowances. Round to $12,500 baseline; paid engineering is extra. The 0/50/150 payer scenario still loses $5,368.14 over the quarter. See the downside cases before committing funds.
+The local three-month forecast is $9.60 estimated electricity plus one $75 contingency pool, or $84.60; round the ceiling to $100. Existing hardware, storage and tools are already available. No paid engineers, customer revenue or cloud credits are assumed. The previous commercial-pilot model remains deferred calculator data. A demo must distinguish measured functionality from prepared media and unbuilt features.
