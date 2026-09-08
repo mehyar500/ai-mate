@@ -14,6 +14,12 @@ from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
 class PlanTests(unittest.TestCase):
+    def test_unrequested_stale_action_is_discarded_but_contextual_repeat_is_allowed(self):
+        data={'reply':'The garden is peaceful.','presentation':'video','scene':'fullbody','action':'wave','facts':[]}
+        for text in ['Tell me two sentences about a peaceful walk in the garden.', 'How are you?', 'What were we discussing?']:
+            self.assertEqual(validate_plan(data,text,'video','fullbody',['fullbody'])['action'],'none')
+        self.assertEqual(validate_plan(data,'Do that again.','video','fullbody',['fullbody'])['action'],'wave')
+
     def test_selected_mode_cannot_be_overridden_by_model_or_body_command(self):
         for mode in ['text','voice','video']:
             plan=validate_plan({'reply':'Okay','presentation':'video','action':'wave','scene':'fullbody','facts':[]},

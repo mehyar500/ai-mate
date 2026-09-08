@@ -12,6 +12,13 @@
 .mode-tabs button{border-color:transparent;background:transparent;padding:10px 19px}
 .mode-tabs button[aria-pressed="true"]{background:#e7edde;color:#21392e}
 .mode-tabs button[data-active="true"][aria-pressed="false"]:after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#bee39e;margin-left:5px;vertical-align:middle}
+#active-call{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 30px;padding:12px 14px;border:1px solid #c3e1aa44;border-radius:16px;background:#0f291fc7}
+#active-call div{display:flex;flex-direction:column;gap:4px;min-width:0}
+#active-call strong{font-size:12px;font-weight:550}
+#active-call strong:before{content:'';display:inline-block;width:6px;height:6px;background:#c2e49e;border-radius:50%;margin-right:7px}
+#active-call span{font-size:11px;color:#c0d1bc}
+#return-call{font-size:12px;padding:9px 13px}
+@media(max-width:600px){#active-call{margin:0 14px;gap:8px;padding:10px}#return-call{font-size:11px;padding:9px}}
 #unread{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:12px;background:#cfddbb;color:#183328;margin-left:3px}
 .conversation[data-mode="video"] .visual{inset:145px 0 165px}
 .conversation[data-mode="video"] .visual img,.conversation[data-mode="video"] .visual video,.conversation[data-mode="video"] .visual canvas{object-fit:contain;object-position:center}

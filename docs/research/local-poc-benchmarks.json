@@ -4544,10 +4544,20 @@
       ],
       "text_scroll_area_height": 492.98,
       "text_opens_at_latest_message": true,
-      "end_call_cancels_pending_video_without_media_restart": true
+      "end_call_cancels_pending_video_without_media_restart": true,
+      "persistent_call_bar_with_return_button": true,
+      "live_return_navigation": {
+        "same_video_source": true,
+        "before_time_s": 0.429737,
+        "after_time_s": 1.144833,
+        "paused_before": false,
+        "paused_after": false,
+        "ended_before": false,
+        "ended_after": false
+      }
     },
     "checks": {
-      "python_tests": 68,
+      "python_tests": 69,
       "node_tests": 7
     },
     "next_renderer_candidates": [
@@ -4569,6 +4579,30 @@
         "local_tested": false,
         "headline_hardware": "four H100 GPUs"
       }
-    ]
+    ],
+    "stale_action_regression": {
+      "request": "Tell me two sentences about a peaceful walk in the garden.",
+      "before": {
+        "incorrect_action": "wave",
+        "first_playback_s": 12.31,
+        "total_s": 18.171,
+        "first_text_s": 3.158,
+        "motion_s": 5.935,
+        "lip_render_s": 7.848
+      },
+      "fix": "Require a latest-turn cue for one of the three supported actions, or an explicit contextual repeat; prompt defaults ordinary conversation to none.",
+      "isolated_live_probe_after": {
+        "action": "none",
+        "planner_s": 1.053
+      },
+      "quality_limit": "Cue gating prevents this stale action; it is not a complete intent parser.",
+      "browser_after": {
+        "first_playback_s": 2.6,
+        "total_server_s": 6.88,
+        "stalls": 0,
+        "scene": "garden",
+        "note": "Same request, different model-selected scene and no unnecessary body motion; not controlled A/B."
+      }
+    }
   }
 }

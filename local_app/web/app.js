@@ -28,6 +28,10 @@ function controls(){
   $('mic').setAttribute('aria-pressed',String(microphone.enabled));
   $('end-call').hidden=replyMode==='text';$('sound').hidden=viewMode==='text'&&replyMode==='text';
   $('voice-view').hidden=viewMode!=='voice';$('voice-caption').textContent=$('call-state').textContent;
+  $('active-call').hidden=viewMode!=='text'||replyMode==='text';
+  $('active-call-title').textContent=(replyMode==='video'?'Video':'Voice')+' call active';
+  $('active-call-status').textContent=$('call-state').textContent;
+  $('return-call').textContent='Return to '+(replyMode==='video'?'video':'voice')+' call';
   if(viewMode==='voice')$('media-label').textContent='Voice call';
   $('replay').hidden=!lastMedia||(lastMedia.video?'video':'voice')!==viewMode||busy;
   $('unread').hidden=!unread;$('unread').textContent=String(unread);
@@ -228,6 +232,7 @@ for(const mode of ['text','voice','video'])$('mode-'+mode).addEventListener('cli
   if(mode==='text')$('chat').scrollTop=$('chat').scrollHeight;
 });
 $('end-call').addEventListener('click',async()=>{microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
+$('return-call').addEventListener('click',()=>{if(replyMode!=='text'){viewMode=replyMode;controls();notice();}});
 $("sound").addEventListener("click",()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;controls();});
 $("history-toggle").addEventListener("click",()=>{
   historyOpen=!historyOpen;

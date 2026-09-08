@@ -64,6 +64,16 @@ def validate_plan(data, user, mode, scene, available):
     action = data.get("action", "none")
     if action not in {"none", "closer", "farther", "wave"}:
         action = "none"
+    # A stale movement label from history must not spend a fresh GPU job.
+    # These are the three implemented actions, not an arbitrary-motion parser.
+    action_cues = {
+        "wave": r"\b(wav(?:e|ing)|rais\w*\b.{0,35}\bhands?|hands?\b.{0,20}\bup|greet\w*\b.{0,25}\bhands?)\b",
+        "closer": r"\b(closer|nearer|come here|approach|toward(?:s)? (?:me|the camera))\b",
+        "farther": r"\b(farther|further|back|away|retreat)\b",
+    }
+    continuation = r"\b(do (?:that|it)|again|repeat|same (?:move|action)|try (?:that|it))\b"
+    if action != "none" and not re.search(action_cues[action] + "|" + continuation, user, re.I):
+        action = "none"
     # Explicit repeat commands must still act even if the planner thinks the
     # previous turn already fulfilled them. Questions/negations keep LLM routing.
     direct = direct_motion_plan(user, available)
@@ -152,6 +162,8 @@ class Conversation:
             "scene: keep unless the user's conversation asks for another available setting. "
             "Choose fullbody when the user asks to see your full body, stand up, move around or show an action. "
             "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
+            "Default action is none. Never repeat an earlier action just because it is in history. "
+            "Talking ABOUT a walk or describing a scene is conversation, not a body-action command. "
             "For closer, farther and wave choose presentation video and scene fullbody. "
             "The app generates these body movements locally; success is not known until the video renders. "
             "Give a short natural reply of at most 10 words for a movement request, such as 'Let me try that.' "

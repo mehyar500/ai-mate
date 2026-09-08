@@ -18,6 +18,10 @@
     <button id="mode-voice" class="glass" aria-pressed="false">Voice call</button>
     <button id="mode-video" class="glass" aria-pressed="true">Video call</button>
   </nav>
+  <aside id="active-call" hidden aria-label="Ongoing call">
+    <div><strong id="active-call-title">Video call active</strong><span id="active-call-status" role="status">Mic off</span></div>
+    <button id="return-call">Return to video call</button>
+  </aside>
   <div id="voice-view" hidden><img src="/portrait/mira.png" alt="Mira"><p id="voice-caption">Voice call with Mira</p></div>
   <div class="scene-note"><span id="media-label">Living room · AI portrait</span><span id="call-state"></span></div>
   <button id="resume" class="resume" hidden>Play reply</button>
