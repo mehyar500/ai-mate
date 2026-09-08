@@ -1,62 +1,76 @@
-# Adult PWA economics
+# Scene-ready PWA economics
 
-USD, 2026-09-07. Generated from [config](../config/economics.json). Every cost is an assumption unless a source is expressly identified. Full allowance redemption. No adult-host approval or inference benchmark completed.
+USD, checked 2026-09-07. Generated from [config](../config/economics.json). No benchmark, binding provider quote or customer forecast. Full allowance redemption; before income tax.
 
-## Unit budget
+## Unit delivery and payment assumptions
 
-Renderer: $0.90/hour / (2 streams x 50% occupied capacity x 60) = $0.0150/connected minute. Add $0.005 auxiliary and $0.0008 transport, apply 20% contingency and floor at $0.025: $0.0250/live minute.
-Phone $0.015/minute; accepted 15-second portrait clip $0.10; paid text/recorded voice/memory $0.40/month; support $0.25. Free accounts $0.15/month, capped at 100. These self-hosted budgets do not use fal adult generation or hosted Cloudflare adult inference.
-Payment scenario: 12% processing + 2% refunds/losses + $0.50/transaction. Obtain quotes. 300% return on cost = 75% margin; 500% = 83.33%.
+Renderer node $0.90/hour, 1 concurrent stream, 50% occupancy. Renderer allocation $0.030/connected minute; transport, contingency and floor produce $0.040/visual minute. A separate warm auxiliary GPU pool costs $432/month and is counted below. One provider does not mean one GPU holds every model.
+Voice-only $0.02/minute; accepted portrait video $0.15; photo $0.05; prepared scene $0.10. Paid text/recorded voice/check-ins/memory $0.50/month plus $0.75 support allowance. These are budgets requiring measured acceptance/retry costs.
+Processor 16% + refunds/losses 2% + $0.50/transaction; hold 10% of gross receipts. All are planning assumptions, not CCBill quotes.
 
-## Monthly plans
+## Monthly plans: full usage
 
-| Plan | Price | Visual min | Phone min | Clips | Total direct cost | Contribution | Return on cost |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Together | $19.99 | 20 | 10 | 2 | $4.80 | $15.19 | 316.6% |
-| Closer | $29.99 | 45 | 20 | 5 | $7.27 | $22.72 | 312.3% |
-| Companion | $39.99 | 75 | 30 | 8 | $9.87 | $30.12 | 305.0% |
+| Plan | Price | Visual / voice min | Photos / videos / scenes | Direct cost | Contribution | Margin |
+|---|---:|---:|---:|---:|---:|---:|
+| Together | $19.99 | 20 / 20 | 4 / 1 / 4 | $7.30 | $12.69 | 63.5% |
+| Closer | $29.99 | 40 / 40 | 8 / 3 / 6 | $11.00 | $18.99 | 63.3% |
+| Companion | $49.99 | 90 / 60 | 12 / 6 / 10 | $18.05 | $31.94 | 63.9% |
 
-| Prepaid pack | Price | Direct cost | Return on cost |
+Optional proactive photos/videos consume these included allowances only after opt-in; no extra surprise charge. Failed preparation restores the user's credit but may still cost us. Do not use unused credits as the profitability assumption.
+
+| Optional pack | Price | Direct cost | Margin |
 |---|---:|---:|---:|
-| Visual call 30 | $14.99 | $3.45 | 334.7% |
-| Visual call 60 | $24.99 | $5.60 | 346.4% |
-| Voice call 60 | $14.99 | $3.60 | 316.6% |
-| Video messages 10 | $14.99 | $3.70 | 305.3% |
+| Visual call 30 | $14.99 | $4.70 | 68.7% |
+| Visual call 60 | $24.99 | $7.70 | 69.2% |
+| Voice call 60 | $9.99 | $3.60 | 64.0% |
+| Portrait videos 10 | $9.99 | $3.90 | 61.0% |
 
-These are contribution returns before company overhead and first-user verification. Packs include $0.10 handling; do not sell them to unverified accounts. Service credits are not cash wallets. No automatic overages or reliance on unused credits.
+## First-month funding at configured cohort
 
-## Company cash scenarios
+| Item | Budget | Basis |
+|---|---:|---|
+| Technical POC | $250 | Fixed experiment cap |
+| Card registration | $1950 | CCBill US/Canada reference, subject to approval/quote |
+| Legal/state/provider review | $1500 | Planning allowance, not a quote or completed national review |
+| Independent security review | $500 | Narrow pilot scope allowance, not a full audit quote |
+| Development tools/API allowance | $100 | Not a published GPT-6 price; excludes existing subscriptions |
+| Domain | $20 | Budget |
+| Warm auxiliary inference | $432 | 720 hours x $0.60 |
+| Platform, storage, monitoring, transactional delivery | $100 | Monthly allowance |
+| Free-account delivery | $5.00 | 25 accounts |
+| Paid delivery, excluding withheld payment fees | $548.75 | Full included usage, 100 payers |
+| Uncovered renderer availability | $0.00 | Minimum 120 hours; no double counting allocated GPU |
+| Internal age-check processing | $12.50 | $0.10/new free/paid user, no vendor fee |
+| Working buffer | $500 | Liquidity, not an expense |
+| **Cash funding before receipts** | **$5918.25** | Assumes no customer receipts fund promised month-one delivery |
 
-Recurring fixed $100; renderer availability floor 120 hours x $0.90, adding only the portion not already allocated to calls. Startup: $500 technical budget + $1950 card registration + $0 unquoted legal expense. Legal zero means excluded/unquoted, NOT unnecessary. Founder labor $0, CAC $0, verification $1.00/new free and paid account.
+Internal review is not free economically: 4 minutes/account at $30/hour values age-review time at $250.00 for this cohort. Founder cash pay defaults to $0; engineering labor remains excluded. Development or legal overruns require more capital, not relaxed release gates.
 
-| Payers | Revenue | First-month cost | First-month profit | Return | Later-month profit* |
-|---|---:|---:|---:|---:|---:|
-| 20 | $599.80 | $2925.22 | $-2325.42 | -79.5% | $244.58 |
-| 100 | $2999.00 | $3534.11 | $-535.11 | -15.1% | $2114.89 |
-| 500 | $14995.00 | $6817.42 | $8177.58 | 120.0% | $11227.58 |
-| 1000 | $29990.00 | $10969.85 | $19020.15 | 173.4% | $22570.15 |
+## Profit versus available cash
 
-*Later month assumes the same retained users, no new acquisition/verification/setup, and excludes an annual registration accrual. Capacity is expandable: higher cohorts require more renderer hours/groups; the model allocates them through each live minute. It does not claim one GPU serves the whole cohort.
+| Payers | Revenue | All first-month modeled expense | Profit/loss | Cash after assumed hold |
+|---|---:|---:|---:|---:|
+| 20 | $649.80 | $5177.71 | $-4527.91 | $-4592.89 |
+| 100 | $3249.00 | $6053.07 | $-2804.07 | $-3128.97 |
+| 250 | $8122.50 | $7843.43 | $279.08 | $-533.17 |
+| 300 | $9747.00 | $8440.21 | $1306.79 | $332.09 |
+| 500 | $16245.00 | $10827.35 | $5417.65 | $3793.15 |
 
-## Stress at configured payer count
+At the assumed plan mix, first-month expense break-even is about 237 payers; cash break-even after the modeled hold is about 281. Fractions in plan mix are expectations; actual sales mix changes these thresholds. A waitlist is not collected revenue. No sales, settlement date or profit is guaranteed.
 
-| Change | Live cost/min | First-month profit | Middle-plan direct return |
-|---|---:|---:|---:|
-| 18% combined fees | $0.0250 | $-655.07 | 253.9% |
-| One stream, 25% occupancy | $0.0790 | $-746.05 | 209.1% |
-| One stream, 10% occupancy | $0.1870 | $-1245.55 | 105.9% |
-| CAC $5 | $0.0250 | $-1035.11 | 312.3% |
-| Legal $3,000 | $0.0250 | $-3535.11 | 312.3% |
-| Founder labor $3,000 | $0.0250 | $-3535.11 | 312.3% |
+## Stress cases at configured cohort
 
-Configured first-month cash after a 10% payment hold: $-835.01. Holds are cash restrictions, not expenses. Provider balances and unsettled receipts need working capital.
+| Change | Funding before receipts | First-month profit |
+|---|---:|---:|
+| Quote-dependent $600 registration | $4568.25 | $-1454.07 |
+| No internal API fee but $1 vendor fallback | $6030.75 | $-2916.57 |
+| 25% renderer occupancy | $6074.81 | $-2960.63 |
+| CAC $5 | $6418.25 | $-3304.07 |
+| Legal budget $3,000 | $7418.25 | $-4304.07 |
+| Founder pay $3,000 | $8918.25 | $-5804.07 |
 
-Price floor = (delivery + fixed transaction fee + allocated overhead) / (1/(1+target return) - percentage fees/losses). At 18%, a 500% total-cost return is impossible even with free inference. At 14%, it leaves just 2.67% of sales for all other costs; none of these offers achieves 500%. Do not relabel markup on GPU cost as company profit.
+The $600 registration scenario is an illustrative USD allowance for a lower-fee approved quote, not a verified EUR conversion or proof that Verotel Basic supports this visual-call business. Its public chart lists EUR 500 annual registration but excludes webcam billing on Basic and has additional recurring fees; confirm full scope.
 
-If combined fees/losses are 18%, price the same visual packs at $19.99/30 minutes and $34.99/60 minutes to retain over 300% direct return at the base delivery budget. Equivalent subscription prices are $29.99/$44.99/$64.99. These still exclude verification/acquisition and company overhead; remeasure before offering.
+Recommended target: roughly 60% direct contribution margin, then positive cash after overhead. A 300-500% return is no longer a requirement. At scale, retention, service quality and acquisition costs determine profit. Keep at least one month of fulfillment/refund runway; do not take restricted reserves or unearned annual subscriptions as spendable profit.
 
-At the default mix, a $1 verification charge for every new payer makes 300% first-month company return unattainable even as cohort size grows under these prices. Existing-account recurring economics can improve, but must include annual registration accrual and actual retention. This forecast does not claim 300% company profit.
-
-Technical POC budget $100-$250 can test rendering privately before merchant activation; it cannot fund a legal adult launch. CCBill currently lists Visa $950 plus Mastercard $1,000 annually for US/Canada high-risk accounts. Verify applicability and quote.
-
-Sources: [TensorDock starting prices](https://www.tensordock.com/), [FlashHead benchmark](https://github.com/Soul-AILab/SoulX-FlashHead), [Cloudflare transport](https://developers.cloudflare.com/realtime/sfu/pricing/), [CCBill registration](https://ccbill.com/doc/visa-and-mastercard-payment-processing-faqs). $0.90 complete renderer node/hour is a budget, not TensorDock's advertised GPU-only floor or a reserved US quote.
+Sources: [CCBill fees](https://ccbill.com/doc/visa-and-mastercard-payment-processing-faqs), [CCBill pricing](https://ccbill.com/pricing), [Verotel chart](https://www.verotel.com/en/pricechart.html), [TensorDock](https://www.tensordock.com/). Processor approval, appropriate internal age assurance and model/content suitability are not established.

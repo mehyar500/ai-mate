@@ -1,47 +1,48 @@
-# US adult launch: concrete conditional path
+# US adult PWA: eligibility and costs
 
-This plan targets verified adults, lawful consensual adult content and original fictional characters. Commercial-use licensing, provider acceptance and US law are separate requirements. No unrestricted model or host approval has been obtained by this research.
+The launch scope is original fictional adults, lawful consensual adult content, clear AI disclosure and verified access. Models' commercial licenses, provider policies, card-network rules and US law are distinct. None of the providers has approved this project yet.
 
-## Providers
+## Processor shortlist
 
-| Platform | Job | Selection / condition |
+| Processor | Public evidence | Decision |
 |---|---|---|
-| TensorDock, selected US host | RTX 4090 Lite renderer, custom inference | Primary POC candidate. Confirm exact US location, node price, data handling and acceptance of the complete adult AI service under provider and underlying-host contracts. |
-| Cloudflare | PWA, D1/R2, account coordination, WebRTC | Infrastructure candidate; review developer/content/data terms. Self-host adult inference; do not infer hosted-model permission from infrastructure eligibility. |
-| CCBill | High-risk hosted checkout | Apply with accurate AI/content flow. Obtain rates, reserves, registration and AI-content acceptance before selling. |
-| Yoti | Age assurance | Obtain suitable method/price for reviewed states, server-verify proof, minimize retained data. |
-| Runware custom compute | Potential future scale-to-zero alternative | Beta access, US region, streaming/metering and intended-use acceptance unconfirmed. Do not depend on it for POC. |
-| Resend or approved transactional provider | Neutral account mail | Confirm whole-business eligibility; no intimate content in email. |
-| fal / Stripe | Not adult traffic routes | fal prohibits explicit content; Stripe prohibits the relevant adult business. Do not route around these rules. |
+| CCBill | PSP pricing describes no monthly fee, while high-risk registration is separate. Current US/Canada FAQ lists Visa $950 + Mastercard $1,000 annually. Processing, reserve and other fees require a quote. | Baseline budget; apply for full AI/visual-call scope |
+| Segpay | Supports subscriptions/digital purchases; public FAQ lists registration but differs from CCBill's updated Mastercard figure. AI-site guidance restricts user uploads. | Alternative quote; reconcile current card fees and product rules |
+| Verotel Basic | Public chart: EUR 500 annual registration, 15.5% non-recurring; recurring adds 1.5%; 10% six-month reserve. Basic lists no webcam billing. | Possible lower-upfront option only if AI visual calls and all fees are expressly accepted |
+| Stripe/fal | Relevant adult content/business restrictions | Not adult payment/inference routes |
 
-Sources: [TensorDock AUP](https://docs.tensordock.com/legal-information/acceptable-use-policy-aup), [compute terms](https://docs.tensordock.com/legal-information/terms-of-service-tos), [Cloudflare developer terms](https://www.cloudflare.com/service-specific-terms-developer-platform/), [CCBill adult processing](https://ccbill.com/industries/adult-business), [Yoti](https://developers.yoti.com/age-verification/quick-start), [Runware terms](https://runware.ai/terms), [fal AUP](https://fal.ai/legal/acceptable-use-policy), [Stripe restrictions](https://stripe.com/legal/restricted-businesses), [Resend AUP](https://resend.com/legal/acceptable-use).
+Sources: [CCBill pricing](https://ccbill.com/pricing), [current registration FAQ](https://ccbill.com/doc/visa-and-mastercard-payment-processing-faqs), [Segpay FAQ](https://segpay.com/csfaq/), [Segpay AI/UGC guidance](https://gethelp.segpay.com/docs/Content/ComplianceDocs/UserGeneratedContent.htm), [Verotel chart](https://www.verotel.com/en/pricechart.html), [Stripe](https://stripe.com/legal/restricted-businesses), [fal](https://fal.ai/legal/acceptable-use-policy).
 
-TensorDock's reviewed AUP prohibits exploitation, nonconsensual imagery and impersonation; it does not establish blanket approval for consensual adult business. Runware's general terms distinguish unlawful/minor content and model licenses; its creator-program advertising restrictions are a separate policy, not proof of platform-wide eligibility. Confirm the actual service rather than treating absence of a blanket ban as approval.
+No verified zero-upfront processor for this exact business was found. Free technical setup does not waive registration. Deferred fees may reduce initial cash but remain costs. Do not disguise visual calls as another category to qualify for a cheaper plan. No account application or communication has been sent by this task.
 
-## Model rights
+## One inference provider
 
-FlashHead Lite, Qwen3-8B, Kokoro and FLUX.1-schnell are commercially usable licensing candidates identified in BUILD. No general Apache-2.0 field-of-use ban is a guarantee of legality, checkpoint behavior or rights in portraits/voices. Pin checkpoint/code revisions and notices, including VAE_LTX, wav2vec2, phonemizers and any guard. No unlicensed fine-tunes, public-figure cloning, research-only sample identities or noncommercial weights.
+TensorDock US host is the primary custom-model candidate; Cloudflare is the app/storage/WebRTC provider. Confirm complete content scope, underlying-host agreement, data routes, storage, log handling and intended US region. TensorDock's AUP restricts exploitation/nonconsensual content and impersonation, but lack of a blanket consensual-adult ban is not written acceptance. [AUP](https://docs.tensordock.com/legal-information/acceptable-use-policy-aup), [compute terms](https://docs.tensordock.com/legal-information/terms-of-service-tos), [Cloudflare developer terms](https://www.cloudflare.com/service-specific-terms-developer-platform/).
 
-Separate licensed capability from product capability: a talking-head model does not prove arbitrary explicit action generation. Evaluate the approved lawful adult scope before advertising it. Require original adult identity provenance and consent wherever real source assets are used.
+Runware custom compute is an alternative requiring access, model/container support, US-region and adult-business acceptance; do not treat a model-upload API as support for every streaming container. US-only inference does not guarantee Cloudflare/payment/notification processing is US-only.
 
-## Release steps
+## Can age assurance be internal?
 
-1. Founder documents the exact adult content, fictional identity rules, PWA, model/data routes and states proposed for launch; obtain provider/merchant eligibility for that description.
-2. Obtain a current state applicability review covering age verification, AI companions, privacy/biometrics, synthetic media, obscenity and billing. Start with an empty state allowlist until reviewed. US hosting is not a legal safe harbor or a US-only data guarantee.
-3. Age-gate before adult access, including free accounts. Payment card possession is not proof of age. Fail closed on forged/expired proof; retain a minimal verification result rather than identity documents where appropriate.
-4. Implement visible AI disclosure, age/consent boundaries, complaint/takedown handling, self-harm protocols, memory deletion, privacy notices and clear renewal/cancellation.
-5. Test security, payments, policy handling and actual content behavior with independent review before paid release. PWA distribution does not bypass law or processor rules.
+Possibly for a reviewed jurisdiction and accepted method. Paying Yoti is not universally mandatory. But 'we built it ourselves' does not establish compliant verification, and a checkbox, entered birthdate, payment card or generic LLM selfie estimate is not a proven substitute.
 
-Concrete laws already relevant to the review: [New York GBS 1701](https://www.nysenate.gov/legislation/laws/GBS/1701) requires a self-harm detection/response protocol for covered companions; [1702](https://www.nysenate.gov/legislation/laws/GBS/1702) requires non-human notices at interaction start (need not exceed daily) and every three hours during continuing interaction. Use enacted law, not similarly named pending bills.
+Texas Chapter 129B expressly discusses verification performed by the commercial entity or a third party, and specifies digital ID or qualifying verification methods. It also restricts retained identifying information. [Current statute](https://statutes.capitol.texas.gov/Docs/CP/pdf/CP.129B.pdf). Assess current application/enforcement with counsel; do not copy statutory warning text without reviewing rulings.
 
-[California SB 243](https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB243) includes AI disclosure, a published self-harm protocol and additional provisions, including future reporting. Its minor-specific provisions are not a blanket prohibition on adult content. Adult-only access does not remove all companion duties. This is not a completed 50-state review.
+Florida's published statute requires qualifying services to offer both anonymous and standard verification choices and meet the linked requirements. An in-house ID upload alone does not establish both options. [Florida 501.1737](https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0500-0599/0501/Sections/0501.1737.html).
 
-For adult-content age assurance, review each qualifying statute and enforcement status. Examples: [Texas Chapter 129B](https://statutes.capitol.texas.gov/Docs/CP/pdf/CP.129B.pdf), [Florida 501.1737](https://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0500-0599/0501/Sections/0501.1737.html). Do not assume one verification method and retention design satisfies every state. Review federal synthetic-media/takedown and any recordkeeping applicability with counsel; no blanket exemption is asserted.
+Proposed internal pilot route, only after acceptance: secure separate verification intake; supported identity/digital-proof method; authenticity and binding checks appropriate to that method; restricted human review for uncertainty; no age documents in AI chat, analytics, notifications or model prompts. Delete identifying evidence according to applicable requirements; retain only permissible minimal verification status. The method, data retention and evidence rules need state/merchant review before implementation.
 
-Position as optional companionship, not clinically proven treatment for loneliness. Do not claim the character is human, conscious, emotionally dependent on payment, or a replacement for all human contact. No unsolicited intimate notifications. Measure whether users find it helpful and whether harm/complaints emerge.
+No homemade face-age model is certified here. NIST documents variable age-estimation performance; an estimate around the adult threshold needs appropriate assurance, not a universal pass. [NIST evaluation](https://www.nist.gov/news-events/news/2024/05/nist-reports-first-results-age-estimation-software-evaluation).
 
-## Minimum commercial budget and ownership
+Budget zero third-party API fee plus $0.10/account internal processing and four minutes of review as an explicit scenario. At 125 accounts, review is about 8.3 hours ($250 economic value at $30/hour). Security, fraud, storage and appeals remain work. If the method or required anonymous option cannot be provided, integrate an accepted service or do not enable that jurisdiction. Never waive the method to preserve the budget.
 
-CCBill's [current US/Canada FAQ](https://ccbill.com/doc/visa-and-mastercard-payment-processing-faqs) lists $950 Visa and $1,000 Mastercard annual high-risk registration, with the Mastercard increase effective May 1, 2026. These costs alone exceed a $250 technical POC. Confirm applicability, fees, reserves and settlement with the actual contract. Alternative processors may differ; no cheaper approved quote is established.
+## Other release duties
 
-Founder owns provider/merchant/state clearance and legal budget. Engineer owns evidence for identity provenance, latency/cost, deletion, age results and payment reconciliation. Feature flags stay disabled until their gates pass. Legal fees are unquoted in the forecast, not zero in reality. A private technical POC and a commercially legal adult launch are separate milestones.
+Start with an empty state allowlist; enable reviewed states only. Assess companion-AI disclosure/safety, synthetic-media rights/takedowns, applicable adult recordkeeping, privacy/biometrics, subscriptions and taxes. Original characters and no user face/camera uploads simplify but do not eliminate obligations.
+
+Covered New York companions have self-harm protocols and non-human notification duties. California SB 243 includes AI disclosure and published self-harm protocols among other duties. Age verification alone does not satisfy these laws. [NY 1701](https://www.nysenate.gov/legislation/laws/GBS/1701), [NY 1702](https://www.nysenate.gov/legislation/laws/GBS/1702), [CA SB 243](https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB243).
+
+Keep character story separate from factual user memory. Be transparent that scenes and care-like interactions are generated fiction; do not claim clinical treatment, sentience or literal private knowledge. Check-ins/media require opt-in and easy revocation; no sensitive push previews or emotional pressure to pay.
+
+Pin model/checkpoint/runtime/voice licenses and provenance. Klein 4B and Qwen Image Edit are licensing candidates for scene work, not proof of every requested adult output. Respect usage terms and demonstrate the approved scope; do not substitute unlicensed or noncommercial weights.
+
+Founder owns eligibility, contracts and legal budget; engineer owns memory isolation, spend caps and verified controls; independent reviewer checks billing/privacy boundaries. Hosted checkout, reconciled server events, straightforward cancellation and refunds precede paid launch. No guaranteed first-month revenue or zero-cost commercial launch is asserted.
