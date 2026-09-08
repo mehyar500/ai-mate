@@ -19,6 +19,8 @@ First spend goes to an **adult viability gate**, before a polished PWA, elaborat
 
 Founder owns the content/business specification and approvals; engineer owns capability and cost evidence. The founder must explicitly approve any later reduction in launch scope. No adult request is promised without limits: minors/age ambiguity, nonconsensual imagery, exploitation and real-person impersonation remain excluded.
 
+September 7 research adds model-specific evidence and exclusions in [BUILD](BUILD.md#model-evidence-checked-september-7-2026) and [USA](USA.md#september-7-model-and-host-exclusions). RealVisXL's author explicitly claims adult-image support; this is stronger evidence than a general image-model license, but no reviewed source demonstrates the whole required service. Recorded Wan video has a different cost/latency profile from a talking portrait. FlashHead Lite's bundled VAE terms require resolution. Existing prices and the approximately $6,000 funding scenario remain unvalidated hypotheses, not a costed, legally cleared adult stack.
+
 ## Product and pricing
 
 All prices and allowances below are **conditional adult-product hypotheses**. Activate a tier only when every included adult modality passes the requirements above; revise its cost before sale if the validated model needs more compute or retries. A paid bundle must not contain an unvalidated video entitlement.

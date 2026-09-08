@@ -25,6 +25,19 @@ TensorDock US host is the primary custom-model candidate; Cloudflare is the app/
 
 Runware custom compute is an alternative requiring access, model/container support, US-region and adult-business acceptance; do not treat a model-upload API as support for every streaming container. US-only inference does not guarantee Cloudflare/payment/notification processing is US-only.
 
+## September 7 model and host exclusions
+
+| Option | Current finding | Decision |
+|---|---|---|
+| Runpod | March 24, 2026 terms expressly prohibit pornography/graphic adult content. | Exclude under published terms; do not assume renting raw GPUs changes the contract. [Terms](https://www.runpod.io/legal/terms-of-service). |
+| Lightricks/LTX-2.3 | Community license incorporates its AUP; March 30, 2026 AUP covers hosted and on-premises products and prohibits explicit sexual content/erotic chats. License also has a $10M annual-revenue threshold and competition restrictions. | Exclude for the required scope under published terms. Free weights or local execution do not waive these terms. [License](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE), [AUP](https://static.lightricks.com/legal/ltx-acceptable-use-policy.pdf). |
+| MiniMaxAI/MiniMax-H3 | August 2026 community license excludes the US, EU, UK and South Korea from its territory, including relevant outputs; separate authorization route exists. | Not a default US deployment option. No separate authorization obtained. [License](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/LICENSE). |
+| ReadyArt/Serenity-12B | Adult-focused June 2026 model card has an Apache tag but also explicitly states personal/noncommercial use. | Exclude pending an unambiguous commercial grant; do not resolve conflicting text in our favor. [Card](https://huggingface.co/ReadyArt/Serenity-12B). |
+| dphn/Dolphin3.0-Mistral-24B | Public repository has no declared license tag or separate license file in the checked metadata. | Exact fine-tune license unresolved; base-model rights alone are insufficient evidence. [Card](https://huggingface.co/dphn/Dolphin3.0-Mistral-24B). |
+| Sao10K/L3.3-70B-Euryale-v2.3 | Roleplay training is documented, but repository tags `llama3` while its stated base is Llama 3.3; no separate license file found. | Defer: resolve applicable Meta and fine-tune terms; 70B is also outside the cheap baseline. No adult-quality benchmark established here. [Card](https://huggingface.co/Sao10K/L3.3-70B-Euryale-v2.3). |
+
+TensorDock remains a candidate, not an approved adult host. Its AUP also has a written-permission provision for selling/reselling or exploiting the service; confirm how that applies to this commercial application. No account application, provider contact, model-weight download or paid inference was performed. This review establishes documented terms and unresolved questions, not a legal opinion that a particular output or nationwide service is lawful.
+
 ## Can age assurance be internal?
 
 Possibly for a reviewed jurisdiction and accepted method. Paying Yoti is not universally mandatory. But 'we built it ourselves' does not establish compliant verification, and a checkbox, entered birthdate, payment card or generic LLM selfie estimate is not a proven substitute.

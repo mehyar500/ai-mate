@@ -12,21 +12,29 @@ Proposed quality gate: at least 85% usable results across the founder-defined su
 
 If Qwen, Klein or another candidate cannot support the intended adult scope, reassess the licensed checkpoint and platform before implementation. Do not remove provider safeguards, treat a noncommercial fine-tune as commercial, or replace the business with a clean-only launch. General scene generation and FlashHead talking portraits do not establish full-body explicit video generation. Until evidence exists, that capability is unresolved.
 
-## Models and one-provider deployment
+## Model evidence checked September 7, 2026
 
-| Stage | Model | Role and constraint |
+This is a current availability and terms review, not a claim that every listed model was released in 2026. RealVisXL and Magnum are older releases still available. No inference was run. No reviewed source establishes this project's complete adult experience, delivery cost or US deployment eligibility. Author claims, general demonstrations and a measured product acceptance test are different evidence levels. An NSFW label alone does not specify the supported content or quality.
+
+| Component / exact model | Evidence found | License and decision |
 |---|---|---|
-| Conversation, event extraction, summaries and scene planning | Qwen/Qwen3-8B, non-thinking mode | Candidate only: bounded dialogue and structured outputs; intended adult behavior unverified |
-| Speech recognition | Systran/faster-whisper-small | Incremental ASR; audit runtime and weight licenses |
-| Speech synthesis | hexgrad/Kokoro-82M | Consistent permitted preset voice across messages, calls and clips |
-| End-of-turn detection | snakers4/silero-vad | Distinguish pauses from completed turns |
-| Character-in-scene image/edit | black-forest-labs/FLUX.2-klein-4B | Candidate only: reference-guided editing and Apache-2.0 card do not prove required adult imagery |
-| Image consistency challenger | Qwen/Qwen-Image-Edit-2511 | Evaluate only if Klein identity fails; larger/slower deployment may need a different GPU |
-| Live portrait and recorded portrait clip | Soul-AILab/SoulX-FlashHead-1_3B, Model_Lite | Candidate only: portrait motion; adult scene preservation and supported framing must be tested |
-| Video dependencies | VAE_LTX bundle and facebook/wav2vec2-base-960h | Pin exact revisions and all licenses |
-| Screening | Local Llama-Guard-3-8B candidate plus application rules and human escalation | Generic model does not prove complete age/content safety |
+| Images: SG161222/RealVisXL_V5.0 and RealVisXL_V5.0_Lightning | Author explicitly states photorealistic SFW/NSFW support; Lightning has a lower-step configuration. Stronger adult-specific evidence than the previous image shortlist, but still an author claim. | OpenRAIL++ metadata; audit exact merge/dependency permissions. Compare image quality and identity continuity before selecting either. [Standard](https://huggingface.co/SG161222/RealVisXL_V5.0), [Lightning](https://huggingface.co/SG161222/RealVisXL_V5.0_Lightning). |
+| Dialogue challenger: anthracite-org/magnum-v4-12b | Published prose-oriented fine-tune and training configuration; no reviewed adult-quality benchmark. | Apache-2.0 declaration; [base Mistral-Nemo](https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407) also declares Apache-2.0. Dataset provenance and intended behavior remain unverified. [Card](https://huggingface.co/anthracite-org/magnum-v4-12b). |
+| Current general dialogue challenger: Qwen/Qwen3.8-27B | Official August 2026 release with general text/vision evaluations; no adult-product evaluation found. | Apache-2.0; larger than the existing Qwen3-8B budget baseline. Do not infer an adult-content qualification from general benchmarks. [Card](https://huggingface.co/Qwen/Qwen3.8-27B). |
+| Scene editing: black-forest-labs/FLUX.2-klein-4B | Reference editing and approximately 13GB VRAM documented; intended adult output remains unverified. | Apache-2.0. Retain as an editing comparator, not the sole proof of adult images. [Card](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B). |
+| General recorded video: Wan-AI/Wan2.2-I2V-A14B | Official image-to-video demonstrations, 480P/720P. No reviewed adult-quality benchmark. | Apache-2.0; official single-GPU example requires at least 80GB VRAM. Separate offline-video cost experiment, not a live-call renderer. [Card](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B). |
+| Smaller general video: Wan-AI/Wan2.2-TI2V-5B | 720P/24FPS output, consumer-GPU support; author reports five seconds of video in under nine minutes without specific optimization. | Apache-2.0. Output FPS is not generation FPS; fast delivery remains unproven. [Card](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B). |
+| Portrait renderer: Soul-AILab/SoulX-FlashHead-1_3B, Model_Lite | General streaming portrait demonstrations; author reports 96FPS on RTX4090. No adult demonstration established in this review. | Apache-2.0 at top level, but bundled LTX VAE rights require separate resolution. Conditional research candidate only. [Card](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B). |
+| Lip-sync comparator: TMElyralab/MuseTalk, version 1.5 | General lip-sync examples and author-reported 30FPS+ on V100. Alters a 256px face region in supplied media; does not create arbitrary body motion. | MIT code; authors expressly permit commercial use of trained model, with separate dependency terms. Supplied test media are noncommercial. Not a substitute for the requested fresh-motion experience without a scope decision. [Repository](https://github.com/TMElyralab/MuseTalk). |
+| 2026 speech challengers: Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice and Qwen/Qwen3-ASR-0.6B | Published speech generation/recognition; these do not establish adult dialogue quality or a complete low-latency call. | Apache-2.0 cards. Compare against Kokoro/faster-whisper; use permitted preset voices. [TTS](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice), [ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B). |
 
-Sources: [Klein 4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B), [image-edit challenger](https://huggingface.co/Qwen/Qwen-Image-Edit-2511), [FlashHead](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B), [Qwen](https://huggingface.co/Qwen/Qwen3-8B), [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M). Commercial licensing is not a certification of lawful adult output quality. Evaluate actual approved content scope; no unlicensed fine-tunes or bypass of a provider prohibition.
+The research shortlist broadens to RealVisXL for image evaluation, Magnum for dialogue comparison, and Wan2.2 for separately measured recorded video. None is promoted to an approved deployment. Keep Qwen/Qwen3-8B, Systran/faster-whisper-small, hexgrad/Kokoro-82M, snakers4/silero-vad, facebook/wav2vec2-base-960h and meta-llama/Llama-Guard-3-8B as the existing budget/auxiliary candidates. Qwen/Qwen-Image-Edit-2511 remains a larger identity-editing comparator. Exact revisions, voices and dependency terms must pass before use.
+
+Audit snapshot: RealVisXL V5.0 revision `ac93e0dda1f6d448cae19bbfab8c5e720a5e48bc`; Magnum v4 12B `3200513f4a737a1f7fa41145c373ac55f886ae35`. Their public repository metadata declares a license but neither repository lists a separate license file. [SDXL's base license](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/LICENSE.md) permits hosted use subject to its restrictions; that alone does not resolve every fine-tune or merged component's rights. Do not substitute a random reupload or assume that permission to sell outputs authorizes every form of model hosting.
+
+FlashHead Lite requires special attention: its authors identify an LTX-Video VAE dependency, while Lightricks' current policy expressly restricts explicit content. The exact VAE provenance and applicable historical/current terms have not been established; do not automatically apply a top-level Apache tag to that component or assume a policy applies retroactively. This is an unresolved release gate. Excluded models and terms are listed in [USA](USA.md).
+
+## One-provider deployment hypothesis
 
 Use one selected TensorDock US provider for the inference services. Keep a warm dialogue/audio pool; launch/stop the scene and renderer worker separately. Forecast one visual session per renderer until full-pipeline tests prove concurrency. Load image editing before the call, release it, then initialize FlashHead rather than assuming image and video models coexist within 24GB.
 
@@ -49,7 +57,7 @@ Use a 4,096-token prompt cap, short summary, recent turns and relevant confirmed
 
 1. User requests a call. Check age/state eligibility, account balance, character scene, host capacity and maximum generation cost.
 2. Reserve a scene entitlement, not call minutes. Reuse a validated matching scene when possible; keep a small per-user cache of recent scenes with expiry.
-3. If a new scene is required, send character references plus the structured fictional setting to Klein. Generate at most two candidates within the configured budget.
+3. If a new scene is required, send character references plus the structured fictional setting to the image model that passes evaluation. Klein is the existing reference-editing baseline; RealVisXL is a comparator, not a verified drop-in reference editor. Generate at most two candidates within the configured budget.
 4. Validate original identity, adult appearance, policy and framing. Reject identity drift; a matching seed alone is not proof. Early pilot uses human-reviewed character/scene presets.
 5. Warm the renderer and encode the selected scene reference. Confirm first frames and audio path before readiness.
 6. Character says 'Give me a moment; I'll let you know when our call is ready.' UI shows 'Preparing your scene' and an honest estimate; do not invent a real-world cover story. Continue text while it loads.
@@ -60,7 +68,7 @@ Use a 4,096-token prompt cap, short summary, recent turns and relevant confirmed
 
 Targets to test: cached-scene preparation 1–5 seconds; a new scene on warm hardware 5–30 seconds; cold worker 30–120 seconds or longer depending on actual provider startup. These are hypotheses, not SLAs. Show the measured ETA and permit cancellation. The user's tolerated pre-call delay lets us avoid an always-on renderer.
 
-Budget $0.10/accepted scene, $0.05/photo and $0.15/accepted portrait clip. For illustration, 60 seconds at $0.90/hour costs $0.015 of node time before loading, retries, checks and other costs. All successful-but-rejected work counts. A two-minute warm-up plus two-minute ready hold costs $0.06 at this node rate even if nobody joins; scene-budget feasibility must be measured against abandonment.
+Budget $0.10/accepted scene, $0.05/photo and $0.15/accepted portrait clip. These are existing hypotheses and do not price general Wan video. For illustration, 60 seconds at $0.90/hour costs $0.015 of node time before loading, retries, checks and other costs. All successful-but-rejected work counts. A two-minute warm-up plus two-minute ready hold costs $0.06 at this node rate even if nobody joins; scene-budget feasibility must be measured against abandonment.
 
 ## During the visual call
 
@@ -70,7 +78,7 @@ Keep native model audio context and chunk sizes initially. Generate ahead of pla
 
 The [Gradio reference](https://raw.githubusercontent.com/Soul-AILab/SoulX-FlashHead/main/gradio_app_streaming.py) groups chunks into video files and starts with a completed audio file. Replace this with incremental audio and WebRTC output; removing file waits does not prove model latency. Target end-of-user-speech to synchronized reply p95 <=2 seconds on warm hardware, sustained 25FPS and limited audio/video skew. Report actual results.
 
-FlashHead Lite's author throughput of 96FPS/4090 supports testing; it does not establish simultaneous LLM, guard, image and video performance. Use one stream until measured. Keep Pro, general Wan video and research models outside the first release.
+FlashHead Lite's author throughput supports technical investigation; it does not establish simultaneous LLM, guard, image and video performance or adult eligibility. Use one stream until measured and licensed for the intended service. General Wan video remains a separate recorded-video experiment; it does not inherit the portrait call's latency or cost assumptions.
 
 ## Opt-in check-ins and media
 
