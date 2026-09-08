@@ -4134,5 +4134,40 @@
     "review": "Local code review, offline checks, live browser and HTTP checks; no independent security reviewer or staging available",
     "migration": "Adds bounded facts and app_state SQLite tables, preserving original notes and turns; previous code ignores added tables; no public deployment",
     "rollback": "Revert this change and restart local server; preserve private SQLite file and prepared assets"
+  },
+  "omniavatar_2026_09_08": {
+    "hardware": "RTX 4060 Ti 16 GB; 48 GB RAM; app remained running",
+    "model": "OmniAvatar-1.3B + Wan2.1-T2V-1.3B",
+    "upstream_revision": "1536bf31abaec74364fb7d5883470d5b23ffa7f8",
+    "resolution": [
+      256,
+      384
+    ],
+    "output_seconds": 2.56,
+    "runs": [
+      {
+        "steps": 10,
+        "guidance": 4.5,
+        "audio_guidance": 4.5,
+        "cold_wall_s": 67.513,
+        "denoise_s": 31,
+        "peak_allocated_gib": 3.959,
+        "export_completed": true,
+        "wave_command_passed": false
+      },
+      {
+        "steps": 8,
+        "guidance": 8,
+        "audio_guidance": 1,
+        "cold_wall_s": 60.464,
+        "denoise_s": 27,
+        "peak_allocated_gib": 3.861,
+        "export_completed": true,
+        "wave_command_passed": false
+      }
+    ],
+    "visual_review": "Five sampled frames per clip show speech-related face changes but arms remain down. Rejected for command-driven body movement; not integrated into app.",
+    "timing_scope": "Cold process wall time includes model loading, audio preprocessing, denoising and export. Not a warm service latency or p95.",
+    "artifacts": "Ignored generated/local-app/audit/omni-wave-10steps.mp4 and omni-wave-strong.mp4"
   }
 }

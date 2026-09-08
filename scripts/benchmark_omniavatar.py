@@ -32,6 +32,25 @@ def patch_single_gpu(root):
     if current not in (original, patched):
         raise RuntimeError('Unrecognized upstream edits; refusing to overwrite them.')
     path.write_text(patched, encoding='utf-8')
+
+    path = root / 'OmniAvatar/utils/io_utils.py'
+    original = subprocess.check_output(['git', '-C', str(root), 'show', 'HEAD:OmniAvatar/utils/io_utils.py'], text=True, encoding='utf-8')
+    patched = 'import shutil\n' + original
+    replacements = {
+        'subprocess.run([f"cp {tmp_save_path} {now_save_path}"], check=True, shell=True)':
+            'shutil.copyfile(tmp_save_path, now_save_path)',
+        'subprocess.check_call(cmd, stdout=None, stdin=subprocess.PIPE, shell=True)':
+            'subprocess.run(["ffmpeg", "-y", "-i", tmp_save_path, "-i", audio_path, "-v", "error", "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "aac", tmp_save_path[:-4]+"_wav.mp4"], check=True)',
+        'subprocess.run([f"cp {tmp_save_path[:-4]}_wav.mp4 {now_save_path[:-4]}_wav.mp4"], check=True, shell=True)':
+            'shutil.copyfile(tmp_save_path[:-4]+"_wav.mp4", now_save_path[:-4]+"_wav.mp4")',
+    }
+    for before, after in replacements.items():
+        if patched.count(before) != 1:
+            raise RuntimeError('Upstream exporter changed; review the Windows patch.')
+        patched = patched.replace(before, after)
+    if path.read_text(encoding='utf-8') not in (original, patched):
+        raise RuntimeError('Unrecognized exporter edits; refusing to overwrite them.')
+    path.write_text(patched, encoding='utf-8')
     path = root / 'OmniAvatar/models/wan_video_dit.py'
     original = subprocess.check_output(['git', '-C', str(root), 'show', 'HEAD:OmniAvatar/models/wan_video_dit.py'], text=True, encoding='utf-8')
     start = original.index('from xfuser.core.distributed import')
@@ -51,9 +70,12 @@ def main():
     parser.add_argument('--height', type=int, default=384)
     parser.add_argument('--width', type=int, default=256)
     parser.add_argument('--frames', type=int, default=81)
+    parser.add_argument('--guidance', type=float, default=4.5)
+    parser.add_argument('--audio-guidance', type=float)
     parser.add_argument('--resident-parameters', type=int, default=2000000000,
                         help='DiT parameters kept on GPU during denoising; 0 enables full CPU offload.')
     parser.add_argument('--prepare-only', action='store_true')
+    parser.add_argument('--wait-models', type=int, default=0, help='Seconds to wait for the existing downloader; does not start another download.')
     opts = parser.parse_args()
     if any(x < 128 or x % 16 for x in (opts.height, opts.width)):
         parser.error('Dimensions must be multiples of 16, at least 128.')
@@ -70,6 +92,7 @@ def main():
     config.update(image_sizes_720=[[opts.height, opts.width]], max_hw=720,
                   max_tokens=(opts.frames + 3) * opts.height * opts.width // 1024,
                   num_steps=opts.steps, seq_len=opts.frames, sp_size=1,
+                  guidance_scale=opts.guidance, audio_scale=opts.audio_guidance,
                   num_persistent_param_in_dit=opts.resident_parameters, silence_duration_s=0, use_fsdp=False)
     config_path = UPSTREAM / 'configs/local_windows.yaml'
     config_path.write_text(yaml.safe_dump(config), encoding='utf-8')
@@ -82,7 +105,16 @@ def main():
                 'Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth',
                 'Wan2.1-T2V-1.3B/Wan2.1_VAE.pth', 'OmniAvatar-1.3B/pytorch_model.pt',
                 'wav2vec2-base-960h/config.json', 'wav2vec2-base-960h/preprocessor_config.json']
-    missing = [name for name in required if not (UPSTREAM / 'pretrained_models' / name).is_file()]
+    deadline = time.monotonic() + opts.wait_models
+    while True:
+        missing = [name for name in required if not (UPSTREAM / 'pretrained_models' / name).is_file()]
+        audio_root = UPSTREAM / 'pretrained_models/wav2vec2-base-960h'
+        if not any((audio_root / name).is_file() for name in ('model.safetensors', 'pytorch_model.bin')):
+            missing.append('wav2vec2-base-960h weights')
+        if not missing or time.monotonic() >= deadline:
+            break
+        print('Waiting for existing download: ' + ', '.join(missing), flush=True)
+        time.sleep(min(30, max(0, deadline-time.monotonic())))
     if missing:
         raise RuntimeError('Model download is incomplete: ' + ', '.join(missing))
     os.environ['HF_HUB_OFFLINE'] = '1'
@@ -90,16 +122,19 @@ def main():
     os.environ['RANK'] = os.environ['LOCAL_RANK'] = '0'
     os.environ['WORLD_SIZE'] = '1'
     import torch
+    torch.set_num_threads(4)
     torch.cuda.reset_peak_memory_stats()
     print(f'GPU: {torch.cuda.get_device_name()}; steps={opts.steps}; {opts.width}x{opts.height}; frames={opts.frames}', flush=True)
     os.chdir(UPSTREAM)
     sys.path.insert(0, str(UPSTREAM))
     sys.argv = ['inference.py', '--config', str(config_path), '--input_file', str(input_path), '--infer']
     started = time.perf_counter()
+    completed = False
     try:
         runpy.run_path(str(UPSTREAM / 'scripts/inference.py'), run_name='__main__')
+        completed = True
     finally:
-        record = {'wall_s': round(time.perf_counter() - started, 3),
+        record = {'completed': completed, 'wall_s': round(time.perf_counter() - started, 3),
                   'peak_allocated_gib': round(torch.cuda.max_memory_allocated() / 2**30, 3),
                   'steps': opts.steps, 'resolution': [opts.width, opts.height], 'upstream': REVISION}
         (UPSTREAM / 'last_benchmark.json').write_text(json.dumps(record, indent=2))
