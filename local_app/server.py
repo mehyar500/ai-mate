@@ -279,7 +279,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         path = urlparse(self.path).path
         static = {"/": ("index.html", "text/html; charset=utf-8"), "/app.js": ("app.js", "text/javascript"),
-                  "/style.css": ("style.css", "text/css"), "/manifest.webmanifest": ("manifest.webmanifest", "application/manifest+json"),
+                  "/style.css": ("style.css", "text/css"), "/actions.css": ("actions.css", "text/css"), "/manifest.webmanifest": ("manifest.webmanifest", "application/manifest+json"),
                   "/icon.svg": ("icon.svg", "image/svg+xml"), "/recorder.js": ("recorder.js", "text/javascript")}
         if path in static:
             file, mime = static[path]
