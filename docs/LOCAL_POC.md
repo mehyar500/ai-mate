@@ -7,14 +7,14 @@ Updated September 8, 2026. **Current interaction: type a message, receive a spok
 On the configured PC:
 
 ```powershell
-.\scripts\start_local.ps1 -Background
+.\scripts\start_local.ps1 -Background -Provider cloudflare -EnvFile C:\Users\mehya\.env
 ```
 
 Open **http://127.0.0.1:8765**. The script avoids starting a duplicate server. Background logs and launch information live in ignored `.cache/local-poc/`. A foreground launch without `-Background` stops when its terminal closes. Startup warms models; the latest measured warm start took 12.69 seconds, but a cold start can take over a minute. A running PC and server are required; this is not a public URL or boot-time Windows service.
 
 Try **“Let’s talk in the café. How are you?”**, **“Back to the garden. Say something cheerful.”**, or **“Send a video from there.”** Ordinary messages receive video plus voice by default. “Voice only” and “just text” change the response style through the conversation. Sound, Interrupt and Replay remain explicit controls. Memory & settings contains saved facts, notes and diagnostics.
 
-Supported settings are living room, garden and café. These are prepared pictures of an original fictional adult character. The app generates mouth movement and speech; it cannot wave, walk, change clothing or perform arbitrary body actions. It must describe that limitation instead of claiming an unsupported action happened. It has no live view of the user.
+Supported settings are living room, garden, café and a full-body garden portrait. These are prepared pictures of a fictional adult character; the separately generated full-body portrait has not passed identity-consistency review. The interactive renderer generates mouth movement and speech; it cannot wave, walk, change clothing or perform arbitrary body actions. The former CSS wave/cutout has been removed. It has no live view of the user.
 
 ## What was wrong, and what changed
 
@@ -22,7 +22,7 @@ The browser audit reproduced a real product failure: at the preview width, the o
 
 The current layout fits the observed 912px-high viewport without document scrolling. Captions/history scroll inside the same screen as the portrait and composer. An LLM now returns a validated reply, presentation, scene and optional factual excerpts in one decision. “From there” uses recent dialogue and the active setting. The app executes only allowlisted presentation/scene changes, never model-generated code, paths, URLs or shell commands.
 
-Video is now **fragmented MP4 streamed while inference is still running**, played through MediaSource with synchronized H.264/AAC tracks. The output is 20 FPS, encoded in roughly 200ms fragments with about 400ms initial media buffered. If MediaSource is unsupported, the app explicitly waits for the completed MP4. Autoplay failure exposes Play reply; connection failures retry; interruptions abort playback and cancel generation. Prepared images remain visible during loading.
+Video is **fragmented MP4 streamed while inference is still running**, played through MediaSource. The embedded audio is muted; a separate WAV speech track follows the video clock from its first playing event, pauses during stalls, and corrects drift over 120ms. Previously speech started only after the entire stream finished downloading, causing a delayed reply. The output is 20 FPS, encoded in roughly 200ms fragments with about 400ms initial media buffered. If MediaSource is unsupported, the app explicitly waits for the completed MP4. Autoplay failure exposes Play reply; interruptions abort both tracks. Test sound sends a short Web Audio tone to help distinguish browser/output-device problems from synthesis failures.
 
 A microphone call experiment exposed background-noise handling problems. That flow was removed at the founder's request. ASR remains installed for diagnostics but is not on the current browser interaction path.
 
@@ -30,7 +30,7 @@ A microphone call experiment exposed background-noise handling problems. That fl
 
 | Component | Actual local selection | Resource |
 |---|---|---|
-| Conversation/action planner | Qwen3.5-9B, Ollama `qwen3.5:9b-q4_K_M` | GPU, thinking off; temporary default until a hosted provider is configured |
+| Conversation/action planner | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Hosted, `/no_think`, bounded JSON response; no local GPU |
 | Voice | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CPU, four intra-op threads |
 | Lip-sync | MuseTalk 1.5 + SD VAE ft-mse + Whisper-tiny encoder | GPU FP16, batch eight; 20 FPS streaming output |
 | Face location | OpenCV YuNet 2023mar | CPU |
@@ -62,6 +62,13 @@ The server binds only to loopback, validates Host/Origin, requires a per-boot to
 
 ## Evidence
 
+September 8 update: Cloudflare global-key authentication succeeded using the existing private credential file (`X-Auth-Key` plus `X-Auth-Email`). The app also supports scoped bearer tokens, but this PC uses the key/email flow. Only the four named Cloudflare settings are read from the explicitly selected file; secrets are not copied into the repository or sent to the browser. The credential file path is supplied at launch, not discovered automatically. The [Cloudflare endpoint](https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/) runs [Qwen3-30B-A3B-FP8](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/).
+
+- One isolated Cloudflare planner reply: **1.13s**. One full browser reply: **2.60s to playback**, **3.77s server completion**, no buffer waits. These are samples, not p95 or continuous-motion measurements.
+- Replay observation: video clock **0.122068s**, unmuted WAV clock **0.127626s** (about **6ms** apart). Both finished without a browser media error. This does not confirm physical speaker output or phoneme quality.
+- Cancellation with Cloudflare: bytes arrived while rendering at **2.596s**, cancellation completed in **0.369s**, and prior conversation was preserved.
+- **54 Python tests and three JavaScript transport tests pass**. The latter cover initial synchronization, buffer stalls, blocked audio and cancellation while audio is starting. Earlier benchmark entries below used the previous provider/playback revision.
+
 - **52 offline tests pass**, covering prior economics/local boundaries plus action validation, verbatim-fact restrictions, corrections, persistence, scene persistence, missing-provider credentials and media bytes arriving before a job finishes.
 - Eight real Qwen planner turns correctly handled two personal facts, a lesson-day correction, recall, photo selection, contextual video selection and returning to text. Planner times were 0.87–1.90 seconds in this small synthetic sample.
 - Browser audit verified contextual image display, actual video playback, visible controls and no document scroll at the observed viewport. An intermediate 25 FPS stream began after 3.10 seconds with no buffer waits.
@@ -75,12 +82,24 @@ Current browser captures and synthetic traces are under ignored `generated/local
 
 ### Full-body motion decision (September 2026)
 
-The current 16 GB RTX 4060 Ti cannot run an unrestricted, photorealistic full-body video generator at call latency. The strongest open candidates split into two groups:
+**Current experiment: OmniAvatar-1.3B**, with Wan2.1-T2V-1.3B, UMT5-XXL, Wan VAE and Wav2Vec2-base-960h. It accepts a reference image, speech and movement prompt. [Upstream](https://github.com/Omni-Avatar/OmniAvatar) is pinned to `1536bf31abaec74364fb7d5883470d5b23ffa7f8` by `scripts/benchmark_omniavatar.py`. The runner removes unnecessary NCCL setup for exactly one GPU and conditionally imports sequence-parallel helpers; its imports pass on Windows. It uses CPU offload and starts at 256×384, 81 frames and 10 denoising steps. Weights are still downloading; **no successful body-motion generation, latency or quality result is claimed yet**. The checkpoint being 1.3B does not include the large text encoder and is not a total VRAM estimate.
+
+The isolated environment `.cache/omni-env` reuses the installed CUDA PyTorch through `app-runtime.pth`; its older Transformers/NumPy dependencies are pinned in `config/omniavatar-requirements.txt`. Do not install those dependencies into the app's `.venv`. Example after downloads finish, with the app stopped to free GPU/RAM:
+
+```powershell
+.cache/omni-env/Scripts/python.exe -X utf8 scripts/benchmark_omniavatar.py --image generated/local-app/fullbody.png --audio PATH_TO_SHORT_TEST_WAV
+```
+
+The runner records wall time and peak CUDA allocation in its ignored upstream cache. Its generated clips must be visually reviewed before integration. A failed/import-only run does not qualify as a working demo.
+
+Research alternatives: the [ComfyUI OmniAvatar node](https://github.com/CallMe1101/ComfyUI_OmniAvatar) exposes image/audio/prompt inputs but does not establish this GPU's speed. [StreamDiffusionV2](https://github.com/daitomanabe/streamdiffusionv2) offers single-GPU causal video-to-video streaming and a lightweight VAE option; it requires a driving video and has no measured 4060 Ti result here. [Vidu Q3](https://www.vidu.com/vidu-q3) documents native audiovisual clips up to 16 seconds; this is not evidence for local weights, continuous live generation or the claimed “S3 July” release. None of these links establishes unrestricted adult-use eligibility.
+
+A photorealistic full-body generator has **not yet met call latency on this 16 GB RTX 4060 Ti**. Earlier wording claimed this was impossible without measuring it; that conclusion was unsupported. Candidate differences matter:
 
 * **SoulX-FlashHead Lite** is the best local low-latency talking-avatar candidate, but it remains a head/upper-body model. Its published 96 FPS result is on an RTX 4090, not this card. [Repository](https://github.com/Soul-AILab/SoulX-FlashHead)
 * **Tencent MimicMotion 1.1** accepts pose guidance and can create body actions such as waving, walking and sitting, but its own README reports about 20 minutes for a 35-second clip on an RTX 4090 and approximately 16 GB VRAM. It is a prepared-clip generator, not a FaceTime renderer. [Repository](https://github.com/Tencent/MimicMotion)
 
-The practical path is a hybrid: generate a small library of full-body action clips offline with MimicMotion, select clips from text commands, and use FlashHead or a lighter facial layer for close-up speech. This gives realistic movement and voice while the library is bounded. It does not provide arbitrary instant body actions. The app should not claim otherwise until a body model is benchmarked on this exact GPU.
+A possible fallback is a library of actual generated action clips, selected by commands and voiced locally. This is not implemented and would support only the prepared actions. It must not be presented as arbitrary instant body generation.
 
 **New primary evaluation target: LongCat-Video-Avatar 1.5.** Its September 2026 model card describes audio-text-to-video and audio-image-text-to-video, full-body temporal stability, identity consistency, 8-step distillation and INT8 inference, with model weights under MIT. The INT8 checkpoint is four shards totaling approximately 16 GB before the base model, Whisper-large-v3 and runtime overhead. The published quick start uses a separate Python 3.10/PyTorch 2.6/FlashAttention environment and two distributed processes. It is therefore a serious full-body candidate, but it has not been installed or benchmarked on this 16 GB card. Do not route production traffic to it until a local smoke test proves VRAM, first-frame latency, audio synchronization and cancellation. [LongCat-Video-Avatar 1.5 model card](https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5)
 

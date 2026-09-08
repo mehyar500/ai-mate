@@ -1,6 +1,7 @@
 """Bounded conversation decisions, never executable model tool calls."""
 import json
 import os
+from pathlib import Path
 import re
 import subprocess
 import urllib.error
@@ -59,13 +60,35 @@ def validate_plan(data, user, mode, scene, available):
 
 class Conversation:
     def __init__(self, default_model):
-        self.provider = os.environ.get("AI_MATE_LLM_PROVIDER", "hermes")
-        if self.provider not in {"ollama", "minimax", "hermes"}:
-            raise ValueError("AI_MATE_LLM_PROVIDER must be ollama, minimax or hermes.")
-        self.model = os.environ.get("AI_MATE_LLM_MODEL") or (default_model if self.provider == "ollama" else "MiniMax-M3")
+        self.provider = os.environ.get("AI_MATE_LLM_PROVIDER", "cloudflare")
+        if self.provider not in {"ollama", "minimax", "hermes", "cloudflare"}:
+            raise ValueError("AI_MATE_LLM_PROVIDER must be ollama, minimax, hermes or cloudflare.")
+        defaults = {"ollama": default_model, "cloudflare": "@cf/qwen/qwen3-30b-a3b-fp8"}
+        self.model = os.environ.get("AI_MATE_LLM_MODEL") or defaults.get(self.provider, "MiniMax-M3")
         self.key = os.environ.get("MINIMAX_API_KEY", "") if self.provider == "minimax" else ""
         if self.provider == "minimax" and not self.key:
             raise ValueError("Set MINIMAX_API_KEY before selecting MiniMax. No cloud request was sent.")
+        self.cf_headers = {}
+        if self.provider == "cloudflare":
+            # Read only the explicitly selected file; never search for credentials.
+            allowed = {"CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_API_KEY", "CLOUDFLARE_EMAIL"}
+            values = {}
+            source = os.environ.get("AI_MATE_ENV_FILE")
+            if source:
+                for line in Path(source).read_text(encoding="utf-8-sig").splitlines():
+                    key, sep, value = line.strip().removeprefix("export ").partition("=")
+                    if sep and key.strip() in allowed:
+                        values[key.strip()] = value.strip().strip('\"').strip("'")
+            values.update({key: os.environ[key] for key in allowed if key in os.environ})
+            self.account = values.get("CLOUDFLARE_ACCOUNT_ID", "")
+            if not re.fullmatch(r"[a-fA-F0-9]{32}", self.account):
+                raise ValueError("Configure a valid CLOUDFLARE_ACCOUNT_ID for Cloudflare dialogue.")
+            if values.get("CLOUDFLARE_API_TOKEN"):
+                self.cf_headers = {"Authorization": "Bearer " + values["CLOUDFLARE_API_TOKEN"]}
+            elif values.get("CLOUDFLARE_API_KEY") and values.get("CLOUDFLARE_EMAIL"):
+                self.cf_headers = {"X-Auth-Key": values["CLOUDFLARE_API_KEY"], "X-Auth-Email": values["CLOUDFLARE_EMAIL"]}
+            else:
+                raise ValueError("Configure a Cloudflare API token, or API key and email, in the selected credential file.")
 
     def plan(self, snapshot, user, mode, scene, available, cancel):
         messages = messages_for(snapshot, user)
@@ -83,7 +106,8 @@ class Conversation:
             "scene: keep unless the user's conversation asks for another available setting. "
             "Choose fullbody when the user asks to see your full body, stand up, move around or show an action. "
             "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
-            "These are bounded visual cues; never claim a full body or hand was rendered. "
+            "Body movement is currently unavailable: closer, farther and wave are requests, not completed actions. "
+            "For those requests, say briefly that movement is not ready in this demo; never say you are waving or stepping. "
             "An unavailable setting/body action must be explained briefly; never claim it was generated. "
             "facts: zero to two stable PERSONAL facts explicitly stated by the user in their latest message. "
             "Use stable keys such as user_name, dog_name, piano_day, hobby. quote MUST be a verbatim substring "
@@ -114,6 +138,12 @@ class Conversation:
             body = {"model": self.model, "messages": messages, "stream": False, "think": False,
                     "format": SCHEMA, "keep_alive": "30m", "options": {"num_ctx": 4096, "num_predict": 300,
                     "temperature": .3, "presence_penalty": 0}}
+        elif self.provider == "cloudflare":
+            url = f"https://api.cloudflare.com/client/v4/accounts/{self.account}/ai/v1/chat/completions"
+            headers.update(self.cf_headers)
+            body = {"model": self.model, "messages": messages, "stream": False,
+                    "max_tokens": 512, "temperature": .3, "response_format": {"type": "json_object"}}
+            messages[-1]["content"] += "\n/no_think"
         else:
             url = "https://api.minimax.io/v1/text/chatcompletion_v2"
             headers["Authorization"] = "Bearer " + self.key

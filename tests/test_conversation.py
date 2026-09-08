@@ -1,4 +1,5 @@
 import json
+import io
 import os
 from pathlib import Path
 import tempfile
@@ -42,6 +43,33 @@ class PlanTests(unittest.TestCase):
                 Conversation("local")
         with patch.dict(os.environ,{"AI_MATE_LLM_PROVIDER":"ollama","AI_MATE_LLM_MODEL":""}):
             self.assertEqual(Conversation("local").provider,"ollama")
+
+    def test_cloudflare_global_key_flow_keeps_credentials_out_of_body(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)/'.env'
+            source.write_text('CLOUDFLARE_ACCOUNT_ID='+'a'*32+'\nCLOUDFLARE_API_KEY=test-secret\nCLOUDFLARE_EMAIL=test@example.test\nUNRELATED_SECRET=ignored\n')
+            env = {'AI_MATE_LLM_PROVIDER':'cloudflare','AI_MATE_ENV_FILE':str(source)}
+            response = {'choices':[{'message':{'content':json.dumps({'reply':'Hello','action':'none','facts':[]})}}]}
+            with patch.dict(os.environ, env, clear=True), patch('urllib.request.urlopen', return_value=io.BytesIO(json.dumps(response).encode())) as network:
+                model = Conversation('local')
+                plan = model.plan({'memory':'','turns':[]},'hello','video','mira',['mira'],threading.Event())
+                request = network.call_args.args[0]
+                self.assertEqual(request.get_header('X-auth-key'),'test-secret')
+                self.assertEqual(request.get_header('X-auth-email'),'test@example.test')
+                self.assertIsNone(request.get_header('Authorization'))
+                self.assertNotIn(b'test-secret',request.data)
+                self.assertNotIn(b'ignored',request.data)
+                self.assertEqual(plan['reply'],'Hello')
+                self.assertIn('/ai/v1/chat/completions',request.full_url)
+
+    def test_cloudflare_missing_auth_or_invalid_account_never_sends_request(self):
+        with patch.dict(os.environ, {'AI_MATE_LLM_PROVIDER':'cloudflare'}, clear=True), patch('urllib.request.urlopen') as network:
+            with self.assertRaises(ValueError): Conversation('local')
+            os.environ['CLOUDFLARE_ACCOUNT_ID']='a'*32
+            with self.assertRaises(ValueError): Conversation('local')
+            os.environ['CLOUDFLARE_ACCOUNT_ID']='../../another-account'
+            with self.assertRaises(ValueError): Conversation('local')
+            network.assert_not_called()
 
     def test_fact_correction_reopen_forget_reset_and_prompt_placement(self):
         with tempfile.TemporaryDirectory() as directory:

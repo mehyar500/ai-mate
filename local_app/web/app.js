@@ -1,3 +1,4 @@
+import {synchronizeSpeech} from './media-sync.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
@@ -91,6 +92,14 @@ async function drain(){
     if(item.video){media.hidden=false;media.muted=true;$("media-label").textContent=sceneNames[scene]+" · Generated video";}
     speech.muted=!soundOn;speech.volume=1;
     const controller=new AbortController();abortMedia=controller;
+    let releaseSpeech=()=>{};
+    if(item.video&&item.audio){
+      speech.src=item.audio;speech.load();
+      releaseSpeech=synchronizeSpeech(media,speech,{signal:controller.signal,onBlocked:error=>{
+        $("resume").hidden=false;
+        notice(error.name==="NotAllowedError"?"Tap Play reply to enable voice.":"Voice playback failed. Try Replay or Test sound.",true);
+      }});
+    }
     media.onplaying=played;
     media.onwaiting=()=>{if(firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
     media.onended=()=>{if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
@@ -103,11 +112,13 @@ async function drain(){
           if(mine!==epoch)break;media.src=item.video;await attemptPlay(media);
         }
       }else{media.src=item.video||item.audio;await attemptPlay(media);}
-      if(item.video&&item.audio){speech.src=item.audio;speech.load();await attemptPlay(speech);}
       if(!media.ended)await waitEvent(media,"ended",controller.signal,Math.max(45000,(item.duration_s+20)*1000));
+      if(item.video&&item.audio&&!speech.ended&&!speech.paused)
+        await waitEvent(speech,"ended",controller.signal,10000);
     }catch(error){
       if(mine===epoch&&error.name!=="AbortError"){notice(error.message,true);$("resume").hidden=false;}
     }
+    releaseSpeech();
     if(mine===epoch&&objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
   }
   if(mine===epoch){playing=false;abortMedia=null;controls();}
@@ -173,7 +184,17 @@ async function interrupt(){
   else notice("Reply stopped. Type your next message.");
 }
 $("stop").addEventListener("click",interrupt);
-$("sound").addEventListener("click",async()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;if(soundOn&&lastMedia?.audio&&!$("audio").src){$("audio").src=lastMedia.audio;$("audio").load();}controls();if(soundOn){const media=$("audio").src?$("audio"):$("video");try{await media.play();notice("Sound enabled.");}catch{notice("Tap Replay to start sound for this reply.");}}});
+$("sound").addEventListener("click",()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;controls();});
+let soundTestContext;
+$("test-sound").addEventListener("click",async()=>{
+  try{
+    soundTestContext??=new AudioContext();await soundTestContext.resume();
+    const tone=soundTestContext.createOscillator(),gain=soundTestContext.createGain();
+    tone.frequency.value=440;gain.gain.value=.08;tone.connect(gain);gain.connect(soundTestContext.destination);
+    tone.start();tone.stop(soundTestContext.currentTime+.4);
+    notice("Test tone sent. If you hear nothing, check this browser's sound permission and your Windows output device.");
+  }catch(error){notice("Sound test failed: "+error.message,true);}
+});
 function renderFacts(facts=[]){
   $("facts").replaceChildren();
   if(!facts.length){const p=document.createElement("p");p.className="no-facts";p.textContent="No facts saved yet."; $("facts").append(p);}

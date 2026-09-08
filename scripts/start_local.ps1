@@ -1,9 +1,11 @@
-param([switch]$Background)
+param([switch]$Background, [string]$EnvFile, [string]$Provider)
 $ErrorActionPreference = 'Stop'
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $pocPython = Join-Path $projectRoot '.venv\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $pocPython)) { throw 'Run the local environment setup in docs/LOCAL_POC.md first.' }
 Set-Location -LiteralPath $projectRoot
+if ($EnvFile) { $env:AI_MATE_ENV_FILE = (Resolve-Path -LiteralPath $EnvFile).Path }
+if ($Provider) { $env:AI_MATE_LLM_PROVIDER = $Provider }
 if ($Background) {
     try {
         $pocState = Invoke-RestMethod -Uri 'http://127.0.0.1:8765/api/bootstrap' -TimeoutSec 2
