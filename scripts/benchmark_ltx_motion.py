@@ -5,6 +5,8 @@ import shutil
 from pathlib import Path
 import time
 import urllib.request
+import uuid
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[1]
 import sys
@@ -41,7 +43,12 @@ def main():
         print('Waiting for existing LTX model downloads.', flush=True)
         time.sleep(min(30, max(0,deadline-time.monotonic())))
     source = ROOT/'generated/local-app'/(opts.reference+'.png')
-    target = ROOT/'.cache/local-poc/ComfyUI/input'/('benchmark-'+opts.reference+'.png')
+    queue = request('/queue')
+    if queue.get('queue_running') or queue.get('queue_pending'):
+        raise RuntimeError('Wait for the motion worker to become idle.')
+    # A new LoadImage identity forces inference while keeping model weights warm.
+    tag = 'benchmark-'+uuid.uuid4().hex
+    target = ROOT/'.cache/local-poc/ComfyUI/input'/(tag+'.png')
     shutil.copyfile(source,target)
     graph = workflow(opts.width, opts.height, opts.frames, opts.seed, opts.action, opts.encoder,
                      end_image=target.name if opts.return_to_reference else None)
@@ -62,17 +69,22 @@ def main():
             execution_s = ((times['execution_success']-times['execution_start'])/1000
                            if 'execution_success' in times and 'execution_start' in times else None)
             record = {'wall_s':round(time.perf_counter()-started,3), 'seed':opts.seed,
+                      'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
                       'server_execution_s':execution_s, 'action':opts.action, 'encoder':opts.encoder, 'reference':opts.reference,
                       'resolution':[opts.width,opts.height], 'frames':opts.frames,
                       'return_to_reference':opts.return_to_reference,
                       'checkpoint':CHECKPOINT, 'status':result.get('status'), 'outputs':result.get('outputs')}
             (audit/f'ltx-motion-{key}.json').write_text(json.dumps(record,indent=2),encoding='utf-8')
             print(json.dumps(record),flush=True)
+            target.unlink(missing_ok=True)
             if result.get('status',{}).get('status_str') != 'success':
                 raise RuntimeError('ComfyUI motion generation failed; see the benchmark record.')
             return
         time.sleep(1)
-    raise RuntimeError('ComfyUI benchmark timed out; inspect its local queue before retrying.')
+    request('/queue', {'delete':[key]})
+    request('/interrupt', {'prompt_id':key})
+    target.unlink(missing_ok=True)
+    raise RuntimeError('ComfyUI benchmark timed out; its specific job was stopped.')
 
 
 if __name__ == '__main__':

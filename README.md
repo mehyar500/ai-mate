@@ -2,9 +2,9 @@
 
 **Lawful consensual adult content is a mandatory launch requirement. If the intended adult experience cannot be delivered within accepted model, host and payment terms, the product does not launch.** This decision supersedes earlier suggestions to launch a non-explicit substitute.
 
-**Current stage: a running, non-explicit local prototype on the founder's RTX 4060 Ti, 16GB VRAM and 48GB RAM.** Type into one phone-style screen to receive streamed video and voice. Context selects supported scenes and media; short shared facts and manual notes persist. Microphone and camera are disabled. The founder is the only engineer; public access and billing are deferred. The intended adult commercial experience remains unqualified.
+**Current stage: a running, non-explicit local prototype on the founder's RTX 4060 Ti, 16GB VRAM and 48GB RAM.** Text, Voice call and Video call share conversation and memory. Calls accept typing or opt-in microphone input; an active call continues when viewing Text. Video supports three bounded body commands with uneven quality. Camera access is disabled. Public access, billing and the intended adult commercial experience remain unqualified.
 
-On this configured PC, run `./scripts/start_local.ps1 -Background` and open **http://127.0.0.1:8765**. Wait for local model warm-up. Setup, exact models, measured performance and limitations are in [LOCAL_POC](docs/LOCAL_POC.md). The default uses local models. An optional MiniMax dialogue adapter is implemented but awaits a configured API key; graphics and voice stay local. The app does not read `.env.example`.
+On this configured PC, run `./scripts/start_local.ps1 -Background` and open **http://127.0.0.1:8765**. Wait for model warm-up. Cloudflare handles dialogue; graphics, speech and transcription run locally. The central `local_app/engine.py` loads three non-secret startup choices from private `.env`; process/launcher overrides win. Cloudflare credentials stay in the explicitly selected private file, using API key plus email here. Setup, model choices, measured performance and limitations are in [LOCAL_POC](docs/LOCAL_POC.md). `.env.example` documents only implemented configuration.
 
 Six active product documents, including the newly requested local POC plan:
 
@@ -15,7 +15,7 @@ Six active product documents, including the newly requested local POC plan:
 5. [USA](docs/USA.md): commercial licenses, hosting, US release conditions and age assurance.
 6. [LOCAL_POC](docs/LOCAL_POC.md): local hardware allocation, benchmark commands, measured findings and the visual-call experiment.
 
-Use the existing computer and loopback services for current inference; hosted dialogue is an optional explicit configuration. Model downloads use internet access. TensorDock/Cloudflare are deferred deployment candidates; no payment processor is needed for this unpaid stage. Self-hosting does not override licenses or establish nationwide legality.
+Use the existing computer and loopback services for graphics and speech; dialogue uses the configured provider. Model downloads use internet access. TensorDock/Cloudflare are deferred deployment candidates; no payment processor is needed for this unpaid stage. Self-hosting does not override licenses or establish nationwide legality.
 
 `local_app/` contains the loopback server, inference adapters and browser interface. `scripts/` contains setup, benchmarks and synthetic integration checks; `config/` pins models and runtimes; `tests/` covers economics and local data/HTTP behavior. Weights, generated media and private memory stay ignored locally. The interface has a web manifest but is not a validated mobile PWA or continuous FaceTime app. Earlier plans remain in Git history; agent/factory files are historical coordination material.
 

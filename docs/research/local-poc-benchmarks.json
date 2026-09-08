@@ -4604,5 +4604,380 @@
         "note": "Same request, different model-selected scene and no unnecessary body motion; not controlled A/B."
       }
     }
+  },
+  "direct_renderer_comparison_2026_09_08": {
+    "direct": [
+      {
+        "engine": "diffusers",
+        "diffusers_version": "0.40.0",
+        "comfyui_dependency": false,
+        "checkpoint": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "precision": "FP8 checkpoint weights cast to BF16; not FP8 matrix multiplication",
+        "config_revision": "e58e28c39631af4d1468ee57a853764e11c1d37e",
+        "source_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "settings": {
+          "action": "wave",
+          "seed": 50,
+          "width": 384,
+          "height": 576,
+          "frames": 73,
+          "runs": 2,
+          "return_to_reference": true
+        },
+        "prompt_encoder_s": 8.287,
+        "setup_s": 13.948,
+        "runs": [
+          {
+            "run": 0,
+            "render_s": 4.647,
+            "total_with_encode_s": 4.72,
+            "steps_elapsed_s": [
+              0.877,
+              1.218,
+              1.559,
+              1.9,
+              2.242,
+              2.583,
+              2.924,
+              3.265
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6603.1,
+            "peak_reserved_mib": 7324.0,
+            "video": "direct-ltx-wave-50-0.mp4"
+          },
+          {
+            "run": 1,
+            "render_s": 4.428,
+            "total_with_encode_s": 4.496,
+            "steps_elapsed_s": [
+              0.679,
+              1.021,
+              1.363,
+              1.706,
+              2.049,
+              2.391,
+              2.733,
+              3.076
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6603.1,
+            "peak_reserved_mib": 7324.0,
+            "video": "direct-ltx-wave-50-1.mp4"
+          }
+        ]
+      },
+      {
+        "engine": "diffusers",
+        "diffusers_version": "0.40.0",
+        "comfyui_dependency": false,
+        "checkpoint": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "precision": "FP8 checkpoint weights cast to BF16; not FP8 matrix multiplication",
+        "config_revision": "e58e28c39631af4d1468ee57a853764e11c1d37e",
+        "source_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "settings": {
+          "action": "closer",
+          "seed": 50,
+          "width": 384,
+          "height": 576,
+          "frames": 73,
+          "runs": 1,
+          "return_to_reference": false
+        },
+        "prompt_encoder_s": 7.634,
+        "setup_s": 11.53,
+        "runs": [
+          {
+            "run": 0,
+            "render_s": 4.032,
+            "total_with_encode_s": 4.107,
+            "steps_elapsed_s": [
+              0.576,
+              0.872,
+              1.169,
+              1.466,
+              1.763,
+              2.06,
+              2.357,
+              2.654
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6601.5,
+            "peak_reserved_mib": 7432.0,
+            "video": "direct-ltx-closer-50-0.mp4"
+          }
+        ]
+      },
+      {
+        "engine": "diffusers",
+        "diffusers_version": "0.40.0",
+        "comfyui_dependency": false,
+        "checkpoint": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "precision": "FP8 checkpoint weights cast to BF16; not FP8 matrix multiplication",
+        "config_revision": "e58e28c39631af4d1468ee57a853764e11c1d37e",
+        "source_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "settings": {
+          "action": "farther",
+          "seed": 50,
+          "width": 384,
+          "height": 576,
+          "frames": 73,
+          "runs": 1,
+          "return_to_reference": false
+        },
+        "prompt_encoder_s": 7.479,
+        "setup_s": 11.496,
+        "runs": [
+          {
+            "run": 0,
+            "render_s": 4.039,
+            "total_with_encode_s": 4.107,
+            "steps_elapsed_s": [
+              0.57,
+              0.868,
+              1.166,
+              1.464,
+              1.762,
+              2.06,
+              2.358,
+              2.656
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6601.5,
+            "peak_reserved_mib": 7432.0,
+            "video": "direct-ltx-farther-50-0.mp4"
+          }
+        ]
+      },
+      {
+        "engine": "diffusers",
+        "diffusers_version": "0.40.0",
+        "comfyui_dependency": false,
+        "checkpoint": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "precision": "FP8 checkpoint weights cast to BF16; not FP8 matrix multiplication",
+        "config_revision": "e58e28c39631af4d1468ee57a853764e11c1d37e",
+        "source_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "settings": {
+          "action": "wave",
+          "seed": 50,
+          "width": 320,
+          "height": 480,
+          "frames": 73,
+          "runs": 2,
+          "return_to_reference": true,
+          "prepare_config": false
+        },
+        "prompt_encoder_s": 0.0,
+        "setup_s": 5.836,
+        "runs": [
+          {
+            "run": 0,
+            "render_s": 4.012,
+            "total_with_encode_s": 4.082,
+            "steps_elapsed_s": [
+              1.001,
+              1.224,
+              1.447,
+              1.671,
+              1.894,
+              2.117,
+              2.34,
+              2.563
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6593.6,
+            "peak_reserved_mib": 7514.0,
+            "video": "direct-ltx-wave-50-320x480-73-0.mp4"
+          },
+          {
+            "run": 1,
+            "render_s": 3.13,
+            "total_with_encode_s": 3.192,
+            "steps_elapsed_s": [
+              0.528,
+              0.75,
+              0.973,
+              1.196,
+              1.419,
+              1.642,
+              1.865,
+              2.088
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6593.6,
+            "peak_reserved_mib": 7514.0,
+            "video": "direct-ltx-wave-50-320x480-73-1.mp4"
+          }
+        ]
+      },
+      {
+        "engine": "diffusers",
+        "diffusers_version": "0.40.0",
+        "comfyui_dependency": false,
+        "checkpoint": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "precision": "FP8 checkpoint weights cast to BF16; not FP8 matrix multiplication",
+        "config_revision": "e58e28c39631af4d1468ee57a853764e11c1d37e",
+        "source_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "settings": {
+          "action": "wave",
+          "seed": 50,
+          "width": 256,
+          "height": 384,
+          "frames": 73,
+          "runs": 2,
+          "return_to_reference": true,
+          "prepare_config": false
+        },
+        "prompt_encoder_s": 0.0,
+        "setup_s": 4.033,
+        "runs": [
+          {
+            "run": 0,
+            "render_s": 2.22,
+            "total_with_encode_s": 2.28,
+            "steps_elapsed_s": [
+              0.596,
+              0.735,
+              0.875,
+              1.014,
+              1.154,
+              1.293,
+              1.432,
+              1.572
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6552.5,
+            "peak_reserved_mib": 7266.0,
+            "video": "direct-ltx-wave-50-256x384-73-0.mp4"
+          },
+          {
+            "run": 1,
+            "render_s": 1.952,
+            "total_with_encode_s": 2.005,
+            "steps_elapsed_s": [
+              0.348,
+              0.487,
+              0.627,
+              0.767,
+              0.907,
+              1.047,
+              1.187,
+              1.327
+            ],
+            "frames": 73,
+            "peak_allocated_mib": 6553.5,
+            "peak_reserved_mib": 7412.0,
+            "video": "direct-ltx-wave-50-256x384-73-1.mp4"
+          }
+        ]
+      }
+    ],
+    "comfy_same_source_seed_50": {
+      "cold_execution_s": 6.809,
+      "warm_execution_s": 4.349,
+      "warm_wall_with_one_second_polling_s": 5.044,
+      "fresh_diffusion_verified": true
+    },
+    "assembly_only": {
+      "runs": [
+        {
+          "source": "direct-ltx-wave-50-320x480-73-1.mp4",
+          "output": "assembly-wave-320x480.mp4",
+          "tts_s": 0.39,
+          "speech_duration_s": 1.8632916666666666,
+          "first_4096_bytes_s": 0.799,
+          "metrics": {
+            "render_s": 2.8613322000001062,
+            "frames": 61,
+            "fps": 21.3187409696776,
+            "duration_s": 3.05,
+            "speech_duration_s": 1.8633125,
+            "lip_sync_frames": 48,
+            "resolution": "320x480",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2727.0830078125,
+            "torch_peak_reserved_mib": 3428.0,
+            "audio_features_s": 0.35475960000076157,
+            "neural_s": 2.4675600999980816,
+            "composite_pipe_s": 0.03123070000219741,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.2963337000001047,
+            "face_encode_stride": 2
+          },
+          "body_generation_included": false,
+          "browser_playback_measured": false
+        },
+        {
+          "source": "direct-ltx-wave-50-256x384-73-1.mp4",
+          "output": "assembly-wave-256x384.mp4",
+          "tts_s": 0.39,
+          "speech_duration_s": 1.8632916666666666,
+          "first_4096_bytes_s": 0.7,
+          "metrics": {
+            "render_s": 2.7635682999989513,
+            "frames": 61,
+            "fps": 22.072912039128234,
+            "duration_s": 3.05,
+            "speech_duration_s": 1.8633125,
+            "lip_sync_frames": 48,
+            "resolution": "256x384",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2727.0830078125,
+            "torch_peak_reserved_mib": 3428.0,
+            "audio_features_s": 0.26756399999976566,
+            "neural_s": 2.4655351000001247,
+            "composite_pipe_s": 0.023924700000861776,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.2471159999986412,
+            "face_encode_stride": 2
+          },
+          "body_generation_included": false,
+          "browser_playback_measured": false
+        }
+      ],
+      "audio_peak": 0.46978759765625,
+      "audio_rms_dbfs": -22.674323663536434,
+      "generated_speech_transcript": "Hi there, here's a wave.",
+      "physical_speaker_verified": false
+    },
+    "limitations": [
+      "Different precision and VAE/latent handling; not a framework-only A/B.",
+      "320 first sample had idle Comfy weights resident; warm sample used for comparison.",
+      "256 wave raised both hands; 384 backward prompt instead approached/crouched.",
+      "Closer sample moved the background/framing.",
+      "No direct backend promotion; no continuous live video claim.",
+      "Physical speaker audibility and public commercial qualification remain unverified."
+    ],
+    "live_engine_regression": {
+      "provider": "cloudflare",
+      "startup_s": 12.422,
+      "startup_from_private_env_without_launcher_overrides": true,
+      "video_first_playback_s": 8.99,
+      "server_total_s": 9.47,
+      "buffer_stalls": 0,
+      "audio_ended": true,
+      "audio_muted": false,
+      "held_frame_size": [
+        384,
+        576
+      ],
+      "held_frame_visible_after_end": true,
+      "held_frame_survived_text_return": true,
+      "stream_cancel": {
+        "first_4096_bytes_s": 2.131,
+        "state_when_bytes_arrived": "rendering",
+        "cancel_s": 0.336,
+        "conversation_unchanged": true,
+        "media_removed": true
+      }
+    },
+    "tests": {
+      "python": 71,
+      "node": 7,
+      "independent_review": "pending",
+      "public_staging": "not provisioned"
+    }
   }
 }

@@ -15,3 +15,5 @@ opencv-python==4.14.0.94
 scipy==1.18.1
 safetensors==0.8.0
 pillow==12.3.0
+# Direct LTX benchmark: convert the official T5 SentencePiece tokenizer.
+sentencepiece==0.2.1

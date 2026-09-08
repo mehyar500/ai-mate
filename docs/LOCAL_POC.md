@@ -141,6 +141,61 @@ A second latency approach is a reviewed library of genuinely generated neutral-t
 
 ## Reproduce
 
+### Central engine and current configuration
+
+`local_app/engine.py` owns startup, turn state, the selected response mode, model sequencing, cancellation, pose continuity and successful memory/message commits. `server.py` is the loopback HTTP transport and retains an `Application` alias for existing integration scripts. Model-specific inference remains in `conversation.py`, `models.py`, `motion.py` and `visual.py`; there is one turn flow rather than separate text/microphone implementations.
+
+```text
+typed input ----------------------┐
+microphone WAV -> Whisper base.en ─┴-> memory + explicit mode
+    -> bounded direct command OR Cloudflare Qwen filled plan
+    -> Text: reply
+    -> Voice call: Kokoro speech
+    -> Video call: Kokoro speech -> optional LTX body action -> MuseTalk lips
+    -> stream picture + synchronized WAV -> hold final picture between turns
+    -> successful completion: memory, in-app call message and last pose
+```
+
+The video tab remains the main experiment. A browser check found a blank picture after an ended video had sat idle. The client now captures its last decoded frame into the existing canvas at completion, hides the ended video surface and keeps a reviewed portrait underneath if capture fails. This is a held image between generated replies, not continuous live movement. A fresh reply hides that held frame only when playback starts.
+
+After restart from the private `.env` without launcher overrides, Cloudflare and the local models became ready in **12.422s**. A fresh cold wave reached browser playback in **8.99s**, finished server-side in **9.47s**, and had zero buffer stalls. The unmuted WAV reached its end; the 384x576 final picture remained visible after playback and a Text/Return-to-call round trip. A streaming cancellation check then received bytes during rendering in **2.131s**, cancelled in **0.336s**, preserved conversation/notes/facts and removed only its cancelled media. These checks validate the engine move and frame retention; they do not meet the target latency.
+
+Private `.env` now contains implemented startup configuration instead of hypothetical production flags. The engine reads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL` and `AI_MATE_ENV_FILE`; environment/launcher overrides take precedence. The existing Cloudflare adapter reads account ID, API key, email or alternative API token from the explicitly selected credential file. API key plus email remains the selected authentication flow. Secrets are never loaded into the browser. MiniMax credentials remain process variables. Custom local values were preserved and the former local file was backed up privately as `.env.before-engine`. Deployment, payment and legal requirements stay in the product documents; deleting unused flags neither implements nor removes access controls.
+
+### Direct renderer comparison, September 8
+
+Same reviewed garden reference, seed 50, three-second/73-frame clips, eight distilled steps. The direct runner uses Diffusers 0.40.0 and existing LTX 2B 0.9.8 FP8 checkpoint weights cast to BF16; ComfyUI uses its fast FP8 kernels. Both wave tests condition the starting and ending pose. Tokenization/config-only assets are pinned to official `Lightricks/LTX-Video-0.9.5` revision `e58e28c39631af4d1468ee57a853764e11c1d37e`, whose transformer/VAE architecture matches this checkpoint. Precision, latent handling, VAE tiling and decode settings differ: this is a practical pipeline comparison, not an isolated framework performance claim.
+
+| Candidate | Measured body time | Reviewed finding |
+|---|---:|---|
+| ComfyUI FP8, 384x576 | 6.809s cold execution; 4.349s warm | Hand raised/lowered, but the other hand also moved |
+| Direct BF16, 384x576 | 4.720s first render+encode; 4.496s warm | One hand raised/lowered; full body; soft face/fingers |
+| Direct BF16, 320x480 | 3.192s warm render+encode | Wave retained; softer details |
+| Direct BF16, 256x384 | 2.005s warm render+encode | Both hands raised; rejected for exact one-hand following |
+| Direct closer, 384x576 | 4.107s render+encode | Approached, but framing/background shifted |
+| Direct backward, 384x576 | 4.107s render+encode | Came forward and crouched; failed command |
+
+Direct cold setup was **13.948s**, including **8.287s** to load/encode the first T5 prompt; subsequent benchmark prompts are cached by prompt/config hash. Peak direct allocated CUDA memory was about **6.4 GiB**, with the app's lip renderer still resident separately. The 320 first sample was 4.082s with idle Comfy weights still resident; only its second warm sample is shown above. None of these numbers includes LLM, speech, lip rendering, browser startup or network delivery. A Comfy repeat uses a unique input node so it reruns diffusion instead of returning a fully cached video.
+
+Speech assembly was separately tested over the reviewed generated 320 and 256 clips: Kokoro took **0.390s** for 1.863s of speech; first 4KB of the voiced video appeared after **0.799/0.700s** of assembly, and rendering completed in **2.861/2.764s**. Body generation was excluded from that test. The audio peaked at 0.470, RMS -22.67 dBFS, and local ASR recovered the exact test sentence. This establishes a non-silent generated track, not the founder's physical speaker output. Reviewed 320 output retained a complete visible wave; facial detail remains limited. Do not add these separate samples and claim a measured end-to-end latency.
+
+**Decision:** keep the existing app backend while the direct pipeline remains an independently reproducible candidate. Its low-resolution speed gain is real in these samples; dependable backward motion, identity and audio/visual quality remain unsolved. Larger joint audio/video LTX-2.3 weights are downloading, have not completed verification/inference and are not selected. Its [weight license](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE) has revenue and directly competing-service conditions; code licensing and self-hosting do not establish public/adult commercial clearance.
+
+Reproduce benchmark candidates separately from user calls, keeping other GPU inference idle:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/benchmark_direct_ltx.py --prepare-config --return-to-reference
+.\.venv\Scripts\python.exe scripts/benchmark_direct_ltx.py --width 320 --height 480 --return-to-reference
+.\.venv\Scripts\python.exe scripts/benchmark_direct_ltx.py --width 256 --height 384 --return-to-reference
+.\.venv\Scripts\python.exe scripts/benchmark_video_assembly.py
+.\.venv\Scripts\python.exe scripts/benchmark_ltx_motion.py --frames 73 --seed 50 --return-to-reference
+# Optional ~39GB pinned candidate download; no automatic renderer selection:
+.\.venv\Scripts\python.exe scripts/download_ltx23_benchmark.py
+.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py
+```
+
+Run the Comfy benchmark with the existing motion service; the direct runner does not call or import ComfyUI. Review source images first, then the private MP4/contact sheets and JSON in `generated/local-app/audit`. Current changes pass 71 Python and seven Node checks. Independent R2 review, staging and public qualification remain outstanding. Rollback is a reviewed code revert; keep SQLite memory and private credentials intact.
+
 The configured environment is Python 3.12 with PyTorch 2.11.0+cu128. Dependencies are pinned in [requirements](../config/local-poc-requirements.txt). For a fresh environment, install Python 3.12, Ollama and FFmpeg, then:
 
 ```powershell

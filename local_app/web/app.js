@@ -63,12 +63,18 @@ function setScene(value){
   $("media-label").textContent=sceneNames[scene]+" · AI portrait";
 }
 function setAction(value="none"){document.querySelector(".visual").dataset.action=value||"none";}
-function resetPlayback(holdFrame=false){
+function holdPicture(){
   const held=$("held-frame"),picture=$("video");
-  if(holdFrame&&!picture.hidden&&picture.readyState>=2){
-    held.width=picture.videoWidth;held.height=picture.videoHeight;
-    held.getContext("2d").drawImage(picture,0,0);held.hidden=false;
-  }else if(!holdFrame)held.hidden=true;
+  if(!picture.hidden&&picture.readyState>=2&&picture.videoWidth&&picture.videoHeight){
+    try{
+      held.width=picture.videoWidth;held.height=picture.videoHeight;
+      held.getContext("2d").drawImage(picture,0,0);held.hidden=false;
+    }catch{held.hidden=true;} // The reviewed portrait remains underneath on decoder failure.
+  }
+  picture.hidden=true;
+}
+function resetPlayback(holdFrame=false){
+  if(holdFrame)holdPicture();else $("held-frame").hidden=true;
   epoch++;queue=[];playing=false;abortMedia?.abort();abortMedia=null;
   for(const media of [$("video"),$("audio")]){media.pause();media.removeAttribute("src");media.load();}
   if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
@@ -136,7 +142,7 @@ async function drain(){
     }
     media.onplaying=played;
     media.onwaiting=()=>{if(firstPlayed!==null&&waitingSince===null){stalls++;waitingSince=performance.now();updateMetrics();}};
-    media.onended=()=>{if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
+    media.onended=()=>{if(mine!==epoch)return;if(item.video)holdPicture();if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}updateMetrics();};
     try{
       if(item.stream){
         const supported=await playStream(item,media,controller.signal);
@@ -150,7 +156,7 @@ async function drain(){
       if(item.video&&item.audio&&!speech.ended&&!speech.paused)
         await waitEvent(speech,"ended",controller.signal,10000);
     }catch(error){
-      if(mine===epoch&&error.name!=="AbortError"){notice(error.message,true);$("resume").hidden=false;}
+      if(mine===epoch&&error.name!=="AbortError"){if(item.video)holdPicture();notice(error.message,true);$("resume").hidden=false;}
     }
     releaseSpeech();
     if(mine===epoch&&objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
@@ -158,6 +164,7 @@ async function drain(){
   if(mine===epoch){playing=false;abortMedia=null;listenAfter=performance.now()+450;controls();}
 }
 $("resume").addEventListener("click",async()=>{
+  if(lastMedia?.video&&$("video").hidden){const item={...lastMedia,stream:null};resetPlayback(true);queue.push(item);drain();return;}
   const media=$("video").hidden?$("audio"):$("video");
   try{await media.play();$("resume").hidden=true;}catch{if(lastMedia){resetPlayback();queue.push({...lastMedia,stream:null});drain();}}
 });
