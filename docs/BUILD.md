@@ -18,6 +18,8 @@ The [86-entry Cloudflare inventory](research/cloudflare-models.json) has no vide
 
 ## One flow
 
+For the first **clean** call, keep Qwen3-30B-A3B, Deepgram Flux/Aura-2 and text checks on Cloudflare; send generated audio to the GPU's MuseTalk renderer. The local chain below is the lower-cost challenger and conditional adult route. Both use the same Cloudflare app/storage/WebRTC infrastructure. Pricing must follow the winning route; see [REPORT](REPORT.md#cloudflare-first-or-lowest-cost).
+
 Verify adult eligibility → sign in → choose character → free text → approve/edit memory → choose paid allowance → hosted checkout → microphone call. Show remaining minutes and service hours. Captions, keyboard controls, mute/end and account deletion are required. User camera stays off.
 
 Browser microphone → Cloudflare SFU → GPU transcription → ≤4,096-token context with ≤8 approved facts → streamed Qwen reply → clause safety checks → Kokoro → MuseTalk → timestamped H.264/Opus back through SFU. Cancel stale audio/frames on interruption. Start with one call per GPU; measure contention. Short talking clips reuse this renderer.

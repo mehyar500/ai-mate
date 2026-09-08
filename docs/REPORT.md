@@ -9,10 +9,34 @@
 | Product | General assistant with live voice and other tools | One persistent fictional adult companion with an animated face |
 | Monthly price | Plus $20; Pro starts at $100 | Close $24.99/60 call minutes; Together $49.99/180 minutes |
 | Cheaper than Plus? | Reference price | **No: Close is 24.95% more; Together 149.95% more** |
-| Usage comparison | Plan-dependent voice allowances; desktop voice uses rolling five-hour windows | Explicit monthly connected-call minutes |
+| Usage comparison | Plan- and app-dependent voice allowances; not sold as our monthly avatar-minute bundle | Explicit monthly connected-call minutes |
 | Our intended difference | Reviewed voice documentation does not establish an equivalent persistent photorealistic companion offering | Consistent character, visible editable relationship memory and approved adult mode |
 
 [Official ChatGPT prices](https://learn.chatgpt.com/docs/pricing), [voice documentation](https://learn.chatgpt.com/docs/features/voice). These describe customer pricing, not OpenAI's internal cost or profit; those were not established. API prices are a different product. Do not turn ChatGPT's subscription into an invented per-minute rate or claim we beat its intelligence/voice quality.
+
+## Cloudflare-first or lowest-cost?
+
+**Start the clean prototype with Cloudflare text, speech and safety models, plus one GPU solely for MuseTalk.** This matches the preference for fewer model services and isolates the hardest test: the face. Move speech/language onto the GPU only if measured quality, utilization and savings justify it. Adult traffic requires a separately permitted local route; Cloudflare infrastructure permission does not authorize every hosted model.
+
+| Call implementation | Estimated 30 / 60 min cost | Pricing implication |
+|---|---:|---|
+| Cloudflare voice + static portrait | $0.93 / $1.86 | Cheap voice product; not animated FaceTime |
+| Cloudflare voice + GPU face | $2.43 / $4.86 | At current $24.99/$49.99 plans, contribution falls to 45.1%/44.1% |
+| Local language/voice + GPU face | $1.55 / $3.11 | Current plans model 52.1%/54.6%, but shared-GPU performance is unproven |
+
+If the Cloudflare-heavy route wins, **$29.99/60 minutes and $59.99/180 minutes** would model 51.2%/50.4% contribution under the same assumptions. These are conditional alternatives, not additional tiers. The $59.99 option is 30.6% cheaper than the lowest listed Chaturbate private category and 86.1% cheaper than the 30-token example at full use; the $29.99 option is actually 4.1% more expensive than the cheapest category. Do not advertise savings universally. Keep the existing prices only if the lower-cost route passes its test.
+
+## Why choose one over another?
+
+These are hypotheses to validate with users, not survey findings.
+
+| Choice | Why someone might prefer it | Why they might choose something else |
+|---|---|---|
+| Amorien | Same fictional character, explicit editable memory, predictable private-call allowance, permitted customization | Simulated relationship, animation defects, limited actions and beta hours; less general utility |
+| ChatGPT | Broad assistance, established voice experience, $20 Plus entry price; may already be subscribed | The reviewed product is not the same photorealistic fictional partner experience |
+| Human performer | Real person's presence, agency, spontaneous movement and interaction | Private time can be expensive; availability and individual boundaries vary |
+
+Our strongest hypothesis is persistent personalized companionship, not replacing human performers or beating ChatGPT on general intelligence. Ask testers which experience they would pay for after trying both; measure repeat use and cancellations, not just visual novelty.
 
 ## Where the price advantage could exist
 
