@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import subprocess
 import urllib.error
 import urllib.request
 
@@ -58,10 +59,10 @@ def validate_plan(data, user, mode, scene, available):
 
 class Conversation:
     def __init__(self, default_model):
-        self.provider = os.environ.get("AI_MATE_LLM_PROVIDER", "ollama")
-        if self.provider not in {"ollama", "minimax"}:
-            raise ValueError("AI_MATE_LLM_PROVIDER must be ollama or minimax.")
-        self.model = os.environ.get("AI_MATE_LLM_MODEL") or (default_model if self.provider == "ollama" else "MiniMax-M2.7")
+        self.provider = os.environ.get("AI_MATE_LLM_PROVIDER", "hermes")
+        if self.provider not in {"ollama", "minimax", "hermes"}:
+            raise ValueError("AI_MATE_LLM_PROVIDER must be ollama, minimax or hermes.")
+        self.model = os.environ.get("AI_MATE_LLM_MODEL") or (default_model if self.provider == "ollama" else "MiniMax-M3")
         self.key = os.environ.get("MINIMAX_API_KEY", "") if self.provider == "minimax" else ""
         if self.provider == "minimax" and not self.key:
             raise ValueError("Set MINIMAX_API_KEY before selecting MiniMax. No cloud request was sent.")
@@ -92,6 +93,21 @@ class Conversation:
             "\nCurrent app state (trusted capabilities): " + json.dumps({"mode": mode, "scene": scene, "available_scenes": available})
         )
         headers = {"Content-Type": "application/json"}
+        if self.provider == "hermes":
+            prompt = "\n\n".join(m["role"].upper()+": "+m["content"] for m in messages)
+            try:
+                completed = subprocess.run(
+                    ["hermes", "-z", prompt, "--provider", "minimax-oauth", "-m", self.model,
+                     "--no-restore-cwd", "--safe-mode", "--cli"],
+                    capture_output=True, text=True, timeout=45, check=True,
+                )
+                plan = validate_plan(json.loads(completed.stdout.strip()), user, mode, scene, available)
+            except (subprocess.SubprocessError, json.JSONDecodeError, ValueError) as error:
+                raise RuntimeError("MiniMax CLI dialogue is unavailable or returned an invalid response.") from error
+            if cancel.is_set():
+                from .models import Cancelled
+                raise Cancelled("Stopped.")
+            return plan
         if self.provider == "ollama":
             url = "http://127.0.0.1:11434/api/chat"
             body = {"model": self.model, "messages": messages, "stream": False, "think": False,
