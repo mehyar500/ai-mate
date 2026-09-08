@@ -12,8 +12,9 @@ The shared flow lives in `local_app/engine.py`. Private `.env` contains implemen
 
 - Direct body generation took 4.50s at 384x576, 3.19s at 320x480 and 2.00s at 256x384 in warm samples. The fastest moved both hands; these times exclude the rest of the call.
 - Browser approach playback began in 5.29s. Immediately returning along that generated path in reverse began in 1.82s, with new speech and zero buffer stalls. This is bounded reuse, not general fresh backward generation.
-- The final video frame now remains visible between replies. Three idle candidates failed: two nearly still guided clips and one that changed position/framing.
-- 77 Python checks pass, including return/cancellation lifecycle and real CPU reversal of synthetic video. Final checks accompany each commit.
+- A reviewed LTX-2.3 listening loop now supplies blinking and foliage motion at the original standing pose. A voiced greeting over it began in 2.08s with zero stalls and returned to the loop. Position-changing turns disable it to avoid snapping back. It is prepared footage, not continuous fresh diffusion.
+- Fresh LTX-2.3 joint audio/video took 144.97s cold and 21.45s with cached text conditioning. Its wave looked more coherent but included unwanted subtitle-like marks. A later LTX-2B closer trial took 8.52s to playback and made her appear smaller; command accuracy remains unreliable.
+- 81 Python checks pass, including idle asset/hash/HTTP boundaries, pose/return cancellation and real CPU reversal of synthetic video. Seven Node checks pass. Final checks accompany each commit.
 
 Continuous visual presence, reliable arbitrary motion, identity/lips, acoustic device testing and sustained p95 latency remain open. This is not production-ready.
 

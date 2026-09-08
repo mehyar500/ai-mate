@@ -250,6 +250,19 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request("/media/"+name,headers={"Range":"bytes=50-"})[0],416)
         self.assertEqual(self.request("/media/"+name,headers={"Range":"bytes=8-2"})[0],416)
 
+    def test_idle_route_requires_loaded_asset_and_preserves_http_boundaries(self):
+        self.assertEqual(self.request('/idle/fullbody.mp4')[0],404)
+        video=Path(self.tmp.name)/'idle-fullbody.mp4';video.write_bytes(b'0123456789')
+        self.app.idle_video=video
+        try:
+            status,body,headers=self.request('/idle/fullbody.mp4',headers={'Range':'bytes=2-5'})
+            self.assertEqual((status,body),(206,b'2345'))
+            self.assertEqual(headers['Cache-Control'],'no-store')
+            self.assertEqual(self.request('/idle/fullbody.mp4',headers={'Origin':'https://evil.example'})[0],403)
+            self.assertEqual(self.request('/idle/memory.sqlite3')[0],404)
+        finally:
+            self.app.idle_video=None
+
 
 if __name__ == "__main__":
     unittest.main()

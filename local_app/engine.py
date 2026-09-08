@@ -57,6 +57,8 @@ class CompanionEngine:
         self.factory = model_factory
         self.scene = self.store.current_scene()
         self.pose = None  # (scene, private PNG), committed only after successful video completion.
+        from .idle import load_reviewed_idle
+        self.idle_video = load_reviewed_idle(self.directory)
         self.return_motion = None  # One approach, valid until the next successful video turn.
         for path in self.directory.glob('*-pose.png'):
             if re.fullmatch(r'[a-f0-9]{32}-\d+-pose\.png',path.name):
@@ -95,6 +97,7 @@ class CompanionEngine:
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
                     "visual_error": self.visual_error,
                     "scene": self.scene,
+                    "idle_video": "/idle/fullbody.mp4" if self.idle_video and self.scene == 'fullbody' and self.pose is None else None,
                     "provider": getattr(getattr(self.models, "conversation", None), "provider", "ollama"),
                     "scenes": [s for s in ["mira", "garden", "cafe", "fullbody"] if (self.directory / (s+".png")).exists()],
                     **self.store.snapshot()}
@@ -230,6 +233,7 @@ class CompanionEngine:
                             job["chunks"].append(chunk)
                         motion_path = None
                         motion_metrics = {}
+                        prepared_idle = False
                         try:
                             if plan and plan.get("action", "none") != "none":
                                 from .motion import generate, reverse_approach
@@ -244,10 +248,15 @@ class CompanionEngine:
                                 if plan['action'] == 'closer':
                                     return_candidate = self.directory / (filename+'-return.mp4')
                                     shutil.copyfile(motion_path, return_candidate)
+                            elif self.idle_video and scene == 'fullbody' and pose_reference is None:
+                                motion_path = self.directory / (filename+'-motion.mp4')
+                                shutil.copyfile(self.idle_video, motion_path)
+                                prepared_idle = True
+                                motion_metrics = {'motion_source':'prepared_listening_loop', 'fresh_body_generation':False}
                             metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
                                                       scene, streaming=True, **({"motion_path":motion_path} if motion_path else {}))
                             metrics.update(motion_metrics)
-                            if (motion_path or pose_reference) and hasattr(renderer,"capture_last_frame"):
+                            if not prepared_idle and (motion_path or pose_reference) and hasattr(renderer,"capture_last_frame"):
                                 pose_candidate = self.directory / (filename+"-pose.png")
                                 renderer.capture_last_frame(self.directory/(filename+".mp4"),pose_candidate)
                                 metrics["continues_previous_pose"] = bool(pose_reference)

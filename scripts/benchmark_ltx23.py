@@ -29,18 +29,20 @@ def request(path,body=None):
         raise RuntimeError(error.read().decode('utf-8')[:4000]) from error
 
 
-def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave'):
+def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False):
     movement={'wave':'She raises her right hand, waves hello once, then lowers it to her side.',
               'closer':'She walks two small steps toward the fixed camera, becoming larger in the frame.',
-              'farther':'She walks two small steps backward away from the fixed camera, becoming smaller in the frame.'}[action]
+              'farther':'She walks two small steps backward away from the fixed camera, becoming smaller in the frame.',
+              'idle':'She stands comfortably in the same place throughout, facing the camera. Her feet stay planted and her arms rest beside her hips. She breathes gently, blinks and briefly softens her smile. A soft breeze moves loose strands of hair and the leaves behind her.'}[action]
+    speech = (' Her lips stay softly closed as she listens quietly. The audio is quiet garden ambience.' if action == 'idle' else
+              ' She looks at the camera and says in a clear, natural female voice, "Hi there, I am Mira." '
+              'Her lips and facial expression match her spoken words. The audio contains her voice and very faint garden ambience, with no music.')
     prompt=('A realistic video of the adult woman in the reference image, standing in the same garden. '
             'The camera remains stationary, with no zoom, pan or cut. Her entire body and both shoes remain visible. '
-            +movement+' She looks at the camera and says in a clear, natural female voice, "Hi there, I am Mira." '
-            'Her lips and facial expression match her spoken words. The plants and paving stay in place. '
-            'Natural overcast daylight, detailed skin, consistent face, clothing and hairstyle. '
-            'The audio contains her voice and very faint garden ambience, with no music. No titles or subtitles.')
+            +movement+speech+' The paving and garden layout stay in place. '
+            'Natural overcast daylight, detailed skin, consistent face, clothing and hairstyle.')
     node=lambda kind,**inputs:dict(class_type=kind,inputs=inputs)
-    return {
+    graph = {
         '1':node('CheckpointLoaderSimple',ckpt_name=CHECKPOINT),
         '2':node('LTXAVTextEncoderLoader',text_encoder=ENCODER,ckpt_name=CHECKPOINT,device=device),
         '3':node('CLIPTextEncode',clip=['2',0],text=prompt),
@@ -64,6 +66,14 @@ def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu',
         '20':node('CreateVideo',images=['18',0],fps=24,audio=['19',0]),
         '21':node('SaveVideo',video=['20',0],filename_prefix='motion/ltx23',format='mp4',**{'format.codec':'h264'}),
     }
+    if return_to_reference:
+        graph['22']=node('LTXVAddGuide',positive=['8',0],negative=['8',1],latent=['8',2],
+                         vae=['1',2],image=['7',0],frame_idx=-1,strength=1.0)
+        graph['11']['inputs']['video_latent']=['22',2]
+        graph['13']['inputs'].update(positive=['22',0],negative=['22',1])
+        graph['23']=node('LTXVCropGuides',positive=['22',0],negative=['22',1],latent=['17',0])
+        graph['18']['inputs']['samples']=['23',2]
+    return graph
 
 
 def main():
@@ -71,7 +81,8 @@ def main():
     parser.add_argument('--width',type=int,default=384);parser.add_argument('--height',type=int,default=576)
     parser.add_argument('--frames',type=int,default=73);parser.add_argument('--seed',type=int,default=50)
     parser.add_argument('--device',choices=['cpu','default'],default='cpu')
-    parser.add_argument('--action',choices=['wave','closer','farther'],default='wave')
+    parser.add_argument('--action',choices=['wave','closer','farther','idle'],default='wave')
+    parser.add_argument('--return-to-reference',action='store_true',help='Add end-pose guidance before combining audio/video latents.')
     parser.add_argument('--timeout',type=int,default=900)
     args=parser.parse_args()
     if any(n<128 or n%32 for n in (args.width,args.height)) or not 9<=args.frames<=241 or args.frames%8!=1:
@@ -83,7 +94,7 @@ def main():
     original=ROOT/'generated/local-app/fullbody.png'
     tag='ltx23-'+uuid.uuid4().hex
     source=COMFY/'input'/(tag+'.png');shutil.copyfile(original,source)
-    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action)
+    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference)
     graph['21']['inputs']['filename_prefix']='motion/'+tag
     audit=ROOT/'generated/local-app/audit';audit.mkdir(exist_ok=True)
     evidence={'model':CHECKPOINT,'encoder':ENCODER,'settings':vars(args),'source_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),

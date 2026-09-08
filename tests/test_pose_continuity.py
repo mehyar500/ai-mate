@@ -145,6 +145,19 @@ class PoseTests(unittest.TestCase):
         self.assertIsNone(self.app.return_motion)
         self.assertEqual(list(Path(self.temp.name).glob('*-return.mp4')),[])
 
+    def test_prepared_idle_only_applies_to_unchanged_base_pose(self):
+        asset=Path(self.temp.name)/'idle-fullbody.mp4';asset.write_bytes(b'idle')
+        self.app.idle_video=asset
+        job=self.reply('hello')
+        self.assertEqual(job['chunks'][0]['render']['motion_source'],'prepared_listening_loop')
+        self.assertIsNone(self.app.pose)
+        self.assertEqual(self.app.status()['idle_video'],'/idle/fullbody.mp4')
+        self.reply('closer')
+        self.assertIsNone(self.app.status()['idle_video'])
+        job=self.reply('hello')
+        self.assertNotIn('motion_source',job['chunks'][0]['render'])
+        self.assertTrue(asset.exists())
+
 
 if __name__=='__main__':
     unittest.main()

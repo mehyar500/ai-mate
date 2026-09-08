@@ -5,6 +5,18 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
 let replyMode="video",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let soundOn=true;
+let idleURL=null,idleFailed=false,idleSuppressed=false;
+function idlePresence(){
+  const video=$('idle-video');
+  const visible=ready&&connected&&!document.hidden&&viewMode==='video'&&replyMode==='video'&&scene==='fullbody'&&idleURL&&!idleFailed&&!idleSuppressed&&!playing;
+  if(!visible){video.pause();video.hidden=true;return;}
+  if(video.getAttribute('src')!==idleURL)video.src=idleURL;
+  video.muted=true;video.hidden=false;$('held-frame').hidden=true;
+  if(video.paused)video.play().then(()=>{if(video.hidden||document.hidden)video.pause();}).catch(()=>{if(!video.hidden)idleFailed=true;video.hidden=true;});
+  $('media-label').textContent='Full-body garden · Prepared listening loop';
+}
+$('idle-video').addEventListener('error',()=>{idleFailed=true;$('idle-video').hidden=true;});
+document.addEventListener('visibilitychange',idlePresence);
 let historyOpen=false;
 let viewMode='video',unread=0,micState='off',listenAfter=0;
 const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
@@ -37,6 +49,7 @@ function controls(){
   $('unread').hidden=!unread;$('unread').textContent=String(unread);
   $('message').placeholder=viewMode==='text'?'Message Mira…':'Type to Mira during the call…';
   $('disclosure').textContent=viewMode==='text'?(replyMode==='text'?'Private local conversation':'Call stays active · return using the call tab'):'AI-generated '+(viewMode==='video'?'video':'voice')+' · Listening pauses during replies';
+  idlePresence();
 }
 async function api(path,body){
   const response=await fetch(path,{method:body===undefined?"GET":"POST",headers:{"X-Local-Token":token,...(body===undefined?{}:{"Content-Type":"application/json"})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(10000)});
@@ -54,7 +67,7 @@ function bubble(text,role){
 function renderHistory(turns){$("chat").replaceChildren();for(const t of turns){bubble(t.user,"user");bubble(t.assistant,"assistant");if(t.message)bubble(t.message,'assistant sent-message');}}
 function setScene(value){
   if(!sceneNames[value])return;
-  if(value!==scene)$("held-frame").hidden=true;
+  if(value!==scene){$("held-frame").hidden=true;idleSuppressed=false;}
   document.querySelector(".visual").dataset.scene=value;
   document.querySelector(".conversation").dataset.scene=value;
   document.querySelector(".conversation").dataset.history=historyOpen?"open":"closed";
@@ -81,6 +94,7 @@ function resetPlayback(holdFrame=false){
   $("video").hidden=true;$("resume").hidden=true;setScene(scene);controls();
 }
 function played(){
+  $('idle-video').pause();$('idle-video').hidden=true;
   if(!$("video").hidden)$("held-frame").hidden=true;
   if(waitingSince!==null){waitingSeconds+=(performance.now()-waitingSince)/1000;waitingSince=null;}
   if(firstPlayed===null){firstPlayed=(performance.now()-lastStart)/1000;updateMetrics();}
@@ -176,7 +190,7 @@ async function follow(key,node){
       const job=await api("/api/jobs/"+key);if(active!==key)return;
       if(job.user)node.textContent=job.user;
       if(!pendingStop&&job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
-      if(job.action)setAction(job.action);
+      if(job.action){setAction(job.action);if(job.action!=='none')idleSuppressed=true;}
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
       if(job.state==='done'&&job.message&&!shownMessage){bubble(job.message,'assistant sent-message');shownMessage=true;if(viewMode!=='text')unread++;controls();}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
@@ -285,9 +299,9 @@ async function boot(){
         const data=await api("/api/bootstrap");
         const restarted=token&&token!==data.token;token=data.token;connected=true;
         if(firstBoot||restarted){renderHistory(data.turns);setScene(data.scene||"mira");firstBoot=false;}
-        if(restarted){resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
+        if(restarted){idleSuppressed=false;idleFailed=false;resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
       }
-      const state=await api("/api/status");ready=state.ready;hasVideo=state.visual_loaded;provider=state.provider;
+      const state=await api("/api/status");ready=state.ready;hasVideo=state.visual_loaded;provider=state.provider;idleURL=state.idle_video||null;
       if(state.app_version!=="0.2"){ready=false;$("connection").textContent="Server update needed";notice("Restart the local server to finish this update.",true);controls();await sleep(1500);continue;}
       if(!active&&!submitting)busy=state.busy;
       $("connection").textContent=state.error?"Models unavailable":!ready?"Preparing Mira…":provider==="ollama"?"On your computer":"Hosted conversation · local video";

@@ -179,7 +179,7 @@ Direct cold setup was **13.948s**, including **8.287s** to load/encode the first
 
 Speech assembly was separately tested over the reviewed generated 320 and 256 clips: Kokoro took **0.390s** for 1.863s of speech; first 4KB of the voiced video appeared after **0.799/0.700s** of assembly, and rendering completed in **2.861/2.764s**. Body generation was excluded from that test. The audio peaked at 0.470, RMS -22.67 dBFS, and local ASR recovered the exact test sentence. This establishes a non-silent generated track, not the founder's physical speaker output. Reviewed 320 output retained a complete visible wave; facial detail remains limited. Do not add these separate samples and claim a measured end-to-end latency.
 
-**Decision:** keep the existing app backend while the direct pipeline remains an independently reproducible candidate. Its low-resolution speed gain is real in these samples; dependable backward motion, identity and audio/visual quality remain unsolved. Larger joint audio/video LTX-2.3 weights are downloading, have not completed verification/inference and are not selected. Its [weight license](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE) has revenue and directly competing-service conditions; code licensing and self-hosting do not establish public/adult commercial clearance.
+**Decision:** keep the existing app backend while the direct pipeline remains an independently reproducible candidate. Its low-resolution speed gain is real in these samples; dependable backward motion, identity and audio/visual quality remain unsolved. LTX-2.3 subsequently completed verification/inference; later findings below distinguish its prepared listening asset from its slow live-generation candidate. Its [weight license](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE) has revenue and directly competing-service conditions; code licensing and self-hosting do not establish public/adult commercial clearance.
 
 Reproduce benchmark candidates separately from user calls, keeping other GPU inference idle:
 
@@ -204,7 +204,15 @@ The cache is consumed once, invalidated by another completed video turn or scene
 
 Continuous presence remains **unresolved**. Three 384x576 LTX-2B idle trials used a reviewed pose: 73-frame/end-guided (4.816s), 97-frame/end-guided (5.978s), and 97-frame/no-end-guide (5.813s). The first two barely moved; the third walked forward and shifted framing. All were rejected for background listening. No failed idle clip is selected by the app. The visible held frame remains a static fallback, not blinking, hair movement or a continuous generated call. The internal benchmark prompt is not a public command or an enabled idle worker.
 
-The revised commercial direction is non-explicit Apple-native distribution; the current Windows browser app remains the test harness. StoreKit, device playback, public serving and independent review are outstanding. Optional larger-GPU experiment budgets are in ECONOMICS; no GPU has been rented. LTX-2.3 remains a candidate until download verification, inference and output review pass.
+The revised commercial direction is non-explicit Apple-native distribution; the current Windows browser app remains the test harness. StoreKit, device playback, public serving and independent review are outstanding. Optional larger-GPU experiment budgets are in ECONOMICS; no GPU has been rented.
+
+### LTX-2.3 first joint audio/video results
+
+Both pinned assets passed SHA-256 verification. The distilled first-stage benchmark generated 73 frames at 384x576/24fps with native audio on the 16GB GPU: **144.974s cold wall time**, then **21.445s** for a new seed with the same cached text conditioning. Comfy execution was 144.47s/21.02s. The CPU Gemma prompt encoder adds substantial cold delay; warm timing does not represent a new conversational prompt. Eight diffusion steps took roughly 14s in the warm log. This is still too slow for a two-second live reply.
+
+The first contact-sheet review shows a coherent one-hand wave and return, with a more consistent body/background than earlier 2B trials. It also contains unwanted subtitle-like marks and soft facial detail, so it is not promoted. The audio track has peak 0.316, RMS -27.50 dBFS; local ASR recovered “Hi there, I am Mira.” Physical speaker playback and precise lip-sync timing remain unverified. A separate idle-prompt test is needed before using this model to prepare listening loops; live model replacement is not selected.
+
+The research shortlist also includes [Hallo-Live](https://github.com/fudan-generative-vision/Hallo-Live), whose authors report 20.38fps and 0.94s latency on **two H200s**, and [LightX2V](https://github.com/ModelTC/LightX2V), which supports quantized/offloaded Wan and other pipelines. These are implementation leads, not evidence of those speeds on the 4060 Ti. Fitting weights through offload does not establish low latency, full-body command accuracy or commercial rights to every component. No additional framework has been installed for these candidates.
 
 The configured environment is Python 3.12 with PyTorch 2.11.0+cu128. Dependencies are pinned in [requirements](../config/local-poc-requirements.txt). For a fresh environment, install Python 3.12, Ollama and FFmpeg, then:
 
@@ -240,3 +248,20 @@ git diff --check
 ```
 
 No cloud GPU, new hardware or paid engineer was purchased. Existing electricity planning remains an unmeasured 300W increment at $0.20/kWh ($6 per 100 hours). Optional hosted model usage adds to that budget. Local electricity is not a public-service unit cost; see [ECONOMICS](ECONOMICS.md).
+
+### Prepared listening-loop integration
+
+The unguided LTX-2.3 idle took **77.795s** and drifted sideways at the end, so it was rejected. A 97-frame end-guided trial took **78.444s**, stayed in the standing position and showed blinking, expression changes and moving foliage. Stray leaf-like artifacts remain. Source frames and the final loop seam were reviewed. A quarter-second seam blend yields a muted **91-frame / 3.792s** loop; this is video editing of generated footage, not ongoing inference. It is suitable for this limited local test, not a production-quality certification.
+
+`local_app/engine.py` loads the fixed `idle-fullbody.mp4` only when its local manifest explicitly records review and both video/reference hashes match. Missing, malformed, changed or unreviewed assets fall back to a held frame/portrait. The server exposes only that fixed asset through existing local-origin and Range controls. It contains no user speech or conversation. The browser pauses it on Text/Voice navigation, ending the call and backgrounding; playback errors fall back to the portrait. Ordinary speech uses the prepared body frames with newly generated Kokoro speech and MuseTalk lips. Any completed changed pose makes the standing loop ineligible; no silent snap-back is permitted.
+
+The live greeting test produced **2.08s browser first playback**, **2.522s server completion**, **0 stalls**, and **3.8s** of moving output. The browser completed 0.895s of unmuted speech and resumed the loop. Text navigation paused hidden playback; Return resumed it. This was one short sample, not p95 or physical speaker verification. A subsequent cold LTX-2B approach took **8.52s** to playback and made the character appear smaller; the idle guard worked, but the movement itself failed. The held-frame fallback remains necessary after body movement. Next priority is reliable, reviewed pose-to-pose transitions and listening assets for those poses before expanding command claims.
+
+Reproduce the asset only after reviewing the generated source, then inspect the new seam and record `reviewed: true` in its private `generated/local-app/idle-fullbody.json` before restarting the app. Preparation deliberately does not mark its own output reviewed:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action idle --frames 97 --seed 61 --return-to-reference
+.\.venv\Scripts\python.exe scripts/prepare_idle_loop.py <reviewed-local-benchmark.mp4>
+```
+
+The latest integration passes **81 Python and seven Node tests**, Python/JavaScript syntax and whitespace checks. These cover asset changes, invalid manifests, HTTP boundaries, pose eligibility and existing cancellation/audio behavior. Browser evidence is private under `generated/local-app/audit/prepared-idle-live.json`. Independent security/correctness review and public staging remain pending. The prepared MP4/manifest are private local artifacts, not included in Git; a fresh checkout falls back until they are prepared and reviewed.

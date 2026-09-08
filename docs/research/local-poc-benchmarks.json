@@ -5025,5 +5025,79 @@
       "syntax": "passed",
       "whitespace": "passed"
     }
+  },
+  "ltx23_and_prepared_idle_2026_09_08": {
+    "model": "ltx-2.3-22b-distilled-fp8.safetensors",
+    "asset_checksums_verified": true,
+    "wave_cold_wall_s": 144.974,
+    "wave_cached_prompt_wall_s": 21.445,
+    "wave_review": "Coherent one-hand wave; unwanted subtitle-like marks; not selected for live inference",
+    "native_audio": {
+      "peak": 0.315521240234375,
+      "rms_dbfs": -27.500709533691406,
+      "transcript": "Hi there, I am Mira.",
+      "physical_speakers_verified": false
+    },
+    "idle_unguided_wall_s": 77.795,
+    "idle_unguided_review": "Sideways drift at end; rejected",
+    "idle_guided_wall_s": 78.444,
+    "idle_guided_review": "Stable standing pose, blink, moving foliage; stray leaf-like artifacts remain",
+    "prepared_loop": {
+      "frames": 91,
+      "duration_s": 3.7916666666666665,
+      "sha256": "8b21f79a47d2c295c0aff8f433e40f22692ef8652f02424a88a682a12c4554d7",
+      "selected_for_local_base_pose": true,
+      "continuous_diffusion": false
+    },
+    "live_greeting": {
+      "state": "done",
+      "metrics": {
+        "first_text_s": 0.519,
+        "decision_source": "model",
+        "first_media_ready_s": 2.514,
+        "total_s": 2.522
+      },
+      "render": {
+        "render_s": 1.6473714000003383,
+        "frames": 76,
+        "fps": 46.134101878898946,
+        "duration_s": 3.8,
+        "speech_duration_s": 0.8953125,
+        "lip_sync_frames": 24,
+        "resolution": "384x576",
+        "face_region": "256x256",
+        "torch_peak_allocated_mib": 2727.61279296875,
+        "torch_peak_reserved_mib": 3422.0,
+        "audio_features_s": 0.35245079999913287,
+        "neural_s": 1.248937800000931,
+        "composite_pipe_s": 0.03467149999960384,
+        "encoder": "libx264",
+        "body_motion": true,
+        "face_tracking_s": 0.2997290000002977,
+        "face_encode_stride": 2,
+        "motion_source": "prepared_listening_loop",
+        "fresh_body_generation": false
+      },
+      "browser_first_play_s": 2.08,
+      "browser_stalls": 0,
+      "browser_audio_completed": true,
+      "browser_audio_muted": false,
+      "idle_resumed_after_reply": true,
+      "text_navigation_paused_hidden_idle": true,
+      "return_navigation_resumed_idle": true,
+      "physical_speakers_verified": false
+    },
+    "subsequent_closer": {
+      "browser_first_play_s": 8.52,
+      "browser_stalls": 0,
+      "old_idle_disabled": true,
+      "review": "Character appeared smaller; movement failed"
+    },
+    "tests": {
+      "python": 81,
+      "node": 7,
+      "independent_review": "pending",
+      "public_staging": "not provisioned"
+    }
   }
 }

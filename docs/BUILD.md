@@ -8,6 +8,8 @@ The local app binds to `127.0.0.1:8765`. Text, Voice call and Video call accept 
 
 Cloudflare is configured using API key plus email. MiniMax and Ollama remain optional adapters. Three startup settings are read from private `.env`; the model adapters pin the actual graphics/voice choices. No production payment flags or pretend deployment controls are configured.
 
+For the original full-body pose, the engine can load a hash-matched, reviewed LTX-2.3 listening loop prepared offline. Browser playback between replies uses no diffusion; ordinary speech applies MuseTalk to that moving footage. A pose-changing command disables the base loop and preserves its generated final frame. This bounded prepared-motion path improves ordinary-call latency without claiming arbitrary real-time video generation.
+
 Use the founder's existing RTX 4060 Ti (16,380 MiB reported VRAM) and about 47.7 GiB system RAM. This is an inventory result, not an inference benchmark. Run a loopback-only server and browser UI with a synthetic profile, local SQLite/file memory and an explicit reset/delete control. No public model endpoint, user signup, customer payment, camera upload or production scheduler.
 
 Installed components include optional local dialogue `qwen3.5:9b-q4_K_M` (Cloudflare is active), Kokoro-82M ONNX v1.0 float32 (`af_sarah`), faster-whisper Base English int8, MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio features, YuNet face detection and FLUX.2 Klein 4B for offline scene preparation. Image generation runs separately and exits before the conversation server starts. Exact revisions/assets are in `config/local-models.json` and `config/local-assets.json`. Other models in the research catalog below are deferred candidates, not the app's runtime.
