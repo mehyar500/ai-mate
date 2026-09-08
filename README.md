@@ -7,6 +7,8 @@
 3. [Build](docs/BUILD.md) — exact models, infrastructure, onboarding and first test.
 4. [US launch](docs/USA.md) — commercial licenses, provider eligibility, payment and age checks.
 
+**Target: photorealistic continuously generated video, with no motion-loop or mouth-only animation approach.** Cloudflare handles the app and clean conversation; Quark LiveAvatar and the cheaper FlashHead Pro challenger require a measured GPU proof.
+
 Status: plan and tested offline calculator; realistic live calls have **not** been demonstrated. No production deployment or adult-provider approval exists yet.
 
 Run `python -m unittest discover -s tests -v`. Change assumptions in [config/economics.json](config/economics.json), then run `python scripts/economics.py --write`. Planned keys are in [.env.example](.env.example); actual `.env` stays private. Superseded plans remain in Git history.

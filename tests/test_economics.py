@@ -9,8 +9,8 @@ from scripts.economics import calculate, load, report, ROOT
 class EconomicsTests(unittest.TestCase):
     def test_gpu_idle_and_sfu_units(self):
         d = calculate(load())
-        self.assertAlmostEqual(d["gpu_per_minute"], 1.2 / 60 / 0.5)
-        self.assertAlmostEqual(d["media_per_minute"], 1.128 * 1e6 * 60 / 8 / 1e9 * 0.05)
+        self.assertAlmostEqual(d["gpu_per_minute"], 18.5 / 60 / 0.5)
+        self.assertAlmostEqual(d["media_per_minute"], 2.128 * 1e6 * 60 / 8 / 1e9 * 0.05)
 
     def test_full_prompt_is_billed_each_turn(self):
         d = calculate(load())
@@ -38,7 +38,7 @@ class EconomicsTests(unittest.TestCase):
         self.assertLess(calculate(c)["clip_cost"], baseline["clip_cost"])
 
     def test_invalid_cost_inputs_rejected(self):
-        for key, value in (("billable_utilization", 0), ("billable_utilization", 1.1), ("clip_success_fraction", 0), ("gpu_per_hour", -1), ("gpu_per_hour", math.nan), ("reserve_fraction", 2), ("concurrent_calls_per_gpu", 0)):
+        for key, value in (("billable_utilization", 0), ("billable_utilization", 1.1), ("clip_success_fraction", 0), ("gpu_per_hour", -1), ("gpu_per_hour", math.nan), ("reserve_fraction", 2), ("concurrent_calls_per_group", 0)):
             with self.subTest(key=key, value=value):
                 c = copy.deepcopy(load())
                 c["assumptions_not_vendor_quotes"][key] = value
@@ -60,7 +60,7 @@ class EconomicsTests(unittest.TestCase):
         self.assertIn("122,880 input + 3,000 output", result)
         self.assertIn("245,760 + 6,000", result)
         self.assertNotIn("368,640", result)
-        self.assertIn("($2.00 GPU + $0.20 VM extras)", result)
+        self.assertIn("($2.00 GPU + $0.50 VM extras)", result)
         self.assertIn("25% utilization", result)
         self.assertIn("20% + $0.50/payment", result)
         self.assertIn("$9.99/7 delivered videos", result)
@@ -81,7 +81,20 @@ class EconomicsTests(unittest.TestCase):
         self.assertNotIn("Together contribution", report(c))
 
     def test_savings_use_customer_price_not_performer_payout(self):
-        self.assertIn("| Together | $0.278 | 42.1% | 88.4% |", report(load()))
+        self.assertIn("| Together | $2.983 | -521.5% | -24.3% |", report(load()))
+
+    def test_plan_includes_conversation_and_rendering(self):
+        c = load()
+        d = calculate(c)
+        p = d["plans"][0]
+        self.assertAlmostEqual(p["variable_cost"], d["paid_text_monthly"] + 30*d["managed_avatar_per_minute"] + .75)
+        self.assertGreater(d["managed_avatar_per_minute"], d["render_transport_per_minute"])
+
+    def test_clip_cost_does_not_use_live_cluster(self):
+        c = load()
+        before = calculate(c)["clip_cost"]
+        c["assumptions_not_vendor_quotes"]["gpu_per_hour"] = 100
+        self.assertEqual(before, calculate(c)["clip_cost"])
 
     def test_json_cannot_overwrite_markdown(self):
         before = (ROOT / "docs/ECONOMICS.md").read_bytes()
