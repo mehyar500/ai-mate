@@ -2,7 +2,9 @@
 
 **Lawful consensual adult content is a mandatory launch requirement. If the intended adult experience cannot be delivered within accepted model, host and payment terms, the product does not launch.** This decision supersedes earlier suggestions to launch a non-explicit substitute.
 
-**Current stage: a local proof of concept on the founder's RTX 4060 Ti, 16GB VRAM and 48GB RAM. No remote inference before local validation.** The founder is the only engineer. Keep a $100 planning cap for the quarter, including a $75 contingency pool; estimated additional electricity is $9.60 for 160 hours. Public adult access and customer billing are deferred.
+**Current stage: a running, non-explicit local prototype on the founder's RTX 4060 Ti, 16GB VRAM and 48GB RAM.** It includes text, spoken replies, push-to-talk input, editable persistent memory and photorealistic portrait lip-sync replies. The founder is the only engineer; public access and billing are deferred. The intended adult commercial experience remains unqualified.
+
+On this configured PC, run `./scripts/start_local.ps1` and open **http://127.0.0.1:8765**. Wait for local model warm-up. Setup, exact models, measured performance and limitations are in [LOCAL_POC](docs/LOCAL_POC.md). No API keys or cloud inference are needed. The app does not read `.env.example`.
 
 Six active product documents, including the newly requested local POC plan:
 
@@ -15,14 +17,14 @@ Six active product documents, including the newly requested local POC plan:
 
 Use the existing computer and loopback services only for current inference. Model downloads use internet access. TensorDock/Cloudflare are deferred deployment candidates; no payment processor is needed for this unpaid stage. Self-hosting does not override licenses or establish nationwide legality.
 
-This repository contains documentation, an offline calculator and local component benchmark scripts, not a working PWA or validated visual-call app. Local model tests use synthetic neutral prompts. No production account, paid inference, deployment or processor approval has been created. Earlier plans remain in Git history. Catalog JSON and agent/factory files are reference/history.
+`local_app/` contains the loopback server, inference adapters and browser interface. `scripts/` contains setup, benchmarks and synthetic integration checks; `config/` pins models and runtimes; `tests/` covers economics and local data/HTTP behavior. Weights, generated media and private memory stay ignored locally. The interface has a web manifest but is not a validated mobile PWA or continuous FaceTime app. Earlier plans remain in Git history; agent/factory files are historical coordination material.
 
 Python 3.11+, standard library:
 
 ```powershell
 python scripts/economics.py --write
 python -m unittest discover -s tests -v
-python -m compileall -q scripts tests
+python -m compileall -q scripts tests local_app
 git diff --check
 ```
 

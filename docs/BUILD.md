@@ -1,18 +1,18 @@
 # Founder demo and future PWA implementation
 
-No app has been implemented here. This document specifies a measured prototype and release gates.
+A single-user local app is implemented under `local_app/`. This document separates that running prototype from the deferred commercial design below. Reproduction and results live in [LOCAL_POC](LOCAL_POC.md).
 
 ## Active scope: local proof before remote inference
 
-The detailed active experiment is [LOCAL_POC](LOCAL_POC.md), the additional document requested by the founder. It supersedes any cloud fallback in the earlier demo plan. Use no remote inference until the founder changes this decision. Benchmark scripts now exist; there is still no complete application or visual-call integration.
+The local app binds to `127.0.0.1:8765`. Browser text or a short microphone recording enters one bounded job. Qwen3.5-9B Q4_K_M produces short phrases; CPU Kokoro makes speech. For video mode, MuseTalk 1.5 converts that speech into mouth movement on an original prepared portrait. Completed phrase clips are served over local HTTP, with captions, stop and replay controls. No remote inference is used.
 
 Use the founder's existing RTX 4060 Ti (16,380 MiB reported VRAM) and about 47.7 GiB system RAM. This is an inventory result, not an inference benchmark. Run a loopback-only server and browser UI with a synthetic profile, local SQLite/file memory and an explicit reset/delete control. No public model endpoint, user signup, customer payment, camera upload or production scheduler.
 
-Start with the explicitly pinned Qwen3-4B-Instruct-2507 Q4_K_M for dialogue and Kokoro-82M CPU speech; faster-whisper-small is the later microphone candidate. Runtime caches consume memory beyond weights. FLUX.2 Klein 4B's card reports roughly 13GB VRAM, so test it alone for scenes rather than assuming it coexists with dialogue/rendering. Small dialogue/speech weights were downloaded for local neutral benchmarks; see LOCAL_POC for actual results. Large Wan rentals are deferred.
+Selected models are installed: `qwen3.5:9b-q4_K_M`, Kokoro-82M ONNX v1.0 float32 (`af_sarah`), faster-whisper Base English int8, MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio features, YuNet face detection and FLUX.2 Klein 4B for offline scene preparation. Image generation runs separately and exits before the conversation server starts. Exact revisions/assets are in `config/local-models.json` and `config/local-assets.json`. Other models in the research catalog below are deferred candidates, not the app's runtime.
 
-Demo memory should genuinely persist across a restart. Keep three permitted, original photorealistic scenes and label reused/prepared assets. A manually triggered check-in can show the proposed interaction if it is labeled as manual. Don't implement vector search, automatic pushes, subscriptions or production WebRTC just to demonstrate the concept. The founder operates a local live demo or shows an honest recording; the public preview remains non-explicit.
+SQLite stores an editable 1,200-character memory and at most 50 exchanges. The UI restores the last 12; the model receives the last four plus saved facts. Memory persistence, correction and reset are exercised in tests. It does not automatically know the user or extract life events. Prepared scenes stay visibly labeled; no automatic check-ins, pushes, subscriptions or WebRTC have been implemented.
 
-Log only synthetic-test metrics: model revision, host/device, actual billed hours, prompt/output token counts, first audio delay, job completion delay, accepted/rejected result and whether content was live or prepared. Include a cold run and failed/cancelled job; show p50/p95 with sample counts instead of quoting author FPS as product latency. Never imply a prerecorded clip is a live call or that prepared delivery speed equals generation speed.
+Job metrics report ASR, first text, first completed media and total time; video reports rendering throughput and PyTorch memory. They do not measure browser playback delay, lip-sync skew, wall power or total-device peak allocation. Keep synthetic benchmark evidence separate from private conversation data. Short clips can have a gap between phrases; this is not a continuous video-call implementation.
 
 The first demo proves the interaction and selected measured components. Adult commercial capability, provider acceptance and full live visual calling remain separately unresolved. The sections below retain the model/license evidence and future paid-service contract; their always-on capacity, 25-user free cohort and paid entitlements are **deferred**, not current POC requirements. Source requirements ADULT-01 through ADULT-04 still apply before that launch.
 
@@ -122,4 +122,4 @@ iOS web push requires an eligible home-screen web app and permission following u
 
 Internal monitoring: per-job actual cost, latency, rejection/retry rate, queue depth, active calls, paid entitlement, free-user ceiling, notification count and settlement balance. Redact sensitive payloads; separate minimal audit evidence from private conversations. Per-account and provider spend caps fail closed before new work. Monitoring compute/storage and founder incident response are budgeted; open-source tools do not eliminate operating effort.
 
-Before paid release test age-result replay, account isolation, scene leakage, stale memory, forged payment events, duplicate jobs, abandonment, cold start, refund order and reconnection. The repo's current tests cover arithmetic only.
+Before paid release test age-result replay, account isolation, scene leakage, stale memory, forged payment events, duplicate jobs, abandonment, cold start, refund order and reconnection. Current offline tests cover arithmetic plus local memory, cancellation and HTTP boundaries. They do not qualify those future production controls.

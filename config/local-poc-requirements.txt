@@ -1,5 +1,17 @@
-# Optional local CPU speech benchmark only; economics remains stdlib-only.
+# Local app on Python 3.12. Install the CUDA wheels from PyTorch first (LOCAL_POC).
+# The economics calculator and offline app tests remain standard-library-only.
 kokoro-onnx==0.6.1
 soundfile==0.14.0
 onnxruntime==1.29.0
 numpy==2.5.3
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+diffusers==0.40.0
+transformers==5.16.1
+accelerate==1.14.0
+faster-whisper==1.2.1
+ctranslate2==4.8.2
+opencv-python==4.14.0.94
+scipy==1.18.1
+safetensors==0.8.0
+pillow==12.3.0

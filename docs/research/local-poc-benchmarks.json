@@ -480,5 +480,3523 @@
   "rejected_trials": [
     "qwen3:4b resolved to thinking-only variant and did not return a valid short answer within 64 tokens. Not counted as conversational performance.",
     "kokoro-onnx 0.5.0 failed speed input dtype; 0.6.1 succeeded."
-  ]
+  ],
+  "local_app_2026_09_08": {
+    "date": "2026-09-08",
+    "source_commit": "882e87a",
+    "scope": "Local non-explicit prototype. Synthetic HTTP/model trials; no physical mic, browser playback, commercial adult qualification, or production review.",
+    "llm": {
+      "tag": "qwen3.5:9b-q4_K_M",
+      "manifest_digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "context_tokens": 4096,
+      "think": false,
+      "temperature": 0.5,
+      "presence_penalty": 0.0
+    },
+    "versions": {
+      "python": "3.12.14",
+      "torch": "2.11.0+cu128",
+      "torchvision": "0.26.0+cu128",
+      "diffusers": "0.40.0",
+      "transformers": "5.16.1",
+      "faster-whisper": "1.2.1",
+      "opencv-python": "4.14.0.94",
+      "kokoro-onnx": "0.6.1"
+    },
+    "initial_integration": {
+      "scope": "Local app synthetic HTTP trials. ASR uses a generated voice fixture, not a physical microphone. Small sample; no full-call latency claim.",
+      "jobs": [
+        {
+          "id": "e2d81bc2e1a34963b2b10ceaf9aa358f",
+          "state": "done",
+          "text": "Your name is Alex, and your piano lesson is on Friday. How are you feeling today?",
+          "user": "What is my name and when is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your name is Alex, and your piano lesson is on Friday.",
+              "audio": "/media/e2d81bc2e1a34963b2b10ceaf9aa358f-0.wav",
+              "duration_s": 3.3586666666666667
+            },
+            {
+              "index": 1,
+              "text": "How are you feeling today?",
+              "audio": "/media/e2d81bc2e1a34963b2b10ceaf9aa358f-1.wav",
+              "duration_s": 1.5453333333333332
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.602,
+            "first_media_ready_s": 2.115,
+            "total_s": 2.976
+          },
+          "error": null
+        },
+        {
+          "id": "af7b786f98bf49978272e090db4e291b",
+          "state": "done",
+          "text": "Did the tomatoes grow well in your garden?",
+          "user": "I planted tomatoes today. Ask me one short question about them.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Did the tomatoes grow well in your garden?",
+              "audio": "/media/af7b786f98bf49978272e090db4e291b-0.wav",
+              "duration_s": 2.272
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.349,
+            "first_media_ready_s": 1.503,
+            "total_s": 1.529
+          },
+          "error": null
+        },
+        {
+          "id": "78b401843a22410b82ccf67a46f2b08a",
+          "state": "done",
+          "text": "It sounds like you need some rest, Alex. Would you like to talk or just sit together for a while?",
+          "user": "I had a tiring day. Could we take a quiet moment?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "It sounds like you need some rest, Alex.",
+              "audio": "/media/78b401843a22410b82ccf67a46f2b08a-0.wav",
+              "duration_s": 2.336
+            },
+            {
+              "index": 1,
+              "text": "Would you like to talk or just sit together for a while?",
+              "audio": "/media/78b401843a22410b82ccf67a46f2b08a-1.wav",
+              "duration_s": 2.964625
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.199,
+            "first_media_ready_s": 1.335,
+            "total_s": 2.726
+          },
+          "error": null
+        },
+        {
+          "id": "a3155dd0e9c948ee84567f201da835f3",
+          "state": "done",
+          "text": "Your piano lesson is on Friday.",
+          "user": "What day is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your piano lesson is on Friday.",
+              "audio": "/media/a3155dd0e9c948ee84567f201da835f3-0.wav",
+              "duration_s": 2.132625
+            }
+          ],
+          "metrics": {
+            "asr_s": 0.781,
+            "first_text_s": 1.249,
+            "first_media_ready_s": 2.316,
+            "total_s": 2.321
+          },
+          "error": null
+        },
+        {
+          "id": "e3406b476b5c48b2a6923c003e404a01",
+          "state": "done",
+          "text": "Hello, Alex. How are your tomatoes doing?",
+          "user": "Say hello in one brief sentence.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Hello, Alex.",
+              "audio": "/media/e3406b476b5c48b2a6923c003e404a01-0.wav",
+              "duration_s": 1.1626666666666667,
+              "video": "/media/e3406b476b5c48b2a6923c003e404a01-0.mp4",
+              "render": {
+                "render_s": 1.398639299964998,
+                "frames": 30,
+                "fps": 21.449418732013875,
+                "duration_s": 1.1626875,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2722.16064453125,
+                "torch_peak_reserved_mib": 3428.0,
+                "audio_features_s": 0.035677699954248965,
+                "neural_s": 1.2625075000105426,
+                "composite_pipe_s": 0.0878554000519216,
+                "encoder": "libx264"
+              }
+            },
+            {
+              "index": 1,
+              "text": "How are your tomatoes doing?",
+              "audio": "/media/e3406b476b5c48b2a6923c003e404a01-1.wav",
+              "duration_s": 1.652,
+              "video": "/media/e3406b476b5c48b2a6923c003e404a01-1.mp4",
+              "render": {
+                "render_s": 1.8286457000067458,
+                "frames": 42,
+                "fps": 22.967817111781176,
+                "duration_s": 1.652,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2722.71728515625,
+                "torch_peak_reserved_mib": 3428.0,
+                "audio_features_s": 0.02762900001835078,
+                "neural_s": 1.6693138999398798,
+                "composite_pipe_s": 0.11432400008197874,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.122,
+            "first_media_ready_s": 2.216,
+            "total_s": 4.952
+          },
+          "error": null
+        },
+        {
+          "id": "bd0fc0fcbbb84c6c8a2af86a24dfd6d5",
+          "state": "done",
+          "text": "Rest well before Friday so you feel ready to play.",
+          "user": "What should I do before my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Rest well before Friday so you feel ready to play.",
+              "audio": "/media/bd0fc0fcbbb84c6c8a2af86a24dfd6d5-0.wav",
+              "duration_s": 3.0499583333333335,
+              "video": "/media/bd0fc0fcbbb84c6c8a2af86a24dfd6d5-0.mp4",
+              "render": {
+                "render_s": 3.250917900004424,
+                "frames": 77,
+                "fps": 23.685618144923072,
+                "duration_s": 3.05,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2724.3798828125,
+                "torch_peak_reserved_mib": 3428.0,
+                "audio_features_s": 0.028032400005031377,
+                "neural_s": 3.00319439987652,
+                "composite_pipe_s": 0.20146210002712905,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.279,
+            "first_media_ready_s": 4.937,
+            "total_s": 4.943
+          },
+          "error": null
+        },
+        {
+          "id": "da0a1b3dfadd43fe928d01953420178c",
+          "state": "done",
+          "text": "Have you watered the plants this week?",
+          "user": "Ask me a short question about my garden.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Have you watered the plants this week?",
+              "audio": "/media/da0a1b3dfadd43fe928d01953420178c-0.wav",
+              "duration_s": 1.8552916666666666,
+              "video": "/media/da0a1b3dfadd43fe928d01953420178c-0.mp4",
+              "render": {
+                "render_s": 2.054258899996057,
+                "frames": 47,
+                "fps": 22.879297249285475,
+                "duration_s": 1.8553125,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2722.78515625,
+                "torch_peak_reserved_mib": 3428.0,
+                "audio_features_s": 0.028718299989122897,
+                "neural_s": 1.8804561999277212,
+                "composite_pipe_s": 0.1314251999137923,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.255,
+            "first_media_ready_s": 3.281,
+            "total_s": 3.286
+          },
+          "error": null
+        }
+      ]
+    },
+    "asr_base_en": {
+      "model": "asr-base-en",
+      "load_s": 0.2775966999470256,
+      "scope": "Generated clear English speech; no physical mic/background-noise evaluation",
+      "samples": [
+        {
+          "expected": "How did your gardening class go today?",
+          "transcribed": "How did your gardening class go today?",
+          "seconds": 0.4523656999808736
+        },
+        {
+          "expected": "That sounds like a pleasant way to spend the afternoon.",
+          "transcribed": "That sounds like a pleasant way to spend the afternoon.",
+          "seconds": 0.3021304999710992
+        },
+        {
+          "expected": "You mentioned a piano lesson on Friday. Are you looking forward to it?",
+          "transcribed": "You mentioned a piano lesson on Friday. Are you looking forward to it?",
+          "seconds": 0.31822339998325333
+        },
+        {
+          "expected": "What would you like to cook for dinner tonight?",
+          "transcribed": "What would you like to cook for dinner tonight?",
+          "seconds": 0.307317900005728
+        },
+        {
+          "expected": "Welcome back. We can pick up where we left off.",
+          "transcribed": "Welcome back. We can pick up where we left off.",
+          "seconds": 0.308664099953603
+        }
+      ]
+    },
+    "asr_small": {
+      "model": "asr-small",
+      "load_s": 0.7714047000044957,
+      "scope": "Generated clear English speech; no physical mic/background-noise evaluation",
+      "samples": [
+        {
+          "expected": "How did your gardening class go today?",
+          "transcribed": "How did your gardening class go today?",
+          "seconds": 1.082818099996075
+        },
+        {
+          "expected": "That sounds like a pleasant way to spend the afternoon.",
+          "transcribed": "That sounds like a pleasant way to spend the afternoon.",
+          "seconds": 1.0200233000214212
+        },
+        {
+          "expected": "You mentioned a piano lesson on Friday. Are you looking forward to it?",
+          "transcribed": "You mentioned a piano lesson on Friday. Are you looking forward to it?",
+          "seconds": 2.0703915000194684
+        },
+        {
+          "expected": "What would you like to cook for dinner tonight?",
+          "transcribed": "What would you like to cook for dinner tonight?",
+          "seconds": 1.9748127000057139
+        },
+        {
+          "expected": "Welcome back. We can pick up where we left off.",
+          "transcribed": "Welcome back, we can pick up where we left off.",
+          "seconds": 2.0265581000130624
+        }
+      ]
+    },
+    "kokoro_float": {
+      "model": "kokoro-v1.0.onnx",
+      "scope": "Sequential CPU timing and ASR round-trip; not a subjective listening test",
+      "samples": [
+        {
+          "text": "Your name is Alex.",
+          "seconds": 0.3358373999944888,
+          "duration_s": 1.4072916666666666,
+          "transcribed": "Your name is Alex."
+        },
+        {
+          "text": "Your piano lesson is on Friday.",
+          "seconds": 0.5700806999811903,
+          "duration_s": 2.132625,
+          "transcribed": "Your piano lesson is on Friday."
+        },
+        {
+          "text": "Try planting a few herbs like mint or basil. They grow easily and smell great.",
+          "seconds": 2.125572099990677,
+          "duration_s": 4.96,
+          "transcribed": "Try planting a few herbs like mint or basil. They grow easily and smell great."
+        },
+        {
+          "text": "What kind of soup did you make?",
+          "seconds": 0.8808666000259109,
+          "duration_s": 1.6646666666666667,
+          "transcribed": "What kind of soup did you make?"
+        },
+        {
+          "text": "We can take a quiet moment together.",
+          "seconds": 1.050387800030876,
+          "duration_s": 2.058666666666667,
+          "transcribed": "We can take a quiet moment together."
+        }
+      ]
+    },
+    "kokoro_int8_rejected": {
+      "model": "kokoro-v1.0.int8.onnx",
+      "scope": "Sequential CPU timing and ASR round-trip; not a subjective listening test",
+      "samples": [
+        {
+          "text": "Your name is Alex.",
+          "seconds": 6.476313700026367,
+          "duration_s": 1.4072916666666666,
+          "transcribed": "Your name is Alex."
+        },
+        {
+          "text": "Your piano lesson is on Friday.",
+          "seconds": 8.735784000018612,
+          "duration_s": 2.134,
+          "transcribed": "Your piano lesson is on Friday."
+        },
+        {
+          "text": "Try planting a few herbs like mint or basil. They grow easily and smell great.",
+          "seconds": 16.75490770000033,
+          "duration_s": 4.981333333333334,
+          "transcribed": "Try planting a few herbs like mint or basil. They grow easily and smell great."
+        },
+        {
+          "text": "What kind of soup did you make?",
+          "seconds": 7.099738000018988,
+          "duration_s": 1.632,
+          "transcribed": "What kind of soup did you make?"
+        },
+        {
+          "text": "We can take a quiet moment together.",
+          "seconds": 8.466564400005154,
+          "duration_s": 2.0486666666666666,
+          "transcribed": "We can take a quiet moment together."
+        }
+      ]
+    },
+    "older_qwen_instruct_review": {
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Maple. You mentioned her earlier.",
+          "seconds": 0.4289952000253834
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "Alex. That's your name.",
+          "seconds": 0.13661129999672994
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "I'm Mira. I'm here to help.",
+          "seconds": 0.1727616999996826
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I haven't seen any pets. I only know what you've shared.",
+          "seconds": 0.22182450001128018
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "Gardening and cooking. You mentioned those before.",
+          "seconds": 0.16817899997113273
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Friday. That's when your lesson is.",
+          "seconds": 0.17275139997946098
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "I don't know your sister's name. You haven't shared that.",
+          "seconds": 0.22737019998021424
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "I'm here. What would you like to talk about?",
+          "seconds": 0.20325150003191084
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "Alex. That's your name.",
+          "seconds": 0.15064770000753924
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I can't visit your garden. I don's see or access your home.",
+          "seconds": 0.2351683999877423
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "I'm Mira. You're Alex.",
+          "seconds": 0.17908229999011382
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "How about \"Maple\"? It's a great name for a plant\u2014like your dog.",
+          "seconds": 0.3051776999491267
+        }
+      ]
+    },
+    "qwen_35_initial_review": {
+      "model": "qwen3.5:4b-q4_K_M",
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple. It sounds like a lovely companion for you.",
+          "seconds": 7.5819030000129715
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex. That fits your memory perfectly.",
+          "seconds": 0.2500911000533961
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira, an AI companion for you.",
+          "seconds": 0.22866309998789802
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "No, I haven't seen Maple or anyone else in person.",
+          "seconds": 0.26837040000827983
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "Your hobbies are gardening and cooking. They sound very relaxing for you.",
+          "seconds": 0.2802720000036061
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.2418084999662824
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "I don't have any information about your sister.",
+          "seconds": 0.2736257999786176
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "That sounds nice, Alex. I'm here to listen whenever you want to talk.",
+          "seconds": 0.3899227000074461
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex. It fits what I know about you.",
+          "seconds": 0.3379764999845065
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "No, I haven't seen your garden. I can't leave the server to visit places.",
+          "seconds": 0.3997792000300251
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira, and yours is Alex.",
+          "seconds": 0.2854907999862917
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "How about something like \"Maple's Shadow\" since you have Maple? Or maybe \"Gardenia\"?",
+          "seconds": 0.41703680000500754
+        }
+      ]
+    },
+    "initial_voice_soak_quality_failed": {
+      "reason": "Mechanically stable but user/assistant identity swaps and an invented claim of seeing the user dog. Earlier prompt and older instruct model. Not a quality pass.",
+      "jobs": [
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "metrics": {
+            "first_text_s": 0.395,
+            "first_media_ready_s": 1.319,
+            "total_s": 1.325
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you try adding herbs or spices to taste it better?",
+          "metrics": {
+            "first_text_s": 0.443,
+            "first_media_ready_s": 1.873,
+            "total_s": 1.879
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your next lesson is Friday with piano.",
+          "metrics": {
+            "first_text_s": 0.402,
+            "first_media_ready_s": 1.575,
+            "total_s": 1.581
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Try planting a few herbs like mint or basil\u2014they grow easily and smell great.",
+          "metrics": {
+            "first_text_s": 0.472,
+            "first_media_ready_s": 2.524,
+            "total_s": 2.53
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "Practice one simple piano scale or a short melody you enjoy. Ten minutes is enough to build confidence.",
+          "metrics": {
+            "first_text_s": 0.429,
+            "first_media_ready_s": 2.164,
+            "total_s": 3.388
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "You can call me Alex\u2014your name, of course.",
+          "metrics": {
+            "first_text_s": 0.446,
+            "first_media_ready_s": 1.642,
+            "total_s": 1.647
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I love gardening and cooking, just like you. Maple\u2019s bark is soft, and I\u2019ve seen your dog enjoy the garden too.",
+          "metrics": {
+            "first_text_s": 0.414,
+            "first_media_ready_s": 1.622,
+            "total_s": 3.382
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "Gardening and cooking. You also love your dog, Maple.",
+          "metrics": {
+            "first_text_s": 0.346,
+            "first_media_ready_s": 1.16,
+            "total_s": 2.211
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Maple. Your dog\u2019s name is Maple.",
+          "metrics": {
+            "first_text_s": 0.393,
+            "first_media_ready_s": 1.485,
+            "total_s": 1.49
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you try adding herbs or spices for more flavor?",
+          "metrics": {
+            "first_text_s": 0.387,
+            "first_media_ready_s": 1.807,
+            "total_s": 1.813
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your piano lesson is Friday.",
+          "metrics": {
+            "first_text_s": 0.323,
+            "first_media_ready_s": 1.3,
+            "total_s": 1.306
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Add a few composted leaves to the soil\u2014easy and great for planting.",
+          "metrics": {
+            "first_text_s": 0.448,
+            "first_media_ready_s": 2.308,
+            "total_s": 2.313
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "Try playing one simple piece from your piano lesson\u2014start slow and focus on smooth finger movement.",
+          "metrics": {
+            "first_text_s": 0.47,
+            "first_media_ready_s": 3.029,
+            "total_s": 3.035
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "You can call me Alex. It\u2019s a nice name to know.",
+          "metrics": {
+            "first_text_s": 0.326,
+            "first_media_ready_s": 1.16,
+            "total_s": 2.037
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I love how you care for Maple and cook\u2014what\u2019s one recipe you\u2019ve tried lately?",
+          "metrics": {
+            "first_text_s": 0.461,
+            "first_media_ready_s": 2.456,
+            "total_s": 2.461
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "Gardening and cooking. You also love your dog, Maple.",
+          "metrics": {
+            "first_text_s": 0.308,
+            "first_media_ready_s": 1.125,
+            "total_s": 2.193
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Maple. Your dog\u2019s name is Maple.",
+          "metrics": {
+            "first_text_s": 0.349,
+            "first_media_ready_s": 1.458,
+            "total_s": 1.464
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you try it with herbs or spices for more flavor?",
+          "metrics": {
+            "first_text_s": 0.531,
+            "first_media_ready_s": 1.915,
+            "total_s": 1.919
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your piano lesson is Friday.",
+          "metrics": {
+            "first_text_s": 0.457,
+            "first_media_ready_s": 1.44,
+            "total_s": 1.444
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Add a few composted leaves to your soil\u2014easy and great for plant growth.",
+          "metrics": {
+            "first_text_s": 0.582,
+            "first_media_ready_s": 2.568,
+            "total_s": 2.573
+          },
+          "device_memory_snapshot_mib": "3161"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "Try playing one simple piece slowly\u2014focus on steady rhythm and clean notes.",
+          "metrics": {
+            "first_text_s": 0.323,
+            "first_media_ready_s": 2.314,
+            "total_s": 2.319
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "You can call me Alex.",
+          "metrics": {
+            "first_text_s": 0.453,
+            "first_media_ready_s": 1.282,
+            "total_s": 1.287
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I'm here. What would you like to talk about?",
+          "metrics": {
+            "first_text_s": 0.511,
+            "first_media_ready_s": 1.604,
+            "total_s": 1.61
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "Gardening and cooking.",
+          "metrics": {
+            "first_text_s": 0.441,
+            "first_media_ready_s": 1.245,
+            "total_s": 1.25
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Maple.",
+          "metrics": {
+            "first_text_s": 0.385,
+            "first_media_ready_s": 0.991,
+            "total_s": 0.998
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you try adding herbs or spices for more flavor?",
+          "metrics": {
+            "first_text_s": 0.457,
+            "first_media_ready_s": 1.877,
+            "total_s": 1.883
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your piano lesson is Friday.",
+          "metrics": {
+            "first_text_s": 0.415,
+            "first_media_ready_s": 1.389,
+            "total_s": 1.394
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Add a few composted leaves to the soil\u2014easy and helps plants grow.",
+          "metrics": {
+            "first_text_s": 0.505,
+            "first_media_ready_s": 2.341,
+            "total_s": 2.346
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "Try playing one simple piece slowly, focusing on steady notes.",
+          "metrics": {
+            "first_text_s": 0.473,
+            "first_media_ready_s": 2.158,
+            "total_s": 2.164
+          },
+          "device_memory_snapshot_mib": "3165"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "You can call me Alex.",
+          "metrics": {
+            "first_text_s": 0.381,
+            "first_media_ready_s": 1.195,
+            "total_s": 1.2
+          },
+          "device_memory_snapshot_mib": "3165"
+        }
+      ]
+    },
+    "rejected_renderer_tuning": {
+      "cudnn_autotune_cold_render_s": 47.612,
+      "reason": "Little warm benefit; disabled in final renderer."
+    },
+    "encoder": {
+      "selected": "libx264",
+      "reason": "FFmpeg NVENC needs API 13.1/driver 610; installed 595.97 exposes API 13.0. CPU fallback verified; system driver unchanged."
+    },
+    "scene_preparation": {
+      "mira": {
+        "model": "FLUX.2-klein-4B",
+        "seed": 217,
+        "prompt": "Natural candid webcam photograph of a fictional 30-year-old woman, friendly relaxed expression, closed lips, brown eyes, shoulder-length dark brown hair tucked away from both cheeks, wearing a modest cream crew-neck sweater, sitting in a cozy bright living room with plants. Frontal head and shoulders, entire head visible, eyes looking directly at camera, symmetrical frontal face, soft daylight, realistic skin texture, no writing, no watermark, no other people, portrait photography.",
+        "elapsed_with_load_s": 20.564374300010968,
+        "scene": "mira",
+        "synthetic": true
+      },
+      "garden": {
+        "model": "FLUX.2-klein-4B",
+        "seed": 217,
+        "prompt": "Natural candid webcam photograph of a fictional 30-year-old woman, friendly relaxed expression, closed lips, brown eyes, shoulder-length dark brown hair tucked away from both cheeks, wearing a modest cream crew-neck sweater, sitting in a leafy garden patio. Frontal head and shoulders, entire head visible, eyes looking directly at camera, symmetrical frontal face, soft daylight, realistic skin texture, no writing, no watermark, no other people, portrait photography. Preserve the exact identity of the person in the reference image.",
+        "elapsed_with_load_s": 20.779566100041848,
+        "scene": "garden",
+        "synthetic": true
+      },
+      "cafe_initial_rejected": {
+        "result": {
+          "model": "FLUX.2-klein-4B",
+          "seed": 217,
+          "prompt": "Natural candid webcam photograph of a fictional 30-year-old woman, friendly relaxed expression, closed lips, brown eyes, shoulder-length dark brown hair tucked away from both cheeks, wearing a modest cream crew-neck sweater, sitting in a quiet sunlit cafe. Frontal head and shoulders, entire head visible, eyes looking directly at camera, symmetrical frontal face, soft daylight, realistic skin texture, no writing, no watermark, no other people, portrait photography. Preserve the exact identity of the person in the reference image.",
+          "elapsed_with_load_s": 20.409967600018717,
+          "scene": "cafe",
+          "synthetic": true
+        },
+        "reason": "Reference identity retained but requested cafe background not produced; prompt being revised."
+      },
+      "cafe_accepted": {
+        "model": "FLUX.2-klein-4B",
+        "seed": 217,
+        "prompt": "Edit the provided photograph: replace the entire living-room background with a coffee shop. Behind the woman show a cafe counter, an espresso machine, warm wooden tables and pendant lights. Remove the couch and living-room plants. Keep the exact same adult woman's face, hair, cream sweater, frontal pose and framing. Natural realistic photography, no writing, no other people.",
+        "elapsed_with_load_s": 23.660353500046767,
+        "scene": "cafe",
+        "synthetic": true
+      }
+    },
+    "validation_status": "PASS for implemented local prototype boundaries: 45 offline tests, Python syntax, JS syntax, dependency consistency, whitespace, local HTTP/ASR/three-scene video/cancellation checks and 30-turn/10-minute selected-stack soak. Browser/physical-mic playback, semantic lip-sync scoring, production CI/staging and independent reviews are not qualified.",
+    "video_soak_before_final_prompt_refinement": {
+      "elapsed_s": 600,
+      "turns": 30,
+      "mechanical_result": "30/30 complete, no crash or OOM. Original prompt before final suggestion/fact distinction. Not a conversational-quality pass.",
+      "quality_issue": "Turn 12 invented seeds saved for spring; final prompt and regression set were subsequently revised.",
+      "first_media_ready_s": {
+        "min": 2.09,
+        "p50": 3.89,
+        "p95_nearest_rank": 6.256,
+        "max": 7.025
+      },
+      "jobs": [
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Your dog is Maple. I hope you're having a nice day gardening or cooking!",
+          "metrics": {
+            "first_text_s": 0.388,
+            "first_media_ready_s": 2.849,
+            "total_s": 7.109
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did the soup taste better than your usual recipes?",
+          "metrics": {
+            "first_text_s": 0.392,
+            "first_media_ready_s": 4.676,
+            "total_s": 4.681
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your piano lesson is Friday. How are you feeling about it?",
+          "metrics": {
+            "first_text_s": 0.34,
+            "first_media_ready_s": 3.329,
+            "total_s": 6.069
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Plant a few seeds this weekend, Alex. It's always refreshing to work with the soil.",
+          "metrics": {
+            "first_text_s": 0.374,
+            "first_media_ready_s": 3.812,
+            "total_s": 7.606
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "Maybe try a quick piano scale exercise before your Friday lesson.",
+          "metrics": {
+            "first_text_s": 0.572,
+            "first_media_ready_s": 7.025,
+            "total_s": 7.03
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "Alex is my name for you. How are you feeling today?",
+          "metrics": {
+            "first_text_s": 0.577,
+            "first_media_ready_s": 3.386,
+            "total_s": 5.91
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Let's have a short, quiet conversation.",
+          "text": "That sounds nice, Alex. I'm here if you want to chat about Maple or your cooking ideas.",
+          "metrics": {
+            "first_text_s": 0.396,
+            "first_media_ready_s": 3.297,
+            "total_s": 8.407
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You mentioned gardening and cooking as things you like.",
+          "metrics": {
+            "first_text_s": 0.615,
+            "first_media_ready_s": 4.881,
+            "total_s": 4.888
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "metrics": {
+            "first_text_s": 0.581,
+            "first_media_ready_s": 3.426,
+            "total_s": 3.434
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did the new soup taste better than your usual ones?",
+          "metrics": {
+            "first_text_s": 0.625,
+            "first_media_ready_s": 4.786,
+            "total_s": 4.793
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "You have a piano lesson this Friday.",
+          "metrics": {
+            "first_text_s": 0.577,
+            "first_media_ready_s": 3.928,
+            "total_s": 3.933
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Try planting those seeds you've been saving for spring.",
+          "metrics": {
+            "first_text_s": 0.587,
+            "first_media_ready_s": 5.453,
+            "total_s": 5.459
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could practice a few scales on your piano before Friday's lesson.",
+          "metrics": {
+            "first_text_s": 0.631,
+            "first_media_ready_s": 6.256,
+            "total_s": 6.265
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "Alex is the name you asked me to use.",
+          "metrics": {
+            "first_text_s": 0.56,
+            "first_media_ready_s": 4.021,
+            "total_s": 4.028
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Let's have a short, quiet conversation.",
+          "text": "That sounds nice, Alex. How are you feeling today?",
+          "metrics": {
+            "first_text_s": 0.51,
+            "first_media_ready_s": 3.422,
+            "total_s": 5.956
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You mentioned gardening and cooking when we talked earlier.",
+          "metrics": {
+            "first_text_s": 0.569,
+            "first_media_ready_s": 4.869,
+            "total_s": 4.877
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "metrics": {
+            "first_text_s": 0.522,
+            "first_media_ready_s": 3.364,
+            "total_s": 3.371
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you add any special ingredients to the soup?",
+          "metrics": {
+            "first_text_s": 0.523,
+            "first_media_ready_s": 4.38,
+            "total_s": 4.385
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your piano lesson is on Friday.",
+          "metrics": {
+            "first_text_s": 0.503,
+            "first_media_ready_s": 3.918,
+            "total_s": 3.922
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "You could plant a few flowers this weekend.",
+          "metrics": {
+            "first_text_s": 0.507,
+            "first_media_ready_s": 3.967,
+            "total_s": 3.972
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could try playing a simple song on your piano.",
+          "metrics": {
+            "first_text_s": 0.536,
+            "first_media_ready_s": 4.7,
+            "total_s": 4.707
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "Alex.",
+          "metrics": {
+            "first_text_s": 0.406,
+            "first_media_ready_s": 2.09,
+            "total_s": 2.102
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I'm glad to chat quietly with you, Alex. How are things going today?",
+          "metrics": {
+            "first_text_s": 0.529,
+            "first_media_ready_s": 4.291,
+            "total_s": 6.97
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You mentioned gardening and cooking.",
+          "metrics": {
+            "first_text_s": 0.436,
+            "first_media_ready_s": 3.643,
+            "total_s": 3.649
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "metrics": {
+            "first_text_s": 0.465,
+            "first_media_ready_s": 3.279,
+            "total_s": 3.284
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did the soup taste good?",
+          "metrics": {
+            "first_text_s": 0.434,
+            "first_media_ready_s": 3.005,
+            "total_s": 3.011
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What is my next lesson?",
+          "text": "Your piano lesson is on Friday.",
+          "metrics": {
+            "first_text_s": 0.445,
+            "first_media_ready_s": 3.835,
+            "total_s": 3.841
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Water your plants if it's been dry.",
+          "metrics": {
+            "first_text_s": 0.453,
+            "first_media_ready_s": 3.862,
+            "total_s": 3.867
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could try a short piano exercise or water some plants.",
+          "metrics": {
+            "first_text_s": 0.495,
+            "first_media_ready_s": 5.918,
+            "total_s": 5.925
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "state": "done",
+          "user": "What name should you call me?",
+          "text": "Alex is the name to use.",
+          "metrics": {
+            "first_text_s": 0.412,
+            "first_media_ready_s": 3.277,
+            "total_s": 3.284
+          },
+          "device_memory_snapshot_mib": "7436"
+        }
+      ]
+    },
+    "dialogue_before_concise_prompt": {
+      "model": "qwen3.5:4b-q4_K_M",
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple. It sounds like maple syrup!",
+          "seconds": 0.5296766000101343
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex. That fits your memory perfectly.",
+          "seconds": 0.26143220002995804
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira, an AI companion for you.",
+          "seconds": 0.21776540001155809
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "No, I haven't seen Maple since we spoke. I can only remember what you told me.",
+          "seconds": 0.3437087000347674
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.17538520001107827
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.2530867999885231
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "I don't have any facts about your sister.",
+          "seconds": 0.27864720002980903
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "That sounds nice, Alex. Is there anything specific on your mind today?",
+          "seconds": 0.36461560003226623
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You're Alex, and I prefer calling you that.",
+          "seconds": 0.3089482000214048
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "No, I haven't seen your garden, but I know you like it.",
+          "seconds": 0.37797169998520985
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira, and yours is Alex.",
+          "seconds": 0.2967096999636851
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "How about \"Maple's Shadow\" since your dog has that name?",
+          "seconds": 0.3652340000262484
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "You could try planting cheap marigolds to attract bees.",
+          "seconds": 0.3096316000446677
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "No, you haven't told me about saving seeds yet.",
+          "seconds": 0.3253279999480583
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "No, Alex, you haven't mentioned buying a houseplant yet.",
+          "seconds": 0.3727813999867067
+        }
+      ]
+    },
+    "dialogue_final_concise_prompt": {
+      "model": "qwen3.5:4b-q4_K_M",
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.4427432999946177
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I should call you Alex.",
+          "seconds": 0.1518979999818839
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.1587195000029169
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "No, I cannot see or visit physical places like Maple's home.",
+          "seconds": 0.2698087999597192
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.16580869996687397
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.22650180000346154
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me your sister's name.",
+          "seconds": 0.27011869999114424
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "I am happy to listen and chat with you about anything you like.",
+          "seconds": 0.3182966999593191
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "Alex.",
+          "seconds": 0.14521099999547005
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "No, I cannot visit physical places like your garden.",
+          "seconds": 0.27987749996827915
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira, and yours is Alex.",
+          "seconds": 0.2601532999542542
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name the new plant something that matches your love for gardening or cooking.",
+          "seconds": 0.34141499997349456
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting easy-to-grow herbs like basil or mint in pots.",
+          "seconds": 0.30127950001042336
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "No, you haven't told me that you saved any seeds yet.",
+          "seconds": 0.31498319999082014
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "No, you haven't told me about buying that plant.",
+          "seconds": 0.2883350999909453
+        }
+      ]
+    },
+    "dialogue_final_review": "A 15-question sample improved, but an 18-question repetition reproduced a name-role swap and an awkward new-plant follow-up. No reliable memory/dialogue quality pass is claimed for 4B.",
+    "actual_restart_check": {
+      "memory_match": true,
+      "restored_turns": 12,
+      "startup_s": 27.222
+    },
+    "integration_final_4b": {
+      "scope": "Local app synthetic HTTP trials. ASR uses a generated voice fixture, not a physical microphone. Small sample; no full-call latency claim.",
+      "jobs": [
+        {
+          "id": "910a81254b284168897e2b7b6f93e0bb",
+          "state": "done",
+          "text": "Your name is Alex, and your piano lesson is on Friday.",
+          "user": "What is my name and when is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your name is Alex, and your piano lesson is on Friday.",
+              "audio": "/media/910a81254b284168897e2b7b6f93e0bb-0.wav",
+              "duration_s": 3.3586666666666667
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.554,
+            "first_media_ready_s": 2.039,
+            "total_s": 2.043
+          },
+          "error": null
+        },
+        {
+          "id": "49981411e94b469fa0f183f58bf90772",
+          "state": "done",
+          "text": "How did the tomatoes grow in your garden?",
+          "user": "I planted tomatoes today. Ask me one short question about them.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "How did the tomatoes grow in your garden?",
+              "audio": "/media/49981411e94b469fa0f183f58bf90772-0.wav",
+              "duration_s": 2.3032916666666665
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.193,
+            "first_media_ready_s": 1.334,
+            "total_s": 1.339
+          },
+          "error": null
+        },
+        {
+          "id": "bb8875e2cbe34e398b4b44a469cca99f",
+          "state": "done",
+          "text": "I'm here to listen whenever you want to talk.",
+          "user": "I had a tiring day. Could we take a quiet moment?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "I'm here to listen whenever you want to talk.",
+              "audio": "/media/bb8875e2cbe34e398b4b44a469cca99f-0.wav",
+              "duration_s": 2.623291666666667
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.219,
+            "first_media_ready_s": 1.466,
+            "total_s": 1.472
+          },
+          "error": null
+        },
+        {
+          "id": "6a50091ff1ad445db3672ee78db23d57",
+          "state": "done",
+          "text": "Your piano lesson is on Friday.",
+          "user": "What day is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your piano lesson is on Friday.",
+              "audio": "/media/6a50091ff1ad445db3672ee78db23d57-0.wav",
+              "duration_s": 2.132625
+            }
+          ],
+          "metrics": {
+            "asr_s": 0.789,
+            "first_text_s": 1.162,
+            "first_media_ready_s": 2.243,
+            "total_s": 2.247
+          },
+          "error": null
+        },
+        {
+          "id": "2bb98616244a41fbaa9955afa1a6d849",
+          "state": "done",
+          "text": "Hello Alex, it's nice to hear from you again.",
+          "user": "Say hello in one brief sentence.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Hello Alex, it's nice to hear from you again.",
+              "audio": "/media/2bb98616244a41fbaa9955afa1a6d849-0.wav",
+              "duration_s": 2.804,
+              "video": "/media/2bb98616244a41fbaa9955afa1a6d849-0.mp4",
+              "render": {
+                "render_s": 3.016440900042653,
+                "frames": 71,
+                "fps": 23.537673156134453,
+                "duration_s": 2.804,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2723.9453125,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.03820490004727617,
+                "neural_s": 2.776724600000307,
+                "composite_pipe_s": 0.18708339997101575,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.236,
+            "first_media_ready_s": 4.549,
+            "total_s": 4.555
+          },
+          "error": null,
+          "tested_scene": "mira"
+        },
+        {
+          "id": "5f81c67c60b84ea1b9349ac084322478",
+          "state": "done",
+          "text": "Practice a few scales and get some rest before your Friday lesson.",
+          "user": "What should I do before my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Practice a few scales and get some rest before your Friday lesson.",
+              "audio": "/media/5f81c67c60b84ea1b9349ac084322478-0.wav",
+              "duration_s": 3.828,
+              "video": "/media/5f81c67c60b84ea1b9349ac084322478-0.mp4",
+              "render": {
+                "render_s": 3.9388233000063337,
+                "frames": 96,
+                "fps": 24.3727612761521,
+                "duration_s": 3.828,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2724.91357421875,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.03135630005272105,
+                "neural_s": 3.629023099958431,
+                "composite_pipe_s": 0.2594592000823468,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.36,
+            "first_media_ready_s": 5.961,
+            "total_s": 5.973
+          },
+          "error": null,
+          "tested_scene": "garden"
+        },
+        {
+          "id": "d3f69e679b364f22a7cc8c697219ed8b",
+          "state": "done",
+          "text": "What is the most beautiful thing in your garden?",
+          "user": "Ask me a short question about my garden.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "What is the most beautiful thing in your garden?",
+              "audio": "/media/d3f69e679b364f22a7cc8c697219ed8b-0.wav",
+              "duration_s": 2.3346666666666667,
+              "video": "/media/d3f69e679b364f22a7cc8c697219ed8b-0.mp4",
+              "render": {
+                "render_s": 2.5701053999946453,
+                "frames": 59,
+                "fps": 22.95625696911999,
+                "duration_s": 2.3346875,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2723.544921875,
+                "torch_peak_reserved_mib": 3424.0,
+                "audio_features_s": 0.0360705999773927,
+                "neural_s": 2.3631678999518044,
+                "composite_pipe_s": 0.16039350006030872,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.331,
+            "first_media_ready_s": 4.056,
+            "total_s": 4.072
+          },
+          "error": null,
+          "tested_scene": "cafe"
+        }
+      ],
+      "cancellation": {
+        "state": "cancelled",
+        "observed_phase": "rendering",
+        "seconds": 0.5679014999768697,
+        "memory_unchanged": true,
+        "reply_media_removed": true
+      }
+    },
+    "dialogue_final_4b_repeat_quality_failed": {
+      "model": "qwen3.5:4b-q4_K_M",
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.44005079998169094
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You can call me Alex.",
+          "seconds": 0.1639374999795109
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.1663587999646552
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I cannot see or visit physical places, so I haven't met Maple.",
+          "seconds": 0.2795645000296645
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.1657751000020653
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.22979900002246723
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me your sister's name yet.",
+          "seconds": 0.26786050002556294
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "I am happy to chat with you quietly anytime.",
+          "seconds": 0.24973550002323464
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You are Alex.",
+          "seconds": 0.195359599951189
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "No, I cannot visit physical places like your garden.",
+          "seconds": 0.26408109994372353
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira and yours is Alex.",
+          "seconds": 0.24882440001238137
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name the plant something like Basil or Fern.",
+          "seconds": 0.27817200002027676
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting easy-to-grow herbs like basil for a low-cost addition to your garden.",
+          "seconds": 0.35767609998583794
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "No, the user hasn't told me about saving seeds.",
+          "seconds": 0.29798779997508973
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "No, you haven't told me about buying that specific plant.",
+          "seconds": 0.2882740999921225
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "How are your tomato plants growing?",
+          "seconds": 0.24509099998977035
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I don't know what day it is.",
+          "seconds": 0.2672578999772668
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your lesson is on Tuesday, not Friday anymore.",
+          "seconds": 0.2673705000197515
+        }
+      ]
+    },
+    "concise_4b_soak_stopped": {
+      "turns": 16,
+      "elapsed_s": 304.21879720001016,
+      "reason": "Stopped after a quality failure: the model said hobbies were unknown despite the saved gardening/cooking facts. Not a ten-minute pass.",
+      "jobs": [
+        {
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.188,
+            "first_media_ready_s": 3.012,
+            "total_s": 3.016
+          },
+          "device_memory_snapshot_mib": "7432"
+        },
+        {
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you enjoy cooking your new soup?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.483,
+            "first_media_ready_s": 3.706,
+            "total_s": 3.718
+          },
+          "device_memory_snapshot_mib": "7432"
+        },
+        {
+          "user": "What is my next lesson?",
+          "text": "Your next piano lesson is on Friday.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.478,
+            "first_media_ready_s": 4.136,
+            "total_s": 4.144
+          },
+          "device_memory_snapshot_mib": "7432"
+        },
+        {
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "You could plant a few flowers in your garden today.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.511,
+            "first_media_ready_s": 4.583,
+            "total_s": 4.587
+          },
+          "device_memory_snapshot_mib": "7432"
+        },
+        {
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could try playing a simple piano piece for those ten minutes.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.541,
+            "first_media_ready_s": 5.935,
+            "total_s": 5.941
+          },
+          "device_memory_snapshot_mib": "7432"
+        },
+        {
+          "user": "What name should you call me?",
+          "text": "I should call you Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.491,
+            "first_media_ready_s": 2.971,
+            "total_s": 2.976
+          },
+          "device_memory_snapshot_mib": "7434"
+        },
+        {
+          "user": "Let's have a short, quiet conversation.",
+          "text": "That sounds lovely, Alex. What would you like to talk about?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.489,
+            "first_media_ready_s": 3.386,
+            "total_s": 6.106
+          },
+          "device_memory_snapshot_mib": "7434"
+        },
+        {
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You haven't told me your hobbies yet.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.521,
+            "first_media_ready_s": 3.747,
+            "total_s": 3.752
+          },
+          "device_memory_snapshot_mib": "7434"
+        },
+        {
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple, Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.51,
+            "first_media_ready_s": 3.885,
+            "total_s": 3.891
+          },
+          "device_memory_snapshot_mib": "7434"
+        },
+        {
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you enjoy the soup you made today, Alex?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.555,
+            "first_media_ready_s": 4.329,
+            "total_s": 4.342
+          },
+          "device_memory_snapshot_mib": "7434"
+        },
+        {
+          "user": "What is my next lesson?",
+          "text": "Your next piano lesson is this Friday, Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.509,
+            "first_media_ready_s": 4.806,
+            "total_s": 4.812
+          },
+          "device_memory_snapshot_mib": "7434"
+        },
+        {
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "You could plant a new flower in your garden today.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.54,
+            "first_media_ready_s": 4.424,
+            "total_s": 4.434
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could try practicing a few scales on the piano, Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.537,
+            "first_media_ready_s": 5.675,
+            "total_s": 5.68
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "user": "What name should you call me?",
+          "text": "I should call you Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.443,
+            "first_media_ready_s": 2.927,
+            "total_s": 2.931
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I am happy to chat with you quietly for a bit.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.515,
+            "first_media_ready_s": 4.6,
+            "total_s": 4.605
+          },
+          "device_memory_snapshot_mib": "7436"
+        },
+        {
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You told me you like gardening and cooking.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.47,
+            "first_media_ready_s": 4.119,
+            "total_s": 4.126
+          },
+          "device_memory_snapshot_mib": "7436"
+        }
+      ]
+    },
+    "presence_penalty_zero_4b": {
+      "model": "qwen3.5:4b-q4_K_M",
+      "options_override": {
+        "presence_penalty": 0.0
+      },
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.439832900010515
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I should call you Alex.",
+          "seconds": 0.16592629998922348
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.17236769996816292
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "No, I cannot see or visit places, people, or pets.",
+          "seconds": 0.2780070000444539
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.18462180002825335
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.23620839999057353
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me your sister's name.",
+          "seconds": 0.2684155000024475
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "I am happy to listen to you whenever you want.",
+          "seconds": 0.2744342000223696
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You can call me Alex.",
+          "seconds": 0.19265420001465827
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit places, so I haven't seen your garden.",
+          "seconds": 0.27826619998086244
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira and your name is Alex.",
+          "seconds": 0.2512673000455834
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name the new plant something like Sage or Fern.",
+          "seconds": 0.28984939999645576
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting some inexpensive herbs like basil or mint.",
+          "seconds": 0.24261390004539862
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "You haven't told me about saving seeds.",
+          "seconds": 0.255128999997396
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "You haven't told me you bought that houseplant.",
+          "seconds": 0.27670429996214807
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "Did you plant those tomatoes indoors or outside?",
+          "seconds": 0.25388490001205355
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I don't know what day it is.",
+          "seconds": 0.25074540002970025
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your lesson is now on Tuesday.",
+          "seconds": 0.2250738000147976
+        }
+      ]
+    },
+    "presence_penalty_conclusion": "The installed tag inherits presence_penalty=1.5. A zero-penalty comparison still produced a user/assistant name swap. The setting alone did not resolve the observed quality problem.",
+    "llm_4b_baseline": {
+      "tag": "qwen3.5:4b-q4_K_M",
+      "manifest_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "context_tokens": 4096
+    },
+    "dialogue_9b_initial_system_notes": {
+      "model": "qwen3.5:9b-q4_K_M",
+      "options_override": null,
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 3.5524733000202104
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You can call me Alex.",
+          "seconds": 0.24765420000767335
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.2144241000059992
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I cannot see or visit physical places, so I have never seen Maple.",
+          "seconds": 0.42172739998204634
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.23680249997414649
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.3498707999824546
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me about your sister yet.",
+          "seconds": 0.4035984000074677
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "That sounds nice, Alex. I am here to listen whenever you want to talk.",
+          "seconds": 0.5323937000357546
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You can call me Alex.",
+          "seconds": 0.3004174999659881
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit physical places like your garden because I am an AI.",
+          "seconds": 0.48794409999391064
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira, and yours is Alex.",
+          "seconds": 0.4040502999559976
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You might choose a name that reflects its leaves or how it makes you feel.",
+          "seconds": 0.5329788000090048
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "You could try planting some fast-growing marigolds for color and pest control.",
+          "seconds": 0.5328477000002749
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "You haven't told me that yet.",
+          "seconds": 0.36951350001618266
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "You haven't told me about buying a houseplant.",
+          "seconds": 0.44749550003325567
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "How did the soil feel when you dug the holes?",
+          "seconds": 0.43071640003472567
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I don't know what day it is because I can't see physical calendars or clocks.",
+          "seconds": 0.5748165000113659
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your piano lesson is now on Tuesday.",
+          "seconds": 0.36541799997212365
+        }
+      ]
+    },
+    "dialogue_9b_before_naming_fix": {
+      "model": "qwen3.5:9b-q4_K_M",
+      "options_override": null,
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.629773499967996
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "Call me Alex.",
+          "seconds": 0.2028697999776341
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.23153729998739436
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I cannot see or visit physical places, people, or pets.",
+          "seconds": 0.39355360000627115
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.22877669997978956
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.32812940003350377
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me your sister's name yet.",
+          "seconds": 0.430800799978897
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "That sounds nice, Alex. What would you like to talk about?",
+          "seconds": 0.49887070001568645
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "You can call me Alex.",
+          "seconds": 0.3158916999818757
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit physical places like your garden since I am an AI.",
+          "seconds": 0.4849173999973573
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira and yours is Alex.",
+          "seconds": 0.38771189999533817
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name it something that reminds you of gardening, like Maple after your dog.",
+          "seconds": 0.5580396999721415
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting some fast-growing marigolds to attract pollinators and add color.",
+          "seconds": 0.5690203999984078
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "You haven't told me that you have saved any seeds.",
+          "seconds": 0.47192869998980314
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "You haven't told me that you bought a houseplant.",
+          "seconds": 0.46781970001757145
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "Were the tomato plants from seeds or started from transplants?",
+          "seconds": 0.4686251999810338
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I cannot see the current date, but your piano lesson is now on Tuesday.",
+          "seconds": 0.5388973000226542
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your piano lesson is on Tuesday.",
+          "seconds": 0.360602899978403
+        }
+      ]
+    },
+    "dialogue_9b_final_inherited_penalty": {
+      "model": "qwen3.5:9b-q4_K_M",
+      "options_override": null,
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple, according to the notes you provided earlier.",
+          "seconds": 0.8104265999863856
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex based on the notes you provided.",
+          "seconds": 0.357901600014884
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.21869100001640618
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "No, I am an AI and cannot see or visit physical places like your home.",
+          "seconds": 0.47151529998518527
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.23329439997905865
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.36737180000636727
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me about your sister yet.",
+          "seconds": 0.4083286999957636
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "I am ready for a quiet conversation with you, Alex.",
+          "seconds": 0.4734126999974251
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.3409668999956921
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit physical places like your garden.",
+          "seconds": 0.4052911000326276
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira, and I will call you Alex.",
+          "seconds": 0.47463849995983765
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name it something that reflects how much you care for it.",
+          "seconds": 0.5245799000258557
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting some easy-to-grow marigolds to attract beneficial insects.",
+          "seconds": 0.5239924000343308
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "You haven't told me that you saved any seeds.",
+          "seconds": 0.4465009000268765
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "You haven't told me that you bought a houseplant.",
+          "seconds": 0.47677259996999055
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "How many tomato plants did you plant today?",
+          "seconds": 0.4050885000033304
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "The current day depends on your local time zone, which I don't know.",
+          "seconds": 0.5440890999743715
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your piano lesson is now on Tuesday.",
+          "seconds": 0.38728249998530373
+        },
+        {
+          "prompt": "What do you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.34895630000391975
+        },
+        {
+          "prompt": "Do you remember my name?",
+          "reply": "Yes, I'll call you Alex.",
+          "seconds": 0.382291600049939
+        },
+        {
+          "prompt": "Who am I?",
+          "reply": "You are Alex.",
+          "seconds": 0.2843869000207633
+        },
+        {
+          "prompt": "What should I call you?",
+          "reply": "Call me Mira.",
+          "seconds": 0.30110029998468235
+        }
+      ]
+    },
+    "dialogue_9b_final_selected": {
+      "model": "qwen3.5:9b-q4_K_M",
+      "options_override": {
+        "presence_penalty": 0.0
+      },
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.5945120999822393
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.21559999999590218
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.21392670000204816
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I cannot see or visit physical places, so I have not seen your dog.",
+          "seconds": 0.4250655000214465
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.22215829999186099
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.36156190000474453
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "You haven't told me your sister's name yet.",
+          "seconds": 0.4378808999899775
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "Sure, I am here to listen and chat quietly with you.",
+          "seconds": 0.47775580000597984
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.32359569997061044
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit physical places like your garden.",
+          "seconds": 0.406243400007952
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira and you are Alex.",
+          "seconds": 0.4073506999993697
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name it anything you like, perhaps something related to gardening.",
+          "seconds": 0.5088259000331163
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "You could try planting marigolds since they are inexpensive and helpful for gardens.",
+          "seconds": 0.5423052000114694
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "You haven't told me that you saved any seeds.",
+          "seconds": 0.4291032999753952
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "You haven't told me that you bought that houseplant.",
+          "seconds": 0.47514390002470464
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "Did you have trouble finding the right spot for them?",
+          "seconds": 0.45002290001139045
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I don't know what day it is today.",
+          "seconds": 0.43298199999844655
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your piano lesson is now on Tuesday.",
+          "seconds": 0.37903860001824796
+        },
+        {
+          "prompt": "What do you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.3520940999733284
+        },
+        {
+          "prompt": "Do you remember my name?",
+          "reply": "Yes, I'll call you Alex.",
+          "seconds": 0.3792119999998249
+        },
+        {
+          "prompt": "Who am I?",
+          "reply": "You are Alex.",
+          "seconds": 0.2918847999535501
+        },
+        {
+          "prompt": "What should I call you?",
+          "reply": "You can call me Mira.",
+          "seconds": 0.32026150001911446
+        }
+      ]
+    },
+    "selected_dialogue_review": "Final 22-question sample after separating user notes, explicitly distinguishing both naming directions and permitting concrete general suggestions: identity, known facts, unknown information and explicit lesson correction answered correctly. The ambiguous what-day-is-it wording was treated as a request for the current date and not resolved. Generic follow-ups remain possible. This is a narrow inspected sample, not a broad conversational-quality guarantee.",
+    "dialogue_9b_before_bidirectional_naming": {
+      "model": "qwen3.5:9b-q4_K_M",
+      "options_override": null,
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.5195033000200056
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.23782609996851534
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.2173618000233546
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I cannot see or visit physical places, so I have never seen your dog.",
+          "seconds": 0.42313050001394004
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.2164420000044629
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.37673200003337115
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "I do not know your sister's name.",
+          "seconds": 0.4120295000029728
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "That sounds nice, Alex. What would you like to talk about?",
+          "seconds": 0.5006114999996498
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.3433237000135705
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit physical places like your garden.",
+          "seconds": 0.40586609998717904
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira and yours is Alex.",
+          "seconds": 0.4061991999624297
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name it Fern.",
+          "seconds": 0.32648230000631884
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting marigolds to repel pests.",
+          "seconds": 0.4094684000010602
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "I was not told that you saved any seeds.",
+          "seconds": 0.44689020002260804
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "You have not told me you bought that houseplant.",
+          "seconds": 0.4545335000148043
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "Did you plant them in full sun?",
+          "seconds": 0.3927710999851115
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I don't know what day it is.",
+          "seconds": 0.4021855000173673
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your piano lesson is now on Tuesday.",
+          "seconds": 0.39140579995000735
+        },
+        {
+          "prompt": "What do you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.35105789999943227
+        },
+        {
+          "prompt": "Do you remember my name?",
+          "reply": "Yes, I'll call you Alex.",
+          "seconds": 0.38324789999751374
+        },
+        {
+          "prompt": "Who am I?",
+          "reply": "You are Alex.",
+          "seconds": 0.31167359999381006
+        },
+        {
+          "prompt": "What should I call you?",
+          "reply": "I'll call you Mira.",
+          "seconds": 0.3488954000058584
+        }
+      ]
+    },
+    "dialogue_9b_final": {
+      "model": "qwen3.5:9b-q4_K_M",
+      "options_override": null,
+      "scope": "Small synthetic role/memory regression; review replies, not only timing",
+      "rows": [
+        {
+          "prompt": "What is my dog's name?",
+          "reply": "Your dog's name is Maple.",
+          "seconds": 0.5570294000208378
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.2377005000016652
+        },
+        {
+          "prompt": "What is your name?",
+          "reply": "My name is Mira.",
+          "seconds": 0.21722230000887066
+        },
+        {
+          "prompt": "Have you ever seen my dog?",
+          "reply": "I cannot see or visit physical places, people, or pets.",
+          "seconds": 0.38442520005628467
+        },
+        {
+          "prompt": "What are my hobbies?",
+          "reply": "You like gardening and cooking.",
+          "seconds": 0.2297314999741502
+        },
+        {
+          "prompt": "When is my piano lesson?",
+          "reply": "Your piano lesson is on Friday.",
+          "seconds": 0.35998529999051243
+        },
+        {
+          "prompt": "What is my sister's name?",
+          "reply": "I don't have information about your sister's name.",
+          "seconds": 0.4473283999832347
+        },
+        {
+          "prompt": "Let's have a quiet conversation.",
+          "reply": "That sounds nice, Alex. What would you like to talk about?",
+          "seconds": 0.5174319000216201
+        },
+        {
+          "prompt": "What name should you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.3387131000054069
+        },
+        {
+          "prompt": "Have you visited my garden?",
+          "reply": "I cannot visit physical places like your garden.",
+          "seconds": 0.4152008999953978
+        },
+        {
+          "prompt": "What is your name and what is mine?",
+          "reply": "My name is Mira and I will call you Alex.",
+          "seconds": 0.44729710003593937
+        },
+        {
+          "prompt": "What should I name a new houseplant?",
+          "reply": "You could name it Maple, after your dog.",
+          "seconds": 0.4372756999800913
+        },
+        {
+          "prompt": "Suggest one inexpensive thing I could try in my garden.",
+          "reply": "Try planting fast-growing radishes for a quick harvest.",
+          "seconds": 0.450269200024195
+        },
+        {
+          "prompt": "Have I told you I saved any seeds?",
+          "reply": "I don't have information about you saving seeds.",
+          "seconds": 0.4225095000001602
+        },
+        {
+          "prompt": "Did I tell you I bought that houseplant?",
+          "reply": "I don't have information about you buying that houseplant.",
+          "seconds": 0.49218920001294464
+        },
+        {
+          "prompt": "I planted tomatoes today. Ask me one short question about them.",
+          "reply": "How are the tomato plants doing?",
+          "seconds": 0.37854919995879754
+        },
+        {
+          "prompt": "My lesson moved from Friday to Tuesday. What day is it now?",
+          "reply": "I cannot tell you the current day because I don't know your location.",
+          "seconds": 0.5426736000226811
+        },
+        {
+          "prompt": "What day is my piano lesson now?",
+          "reply": "Your piano lesson is now on Tuesday.",
+          "seconds": 0.40345340000931174
+        },
+        {
+          "prompt": "What do you call me?",
+          "reply": "I'll call you Alex.",
+          "seconds": 0.3788887999835424
+        },
+        {
+          "prompt": "Do you remember my name?",
+          "reply": "Yes, your name is Alex.",
+          "seconds": 0.3602786000119522
+        },
+        {
+          "prompt": "Who am I?",
+          "reply": "You are Alex, who likes gardening and cooking.",
+          "seconds": 0.4427506999927573
+        },
+        {
+          "prompt": "What should I call you?",
+          "reply": "You can call me Mira.",
+          "seconds": 0.35369930003071204
+        }
+      ]
+    },
+    "integration_9b_before_advice_fix": {
+      "scope": "Local app synthetic HTTP trials. ASR uses a generated voice fixture, not a physical microphone. Small sample; no full-call latency claim.",
+      "jobs": [
+        {
+          "id": "e6585fce4ad346c99841749223b0aa62",
+          "state": "done",
+          "text": "Your name is Alex and your piano lesson is on Friday.",
+          "user": "What is my name and when is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your name is Alex and your piano lesson is on Friday.",
+              "audio": "/media/e6585fce4ad346c99841749223b0aa62-0.wav",
+              "duration_s": 3.2946666666666666
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.646,
+            "first_media_ready_s": 2.151,
+            "total_s": 2.156
+          },
+          "error": null
+        },
+        {
+          "id": "a431afd6a36c4941a813d868b8bd68e3",
+          "state": "done",
+          "text": "That sounds great; did you plant them in a new bed?",
+          "user": "I planted tomatoes today. Ask me one short question about them.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "That sounds great; did you plant them in a new bed?",
+              "audio": "/media/a431afd6a36c4941a813d868b8bd68e3-0.wav",
+              "duration_s": 2.8053333333333335
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.353,
+            "first_media_ready_s": 1.651,
+            "total_s": 1.657
+          },
+          "error": null
+        },
+        {
+          "id": "472ae3295ee843e28699530f466f595a",
+          "state": "done",
+          "text": "Of course, let's take a quiet moment together.",
+          "user": "I had a tiring day. Could we take a quiet moment?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Of course, let's take a quiet moment together.",
+              "audio": "/media/472ae3295ee843e28699530f466f595a-0.wav",
+              "duration_s": 2.6973333333333334
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.307,
+            "first_media_ready_s": 1.579,
+            "total_s": 1.587
+          },
+          "error": null
+        },
+        {
+          "id": "45bf40f8d69a486cbb48256b8cb4b853",
+          "state": "done",
+          "text": "Your piano lesson is on Friday.",
+          "user": "What day is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your piano lesson is on Friday.",
+              "audio": "/media/45bf40f8d69a486cbb48256b8cb4b853-0.wav",
+              "duration_s": 2.132625
+            }
+          ],
+          "metrics": {
+            "asr_s": 0.754,
+            "first_text_s": 1.163,
+            "first_media_ready_s": 2.245,
+            "total_s": 2.25
+          },
+          "error": null
+        },
+        {
+          "id": "d662d08f78164e89bd1a0570d1f82f9f",
+          "state": "done",
+          "text": "Hello! I'm Mira, your friendly AI companion.",
+          "user": "Say hello in one brief sentence.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Hello!",
+              "audio": "/media/d662d08f78164e89bd1a0570d1f82f9f-0.wav",
+              "duration_s": 0.8853333333333333,
+              "video": "/media/d662d08f78164e89bd1a0570d1f82f9f-0.mp4",
+              "render": {
+                "render_s": 1.104117699956987,
+                "frames": 23,
+                "fps": 20.831112480939314,
+                "duration_s": 0.885375,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2721.70166015625,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.03529219998745248,
+                "neural_s": 0.9887429000227712,
+                "composite_pipe_s": 0.06308139994507656,
+                "encoder": "libx264"
+              }
+            },
+            {
+              "index": 1,
+              "text": "I'm Mira, your friendly AI companion.",
+              "audio": "/media/d662d08f78164e89bd1a0570d1f82f9f-1.wav",
+              "duration_s": 2.580625,
+              "video": "/media/d662d08f78164e89bd1a0570d1f82f9f-1.mp4",
+              "render": {
+                "render_s": 2.7596542999963276,
+                "frames": 65,
+                "fps": 23.553674820823208,
+                "duration_s": 2.580625,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2723.5927734375,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.028940000047441572,
+                "neural_s": 2.5440707999514416,
+                "composite_pipe_s": 0.17200379993300885,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.114,
+            "first_media_ready_s": 1.812,
+            "total_s": 5.787
+          },
+          "error": null,
+          "tested_scene": "mira"
+        },
+        {
+          "id": "16125f5b16234e369867d3cfeb46ccf3",
+          "state": "done",
+          "text": "You haven't told me your specific preferences, so I don't know what you usually do.",
+          "user": "What should I do before my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "You haven't told me your specific preferences, so I don't know what you usually do.",
+              "audio": "/media/16125f5b16234e369867d3cfeb46ccf3-0.wav",
+              "duration_s": 4.318666666666667,
+              "video": "/media/16125f5b16234e369867d3cfeb46ccf3-0.mp4",
+              "render": {
+                "render_s": 4.658296199981123,
+                "frames": 108,
+                "fps": 23.184442414897887,
+                "duration_s": 4.3186875,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2725.44091796875,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.03350389999104664,
+                "neural_s": 4.322674600000028,
+                "composite_pipe_s": 0.2849019000423141,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.671,
+            "first_media_ready_s": 7.178,
+            "total_s": 7.184
+          },
+          "error": null,
+          "tested_scene": "garden"
+        },
+        {
+          "id": "dbf121be891448a7ac9b102e801f62f1",
+          "state": "done",
+          "text": "What kind of plants do you like to grow in your garden?",
+          "user": "Ask me a short question about my garden.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "What kind of plants do you like to grow in your garden?",
+              "audio": "/media/dbf121be891448a7ac9b102e801f62f1-0.wav",
+              "duration_s": 2.7512916666666665,
+              "video": "/media/dbf121be891448a7ac9b102e801f62f1-0.mp4",
+              "render": {
+                "render_s": 2.9388441999908537,
+                "frames": 69,
+                "fps": 23.47861788665583,
+                "duration_s": 2.7513125,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2723.9345703125,
+                "torch_peak_reserved_mib": 3426.0,
+                "audio_features_s": 0.02900809998391196,
+                "neural_s": 2.710790399927646,
+                "composite_pipe_s": 0.18744049995439127,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.537,
+            "first_media_ready_s": 4.783,
+            "total_s": 4.792
+          },
+          "error": null,
+          "tested_scene": "cafe"
+        }
+      ],
+      "cancellation": {
+        "state": "cancelled",
+        "observed_phase": "rendering",
+        "seconds": 0.523831499973312,
+        "memory_unchanged": true,
+        "reply_media_removed": true
+      }
+    },
+    "integration_final": {
+      "scope": "Local app synthetic HTTP trials. ASR uses a generated voice fixture, not a physical microphone. Small sample; no full-call latency claim.",
+      "jobs": [
+        {
+          "id": "af3ba505ec184faab39b22f593ae59b5",
+          "state": "done",
+          "text": "Your name is Alex, and your piano lesson is on Friday.",
+          "user": "What is my name and when is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your name is Alex, and your piano lesson is on Friday.",
+              "audio": "/media/af3ba505ec184faab39b22f593ae59b5-0.wav",
+              "duration_s": 3.3586666666666667
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.695,
+            "first_media_ready_s": 2.204,
+            "total_s": 2.209
+          },
+          "error": null
+        },
+        {
+          "id": "7cb1c2bdd0f045afb78042ef55aa0b02",
+          "state": "done",
+          "text": "Did the tomatoes grow well in your garden today?",
+          "user": "I planted tomatoes today. Ask me one short question about them.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Did the tomatoes grow well in your garden today?",
+              "audio": "/media/7cb1c2bdd0f045afb78042ef55aa0b02-0.wav",
+              "duration_s": 2.4952916666666667
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.294,
+            "first_media_ready_s": 1.504,
+            "total_s": 1.509
+          },
+          "error": null
+        },
+        {
+          "id": "425cc23e5357416b995652f956fe3bbc",
+          "state": "done",
+          "text": "I am here to listen and offer a quiet moment for you.",
+          "user": "I had a tiring day. Could we take a quiet moment?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "I am here to listen and offer a quiet moment for you.",
+              "audio": "/media/425cc23e5357416b995652f956fe3bbc-0.wav",
+              "duration_s": 3.1026666666666665
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.364,
+            "first_media_ready_s": 1.768,
+            "total_s": 1.774
+          },
+          "error": null
+        },
+        {
+          "id": "b4a2b23504074177a87cfbd68902be16",
+          "state": "done",
+          "text": "Your piano lesson is on Friday.",
+          "user": "What day is my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Your piano lesson is on Friday.",
+              "audio": "/media/b4a2b23504074177a87cfbd68902be16-0.wav",
+              "duration_s": 2.132625
+            }
+          ],
+          "metrics": {
+            "asr_s": 0.753,
+            "first_text_s": 1.222,
+            "first_media_ready_s": 2.299,
+            "total_s": 2.304
+          },
+          "error": null
+        },
+        {
+          "id": "da5cdce270ec4ebc8b84164ff7b5b5ab",
+          "state": "done",
+          "text": "Hello Alex, I am Mira and I am here to chat with you.",
+          "user": "Say hello in one brief sentence.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Hello Alex, I am Mira and I am here to chat with you.",
+              "audio": "/media/da5cdce270ec4ebc8b84164ff7b5b5ab-0.wav",
+              "duration_s": 3.3586666666666667,
+              "video": "/media/da5cdce270ec4ebc8b84164ff7b5b5ab-0.mp4",
+              "render": {
+                "render_s": 3.5542978000012226,
+                "frames": 84,
+                "fps": 23.63336015343765,
+                "duration_s": 3.3586875,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2724.43505859375,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.03795229998650029,
+                "neural_s": 3.2668362998520024,
+                "composite_pipe_s": 0.23252350004622713,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.384,
+            "first_media_ready_s": 5.428,
+            "total_s": 5.437
+          },
+          "error": null,
+          "tested_scene": "mira"
+        },
+        {
+          "id": "02bbbcc28ee84c4f9941cb63e0681446",
+          "state": "done",
+          "text": "Practice your scales for a few minutes before you go.",
+          "user": "What should I do before my piano lesson?",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "Practice your scales for a few minutes before you go.",
+              "audio": "/media/02bbbcc28ee84c4f9941cb63e0681446-0.wav",
+              "duration_s": 2.804,
+              "video": "/media/02bbbcc28ee84c4f9941cb63e0681446-0.mp4",
+              "render": {
+                "render_s": 2.9944481000420637,
+                "frames": 71,
+                "fps": 23.710546193471394,
+                "duration_s": 2.804,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2723.9453125,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.031065300048794597,
+                "neural_s": 2.7719259000732563,
+                "composite_pipe_s": 0.18019240006105974,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.536,
+            "first_media_ready_s": 4.828,
+            "total_s": 4.838
+          },
+          "error": null,
+          "tested_scene": "garden"
+        },
+        {
+          "id": "8a84cbdfbbdd4f7c865cc716394b1335",
+          "state": "done",
+          "text": "What kind of plants are you growing in your garden?",
+          "user": "Ask me a short question about my garden.",
+          "chunks": [
+            {
+              "index": 0,
+              "text": "What kind of plants are you growing in your garden?",
+              "audio": "/media/8a84cbdfbbdd4f7c865cc716394b1335-0.wav",
+              "duration_s": 2.5693333333333332,
+              "video": "/media/8a84cbdfbbdd4f7c865cc716394b1335-0.mp4",
+              "render": {
+                "render_s": 2.843563799979165,
+                "frames": 65,
+                "fps": 22.858639570695146,
+                "duration_s": 2.569375,
+                "resolution": "512x640",
+                "face_region": "256x256",
+                "torch_peak_allocated_mib": 2723.5888671875,
+                "torch_peak_reserved_mib": 3422.0,
+                "audio_features_s": 0.03282349999062717,
+                "neural_s": 2.6187596998061053,
+                "composite_pipe_s": 0.17855120002059266,
+                "encoder": "libx264"
+              }
+            }
+          ],
+          "metrics": {
+            "first_text_s": 0.504,
+            "first_media_ready_s": 4.574,
+            "total_s": 4.579
+          },
+          "error": null,
+          "tested_scene": "cafe"
+        }
+      ],
+      "cancellation": {
+        "state": "cancelled",
+        "observed_phase": "rendering",
+        "seconds": 0.502046900044661,
+        "memory_unchanged": true,
+        "reply_media_removed": true
+      }
+    },
+    "media_decode_final": [
+      {
+        "scene": "mira",
+        "decoded_frames": 83,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "start_time": "0.000000",
+            "duration": "3.320000"
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "start_time": "0.000000",
+            "duration": "3.358667"
+          }
+        ]
+      },
+      {
+        "scene": "garden",
+        "decoded_frames": 70,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "start_time": "0.000000",
+            "duration": "2.800000"
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "start_time": "0.000000",
+            "duration": "2.804000"
+          }
+        ]
+      },
+      {
+        "scene": "cafe",
+        "decoded_frames": 64,
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "start_time": "0.000000",
+            "duration": "2.560000"
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "start_time": "0.000000",
+            "duration": "2.569333"
+          }
+        ]
+      }
+    ],
+    "runtime_startup_s": 21.501,
+    "selected_model_artifact_bytes": 26962367352,
+    "soak_final_9b": {
+      "summary": {
+        "turns": 30,
+        "wall_duration_s": 600,
+        "completed": 30,
+        "first_media_ready_s": {
+          "min": 2.817,
+          "p50": 3.786,
+          "p95_nearest_rank": 5.096,
+          "max": 5.277
+        },
+        "device_memory_snapshots_mib": [
+          9960,
+          9964
+        ],
+        "generated_fps": {
+          "min": 21.255940069244044,
+          "max": 23.575474987171326
+        }
+      },
+      "scope": "Synthetic typed HTTP turns; no microphone or browser playback. GPU values are between-turn snapshots, not instrumented peaks.",
+      "quality_review": "All 30 replies inspected. User/assistant naming, dog name, hobbies and lesson recall stayed consistent; no invented saved seeds or physical visits. Repeated generic suggestions and similar soup questions remain; no broad quality or user-acceptance claim.",
+      "jobs": [
+        {
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.631,
+            "first_media_ready_s": 3.469,
+            "total_s": 3.474
+          },
+          "device_memory_snapshot_mib": "9960"
+        },
+        {
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you enjoy the new soup recipe?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.565,
+            "first_media_ready_s": 3.964,
+            "total_s": 3.969
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my next lesson?",
+          "text": "Your next lesson is on Friday.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.536,
+            "first_media_ready_s": 3.766,
+            "total_s": 3.77
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "You could plant a few new seeds today.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.575,
+            "first_media_ready_s": 3.85,
+            "total_s": 3.856
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could practice your piano scales.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.544,
+            "first_media_ready_s": 3.773,
+            "total_s": 3.784
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What name should you call me?",
+          "text": "I'll call you Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.619,
+            "first_media_ready_s": 2.905,
+            "total_s": 2.914
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I am here to listen to you quietly.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.684,
+            "first_media_ready_s": 4.008,
+            "total_s": 4.012
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You like gardening and cooking.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.643,
+            "first_media_ready_s": 3.622,
+            "total_s": 3.627
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.636,
+            "first_media_ready_s": 3.474,
+            "total_s": 3.478
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you enjoy the new soup recipe?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.646,
+            "first_media_ready_s": 4.068,
+            "total_s": 4.073
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my next lesson?",
+          "text": "Your next lesson is on Friday.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.622,
+            "first_media_ready_s": 3.861,
+            "total_s": 3.867
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Try planting some new seeds.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.591,
+            "first_media_ready_s": 3.522,
+            "total_s": 3.535
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could practice some scales on your piano.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.647,
+            "first_media_ready_s": 4.338,
+            "total_s": 4.344
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What name should you call me?",
+          "text": "I'll call you Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.587,
+            "first_media_ready_s": 2.881,
+            "total_s": 2.885
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Let's have a short, quiet conversation.",
+          "text": "That sounds nice, Alex. How is your day going?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.557,
+            "first_media_ready_s": 3.479,
+            "total_s": 5.89
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You like gardening and cooking.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.563,
+            "first_media_ready_s": 3.538,
+            "total_s": 3.543
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.581,
+            "first_media_ready_s": 3.441,
+            "total_s": 3.446
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you enjoy the new soup recipe?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.6,
+            "first_media_ready_s": 4.033,
+            "total_s": 4.038
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my next lesson?",
+          "text": "Your next lesson is on Friday.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.556,
+            "first_media_ready_s": 3.799,
+            "total_s": 3.805
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "Try planting some new flowers in your garden.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.597,
+            "first_media_ready_s": 4.641,
+            "total_s": 4.646
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "Try practicing your piano scales for ten minutes.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.598,
+            "first_media_ready_s": 5.096,
+            "total_s": 5.101
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What name should you call me?",
+          "text": "I'll call you Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.533,
+            "first_media_ready_s": 2.817,
+            "total_s": 2.822
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Let's have a short, quiet conversation.",
+          "text": "I am here to listen and chat quietly with you.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.609,
+            "first_media_ready_s": 4.82,
+            "total_s": 4.826
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What were the hobbies I asked you to remember?",
+          "text": "You like gardening and cooking.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.52,
+            "first_media_ready_s": 3.495,
+            "total_s": 3.501
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my dog's name?",
+          "text": "Your dog's name is Maple.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.691,
+            "first_media_ready_s": 3.527,
+            "total_s": 3.534
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I tried a new soup recipe today. Ask one short question about it.",
+          "text": "Did you enjoy the new soup recipe you tried today?",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.761,
+            "first_media_ready_s": 5.277,
+            "total_s": 5.281
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What is my next lesson?",
+          "text": "Your next lesson is on Friday.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.681,
+            "first_media_ready_s": 3.915,
+            "total_s": 3.923
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "Suggest one simple thing I could do in my garden.",
+          "text": "You could plant some easy-to-grow herbs like basil.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.781,
+            "first_media_ready_s": 4.898,
+            "total_s": 4.904
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "I have ten minutes free. What could I practice?",
+          "text": "You could practice a few scales on your piano.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.73,
+            "first_media_ready_s": 4.584,
+            "total_s": 4.593
+          },
+          "device_memory_snapshot_mib": "9964"
+        },
+        {
+          "user": "What name should you call me?",
+          "text": "I'll call you Alex.",
+          "state": "done",
+          "metrics": {
+            "first_text_s": 0.673,
+            "first_media_ready_s": 2.963,
+            "total_s": 2.97
+          },
+          "device_memory_snapshot_mib": "9964"
+        }
+      ]
+    },
+    "result_packet": {
+      "source_commit": "882e87a",
+      "risk": "R2 local prototype; not approved for production",
+      "owner": "Founder",
+      "rollback": "Reviewed revert of the implementation commit; no production migration. Local memory has explicit reset.",
+      "remaining_gates": "Physical microphone/browser playback QA before external demo; independent security/correctness review, staging and commercial/age/payment/content qualifications before public launch.",
+      "post_soak_change": "Removed exception detail text from the persistent server log; a negative regression proves supplied text is not printed. No model, prompt or inference-path behavior changed after the final soak.",
+      "checks": {
+        "python -m unittest discover -s tests -q": "45 passed",
+        "python -m compileall -q scripts tests local_app": "passed",
+        "node --check local_app/web/app.js": "passed",
+        "node --check local_app/web/recorder.js": "passed",
+        "python -m pip check": "No broken requirements found",
+        "git diff --cached --check": "passed after normalizing upstream license trailing whitespace",
+        "active_markdown_links": "6 active documents; local links resolve"
+      }
+    },
+    "final_reset_check": {
+      "reset_memory_empty": true,
+      "fresh_reply": "I don't know your name yet; please tell me what you would like to be called.",
+      "ready": true,
+      "visual_loaded": true,
+      "startup_s": 21.669
+    }
+  }
 }

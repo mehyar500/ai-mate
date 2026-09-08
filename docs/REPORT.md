@@ -1,6 +1,6 @@
 # Local proof first, commercial pilot later
 
-Decision updated September 7, 2026: test on the founder's existing **RTX 4060 Ti with 16GB VRAM and 48GB RAM before using remote inference**. The founder is the only engineer. Build evidence for a future demonstration and funding conversations; do not finance a public commercial pilot yet.
+Decision updated September 8, 2026: test on the founder's existing **RTX 4060 Ti with 16GB VRAM and 48GB RAM before using remote inference**. The founder is the only engineer. Build evidence for a future demonstration and funding conversations; do not finance a public commercial pilot yet.
 
 The additional [LOCAL_POC](LOCAL_POC.md) document is the active technical plan. There are now six active product documents, as requested. It records hardware, exact candidates, benchmark commands, observed failures and successes, and acceptance targets for a realistic local portrait call.
 
@@ -8,9 +8,9 @@ The additional [LOCAL_POC](LOCAL_POC.md) document is the active technical plan. 
 
 Keep a small instruction-following LLM on the GPU, run speech on the CPU, and use the remaining VRAM for a single portrait renderer. Prepare the character and scene before the call, then reuse valid scene/face representations while generating the speech-driven visual changes. Do not run a large image/video generation job for every conversational turn.
 
-This can reduce the amount of work substantially, but the complete visual path is still an experiment. Loading models separately is not proof they meet latency together. The local plan measures usable responses, first speech, synchronized frames, VRAM and quality. A lip-sync prototype must be labeled as such; a prepared clip must not be presented as live generation.
+The combined local path now runs: dialogue and the portrait renderer share the GPU; speech runs on the CPU. Final selected-stack warm trials delivered speech after 1.5–2.2 seconds from typed input. The ten-minute video run delivered completed portrait replies at a median of 3.79 seconds and empirical p95 of 5.10 seconds. These server timings exclude browser playback. The visual target remains unmet: the head/body are still and generation is slightly below the 25 FPS output rate. See LOCAL_POC for sample counts, sustained-run results and rejected experiments.
 
-Current local candidates: explicitly pinned Qwen3-4B-Instruct-2507 Q4_K_M; Kokoro-82M ONNX on CPU; faster-whisper-small int8 on CPU for later microphone work. MuseTalk 1.5 is the first constrained visual comparator; FlashHead Lite is the fresh-motion challenger with unresolved dependency rights. FLUX.2 Klein 4B is a separate scene-preparation experiment. Model and license details are in LOCAL_POC and BUILD.
+Installed local stack: Qwen3.5-9B Q4_K_M; Kokoro-82M float32 on CPU; faster-whisper Base English int8 on CPU; MuseTalk 1.5 with SD VAE/Whisper-tiny and YuNet; FLUX.2 Klein 4B for separate scene preparation. FlashHead remains deferred. Exact model revisions and licensing boundaries are in LOCAL_POC and BUILD.
 
 ## Budget now
 
@@ -30,17 +30,15 @@ The previous $12,096.50 scenario was a conditional funded commercial pilot and a
 
 One original fictional adult companion, one synthetic profile and a few permitted photorealistic scenes. The intended demo shows real dialogue, a user-confirmed fact saved locally and recalled after restart, local speech, honest scene preparation and whatever visual behavior actually passes testing. Label each part live, prepared or unimplemented.
 
-No public adult beta, customer payments, automatic check-in service, growth funnel, custom identity system or production WebRTC scaling in this stage. Begin with founder-operated loopback tests. A later non-explicit screen share/recording can demonstrate the product interaction while separately disclosing unresolved adult capability and commercial eligibility. There is no complete PWA or FaceTime-like application in the repository yet.
+No public adult beta, customer payments, automatic check-in service, growth funnel, custom identity system or production WebRTC scaling in this stage. Begin with founder-operated loopback tests. A later non-explicit screen share/recording can demonstrate the product interaction while separately disclosing unresolved adult capability and commercial eligibility. A local browser app is available at http://127.0.0.1:8765 after starting `scripts/start_local.ps1`. It has a manifest but has not been validated as an installed mobile PWA or a continuous FaceTime-like call.
 
-## Sequence and decision criteria
+## Current decision and next work
 
-1. Verify hardware/runtime and run neutral local LLM and CPU speech benchmarks. Preserve failures rather than claiming throughput alone proves usability.
-2. Build the single-profile local memory/voice flow. Test save, restart, recall, correction and deletion. Add CPU microphone recognition after typed input works.
-3. Test a portrait renderer alone; record peak VRAM, first-frame delay, sustained FPS and visible defects. Audit exact model/dependency/asset rights before the intended use.
-4. Run dialogue and renderer together. Target warm end-of-speech to synchronized reply p95 <=2 seconds, >=20FPS and no VRAM spill during ten minutes. These are goals, not achieved results.
-5. If the combined pipeline works, assemble an honest three-minute demo plus the evidence. If it fails, reduce the model, context, resolution or tested feature and document the tradeoff. Do not rent a cloud GPU automatically.
+The original character, prepared settings, persisted user facts, typed/recorded input, speech and generated portrait replies are integrated. Synthetic HTTP tests and frame inspection demonstrate the pipeline on the existing hardware. CPU/GPU allocation therefore has evidence; a commercial experience does not yet.
 
-A narrow voice/memory demo may take 3–7 focused founder days; visual integration has greater uncertainty and should be timeboxed as a separate experiment. Windows/CUDA dependency compatibility, licenses and visual quality may prevent a pass. No guaranteed development date or complete visual capability is asserted.
+Finish real microphone and browser playback QA before calling this an externally validated demo. The browser-control surface was unavailable during implementation, so autoplay, microphone permission flows, mobile behavior and perceived lip-sync quality still need direct use. Keep this as a founder-operated local prototype until then.
+
+The next technical decision is whether short portrait replies are useful despite static head/body and several seconds of delay. If they are, improve bounded incremental delivery; otherwise evaluate a licensed motion model. Do not buy a new GPU or rent remote capacity merely to hide an unmeasured bottleneck. The two-second synchronized-response goal remains a research target, not a sales promise.
 
 ## Business and adult requirement
 
@@ -52,6 +50,8 @@ For funding conversations, prepare a rights/provider matrix, local cost/latency 
 
 ## Scope and evidence
 
-Source revision `6d6ac63`; changes cover six product documents, planned environment settings, economics and local benchmark scripts. The founder owns implementation, evidence and spend tracking. Local component tests use synthetic neutral inputs; model weights, Python environment and generated media remain ignored. No cloud inference, deployment, payment or purchase was made.
+Implementation source revision `882e87a`; the founder authorized work directly on main. Owned paths: `local_app/`, the local model/runtime configs, setup/benchmark/integration scripts, `tests/test_local_app.py`, `.env.example` and the existing active product documents/evidence. Pre-existing changes to agent contracts, routing, AGENTS.md and SOUL.md are outside this task and remain untouched.
 
-Validation: 29 unit tests pass, covering arithmetic, invalid inputs, budget caps and generated-report consistency; Python syntax, whitespace and six-document local links pass. Local inference evidence is described in LOCAL_POC with its limitations, including a failed model selection and a corrected speech-runtime version. There is no staging or independent production review and no production migration. Rollback is a reviewed revert; the planning cap is not an implemented spend controller.
+45 offline tests pass across economics and local persistence, input validation, single-job behavior, cancellation/reset, HTTP origin/token/file boundaries and media delivery. Real model integration and a completed 30-turn/ten-minute selected-stack video run are documented in LOCAL_POC; median first video was 3.79s and empirical p95 was 5.10s. Python syntax, JavaScript syntax, dependency consistency and whitespace checks passed before the implementation commit. Model weights, generated media and memory are ignored; no secrets are included.
+
+This is an R2 local prototype because it handles microphone and memory data. There is no independent security/correctness review, CI qualification, staging, production deployment, production migration or public-access approval. Those release requirements remain open. SQLite is a new local-only store with an explicit reset; production rollback remains a reviewed revert. The founder owns the remaining UI/microphone and commercial-release decisions before any external launch. No remote inference, payment, purchase or new paid engineer was used.

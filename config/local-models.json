@@ -1,0 +1,8 @@
+{
+  "asr-base-en": {"repo": "Systran/faster-whisper-base.en", "revision": "3d3d5dee26484f91867d81cb899cfcf72b96be6c", "files": ["config.json", "model.bin", "tokenizer.json", "vocabulary.txt", "README.md"]},
+  "musetalk": {"repo": "TMElyralab/MuseTalk", "revision": "3ef28bc5cff08c90ad8178a25f1b570cd800170f", "files": ["musetalkV15/musetalk.json", "musetalkV15/unet.pth", "README.md"]},
+  "sd-vae": {"repo": "stabilityai/sd-vae-ft-mse", "revision": "31f26fdeee1355a5c34592e401dd41e45d25a493", "files": ["config.json", "diffusion_pytorch_model.safetensors", "README.md"]},
+  "whisper-tiny": {"repo": "openai/whisper-tiny", "revision": "169d4a4341b33bc18d8881c4b69c2e104e1cc0af", "files": ["config.json", "model.safetensors", "preprocessor_config.json", "README.md"]},
+  "asr-small": {"repo": "Systran/faster-whisper-small", "revision": "536b0662742c02347bc0e980a01041f333bce120", "files": ["config.json", "model.bin", "tokenizer.json", "vocabulary.txt", "README.md"]},
+  "klein": {"repo": "black-forest-labs/FLUX.2-klein-4B", "revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294", "files": ["LICENSE.md", "README.md", "model_index.json", "scheduler/scheduler_config.json", "text_encoder/config.json", "text_encoder/generation_config.json", "text_encoder/model-00001-of-00002.safetensors", "text_encoder/model-00002-of-00002.safetensors", "text_encoder/model.safetensors.index.json", "tokenizer/added_tokens.json", "tokenizer/chat_template.jinja", "tokenizer/merges.txt", "tokenizer/special_tokens_map.json", "tokenizer/tokenizer.json", "tokenizer/tokenizer_config.json", "tokenizer/vocab.json", "transformer/config.json", "transformer/diffusion_pytorch_model.safetensors", "vae/config.json", "vae/diffusion_pytorch_model.safetensors"]}
+}
