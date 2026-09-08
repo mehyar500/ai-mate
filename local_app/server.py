@@ -66,13 +66,13 @@ class Application:
                     "visual_error": self.visual_error,
                     "scene": self.scene,
                     "provider": getattr(getattr(self.models, "conversation", None), "provider", "ollama"),
-                    "scenes": [s for s in ["mira", "garden", "cafe"] if (self.directory / (s+".png")).exists()],
+                    "scenes": [s for s in ["mira", "garden", "cafe", "fullbody"] if (self.directory / (s+".png")).exists()],
                     **self.store.snapshot()}
 
     def submit(self, text, mode, scene, raw=None):
         if mode not in {"auto", "text", "voice", "video"}:
             raise ValueError("Select text, voice or video.")
-        if scene not in {"auto", "mira", "garden", "cafe"}:
+        if scene not in {"auto", "mira", "garden", "cafe", "fullbody"}:
             raise ValueError("Unknown scene.")
         if raw is None and (not isinstance(text, str) or not text.strip() or len(text) > 1000):
             raise ValueError("Enter a message between 1 and 1,000 characters.")
@@ -141,7 +141,7 @@ class Application:
             scene = self.scene if scene == "auto" else scene
             plan = None
             if hasattr(self.models, "plan"):
-                available = [s for s in ("mira", "garden", "cafe") if (self.directory/(s+".png")).exists()]
+                available = [s for s in ("mira", "garden", "cafe", "fullbody") if (self.directory/(s+".png")).exists()]
                 plan = self.models.plan(self.store.snapshot(), text, mode, scene, available, event)
                 check_cancel(event)
                 mode, scene = plan["presentation"], plan["scene"]
@@ -286,7 +286,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.respond(200, (WEB / file).read_bytes(), mime)
         if path == "/api/bootstrap":
             return self.respond(200, {"token": self.app.token, **self.app.status()})
-        if path in {"/portrait/mira.png", "/portrait/garden.png", "/portrait/cafe.png"}:
+        if path in {"/portrait/mira.png", "/portrait/garden.png", "/portrait/cafe.png", "/portrait/fullbody.png"}:
             file = self.app.directory / path.rsplit("/", 1)[-1]
             if file.exists():
                 return self.respond(200, file.read_bytes(), "image/png")

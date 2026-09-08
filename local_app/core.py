@@ -32,10 +32,10 @@ class Store:
     def current_scene(self):
         with self.lock, self.connect() as db:
             row = db.execute("SELECT value FROM app_state WHERE key='scene'").fetchone()
-            return row[0] if row and row[0] in {"mira", "garden", "cafe"} else "mira"
+            return row[0] if row and row[0] in {"mira", "garden", "cafe", "fullbody"} else "mira"
 
     def set_scene(self, scene):
-        if scene not in {"mira", "garden", "cafe"}:
+        if scene not in {"mira", "garden", "cafe", "fullbody"}:
             raise ValueError("Unknown scene.")
         with self.lock, self.connect() as db:
             db.execute("INSERT INTO app_state(key,value) VALUES('scene',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (scene,))

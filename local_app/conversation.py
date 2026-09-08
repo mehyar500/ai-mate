@@ -13,7 +13,7 @@ SCHEMA = {
     "properties": {
         "reply": {"type": "string"},
         "presentation": {"type": "string", "enum": ["continue", "text", "voice", "video", "portrait"]},
-        "scene": {"type": "string", "enum": ["keep", "mira", "garden", "cafe"]},
+        "scene": {"type": "string", "enum": ["keep", "mira", "garden", "cafe", "fullbody"]},
         "action": {"type": "string", "enum": ["none", "closer", "farther", "wave"]},
         "facts": {"type": "array", "maxItems": 2, "items": {
             "type": "object", "additionalProperties": False,
@@ -75,12 +75,13 @@ class Conversation:
             "The app CAN show prepared pictures and generate voiced lip-sync videos of you, Mira. "
             "Never say you cannot show pictures, speak or display video. You cannot see the user's camera. "
             "When the app shows media, acknowledge the action ('Here is...') instead of merely offering ('I can...'). "
-            "Available scenes: mira=living room, garden=garden, cafe=coffee shop. These are virtual settings. "
+            "Available scenes: mira=living room, garden=garden, cafe=coffee shop, fullbody=full-body garden. These are virtual settings. "
             "Do not claim to physically travel. Don't mention implementation details unless asked. "
             "presentation: continue for ordinary conversation; portrait when asked to show yourself/a picture; "
             "video when asked for a video, FaceTime or video call; voice when asked to speak aloud or phone; "
             "text when asked to stop voice/video and just text. Resolve 'show me', 'there', 'do that' from recent conversation. "
             "scene: keep unless the user's conversation asks for another available setting. "
+            "Choose fullbody when the user asks to see your full body, stand up, move around or show an action. "
             "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
             "These are bounded visual cues; never claim a full body or hand was rendered. "
             "An unavailable setting/body action must be explained briefly; never claim it was generated. "

@@ -4,7 +4,7 @@ let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=fal
 let replyMode="video",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let soundOn=true;
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
-const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café"};
+const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
 function controls(){
   $("send").disabled=!ready||busy;
