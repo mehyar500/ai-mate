@@ -17,6 +17,17 @@ from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
 class MemoryTests(unittest.TestCase):
+    def test_call_messages_persist_prune_and_reset_with_their_turn(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'memory.sqlite3'
+            store=Store(path);store.append('Send me a message','Sent to Text.',message='Hello from your call.')
+            self.assertEqual(Store(path).snapshot()['turns'][0]['message'],'Hello from your call.')
+            self.assertIn('Hello from your call.',messages_for(store.snapshot(),'Read it')[2]['content'])
+            for i in range(51):store.append(str(i),'reply')
+            with store.connect() as db:self.assertEqual(db.execute('SELECT count(*) FROM call_messages').fetchone()[0],0)
+            store.append('message','sent',message='Again');store.reset()
+            self.assertEqual(store.snapshot(),{'memory':'','turns':[]})
+
     def test_persists_across_reopen_and_reset(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "memory.sqlite3"
@@ -209,6 +220,7 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(json.loads(body)["token"], self.app.token)
         self.assertEqual(headers["Cache-Control"], "no-store")
         self.assertNotIn("Access-Control-Allow-Origin", headers)
+        self.assertEqual(headers['Permissions-Policy'],'camera=(), microphone=(self)')
 
     def test_cross_origin_and_dns_rebinding_are_rejected(self):
         for headers in [{"Host":"evil.example"}, {"Origin":"https://evil.example"}, {"Sec-Fetch-Site":"cross-site"}]:

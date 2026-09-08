@@ -26,6 +26,7 @@ class Store:
         with self.connect() as db:
             db.execute("CREATE TABLE IF NOT EXISTS memory (id INTEGER PRIMARY KEY CHECK(id=1), text TEXT NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS turns (id INTEGER PRIMARY KEY, user TEXT NOT NULL, assistant TEXT NOT NULL)")
+            db.execute("CREATE TABLE IF NOT EXISTS call_messages (turn_id INTEGER PRIMARY KEY, text TEXT NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS facts (key TEXT PRIMARY KEY, quote TEXT NOT NULL, updated INTEGER NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS app_state (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
 
@@ -53,9 +54,9 @@ class Store:
     def snapshot(self):
         with self.lock, self.connect() as db:
             row = db.execute("SELECT text FROM memory WHERE id=1").fetchone()
-            turns = db.execute("SELECT user, assistant FROM turns ORDER BY id DESC LIMIT 12").fetchall()[::-1]
+            turns = db.execute("SELECT user, assistant, call_messages.text FROM turns LEFT JOIN call_messages ON turns.id=call_messages.turn_id ORDER BY turns.id DESC LIMIT 12").fetchall()[::-1]
             facts = db.execute("SELECT key, quote FROM facts ORDER BY updated DESC, rowid DESC LIMIT 12").fetchall()
-            result = {"memory": row[0] if row else "", "turns": [{"user": u, "assistant": a} for u, a in turns]}
+            result = {"memory": row[0] if row else "", "turns": [{"user": u, "assistant": a, **({"message": m} if m else {})} for u, a, m in turns]}
             if facts:
                 result["facts"] = [{"key": k, "quote": q} for k, q in facts]
             return result
@@ -80,15 +81,21 @@ class Store:
         with self.lock, self.connect() as db:
             db.execute("INSERT INTO memory(id,text) VALUES(1,?) ON CONFLICT(id) DO UPDATE SET text=excluded.text", (text.strip(),))
 
-    def append(self, user, assistant):
+    def append(self, user, assistant, message=None):
+        if message is not None and (not isinstance(message, str) or not 0 < len(message) <= 600):
+            raise ValueError("Call message must be between 1 and 600 characters.")
         with self.lock, self.connect() as db:
-            db.execute("INSERT INTO turns(user,assistant) VALUES(?,?)", (user, assistant))
+            cursor = db.execute("INSERT INTO turns(user,assistant) VALUES(?,?)", (user, assistant))
+            if message:
+                db.execute("INSERT INTO call_messages(turn_id,text) VALUES(?,?)", (cursor.lastrowid, message))
             db.execute("DELETE FROM turns WHERE id NOT IN (SELECT id FROM turns ORDER BY id DESC LIMIT 50)")
+            db.execute("DELETE FROM call_messages WHERE turn_id NOT IN (SELECT id FROM turns)")
 
     def reset(self):
         with self.lock, self.connect() as db:
             db.execute("DELETE FROM memory")
             db.execute("DELETE FROM turns")
+            db.execute("DELETE FROM call_messages")
             db.execute("DELETE FROM facts")
             db.execute("DELETE FROM app_state")
 
@@ -121,6 +128,6 @@ def messages_for(snapshot, user):
     # Reserve capacity for prompt/reply; stored history remains visible in the UI.
     for turn in snapshot["turns"][-4:]:
         out += [{"role": "user", "content": turn["user"][:1000]},
-                {"role": "assistant", "content": turn["assistant"][:600]}]
+                {"role": "assistant", "content": turn["assistant"][:600] + ("\nMessage sent in Text tab: " + turn["message"] if turn.get("message") else "")}]
     out.append({"role": "user", "content": user})
     return out

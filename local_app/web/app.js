@@ -1,10 +1,14 @@
 import {synchronizeSpeech} from './media-sync.mjs';
+import {Microphone} from './microphone.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
 let replyMode="video",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let soundOn=true;
 let historyOpen=false;
+let viewMode='video',unread=0,micState='off',listenAfter=0;
+const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
+  onState:state=>{if(micState!==state){micState=state;controls();}}});
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
 const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
@@ -12,9 +16,23 @@ function controls(){
   $("send").disabled=!ready||busy;
   $("stop").hidden=!busy&&!playing;
   $("reset").disabled=submitting;
-  $("call-state").textContent=playing?(firstPlayed===null?"Connecting picture…":"Mira is speaking"):busy?"Preparing reply…":"Type to talk";
+  const listening={off:'Mic off · type to talk',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Listening resumes after the reply',listening:'Listening · speak naturally',disconnected:'Microphone disconnected'};
+  $("call-state").textContent=playing?(firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?'Text conversation':listening[micState];
   $("sound").textContent=soundOn?"Sound on":"Sound off";
-  $("history-toggle").hidden=scene!=="fullbody";
+  $("history-toggle").hidden=true;
+  document.querySelector('.conversation').dataset.mode=viewMode;
+  for(const mode of ['text','voice','video'])$('mode-'+mode).setAttribute('aria-pressed',String(viewMode===mode));
+  for(const mode of ['voice','video'])$('mode-'+mode).dataset.active=replyMode===mode?'true':'false';
+  $('mic').hidden=replyMode==='text';$('mic').disabled=!ready;
+  $('mic').textContent=microphone.pending?'Cancel mic':microphone.enabled?'Mute mic':'Enable mic';
+  $('mic').setAttribute('aria-pressed',String(microphone.enabled));
+  $('end-call').hidden=replyMode==='text';$('sound').hidden=viewMode==='text'&&replyMode==='text';
+  $('voice-view').hidden=viewMode!=='voice';$('voice-caption').textContent=$('call-state').textContent;
+  if(viewMode==='voice')$('media-label').textContent='Voice call';
+  $('replay').hidden=!lastMedia||(lastMedia.video?'video':'voice')!==viewMode||busy;
+  $('unread').hidden=!unread;$('unread').textContent=String(unread);
+  $('message').placeholder=viewMode==='text'?'Message Mira…':'Type to Mira during the call…';
+  $('disclosure').textContent=viewMode==='text'?(replyMode==='text'?'Private local conversation':'Call stays active · return using the call tab'):'AI-generated '+(viewMode==='video'?'video':'voice')+' · Listening pauses during replies';
 }
 async function api(path,body){
   const response=await fetch(path,{method:body===undefined?"GET":"POST",headers:{"X-Local-Token":token,...(body===undefined?{}:{"Content-Type":"application/json"})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(10000)});
@@ -29,7 +47,7 @@ function bubble(text,role){
   $("chat").scrollTop=$("chat").scrollHeight;
   return content;
 }
-function renderHistory(turns){$("chat").replaceChildren();for(const t of turns){bubble(t.user,"user");bubble(t.assistant,"assistant");}}
+function renderHistory(turns){$("chat").replaceChildren();for(const t of turns){bubble(t.user,"user");bubble(t.assistant,"assistant");if(t.message)bubble(t.message,'assistant sent-message');}}
 function setScene(value){
   if(!sceneNames[value])return;
   if(value!==scene)$("held-frame").hidden=true;
@@ -133,7 +151,7 @@ async function drain(){
     releaseSpeech();
     if(mine===epoch&&objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
   }
-  if(mine===epoch){playing=false;abortMedia=null;controls();}
+  if(mine===epoch){playing=false;abortMedia=null;listenAfter=performance.now()+450;controls();}
 }
 $("resume").addEventListener("click",async()=>{
   const media=$("video").hidden?$("audio"):$("video");
@@ -141,23 +159,23 @@ $("resume").addEventListener("click",async()=>{
 });
 $("replay").addEventListener("click",()=>{if(lastMedia&&!busy){const item={...lastMedia,stream:null};resetPlayback();queue.push(item);drain();}});
 async function follow(key,node){
-  active=key;let replyNode=null,consumed=0,shownPortrait=false;
+  active=key;let replyNode=null,consumed=0,shownPortrait=false,shownMessage=false;
   try{
     for(;;){
       const job=await api("/api/jobs/"+key);if(active!==key)return;
-      if(["voice","video","text"].includes(job.presentation)){replyMode=job.presentation;controls();}
       if(job.user)node.textContent=job.user;
-      if(job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
+      if(!pendingStop&&job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
       if(job.action)setAction(job.action);
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
+      if(job.state==='done'&&job.message&&!shownMessage){bubble(job.message,'assistant sent-message');shownMessage=true;if(viewMode!=='text')unread++;controls();}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
-      while(consumed<job.chunks.length){queue.push(job.chunks[consumed++]);drain();}
+      while(!pendingStop&&consumed<job.chunks.length){queue.push(job.chunks[consumed++]);drain();}
       if(job.state==="thinking")notice("Mira is thinking…");
       else if(job.state==="transcribing")notice("Listening to your message…");
       else if(job.state==="rendering"&&!playing)notice("Connecting the picture…");
       else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
       if(["done","failed","cancelled"].includes(job.state)){
-        if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("Type a message to continue.");}
+        if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Speak again or type.");}
         else if(job.state==="failed"){notice(job.error,true);if(!replyNode)bubble("That reply couldn't finish. Please try again.","assistant");}
         else if(job.state==="cancelled")notice("Stopped. You can talk or type now.");
         else if($("resume").hidden){notice(job.remembered?.length?"Saved what you shared. You can review it in Memory.":"");}
@@ -178,7 +196,7 @@ async function submit(text,raw=null,inputMode=null){
   notice(raw?"Listening to your message…":"Mira is thinking…");
   try{
     let data;
-    const mode=inputMode||replyMode;
+    const mode=inputMode||viewMode;
     if(raw){
       const response=await fetch("/api/audio",{method:"POST",headers:{"Content-Type":"audio/wav","X-Local-Token":token,"X-Reply-Mode":mode,"X-Scene":"auto"},body:raw,signal:AbortSignal.timeout(10000)});
       data=await response.json();if(!response.ok)throw Error(data.error);
@@ -190,12 +208,26 @@ async function submit(text,raw=null,inputMode=null){
 $("composer").addEventListener("submit",e=>{e.preventDefault();submit($("message").value);});
 $("message").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit($("message").value);}});
 async function interrupt(){
+  pendingStop=true;
+  if(active||submitting)lastMedia=null;
   resetPlayback(true);
   if(submitting){pendingStop=true;return;}
   if(active){try{await api("/api/cancel",{id:active});notice("Stopping…");}catch(error){notice(error.message,true);}}
   else notice("Reply stopped. Type your next message.");
 }
 $("stop").addEventListener("click",interrupt);
+$('mic').addEventListener('click',async()=>{
+  if(microphone.enabled||microphone.pending){microphone.stop();return;}
+  try{await microphone.start();}catch(error){notice(error.message,true);}controls();
+});
+for(const mode of ['text','voice','video'])$('mode-'+mode).addEventListener('click',async()=>{
+  if(mode!=='text'&&replyMode!==mode){
+    microphone.stop();await interrupt();replyMode=mode;
+  }
+  viewMode=mode;if(mode==='text')unread=0;controls();notice();
+  if(mode==='text')$('chat').scrollTop=$('chat').scrollHeight;
+});
+$('end-call').addEventListener('click',async()=>{microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
 $("sound").addEventListener("click",()=>{soundOn=!soundOn;$("video").muted=true;$("audio").muted=!soundOn;controls();});
 $("history-toggle").addEventListener("click",()=>{
   historyOpen=!historyOpen;
@@ -231,9 +263,9 @@ $("close-settings").addEventListener("click",()=>$("settings").close());
 $("save-memory").addEventListener("click",async()=>{try{await api("/api/memory",{memory:$("memory").value});$("settings").close();notice("Notes saved.");}catch(error){notice(error.message,true);}});
 $("reset").addEventListener("click",async()=>{
   if(!confirm("Erase this local conversation, saved facts and generated replies? Prepared pictures remain."))return;
-  try{replyMode="video";resetPlayback();await api("/api/reset",{});active=null;busy=false;lastMedia=null;$("replay").hidden=true;$("chat").replaceChildren();$("memory").value="";renderFacts();$("settings").close();setScene("mira");notice("Conversation and memory cleared.");controls();}catch(error){notice(error.message,true);}
+  try{microphone.stop();replyMode=viewMode="text";unread=0;resetPlayback();await api("/api/reset",{});active=null;busy=false;lastMedia=null;$("replay").hidden=true;$("chat").replaceChildren();$("memory").value="";renderFacts();$("settings").close();setScene("mira");notice("Conversation and memory cleared.");controls();}catch(error){notice(error.message,true);}
 });
-window.addEventListener("pagehide",()=>abortMedia?.abort());
+window.addEventListener("pagehide",()=>{microphone.stop();abortMedia?.abort();});
 async function boot(){
   for(;;){
     try{

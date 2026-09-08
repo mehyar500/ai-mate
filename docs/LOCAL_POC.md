@@ -1,6 +1,6 @@
-# Text-to-video local demo
+# Local companion demo
 
-Updated September 8, 2026. **Current interaction: type a message, receive a spoken video reply in one phone-style screen.** No microphone or camera permission is requested; both are disabled by the page's Permissions Policy. This is a private, non-explicit prototype.
+Updated September 8, 2026. **Current interaction: Text, Voice call and Video call in one window.** Calls accept typed input or microphone speech after Enable mic. Camera access remains disabled; microphone permission is limited to this origin. This is a private, non-explicit prototype.
 
 ## Run
 
@@ -13,7 +13,7 @@ On the configured PC:
 
 Open **http://127.0.0.1:8765**. The script avoids starting a duplicate server. Background logs and launch information live in ignored `.cache/local-poc/`. A foreground launch without `-Background` stops when its terminal closes. Startup warms models; the latest measured warm start took 12.69 seconds, but a cold start can take over a minute. The current motion worker runs with `-FastFP8`; this is a measured local configuration, not a guarantee on other GPUs. A running PC and server are required; this is not a public URL or boot-time Windows service.
 
-Try **“Let’s talk in the café. How are you?”**, **“Back to the garden. Say something cheerful.”**, or **“Send a video from there.”** Ordinary messages receive video plus voice by default. “Voice only” and “just text” change the response style through the conversation. Sound, Interrupt and Replay remain explicit controls. Memory & settings contains saved facts, notes and diagnostics.
+Try **“Let’s talk in the café. How are you?”**, **“Back to the garden. Say something cheerful.”**, or **“Send a video from there.”** The selected tab controls output: Text has no media, Voice call has speech, Video call has speech and video. Opening Text keeps an existing call active; End call stops microphone capture and playback. Ask “Send me a message saying hello from our call” to deliver a separate message to Text with an unread badge. The call stays in its selected mode. Sound, Interrupt and Replay remain explicit controls. Memory & settings contains saved facts, notes and diagnostics.
 
 Supported settings are living room, garden, café and a full-body garden portrait. These are prepared pictures of a fictional adult character. The reviewed identity-conditioned full-body reference is now used in the prototype; photorealistic quality is still under evaluation. Wave, closer and farther commands now generate fresh LTX body video with tracked MuseTalk lip-sync and Kokoro voice. Wave/forward motion has been observed; backward direction has failed review. Ordinary messages still use the talking portrait. Arbitrary actions remain unimplemented. Within a server session, completed video poses now carry into the next video reply. The former CSS wave/cutout has been removed. It has no live view of the user.
 
@@ -21,11 +21,11 @@ Supported settings are living room, garden, café and a full-body garden portrai
 
 The browser audit reproduced a real product failure: at the preview width, the old page placed video above the conversation, off screen. The user typed “show me” and the model answered that it could not display images. The existing MP4 had played successfully according to the browser, but the user could not see it from the composer. The implementation also waited for a complete phrase video, offered no contextual media routing and required manual mode/scene choices.
 
-The current layout fits the observed 912px-high viewport without document scrolling. Captions/history scroll inside the same screen as the portrait and composer. An LLM now returns a validated reply, presentation, scene and optional factual excerpts in one decision. “From there” uses recent dialogue and the active setting. The app executes only allowlisted presentation/scene changes, never model-generated code, paths, URLs or shell commands.
+The current layout fits the observed 912px-high viewport without document scrolling. Text history scrolls in its tab. Call screens hide the transcript and keep a compact translucent composer below the uncropped video stage. Voice call shows a portrait and listening state. An LLM now returns a validated reply, presentation, scene and optional factual excerpts in one decision. “From there” uses recent dialogue and the active setting. The app executes only allowlisted presentation/scene changes, never model-generated code, paths, URLs or shell commands.
 
 Video is **fragmented MP4 streamed while inference is still running**, played through MediaSource. The embedded audio is muted; a separate WAV speech track follows the video clock from its first playing event, pauses during stalls, and corrects drift over 120ms. Previously speech started only after the entire stream finished downloading, causing a delayed reply. The output is 20 FPS, encoded in roughly 200ms fragments with about 400ms initial media buffered. If MediaSource is unsupported, the app explicitly waits for the completed MP4. Autoplay failure exposes Play reply; interruptions abort both tracks. Test sound sends a short Web Audio tone to help distinguish browser/output-device problems from synthesis failures.
 
-A microphone call experiment exposed background-noise handling problems. That flow was removed at the founder's request. ASR remains installed for diagnostics but is not on the current browser interaction path.
+The new microphone path uses an AudioWorklet, mono PCM16 WAV and local faster-whisper. Energy-based turn detection keeps 200ms of pre-roll, submits after 650ms of silence and caps each turn at 25 seconds. Short clicks and silence are rejected. Echo cancellation/noise suppression are requested from the browser. Capture pauses during synthesis/playback and resumes 450ms after playback; this is half-duplex, not reliable voice barge-in. Interrupt enables an earlier turn. Mute, End call, mode changes, page exit and late permission cancellation release tracks. Raw microphone audio is held in memory, not persisted; transcripts join local history and hosted dialogue context. Device/noise robustness and phone backgrounding still need real-user testing.
 
 ## Models and hardware split
 
@@ -38,7 +38,7 @@ A microphone call experiment exposed background-noise handling problems. That fl
 | Face location | OpenCV YuNet 2023mar | CPU, per-frame movement tracking |
 | Scene preparation | FLUX.2 Klein 4B, four steps, 512x640 | Separate GPU process with CPU offload; never during replies |
 | Encoding | FFmpeg H.264/AAC | CPU libx264; installed FFmpeg/NVENC driver pair is incompatible |
-| Speech recognition, retained diagnostics | faster-whisper Base English int8 | CPU; no microphone capture in the current UI |
+| Speech recognition | faster-whisper Base English int8 | CPU; browser microphone or synthetic WAV through `/api/audio` |
 
 Pinned repositories, revisions and assets are in [local-models.json](../config/local-models.json) and [local-assets.json](../config/local-assets.json). Selected Ollama digest: `6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7`. The mutable tag is not enforced against this digest at startup.
 
@@ -117,6 +117,26 @@ Two FLUX Klein attempts to create a closer destination image failed still-image 
 
 Cloudflare intermittently echoed a JSON schema rather than a filled plan. The prompt now requests concrete values and shows an example plan; five live samples returned valid plans in 0.578-1.469s. A later hosted request still took 22.064s, causing a 28.54s first-playback outlier. Exact simple motion commands now use a bounded local command path; contextual requests, questions, conditions and negations still go to the model. `decision_source` records that distinction. The live direct-command sample reached text in 0.001s and browser playback in 5.81s with zero stalls; a complete 3.05s action contained 0.961s of speech and finished server-side in 6.281s. Its reviewed frames showed one hand raising/lowering, both feet visible and a neutral final pose. This removes a hosted dependency for those exact commands; it is not a fallback promise for arbitrary dialogue. [Cloudflare JSON-mode limitations](https://developers.cloudflare.com/workers-ai/features/json-mode/).
 
+## Call modes: verified September 8
+
+Validation: 68 Python tests and seven Node audio/microphone tests passed, along with Python compilation, JavaScript syntax and `git diff --check`. Browser checks covered 716x854 and 390x844 layouts, latest-message scrolling, silent Text replies, Voice call delivery, Video call playback, microphone activation/muting and End call during a pending reply. The temporary viewport override was restored. Tests and raw synthetic evidence do not replace the outstanding independent review and production gates.
+
+Text-only completed in **0.74s** with no media sources. A Voice call acknowledged and delivered a separate in-app message in **1.05s to playback**, with zero stalls; Text showed an unread badge, opening it preserved the call, and the message persisted in SQLite. The first message test had failed semantically (the model spoke the requested text without delivering it); the plan contract now includes an explicit message field and an example. Three isolated live planner probes covered two positive requests and a negated request successfully. These are samples, not reliability guarantees.
+
+Video call microphone activation reached **Listening** in the preview and Mute released capture. A synthetic spoken wave passed through the real `/api/audio` endpoint: **0.494s ASR**, **4.107s body generation**, **1.613s lip rendering**, **6.661s total server time**. Silence returned `no_speech` without changing conversation. This does not establish an acoustic microphone-to-speaker round trip. The separate typed wave reached browser playback in **5.78s**, zero stalls. Reviewed frames showed a raised/lowered hand, full body, stable overall framing and a return to neutral; face detail and fingers remain soft. Evidence: `generated/local-app/audit/call-modes-asr.json` and `call-mode-wave-review.jpg` (private ignored artifacts).
+
+The 650ms microphone turn boundary adds to end-of-speech response latency. Hands-free capture is half-duplex; headphones, quiet-room testing, microphone denial/disconnection and real-user noise testing remain necessary qualification work. A seamless live body stream, reliable backward walking, identity consistency over long sessions, arbitrary actions, browser mobile/background behavior and physical speaker confirmation remain open. Do not label this production-ready.
+
+Persistence adds an optional `call_messages` table linked to existing turns without rewriting existing conversation rows. Messages commit with successful replies, prune with their parent turns, and clear with conversation reset. Rolling back code leaves that extra table unused; preserve the database. Microphone access remains same-origin on loopback, camera denied, with existing Origin/Host/token checks. R2 review and staging/public deployment evidence are still absent; this build stays local.
+
+### Renderer research and the next experiment
+
+[LTX-2.3 FP8](https://huggingface.co/Lightricks/LTX-2.3-fp8) supplies a **22B distilled, eight-step CFG=1** joint audio/video model. It is the next quality candidate for avoiding a separately pasted lip renderer. [Lightricks' desktop app](https://github.com/Lightricks/LTX-Desktop) now supports local Windows CUDA with **at least 16 GB VRAM** and also advertises newer LTX 2.5 Fast; it lists **160 GB free disk** and describes newer weights as gated. [Official inference](https://github.com/Lightricks/LTX-2) offers FP8 and CPU/disk offloading. Hardware compatibility is not evidence of two-second latency: offloading can add PCIe transfer time, and neither candidate has been benchmarked on this rig. Model weights use a [community license](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE), not the code repository's Apache license. No new license agreement was accepted and no public/adult clearance is claimed.
+
+[StreamDiffusionV2](https://arxiv.org/abs/2511.07399) is worth evaluating for continuous generation, but its headline first-frame/FPS figures use **four H100 GPUs**. [Scope's integration](https://github.com/daydreamlive/scope/blob/main/src/scope/core/pipelines/streamdiffusionv2/docs/usage.md) provides a practical implementation to inspect. It is not a demonstrated synchronized, identity-preserving talking companion on the 4060 Ti. Do not replace measured local numbers with its paper's hardware results.
+
+A second latency approach is a reviewed library of genuinely generated neutral-to-neutral body actions, with live speech rendering and fresh generation for uncached actions. That can remove repeated body diffusion from common commands, but it must be labelled and measured as reuse, preserve framing/identity, and reject cache hits when the current pose differs. It is a proposed experiment, not implemented success. Gate every candidate on a reviewed reference image, first/last-frame continuity, complete visible action, synchronized speech, multiple seeds/turns, cancellation and measured warm/cold delays before making it the default.
+
 ## Reproduce
 
 The configured environment is Python 3.12 with PyTorch 2.11.0+cu128. Dependencies are pinned in [requirements](../config/local-poc-requirements.txt). For a fresh environment, install Python 3.12, Ollama and FFmpeg, then:
@@ -146,6 +166,7 @@ Checks:
 .\.venv\Scripts\python.exe -m unittest discover -s tests -q
 .\.venv\Scripts\python.exe -m compileall -q local_app scripts tests
 node --check local_app/web/app.js
+node --test tests/media-sync.test.mjs tests/microphone.test.mjs
 git diff --check
 # With an idle ready server; preserves existing conversation:
 .\.venv\Scripts\python.exe scripts/verify_streaming.py

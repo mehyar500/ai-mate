@@ -14,6 +14,22 @@ from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
 class PlanTests(unittest.TestCase):
+    def test_selected_mode_cannot_be_overridden_by_model_or_body_command(self):
+        for mode in ['text','voice','video']:
+            plan=validate_plan({'reply':'Okay','presentation':'video','action':'wave','scene':'fullbody','facts':[]},
+                               'Wave',mode,'mira',['mira','fullbody'])
+            self.assertEqual(plan['presentation'],mode)
+            self.assertEqual(plan['action'],'wave' if mode=='video' else 'none')
+
+    def test_call_message_is_bounded_and_does_not_change_call(self):
+        data={'reply':'Sent it to Text.','presentation':'text','message':'Meet me here tomorrow.','facts':[]}
+        plan=validate_plan(data,'Send me a message','video','mira',['mira'])
+        self.assertEqual(plan['presentation'],'video')
+        self.assertEqual(plan['message'],data['message'])
+        for invalid in ['', 'x'*601, {}, None]:
+            self.assertNotIn('message',validate_plan({**data,'message':invalid},'hi','voice','mira',['mira']))
+        self.assertNotIn('message',validate_plan(data,'hi','text','mira',['mira']))
+
     def test_direct_commands_bypass_network_but_context_and_negations_do_not(self):
         with patch.dict(os.environ, {'AI_MATE_LLM_PROVIDER':'ollama'},clear=True), patch('urllib.request.urlopen') as network:
             model=Conversation('local')

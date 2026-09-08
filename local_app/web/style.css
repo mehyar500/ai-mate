@@ -5,7 +5,33 @@
 
 .conversation[data-scene="fullbody"] .visual{bottom:280px}
 .conversation[data-scene="fullbody"] .shade{background:linear-gradient(180deg,#091d1f80,transparent 25%,transparent)}
-.conversation[data-scene="fullbody"][data-history="closed"] #chat{max-height:90px}
-.conversation[data-scene="fullbody"][data-history="closed"] #chat .bubble:not(:nth-last-child(-n+2)){display:none}
 .call-controls{flex-wrap:wrap}
-@media(max-height:620px){.conversation[data-scene="fullbody"] .visual{bottom:220px}.conversation[data-scene="fullbody"][data-history="closed"] #chat{max-height:44px}}
+
+/* One stage, separate conversation modes; controls never crop the generated body. */
+.mode-tabs{display:flex;gap:5px;align-self:center;padding:5px;border-radius:28px;background:#0b171aa6;backdrop-filter:blur(18px);margin:5px 12px 12px;z-index:3}
+.mode-tabs button{border-color:transparent;background:transparent;padding:10px 19px}
+.mode-tabs button[aria-pressed="true"]{background:#e7edde;color:#21392e}
+.mode-tabs button[data-active="true"][aria-pressed="false"]:after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#bee39e;margin-left:5px;vertical-align:middle}
+#unread{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:12px;background:#cfddbb;color:#183328;margin-left:3px}
+.conversation[data-mode="video"] .visual{inset:145px 0 165px}
+.conversation[data-mode="video"] .visual img,.conversation[data-mode="video"] .visual video,.conversation[data-mode="video"] .visual canvas{object-fit:contain;object-position:center}
+.conversation[data-mode="video"] .shade{display:none}
+.conversation[data-mode="video"] .conversation-bottom,.conversation[data-mode="voice"] .conversation-bottom{width:min(100%,650px);align-self:center;padding-top:8px;gap:7px}
+.conversation[data-mode="video"] #composer,.conversation[data-mode="voice"] #composer{background:#11251b6b;backdrop-filter:blur(14px)}
+.conversation:not([data-mode="text"]) #chat{display:none}
+.conversation[data-mode="text"] .visual{display:none}
+.conversation[data-mode="text"] .scene-note{display:none}
+.conversation[data-mode="text"] .conversation-bottom{flex:1;overflow:hidden;margin-top:15px}
+.conversation[data-mode="text"] #chat{flex:1;max-height:none;min-height:0}
+.conversation[data-mode="text"] #chat .bubble{display:block!important}
+.conversation[data-mode="text"] #chat .sent-message{border:1px solid #c0d3a4}
+.sent-message:before{content:'Message from your call';display:block;font-size:10px;opacity:.7;margin-bottom:4px}
+.conversation[data-mode="voice"] .visual{visibility:hidden}
+#voice-view{position:absolute;inset:190px 0 180px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+#voice-view img{width:clamp(100px,22vh,220px);height:clamp(100px,22vh,220px);border-radius:50%;object-fit:cover;object-position:50% 30%;border:3px solid #d4e1be60;box-shadow:0 0 80px #b7c9a518}
+#voice-view p{font-size:13px;color:#d6e2d3;text-align:center;padding:0 18px}
+.conversation .scene-note{padding-top:0}
+.conversation #notice{max-height:38px;overflow:auto}
+.conversation #message{max-height:70px}
+@media(max-width:600px){.mode-tabs button{padding:9px 14px}.conversation[data-mode="video"] .visual{inset:140px 0 170px}.call-actions button{padding:10px}.call-controls{justify-content:center}.call-actions{justify-content:center}}
+@media(max-height:620px){.conversation[data-mode="video"] .visual{inset:126px 0 138px}.mode-tabs{margin-bottom:6px}.mode-tabs button{padding:6px 14px}#voice-view{inset:145px 0 145px}.conversation .scene-note{font-size:10px}.conversation[data-mode="video"] .conversation-bottom{gap:3px}}

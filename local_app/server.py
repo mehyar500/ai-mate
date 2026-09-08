@@ -152,7 +152,11 @@ class Application:
                 available = [s for s in ("mira", "garden", "cafe", "fullbody") if (self.directory/(s+".png")).exists()]
                 plan = self.models.plan(self.store.snapshot(), text, mode, scene, available, event)
                 check_cancel(event)
-                mode, scene = plan["presentation"], plan["scene"]
+                selected_mode = mode
+                mode, scene = (mode if mode in {"text", "voice", "video"} else plan["presentation"]), plan["scene"]
+                if selected_mode in {"text", "voice"}:
+                    plan["action"] = "none"
+                    scene = self.scene
                 with self.lock:
                     job["presentation"], job["scene"], job["action"] = mode, scene, plan.get("action", "none")
                     job["text"] = plan["reply"]
@@ -224,7 +228,10 @@ class Application:
                 raise RuntimeError("The model did not return a complete reply. Please retry.")
             with self.lock:
                 check_cancel(event)
-                self.store.append(text, " ".join(parts))
+                message = plan.get("message") if plan and mode in {"voice", "video"} else None
+                self.store.append(text, " ".join(parts), **({"message": message} if message else {}))
+                if message:
+                    job["message"] = message
                 if plan:
                     self.store.learn(plan["facts"])
                     job["remembered"] = plan["facts"]
@@ -303,7 +310,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("Cross-Origin-Resource-Policy", "same-origin")
-        self.send_header("Permissions-Policy", "camera=(), microphone=()")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(self)")
         self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         self.end_headers()
         if not head:
@@ -318,6 +325,7 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         static = {"/": ("index.html", "text/html; charset=utf-8"), "/app.js": ("app.js", "text/javascript"),
                   "/media-sync.mjs": ("media-sync.mjs", "text/javascript"),
+                  "/microphone.mjs": ("microphone.mjs", "text/javascript"),
                   "/style.css": ("style.css", "text/css"), "/actions.css": ("actions.css", "text/css"), "/manifest.webmanifest": ("manifest.webmanifest", "application/manifest+json"),
                   "/icon.svg": ("icon.svg", "image/svg+xml"), "/recorder.js": ("recorder.js", "text/javascript")}
         if path in static:

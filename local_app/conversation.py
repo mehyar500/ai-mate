@@ -13,6 +13,7 @@ SCHEMA = {
     "type": "object", "additionalProperties": False,
     "properties": {
         "reply": {"type": "string"},
+        "message": {"type": "string", "maxLength": 600},
         "presentation": {"type": "string", "enum": ["continue", "text", "voice", "video", "portrait"]},
         "scene": {"type": "string", "enum": ["keep", "mira", "garden", "cafe", "fullbody"]},
         "action": {"type": "string", "enum": ["none", "closer", "farther", "wave"]},
@@ -20,7 +21,7 @@ SCHEMA = {
             "type": "object", "additionalProperties": False,
             "properties": {"key": {"type": "string"}, "quote": {"type": "string"}},
             "required": ["key", "quote"]}},
-    }, "required": ["reply", "presentation", "scene", "action", "facts"],
+    }, "required": ["reply", "message", "presentation", "scene", "action", "facts"],
 }
 
 
@@ -81,7 +82,15 @@ def validate_plan(data, user, mode, scene, available):
         if (isinstance(key, str) and re.fullmatch(r"[a-z][a-z0-9_]{0,31}", key)
                 and isinstance(quote, str) and 3 <= len(quote) <= 180 and quote in user):
             facts.append({"key": key, "quote": quote})
-    return {"reply": reply, "presentation": presentation, "scene": chosen, "action": action, "facts": facts}
+    if mode in {"text", "voice", "video"}:
+        presentation = mode  # The selected call mode is a user control, not a model tool.
+        if mode != "video":
+            action, chosen = "none", scene
+    result = {"reply": reply, "presentation": presentation, "scene": chosen, "action": action, "facts": facts}
+    message = data.get("message")
+    if mode in {"voice", "video"} and isinstance(message, str) and 0 < len(message.strip()) <= 600:
+        result["message"] = clean_reply(message)
+    return result
 
 
 class Conversation:
@@ -122,22 +131,24 @@ class Conversation:
         if cancel.is_set():
             from .models import Cancelled
             raise Cancelled('Stopped.')
-        direct = direct_motion_plan(user, available)
+        direct = direct_motion_plan(user, available) if mode in {"auto", "video"} else None
         if direct:
             return direct
         messages = messages_for(snapshot, user)
         messages[0]["content"] += (
-            "\nYou control this app's conversation presentation. Return one FILLED-IN JSON plan, never a JSON schema. "
+            "\nReturn one FILLED-IN JSON plan, never a JSON schema. The USER selects text, voice call or video call. "
+            "Never change their selected mode. In text or voice mode, explain that body actions need the Video call tab. "
+            "During a call, if the user explicitly asks you to send/write/text them a message, put that message in "
+            "the message field (600 characters maximum), and use reply for a short spoken acknowledgement. "
+            "The message is delivered to the in-app Text tab, never SMS or an external service. "
+            "Otherwise message must be an empty string. A call stays active when a message is sent. "
             "Your reply should be natural, relevant and at most two short sentences (about 28 words). "
             "The app CAN show prepared pictures and generate voiced lip-sync videos of you, Mira. "
             "Never say you cannot show pictures, speak or display video. You cannot see the user's camera. "
             "When the app shows media, acknowledge the action ('Here is...') instead of merely offering ('I can...'). "
             "Available scenes: mira=living room, garden=garden, cafe=coffee shop, fullbody=full-body garden. These are virtual settings. "
             "Do not claim to physically travel. Don't mention implementation details unless asked. "
-            "presentation: continue for ordinary conversation; portrait when asked to show yourself/a picture; "
-            "For ordinary conversation keep the current mode, including video; never turn video off without an explicit request. "
-            "video when asked for a video, FaceTime or video call; voice when asked to speak aloud or phone; "
-            "text when asked to stop voice/video and just text. Resolve 'show me', 'there', 'do that' from recent conversation. "
+            "presentation: use the current selected mode. Resolve 'show me', 'there', 'do that' from recent conversation. "
             "scene: keep unless the user's conversation asks for another available setting. "
             "Choose fullbody when the user asks to see your full body, stand up, move around or show an action. "
             "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
@@ -152,7 +163,9 @@ class Conversation:
             "Use the same key to replace a corrected fact. Usually facts is empty. "
             "Do not put the whole conversation in facts. Never claim a fact was saved before the app does so. "
             'Required output shape (replace these example values with your decision): '
-            '{"reply":"Hello, how are you?","presentation":"video","scene":"keep","action":"none","facts":[]}. '
+            '{"reply":"Hello, how are you?","message":"","presentation":"video","scene":"keep","action":"none","facts":[]}. '
+            'Message delivery example: user says "Send me a message saying hello from our call", '
+            'output {"reply":"I sent it to your Text tab.","message":"Hello from our call.","presentation":"continue","scene":"keep","action":"none","facts":[]}. '
             'The reply field must contain your actual spoken answer, not a type definition. '
             "\nCurrent app state (trusted capabilities): " + json.dumps({"mode": mode, "scene": scene, "available_scenes": available})
         )

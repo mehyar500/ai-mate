@@ -4439,5 +4439,136 @@
       "full_body_visible_above_controls": true
     },
     "gpu_resident_mib": 12616
+  },
+  "call_modes_2026_09_08": {
+    "status": "local_prototype_not_production_accepted",
+    "modes": [
+      "text",
+      "voice",
+      "video"
+    ],
+    "selected_mode_authoritative": true,
+    "call_messages_preserve_mode_and_persist": true,
+    "browser_mic_activation": "Listening observed; then explicitly muted",
+    "typed_text": {
+      "total_server_s": 0.74,
+      "audio_source": null,
+      "video_source": null
+    },
+    "voice_message": {
+      "first_playback_s": 1.05,
+      "total_server_s": 1.02,
+      "stalls": 0,
+      "unread_badge_seen": true,
+      "text_tab_preserves_call": true
+    },
+    "typed_wave": {
+      "first_playback_s": 5.78,
+      "total_server_s": 6.25,
+      "stalls": 0,
+      "audio_ended": true,
+      "audio_muted": false
+    },
+    "synthetic_speech_to_video": {
+      "input": "Kokoro synthetic wave command; not a microphone recording",
+      "silence_rejected": true,
+      "silence_preserves_conversation": true,
+      "job_id": "ee1418750ee044399f3514308e160849",
+      "transcript": "Wave hello and say hi briefly.",
+      "state": "done",
+      "presentation": "video",
+      "action": "wave",
+      "metrics": {
+        "asr_s": 0.494,
+        "first_text_s": 0.495,
+        "decision_source": "direct_command",
+        "first_media_ready_s": 6.653,
+        "total_s": 6.661
+      },
+      "render": {
+        "render_s": 1.6134887999996863,
+        "frames": 61,
+        "fps": 37.80627420531947,
+        "duration_s": 3.05,
+        "speech_duration_s": 0.9606875,
+        "lip_sync_frames": 24,
+        "resolution": "384x576",
+        "face_region": "256x256",
+        "torch_peak_allocated_mib": 2727.0830078125,
+        "torch_peak_reserved_mib": 3422.0,
+        "audio_features_s": 0.32560519999969983,
+        "neural_s": 1.2496015000015177,
+        "composite_pipe_s": 0.027888300000995514,
+        "encoder": "libx264",
+        "body_motion": true,
+        "face_tracking_s": 0.2914204000007885,
+        "face_encode_stride": 2,
+        "motion_s": 4.107,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "continues_previous_pose": true
+      },
+      "wall_s": 6.751,
+      "physical_microphone_to_speaker_test": false
+    },
+    "microphone_turn_end_s": 0.65,
+    "post_playback_echo_guard_s": 0.45,
+    "half_duplex": true,
+    "physical_speaker_confirmed": false,
+    "visual_review": {
+      "artifact": "generated/local-app/audit/call-mode-wave-review.jpg",
+      "finding": "Raised/lowered hand and full body, return to neutral; face and fingers remain soft."
+    },
+    "ui": {
+      "desktop_viewport": [
+        716,
+        854
+      ],
+      "phone_viewport": [
+        390,
+        844
+      ],
+      "phone_video_stage": [
+        0,
+        140,
+        390,
+        674
+      ],
+      "phone_composer": [
+        14,
+        708.25,
+        376,
+        766
+      ],
+      "text_scroll_area_height": 492.98,
+      "text_opens_at_latest_message": true,
+      "end_call_cancels_pending_video_without_media_restart": true
+    },
+    "checks": {
+      "python_tests": 68,
+      "node_tests": 7
+    },
+    "next_renderer_candidates": [
+      {
+        "model": "LTX-2.3 22B distilled FP8",
+        "source": "https://huggingface.co/Lightricks/LTX-2.3-fp8",
+        "local_tested": false,
+        "license": "LTX community license; not code Apache license"
+      },
+      {
+        "model": "LTX 2.5 Fast",
+        "source": "https://github.com/Lightricks/LTX-Desktop",
+        "local_tested": false,
+        "gated_download_not_accepted": true
+      },
+      {
+        "model": "StreamDiffusionV2",
+        "source": "https://arxiv.org/abs/2511.07399",
+        "local_tested": false,
+        "headline_hardware": "four H100 GPUs"
+      }
+    ]
   }
 }
