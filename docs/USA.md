@@ -1,4 +1,16 @@
-# US adult PWA: eligibility and costs
+# US distribution: native app first, separate web alternative
+
+## Current Apple direction — September 8
+
+The founder now prioritizes a non-explicit native companion app with Apple in-app purchases. This supersedes the earlier explicit-first launch requirement. The existing local demo stays private and fully clothed.
+
+Apple guideline 1.1.4 excludes overtly sexual/pornographic material. Clothing alone is not a safe-harbor test: a bikini does not guarantee approval, and erotic presentation or revealing sheer clothing can still conflict with that rule. The incidental mature-UGC provision is not general permission for a primarily sexual AI service. Use a non-explicit product, honest review notes and consistent server-side behavior. Apple decides approval. [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/).
+
+Use StoreKit in-app purchases for the proposed digital subscriptions/credits; Apple Pay is a different product. Implement server-verified transactions, restored entitlements and revocation/refund handling before charging. The US storefront permits external purchase links under current guidelines, but the founder's selected path remains Apple billing. Model and hosting terms still apply independently. [Payment guidelines](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase).
+
+## Deferred explicit web-service review
+
+The material below applies only if a separate explicit web scope is later chosen. It does not describe the native MVP or establish permission for it.
 
 **Current stage is a founder-operated private prototype and fundraising demonstration, with no customer billing or public adult access.** The founder can show a non-explicit product preview using synthetic profiles. The commercial launch conditions below remain deferred requirements; they are not waived by calling something a demo.
 
@@ -10,7 +22,7 @@ The launch scope is original fictional adults, lawful consensual adult content, 
 
 **Adult-service eligibility is a selection criterion, not a post-launch check.** Request acceptance for the actual explicit-content service, including generation, storage, private delivery, visual calls and billing. Do not describe it merely as a generic chatbot to obtain approval. A host accepting stored content does not automatically approve model APIs or every underlying provider.
 
-The launch cannot proceed as a non-explicit substitute when adult eligibility fails. The founder's decision is to stop, find a permitted adult route, or explicitly change scope. Keep adult flags disabled until evidence is complete; disabled deployment flags do not mean adult content is optional in the product requirements.
+An explicit web service would require its own accepted scope, rights, hosting, access controls and payment route. The founder has now explicitly chosen a non-explicit native direction first. There is no hidden explicit-mode switch, and removed planning-only environment flags were never functioning access controls.
 
 ## What self-hosting does and does not permit
 
@@ -59,7 +71,7 @@ Runware custom compute is an alternative requiring access, model/container suppo
 | Option | Current finding | Decision |
 |---|---|---|
 | Runpod | March 24, 2026 terms expressly prohibit pornography/graphic adult content. | Exclude under published terms; do not assume renting raw GPUs changes the contract. [Terms](https://www.runpod.io/legal/terms-of-service). |
-| Lightricks/LTX-2.3 | Community license incorporates its AUP; March 30, 2026 AUP covers hosted and on-premises products and prohibits explicit sexual content/erotic chats. License also has a $10M annual-revenue threshold and competition restrictions. | Exclude for the required scope under published terms. Free weights or local execution do not waive these terms. [License](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE), [AUP](https://static.lightricks.com/legal/ltx-acceptable-use-policy.pdf). |
+| Lightricks/LTX-2.3 | Community license incorporates its AUP; March 30, 2026 AUP covers hosted and on-premises products and prohibits explicit sexual content/erotic chats. License also has a $10M annual-revenue threshold and competition restrictions. | Exclude for the explicit scope under published terms. Free weights or local execution do not waive these terms. [License](https://huggingface.co/Lightricks/LTX-2.3/blob/main/LICENSE), [AUP](https://static.lightricks.com/legal/ltx-acceptable-use-policy.pdf). |
 | MiniMaxAI/MiniMax-H3 | August 2026 community license excludes the US, EU, UK and South Korea from its territory, including relevant outputs; separate authorization route exists. | Not a default US deployment option. No separate authorization obtained. [License](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/LICENSE). |
 | ReadyArt/Serenity-12B | Adult-focused June 2026 model card has an Apache tag but also explicitly states personal/noncommercial use. | Exclude pending an unambiguous commercial grant; do not resolve conflicting text in our favor. [Card](https://huggingface.co/ReadyArt/Serenity-12B). |
 | dphn/Dolphin3.0-Mistral-24B | Public repository has no declared license tag or separate license file in the checked metadata. | Exact fine-tune license unresolved; base-model rights alone are insufficient evidence. [Card](https://huggingface.co/dphn/Dolphin3.0-Mistral-24B). |

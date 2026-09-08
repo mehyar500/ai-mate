@@ -1,6 +1,6 @@
-# AI-mate: adult-first companion PWA
+# AI-mate: realistic companion calls
 
-**Lawful consensual adult content is a mandatory launch requirement. If the intended adult experience cannot be delivered within accepted model, host and payment terms, the product does not launch.** This decision supersedes earlier suggestions to launch a non-explicit substitute.
+**Current direction, September 8: a non-explicit companion experience intended for an Apple-native app and Apple in-app purchases.** Realistic, responsive video calls are the priority. The founder's revised goal supersedes the earlier explicit-content-first launch requirement. Any later explicit web product requires a separate scope and eligibility review; it is not a hidden native-app mode.
 
 **Current stage: a running, non-explicit local prototype on the founder's RTX 4060 Ti, 16GB VRAM and 48GB RAM.** Text, Voice call and Video call share conversation and memory. Calls accept typing or opt-in microphone input; an active call continues when viewing Text. Video supports three bounded body commands with uneven quality. Camera access is disabled. Public access, billing and the intended adult commercial experience remain unqualified.
 

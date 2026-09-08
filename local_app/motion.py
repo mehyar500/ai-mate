@@ -2,8 +2,10 @@
 import json
 import math
 from pathlib import Path
+import re
 import secrets
 import shutil
+import subprocess
 import time
 import urllib.request
 
@@ -21,6 +23,12 @@ PROMPT = ('A realistic full-body video of an adult woman standing on a stone gar
           'still and her whole body stays visible. Soft daylight illuminates her face and '
           'the green plants behind her. Natural human movement, continuous realistic footage.')
 PROMPTS = {
+    'idle': ('A continuous photographic video of the adult woman in the reference image listening '
+             'quietly to the person behind the camera. She briefly turns her head to glance to her left, '
+             'then turns back toward the camera and gives a gentle nod. She blinks naturally. Her lips '
+             'remain softly closed, her arms rest beside her hips, and her feet remain planted. '
+             'Her identity, clothing, body position, framing and surroundings remain unchanged. '
+             'The camera stays perfectly fixed. Calm subtle natural human movement.'),
     'wave': PROMPT,
     'closer': ('A continuous realistic video of an adult woman wearing a cream sweater, blue jeans '
                'and white shoes on a stone garden path. She looks at the camera, smiles and walks '
@@ -81,6 +89,61 @@ def request(path, data=None):
         return json.loads(raw) if raw else {}
 
 
+def reverse_approach(source, destination, cancel):
+    """Reuse the immediately preceding generated approach in reverse; no diffusion.
+
+    Only the engine selects these private files. New speech/lips are added later.
+    """
+    check_cancel(cancel)
+    source, destination = Path(source), Path(destination)
+    folder = (ROOT/'generated/local-app').resolve()
+    if (source.resolve().parent != folder or destination.resolve().parent != folder
+            or not re.fullmatch(r'[a-f0-9]{32}-\d+-return\.mp4', source.name)
+            or not re.fullmatch(r'[a-f0-9]{32}-\d+-motion\.mp4', destination.name)):
+        raise ValueError('Return motion must use private app-owned media.')
+    if not source.is_file() or source.stat().st_size > 40_000_000:
+        raise ValueError('The preceding movement is missing or too large.')
+    started = time.perf_counter()
+    info = subprocess.run(['ffprobe','-v','error','-select_streams','v:0','-show_entries',
+                           'stream=width,height,nb_frames,duration','-of','json',str(source)],
+                          capture_output=True, timeout=5, creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    if info.returncode:
+        raise RuntimeError('The preceding movement could not be read.')
+    streams = json.loads(info.stdout).get('streams', [])
+    if len(streams) != 1 or not 0 < float(streams[0].get('duration', 0)) <= 5:
+        raise ValueError('Return motion requires a short completed movement.')
+    stream = streams[0]
+    if not 0 < stream.get('width',0) <= 768 or not 0 < stream.get('height',0) <= 1152:
+        raise ValueError('The preceding movement exceeds the local size limit.')
+    check_cancel(cancel)
+    command = ['ffmpeg','-hide_banner','-loglevel','error','-y','-i',str(source),'-an',
+               '-vf','reverse','-c:v','libx264','-preset','ultrafast','-crf','18','-threads','2',
+               '-pix_fmt','yuv420p',str(destination)]
+    process = subprocess.Popen(command,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,
+                               creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    try:
+        while process.poll() is None:
+            check_cancel(cancel)
+            if time.perf_counter()-started > 15:
+                raise RuntimeError('Return motion encoding timed out.')
+            cancel.wait(.02)
+        if process.returncode:
+            raise RuntimeError('Return motion encoding failed.')
+        check_cancel(cancel)
+        return {'motion_s':round(time.perf_counter()-started,3),'action':'farther',
+                'motion_source':'reversed_previous_approach','fresh_body_generation':False,
+                'motion_frames':int(stream.get('nb_frames',0)),
+                'motion_resolution':f"{stream['width']}x{stream['height']}"}
+    except BaseException:
+        if process.poll() is None:
+            process.kill()
+        process.wait()
+        destination.unlink(missing_ok=True)
+        raise
+    finally:
+        process.stderr.close()
+
+
 def generate(scene, action, duration, cancel, destination, reference_path=None):
     """Generate one fresh action. No model-authored URLs, paths or graph nodes."""
     if scene not in {'mira','garden','cafe','fullbody'} or action not in PROMPTS:
@@ -95,12 +158,12 @@ def generate(scene, action, duration, cancel, destination, reference_path=None):
         raise ValueError('The motion reference must be an app-owned image.')
     shutil.copyfile(reference, source)
     frames = min(97, max(49, math.ceil(duration*24/8)*8+1))
-    if action == 'wave':
+    if action in {'wave','idle'}:
         # Two-second start/end-guided tests stayed still; allow time to raise
         # and lower the arm. Three-second trials moved across three fresh seeds.
         frames = max(73,frames)
     graph = workflow(384,576,frames,secrets.randbits(32),action,
-                     end_image=source.name if action == 'wave' else None)
+                     end_image=source.name if action in {'wave','idle'} else None)
     graph['5']['inputs']['image'] = source.name
     graph['13']['inputs']['filename_prefix'] = 'motion/'+tag
     started = time.perf_counter()
@@ -133,7 +196,8 @@ def generate(scene, action, duration, cancel, destination, reference_path=None):
                 shutil.copyfile(video,destination)
                 video.unlink()
                 return {'motion_s':round(time.perf_counter()-started,3), 'motion_frames':frames,
-                        'motion_model':CHECKPOINT, 'motion_resolution':'384x576', 'action':action}
+                        'motion_model':CHECKPOINT, 'motion_resolution':'384x576', 'action':action,
+                        'motion_source':'fresh_diffusion','fresh_body_generation':True}
             cancel.wait(.1)
         request('/queue', {'delete':[prompt_id]})
         request('/interrupt', {'prompt_id':prompt_id})

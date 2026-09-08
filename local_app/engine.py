@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import shutil
 import threading
 import time
 import uuid
@@ -56,8 +57,12 @@ class CompanionEngine:
         self.factory = model_factory
         self.scene = self.store.current_scene()
         self.pose = None  # (scene, private PNG), committed only after successful video completion.
+        self.return_motion = None  # One approach, valid until the next successful video turn.
         for path in self.directory.glob('*-pose.png'):
             if re.fullmatch(r'[a-f0-9]{32}-\d+-pose\.png',path.name):
+                path.unlink(missing_ok=True)
+        for path in self.directory.glob('*-return.mp4'):
+            if re.fullmatch(r'[a-f0-9]{32}-\d+-return\.mp4', path.name):
                 path.unlink(missing_ok=True)
 
     def warm(self):
@@ -136,6 +141,9 @@ class CompanionEngine:
             if self.pose:
                 self.pose[1].unlink(missing_ok=True)
                 self.pose = None
+            if self.return_motion:
+                self.return_motion[1].unlink(missing_ok=True)
+                self.return_motion = None
             # In-flight files belong to the cancelling worker. Also clear replies
             # from previous process lifetimes, whose jobs are no longer in RAM.
             active_keys = {job["id"] for job in self.jobs.values()
@@ -156,6 +164,7 @@ class CompanionEngine:
         event = job["cancel"]
         started = time.perf_counter()
         pose_candidate = None
+        return_candidate = None
         try:
             if raw is not None:
                 text = self.models.transcribe(raw)
@@ -223,10 +232,18 @@ class CompanionEngine:
                         motion_metrics = {}
                         try:
                             if plan and plan.get("action", "none") != "none":
-                                from .motion import generate
+                                from .motion import generate, reverse_approach
                                 motion_path = self.directory / (filename+"-motion.mp4")
-                                motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path,
-                                                          reference_path=pose_reference)
+                                with self.lock:
+                                    previous_approach = self.return_motion[1] if self.return_motion and self.return_motion[0] == scene else None
+                                if plan['action'] == 'farther' and previous_approach and pose_reference:
+                                    motion_metrics = reverse_approach(previous_approach, motion_path, event)
+                                else:
+                                    motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path,
+                                                              reference_path=pose_reference)
+                                if plan['action'] == 'closer':
+                                    return_candidate = self.directory / (filename+'-return.mp4')
+                                    shutil.copyfile(motion_path, return_candidate)
                             metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
                                                       scene, streaming=True, **({"motion_path":motion_path} if motion_path else {}))
                             metrics.update(motion_metrics)
@@ -258,6 +275,11 @@ class CompanionEngine:
                     job["remembered"] = plan["facts"]
                 self.scene = scene
                 self.store.set_scene(scene)
+                if mode == 'video' or (self.return_motion and self.return_motion[0] != scene):
+                    previous_return = self.return_motion
+                    self.return_motion = (scene, return_candidate) if return_candidate else None
+                    if previous_return:
+                        previous_return[1].unlink(missing_ok=True)
                 if pose_candidate:
                     previous = self.pose
                     self.pose = (scene, pose_candidate)
@@ -288,6 +310,8 @@ class CompanionEngine:
             with self.lock:
                 if pose_candidate and (not self.pose or self.pose[1] != pose_candidate):
                     pose_candidate.unlink(missing_ok=True)
+                if return_candidate and (not self.return_motion or self.return_motion[1] != return_candidate):
+                    return_candidate.unlink(missing_ok=True)
                 self.busy = False
             # Bound generated media growth. Keep the latest 100 files, never scene assets.
             files = sorted([p for p in self.directory.iterdir() if re.fullmatch(r"[a-f0-9]{32}-\d+\.(wav|mp4)", p.name)], key=lambda p: p.stat().st_mtime)

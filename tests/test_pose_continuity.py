@@ -35,7 +35,7 @@ class FakeModels:
         self.visual=FakeVisual()
 
     def plan(self, snapshot, text, mode, scene, available, event):
-        return {'reply':'Hello','presentation':'video','scene':scene,'action':'wave' if text=='wave' else 'none','facts':[]}
+        return {'reply':'Hello','presentation':'video','scene':scene,'action':text if text in {'wave','closer','farther'} else 'none','facts':[]}
 
     def load_visual(self):
         return self.visual
@@ -57,10 +57,16 @@ class PoseTests(unittest.TestCase):
             destination.write_bytes(b'motion')
             return {}
         self.motion=patch('local_app.motion.generate',side_effect=generate)
-        self.motion.start()
+        self.generate = self.motion.start()
+        def reverse(source, destination, event):
+            destination.write_bytes(source.read_bytes()[::-1])
+            return {'motion_source':'reversed_previous_approach','fresh_body_generation':False}
+        self.reverse_patch = patch('local_app.motion.reverse_approach',side_effect=reverse)
+        self.reverse = self.reverse_patch.start()
 
     def tearDown(self):
         self.motion.stop()
+        self.reverse_patch.stop()
         self.temp.cleanup()
 
     def reply(self,text):
@@ -106,6 +112,38 @@ class PoseTests(unittest.TestCase):
         renderer.cv.imwrite.assert_called_once_with('pose.png','last frame')
         capture.set.assert_not_called()
         capture.release.assert_called_once()
+
+    def test_immediate_step_back_reuses_completed_approach_once(self):
+        self.assertEqual(self.reply('closer')['state'],'done')
+        cached = self.app.return_motion[1]
+        self.assertTrue(cached.exists())
+        returned = self.reply('farther')
+        self.assertEqual(returned['state'],'done')
+        self.assertEqual(self.generate.call_count,1)
+        self.assertEqual(self.reverse.call_count,1)
+        self.assertFalse(returned['chunks'][0]['render']['fresh_body_generation'])
+        self.assertIsNone(self.app.return_motion)
+        self.assertFalse(cached.exists())
+        self.reply('farther')
+        self.assertEqual(self.generate.call_count,2)
+
+    def test_other_successful_video_invalidates_return_and_failed_turn_preserves_it(self):
+        self.reply('closer')
+        cached = self.app.return_motion
+        self.visual.fail=True
+        self.assertEqual(self.reply('farther')['state'],'failed')
+        self.assertEqual(self.app.return_motion,cached)
+        self.assertTrue(cached[1].exists())
+        self.visual.fail=False
+        self.reply('hello')
+        self.assertIsNone(self.app.return_motion)
+        self.assertFalse(cached[1].exists())
+
+    def test_reset_during_approach_does_not_resurrect_return_media(self):
+        self.visual.after_capture=self.app.reset
+        self.assertEqual(self.reply('closer')['state'],'cancelled')
+        self.assertIsNone(self.app.return_motion)
+        self.assertEqual(list(Path(self.temp.name).glob('*-return.mp4')),[])
 
 
 if __name__=='__main__':

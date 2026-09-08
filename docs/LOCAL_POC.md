@@ -194,7 +194,17 @@ Reproduce benchmark candidates separately from user calls, keeping other GPU inf
 .\.venv\Scripts\python.exe scripts/benchmark_ltx23.py
 ```
 
-Run the Comfy benchmark with the existing motion service; the direct runner does not call or import ComfyUI. Review source images first, then the private MP4/contact sheets and JSON in `generated/local-app/audit`. Current changes pass 71 Python and seven Node checks. Independent R2 review, staging and public qualification remain outstanding. Rollback is a reviewed code revert; keep SQLite memory and private credentials intact.
+Run the Comfy benchmark with the existing motion service; the direct runner does not call or import ComfyUI. Review source images first, then the private MP4/contact sheets and JSON in `generated/local-app/audit`. The direct-renderer checkpoint passed 71 Python and seven Node checks; the later return-motion changes pass 77 Python and seven Node checks. Independent R2 review, staging and public qualification remain outstanding. Rollback is a reviewed code revert; keep SQLite memory and private credentials intact.
+
+### Return motion and continuous-presence findings — September 8
+
+The engine now keeps one private, completed approach clip. An immediate request to move back in the same scene reverses that trajectory on CPU, then generates the current reply's voice and lips. A paired browser test measured **5.29s** to first approach playback and **1.82s** for the return, with no stalls. Server completion was 6.174s/2.700s; reversing the body clip took 0.160s. The reviewed return restored the full-body position with both shoes visible. This is disclosed motion reuse, not a new diffusion result or a benchmark of arbitrary backward commands.
+
+The cache is consumed once, invalidated by another completed video turn or scene change, and cleared on reset/startup. Failed turns retain the prior valid cache; cancellation cannot publish a new one. Files stay within the private media directory. Tests cover these transitions, bounded input/duration, cancellation and a real CPU FFmpeg reversal with synthetic frames. Memory is preserved.
+
+Continuous presence remains **unresolved**. Three 384x576 LTX-2B idle trials used a reviewed pose: 73-frame/end-guided (4.816s), 97-frame/end-guided (5.978s), and 97-frame/no-end-guide (5.813s). The first two barely moved; the third walked forward and shifted framing. All were rejected for background listening. No failed idle clip is selected by the app. The visible held frame remains a static fallback, not blinking, hair movement or a continuous generated call. The internal benchmark prompt is not a public command or an enabled idle worker.
+
+The revised commercial direction is non-explicit Apple-native distribution; the current Windows browser app remains the test harness. StoreKit, device playback, public serving and independent review are outstanding. Optional larger-GPU experiment budgets are in ECONOMICS; no GPU has been rented. LTX-2.3 remains a candidate until download verification, inference and output review pass.
 
 The configured environment is Python 3.12 with PyTorch 2.11.0+cu128. Dependencies are pinned in [requirements](../config/local-poc-requirements.txt). For a fresh environment, install Python 3.12, Ollama and FFmpeg, then:
 

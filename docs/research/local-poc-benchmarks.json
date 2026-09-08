@@ -4979,5 +4979,51 @@
       "independent_review": "pending",
       "public_staging": "not provisioned"
     }
+  },
+  "return_motion_and_idle_2026_09_08": {
+    "hardware": "RTX 4060 Ti 16GB; 48GB RAM",
+    "paired_return": {
+      "approach_browser_first_play_s": 5.29,
+      "return_browser_first_play_s": 1.82,
+      "approach_server_total_s": 6.174,
+      "return_server_total_s": 2.7,
+      "reverse_body_s": 0.16,
+      "stalls": 0,
+      "motion_source": "reversed_previous_approach",
+      "fresh_body_generation": false,
+      "review": "Returned to full-body pose; camera drift and soft detail remain. Only immediate paired return is optimized."
+    },
+    "idle_trials": [
+      {
+        "frames": 73,
+        "seed": 60,
+        "end_guidance": true,
+        "execution_s": 4.816,
+        "review": "Nearly static; rejected"
+      },
+      {
+        "frames": 97,
+        "seed": 61,
+        "end_guidance": true,
+        "execution_s": 5.978,
+        "review": "Nearly static; rejected"
+      },
+      {
+        "frames": 97,
+        "seed": 62,
+        "end_guidance": false,
+        "execution_s": 5.813,
+        "review": "Walked forward; framing shifted; rejected"
+      }
+    ],
+    "idle_promoted": false,
+    "independent_review": "pending",
+    "public_staging": "not provisioned",
+    "tests": {
+      "python": 77,
+      "node": 7,
+      "syntax": "passed",
+      "whitespace": "passed"
+    }
   }
 }

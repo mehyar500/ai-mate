@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--action', choices=tuple(PROMPTS), default='wave')
     parser.add_argument('--reference', choices=['fullbody','fullbody-candidate','mira'], default='fullbody')
+    parser.add_argument('--reference-path', type=Path, help='Optional app-owned PNG pose to benchmark without changing the call.')
     parser.add_argument('--return-to-reference', action='store_true', help='Guide the final frame back to the reviewed starting image.')
     parser.add_argument('--encoder', choices=['h264','vp9'], default='h264')
     parser.add_argument('--wait-models', type=int, default=0)
@@ -42,7 +43,9 @@ def main():
             raise RuntimeError('LTX checkpoint/text encoder download is incomplete.')
         print('Waiting for existing LTX model downloads.', flush=True)
         time.sleep(min(30, max(0,deadline-time.monotonic())))
-    source = ROOT/'generated/local-app'/(opts.reference+'.png')
+    source = opts.reference_path or ROOT/'generated/local-app'/(opts.reference+'.png')
+    if source.resolve().parent != (ROOT/'generated/local-app').resolve() or source.suffix != '.png':
+        raise ValueError('Use an app-owned PNG reference.')
     queue = request('/queue')
     if queue.get('queue_running') or queue.get('queue_pending'):
         raise RuntimeError('Wait for the motion worker to become idle.')
