@@ -12,6 +12,10 @@ Use StoreKit in-app purchases for the proposed digital subscriptions/credits; Ap
 
 ## Deferred explicit web-service review
 
+September 8 remote-provider clarification: "NSFW" is not a sufficiently precise content category for provider selection. Non-explicit romance, factual sexual-health Q&A, suggestive imagery and explicit sexual generation need separate review. One Cloudflare bill does not replace model-specific conditions. [Cloudflare terms](https://www.cloudflare.com/service-specific-terms-developer-platform/) retain third-party terms for Workers AI and AI Gateway; routing also does not establish US-only processing.
+
+Runpod's current terms prohibit pornography/graphic adult content; self-hosting weights there does not waive the restriction. Pruna's general terms do not list a blanket consensual-adult ban, but explicitly retain third-party conditions, and its P-Video documentation links LTX's license: this is not an explicit-content workaround. Inworld's developer AUP restricts suggestive/mature tools, so its TTS is deferred for the proposed mature scope. Published filter controls are not permission to bypass contractual limits. These findings leave remote neutral clip tests feasible, not an approved NSFW launch. [Runpod](https://www.runpod.io/legal/terms-of-service), [Pruna terms](https://docs.api.pruna.ai/terms), [P-Video license reference](https://docs.api.pruna.ai/guides/models/p-video), [Inworld AUP](https://inworld.ai/aup/).
+
 The material below applies only if a separate explicit web scope is later chosen. It does not describe the native MVP or establish permission for it.
 
 **Current stage is a founder-operated private prototype and fundraising demonstration, with no customer billing or public adult access.** The founder can show a non-explicit product preview using synthetic profiles. The commercial launch conditions below remain deferred requirements; they are not waived by calling something a demo.

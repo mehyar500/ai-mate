@@ -2,11 +2,13 @@
 
 A single-user local app is implemented under `local_app/`. This document separates that running prototype from the deferred commercial design below. Reproduction and results live in [LOCAL_POC](LOCAL_POC.md).
 
-## Active scope: local proof before remote inference
+## Active scope: local demo with optional remote inference
 
 The local app binds to `127.0.0.1:8765`. Text has the composer; Voice and Video calls request microphone access when started, with mute/end icons and automatic sound playback. Opening Text keeps an existing call connected. Video uses the full height when controls fit beside it; tall phones trim side background to retain head-to-toe framing. Camera access is disabled. `local_app/engine.py` owns the shared turn flow, cancellation and memory. Cloudflare Qwen selects a bounded plan; CPU Kokoro makes speech; LTX body video and MuseTalk lips run on the local GPU. Picture fragments and a synchronized WAV reach the browser during rendering. Exact timings, failures and candidate comparisons live in LOCAL_POC.
 
 Cloudflare is configured using API key plus email. MiniMax and Ollama remain optional adapters. Three startup settings are read from private `.env`; the model adapters pin the actual graphics/voice choices. No production payment flags or pretend deployment controls are configured.
+
+The founder now permits remote models while minimizing credentials: prefer Cloudflare's combined AI catalog and add one GPU provider only if continuous video needs it. Cloudflare-listed Pruna motion/avatar models are the next clip candidates; they are not integrated or quality-qualified. The billing-read check works with existing key/email, but prepaid Gateway credits are unavailable. LOCAL_POC records model IDs, access evidence and the benchmark sequence; USA records content restrictions. Streaming speech/pose continuity remain engine work regardless of provider.
 
 September 8 API trials keep Qwen selected: Granite was cheaper but slower, while GLM-4.7-Flash did not complete the current bounded planner format. Kokoro remains the voice; Aura-1, Aura-2 and Melo were benchmarked with synthetic prompts. FlashHead Lite is installed only in an isolated Windows test and reaches short-run real-time throughput, with stronger close-up than full-body speech quality. None of these benchmark adapters is automatically promoted. LOCAL_POC records every measured configuration and its limits.
 

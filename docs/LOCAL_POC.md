@@ -111,7 +111,26 @@ Three identical texts (16/62/215 characters), with one new sample per voice:
 
 All twelve WAVs contained non-silent, unclipped signal. Local Whisper recovered the count through 25 for Kokoro/Aura; Aura-1's “birdsong” became “birds on,” and Melo's count transcription repeated 20. These are ASR flags, not proof of which model introduced an error or a subjective listening score. Kokoro stays selected: the cloud alternatives do not consistently beat it, and voice preference is untested. `review_cloud_speech.py` reproduces the local comparison. [Cloudflare list pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) determines nominal costs; the failed GLM timeout has unknown billed usage.
 
-The [hosted catalog](https://developers.cloudflare.com/workers-ai/models/) currently lists 86 entries including deprecated models, speech, recognition and images; no full-body live-video generation entry was identified. Gateway access to external models is a separate provider route. Cloudflare can handle dialogue/speech while graphics stay local; catalog presence is not project/content approval.
+The 86-entry [Workers AI catalog](https://developers.cloudflare.com/workers-ai/models/) is only the Cloudflare-hosted subset. The broader [AI catalog](https://developers.cloudflare.com/ai/models/) lists 235 entries on September 8, including third-party video. Our earlier Workers AI inventory therefore did not cover every model reachable through Cloudflare.
+
+### Remote inference with fewer credentials — September 8
+
+Prefer **one Cloudflare credential, at most one additional GPU credential** if continuous rendering requires it. Cloudflare's [unified REST endpoint](https://developers.cloudflare.com/ai-gateway/usage/rest-api/) accepts `{model, input}` at `/accounts/{account}/ai/run`; its documented third-party examples use Unified Billing without individual provider keys. This is a proposed benchmark route, not a new app renderer.
+
+| Role | Exact Cloudflare model ID | Decision |
+|---|---|---|
+| Dialogue | `@cf/qwen/qwen3-30b-a3b-fp8` | Keep the measured active route |
+| Remote speech | `@cf/deepgram/aura-1` | Already compared; Kokoro remains selected |
+| Cheap motion candidate | `pruna/p-video` | Compare 720p draft and standard, same fictional reference and command |
+| Spoken avatar clip | `pruna/p-video-avatar` | Compare against local FlashHead; completed clips are not proof of streaming calls |
+| Alternative motion | `lightricks/ltx-2-5-fast`, `bytedance/seedance-2.0-fast` | Secondary candidates after price/terms checks |
+| Additional speech candidate | `inworld/tts-1.5-mini` | Defer: its AUP restricts suggestive/mature applications; advertised latency is not measured here |
+
+Sources: [P-Video](https://developers.cloudflare.com/ai/models/pruna/p-video/), [avatar](https://developers.cloudflare.com/ai/models/pruna/p-video-avatar/), [LTX](https://developers.cloudflare.com/ai/models/lightricks/ltx-2-5-fast/), [Seedance](https://developers.cloudflare.com/ai/models/bytedance/seedance-2.0-fast/), [Inworld AUP](https://inworld.ai/aup/). Cloudflare routing preserves underlying model terms; no NSFW approval is established. See USA for content exclusions and ECONOMICS for per-clip versus continuous-video costs.
+
+The existing **API key + email** returned HTTP 200 on the [credit-balance GET](https://developers.cloudflare.com/api/resources/ai_gateway/subresources/billing/), but no positive prepaid balance. Reproduce with `.\.venv\Scripts\python.exe scripts/check_cloud_gateway.py`; it writes only sanitized status to the local audit folder. It reads no conversation and never purchases credits, changes billing or follows redirects. This confirms billing-read authentication, not third-party inference access. The documented inference examples use a scoped token; compatibility of key/email with that route still needs a bounded test.
+
+[Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) adds 5% to credit purchases; rare negative balances can still be collected later. No credits or GPU were purchased. Once funded and priced, test one short, fully clothed synthetic clip per configuration, keep safety filtering enabled, and measure request-to-playable time, identity, command execution and audio sync. Do not upload private history or mistake provider inference time for call latency. Continuous calls retain local rendering while remote candidates are unqualified.
 
 ### FlashHead Lite local trial
 
@@ -179,7 +198,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, sustained p50/p95, real microphone/speaker testing, interruption continuity and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Final checks for this revision: 92 Python tests, seven Node tests, Python compile, JavaScript syntax and `git diff --check` passed. `review_call_playback.cjs` additionally runs two real Chromium playback cases with synthetic APIs/capture; it requires Playwright on `NODE_PATH` and the generated close FlashHead fixture. It never starts a physical microphone or reads the real conversation.
+Final checks for this revision: 97 Python tests, seven Node tests, Python compile, JavaScript syntax and `git diff --check` passed. The five new Gateway checks cover missing/invalid balance, positive/empty balance, blocked redirects, sensitive-response redaction and HTTP failure without retry. `check_cloud_gateway.py` returned HTTP 200 with key/email and `not_positive` credits; inference and account mutation remained disabled. No memory schema or live runtime changed. `review_call_playback.cjs` additionally runs two real Chromium playback cases with synthetic APIs/capture; it requires Playwright on `NODE_PATH` and the generated close FlashHead fixture. It never starts a physical microphone or reads the real conversation.
 
 ## Cost and next decision
 

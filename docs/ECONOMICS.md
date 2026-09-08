@@ -68,6 +68,23 @@ More system RAM helps keep weights available for offloading; it does not turn th
 
 September 8's additional synthetic Cloudflare comparisons total **$0.01443 at published variable list prices for responses with known usage**, including the capability-prompt retest. One timed-out GLM request has unknown billed usage; this is not an invoice. The earlier Aura-2 experiment added $0.01806 nominally. These small tests use existing credentials, do not purchase a plan, and do not establish future production costs. Qwen and local Kokoro remain selected. [Measured comparison](LOCAL_POC.md#cloudflare-comparison--september-8-follow-up).
 
+### Cloudflare-routed clip candidates — September 8
+
+Provider list-price arithmetic below is a planning comparison; Cloudflare model pages direct pricing to the account dashboard. Confirm the account quote before inference. The last billing-read check found no positive Gateway credits; no purchase or remote video test was made. One Cloudflare credential is preferred. [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) adds 5% to credit purchases.
+
+| Model / 720p configuration | Provider $/output second | 15-second clip | Clip with 5% funding fee | 30 minutes of generated footage, with fee |
+|---|---:|---:|---:|---:|
+| Pruna P-Video draft | $0.005 | $0.075 | $0.0788 | $9.45 |
+| Pruna P-Video standard | $0.020 | $0.300 | $0.3150 | $37.80 |
+| Pruna P-Video-Avatar | $0.025 | $0.375 | $0.3938 | $47.25 |
+| LTX-2.5 Fast | $0.090 | $1.350 | $1.4175 | $170.10 |
+
+Sources: [P-Video rates](https://docs.api.pruna.ai/guides/models/p-video), [avatar rates](https://docs.api.pruna.ai/guides/models/p-video-avatar), [LTX rates](https://docs.ltx.io/pricing). Draft means lower quality. The 30-minute column aggregates many clips, not a supported continuous request or a measured live call. It excludes retries, discarded output, transport, other inference, taxes, payment fees and support. No volume discount or reusable-video saving is assumed.
+
+At a hypothetical $1.99 price for one 15-second standard P-Video clip, 30% Apple commission and the above $0.315 generation estimate leave $1.078 (54.2% of customer price) before every other cost. Avatar leaves $0.9993 (50.2%). Those are contribution ceilings, not net margins or validated willingness to pay. Ten standard clips consume $3.15 before other service costs, exceeding the $3.00 service ceiling for a $29.99 plan targeting 60% contribution at 30% Apple fees. Keep clips metered.
+
+Runpod [InfiniteTalk](https://docs.runpod.io/public-endpoints/models/infinitetalk) lists $0.25/480p or $0.50/720p per video, but that page does not establish an accepted audio-duration limit. Do not turn its flat price into an unlimited-call estimate. Managed clip endpoints need no reserved GPU, but have unmeasured queue/render latency. For continuous calls, compare a persistent streaming worker against local FlashHead; cold-start and occupancy costs remain. Runpod is excluded for explicit content under its [terms](https://www.runpod.io/legal/terms-of-service).
+
 The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.
 
 | Future monthly offer | Price to test | Earlier direct contribution hypothesis |
