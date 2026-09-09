@@ -289,7 +289,7 @@ async function follow(key,node){
 }
 async function submit(text,raw=null,inputMode=null,draftId='message'){
   if(busy||stopping||!ready||(!raw&&!text.trim()))return;
-  resetPlayback(true);lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
+  resetPlayback(true);if(rtcPeer)$('video').muted=false;lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
   pendingStop=false;submitting=true;busy=true;submittedSpeech=Boolean(raw);controls();
   const node=bubble(raw?"Listening…":text,"user");
   if(!raw)$(draftId).value="";
@@ -342,7 +342,16 @@ async function interrupt(){
   if(active||submitting)lastMedia=null;
   resetPlayback(true);
   const mine=epoch;
-  if(rtcPeer)await api('/api/cancel',{});
+  if(rtcPeer){
+    stopping=true;$('video').muted=true;holdPicture();controls();
+    try{
+      const result=await api('/api/rtc/stop',{});
+      if(mine!==epoch)return;
+      notice(result.warning||'Reply stopped. You can speak now.',Boolean(result.warning));
+    }catch(error){notice(error.message,true);return false;}
+    finally{stopping=false;listenAfter=performance.now()+450;controls();}
+    return;
+  }
   if(submitting){pendingStop=true;return;}
   if(key){
     stopping=true;controls();
@@ -487,7 +496,7 @@ setInterval(async()=>{
     if(rtcPeer!==peer)return;
     if(peer.remoteDescription&&['closed','failed'].includes(state.connection_state)){failRtc();return;}
     playing=state.playing;
-    if(playing&&state.started){pictureStarted=true;$("video").hidden=false;$("held-frame").hidden=true;}
+    if(playing&&state.started&&!pendingStop){pictureStarted=true;$("video").hidden=false;$("held-frame").hidden=true;}
     controls();
   }catch(error){notice(error.message,true);}
   finally{rtcPolling=false;}

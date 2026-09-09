@@ -273,6 +273,27 @@ class LocalCallCleanupTests(unittest.TestCase):
         self.assertFalse(call.thread.is_alive())
         self.assertTrue(call.loop.is_closed())
 
+    def test_stop_preserves_sent_current_reply_without_closing_call(self):
+        from scripts.serve_webrtc_benchmark import PlaybackSession
+        from local_app.rtc import LocalCall
+        engine = SimpleNamespace(cancel=MagicMock(return_value={'ok':True,'pose_preserved':True}), frame_output=None)
+        call = LocalCall(engine)
+        session = PlaybackSession(None, [], [], Path('.'))
+        call.session = session
+        session.clip = {'finished':False,'job_id':'current','chunk_index':2}
+        session.last_sent_position = ('current',2,7)
+        try:
+            self.assertEqual(call.request('stop', {})['position_basis'], 'last_sent_frame')
+            engine.cancel.assert_called_once_with('current', {'index':2,'time_s':.35})
+            self.assertIs(call.session, session)
+            self.assertFalse(session.cancel.is_set())
+            engine.cancel.reset_mock()
+            session.clip['job_id'] = 'next'
+            call.request('stop', {})
+            engine.cancel.assert_called_once_with()
+        finally:
+            call.shutdown()
+
     def test_close_does_not_detach_replacement_output(self):
         from scripts.serve_webrtc_benchmark import PlaybackSession
         from local_app.rtc import LocalCall

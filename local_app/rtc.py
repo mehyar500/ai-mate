@@ -209,6 +209,20 @@ class LocalCall:
         if action == 'close':
             await self.close()
             return {'ok': True}
+        if action == 'stop':
+            session = self.session
+            if session is None:
+                return {'ok': True, 'pose_preserved': False}
+            clip = session.clip
+            position = session.playback_position()
+            # Never preserve a previous reply's frame while a new reply is pending.
+            if (position and clip and not clip['finished']
+                    and position['id'] == clip.get('job_id')
+                    and position['playback']['index'] == clip.get('chunk_index')):
+                result = await asyncio.to_thread(self.engine.cancel, position['id'], position['playback'])
+                return {**result, 'position_basis': 'last_sent_frame'}
+            self.engine.cancel()
+            return {'ok': True, 'pose_preserved': False}
         if action == 'state':
             clip = self.session.clip if self.session else None
             return {'connection_state': self.peer.connectionState if self.peer else 'closed',
@@ -238,7 +252,7 @@ class LocalCall:
             def select_idle(seconds, last):
                 with self.engine.lock:
                     held, busy, pose = self.engine.hold_still, self.engine.busy, self.engine.performance_state
-                if last is not None and (held or busy):
+                if last is not None and (held or busy or pose not in {'base', 'near'}):
                     return last
                 frames = near if pose == 'near' else idle
                 return frames[int(seconds*24) % len(frames)] if frames else (last if last is not None else idle[0])

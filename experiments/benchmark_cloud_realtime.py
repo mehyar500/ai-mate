@@ -137,7 +137,7 @@ def attach_test_engine(session):
             held, busy, pose = engine.hold_still, engine.busy, engine.performance_state
         # Rendering can finish before the engine commits the destination pose.
         # Keep the last presented frame through that interval and a stop command.
-        if last is not None and (held or busy):
+        if last is not None and (held or busy or pose not in {'base', 'near'}):
             return last
         frames = near if pose == 'near' else session.idle
         if not frames:
