@@ -34,7 +34,10 @@ class Models:
         from kokoro_onnx import Kokoro
         from faster_whisper import WhisperModel
         options = ort.SessionOptions()
-        options.intra_op_num_threads = 4
+        # Same Kokoro weights and preset; eight threads reduced warm synthesis
+        # time on the demo i9. The isolated call suite qualifies CPU contention.
+        self.speech_threads = 8
+        options.intra_op_num_threads = self.speech_threads
         options.inter_op_num_threads = 1
         session = ort.InferenceSession(str(CACHE / "kokoro-v1.0.onnx"), sess_options=options,
                                        providers=["CPUExecutionProvider"])

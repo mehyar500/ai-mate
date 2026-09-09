@@ -1,0 +1,73 @@
+{
+  "repository": "Supertone/supertonic-3",
+  "revision": "3cadd1ee6394adea1bd021217a0e650ede09a323",
+  "code_revision": "7e2804f96016a7028cb1ed627353c61c1e9dd281",
+  "voice": "F1",
+  "model_license": "OpenRAIL-M, use restrictions apply; retain LICENSE",
+  "code_license": "MIT; retain code-LICENSE",
+  "support_notice": "Upstream July 23, 2026 notice: no further development or official open-source support; Voice Builder unavailable after August 31.",
+  "scope": "Isolated neutral CPU speech experiment; no voice cloning, API credential, public acceptance or active model selection.",
+  "selected_in_app": false,
+  "files": [
+    {
+      "path": "onnx/duration_predictor.onnx",
+      "bytes": 3700147,
+      "sha256": "c3eb91414d5ff8a7a239b7fe9e34e7e2bf8a8140d8375ffb14718b1c639325db",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/onnx/duration_predictor.onnx"
+    },
+    {
+      "path": "onnx/text_encoder.onnx",
+      "bytes": 36416150,
+      "sha256": "c7befd5ea8c3119769e8a6c1486c4edc6a3bc8365c67621c881bbb774b9902ff",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/onnx/text_encoder.onnx"
+    },
+    {
+      "path": "onnx/vector_estimator.onnx",
+      "bytes": 256534781,
+      "sha256": "883ac868ea0275ef0e991524dc64f16b3c0376efd7c320af6b53f5b780d7c61c",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/onnx/vector_estimator.onnx"
+    },
+    {
+      "path": "onnx/vocoder.onnx",
+      "bytes": 101424195,
+      "sha256": "085de76dd8e8d5836d6ca66826601f615939218f90e519f70ee8a36ed2a4c4ba",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/onnx/vocoder.onnx"
+    },
+    {
+      "path": "onnx/tts.json",
+      "bytes": 8253,
+      "sha256": "42078d3aef1cd43ab43021f3c54f47d2d75ceb4e75f627f118890128b06a0d09",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/onnx/tts.json"
+    },
+    {
+      "path": "onnx/unicode_indexer.json",
+      "bytes": 277676,
+      "sha256": "9bf7346e43883a81f8645c81224f786d43c5b57f3641f6e7671a7d6c493cb24f",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/onnx/unicode_indexer.json"
+    },
+    {
+      "path": "voice_styles/F1.json",
+      "bytes": 292046,
+      "sha256": "bbdec6ee00231c2c742ad05483df5334cab3b52fda3ba38e6a07059c4563dbc2",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/voice_styles/F1.json"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 15007,
+      "sha256": "0d944a9110fed9a9602d60e0423a272903e7bd21ab060490774efc77c2275e9f",
+      "url": "https://huggingface.co/Supertone/supertonic-3/resolve/3cadd1ee6394adea1bd021217a0e650ede09a323/LICENSE"
+    },
+    {
+      "path": "helper.py",
+      "bytes": 15027,
+      "sha256": "b14b1da8a018aa4db6ca8cbb927c32590bfc889b49116ea344c56e8351d94279",
+      "url": "https://raw.githubusercontent.com/supertone-inc/supertonic/7e2804f96016a7028cb1ed627353c61c1e9dd281/py/helper.py"
+    },
+    {
+      "path": "code-LICENSE",
+      "bytes": 1070,
+      "sha256": "0dfe0d0ba84416fe3879d9a34f4909d8d0137c78d1e95834177b0414ac096fa2",
+      "url": "https://raw.githubusercontent.com/supertone-inc/supertonic/7e2804f96016a7028cb1ed627353c61c1e9dd281/LICENSE"
+    }
+  ]
+}

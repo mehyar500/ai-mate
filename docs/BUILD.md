@@ -24,7 +24,7 @@ Known actions are closer, farther and wave. Unsupported actions must be explaine
 |---|---|---|
 | Dialogue / plan | @cf/qwen/qwen3-30b-a3b-fp8 | Cloudflare, existing API key + email |
 | Recognition | faster-whisper Base English, int8, eight threads | Local CPU |
-| Speech | Kokoro-82M ONNX v1.0, af_sarah | Local CPU |
+| Speech | Kokoro-82M ONNX v1.0, af_sarah, eight threads | Local CPU |
 | Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features; optional TensorRT 11.2.1.2 FP16 decoder | Local GPU |
 | Face tracking | YuNet ONNX | Local CPU |
 | Reviewed body preparation | LTX-2.3 22B distilled FP8, Gemma 3 12B FP4 encoder | Offline local preparation |
@@ -45,12 +45,12 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Selected decoder sustained trial: end-of-speech median 2.48s / p95 2.90s, 54 spoken replies. Synthetic MediaStream includes recorder/VAD but excludes physical acoustics |
+| Fast voice and visual response | Latest eight-thread TTS trial: end-of-speech median 2.47s / p95 3.22s, nine spoken replies. Earlier four-thread sustained p95 2.90s across 54. Synthetic MediaStream includes recorder/VAD; no physical-acoustic or overall speed-gain claim |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | Latest 3,685 browser clock samples: 24.74ms p95 / 51.72ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
-| Stable 30-minute call | TensorRT: 120 interactions, zero functional failures/reported reply stalls, all 120 clips retained; no steadily accumulating response delay |
-| Realistic images and motion | Latest 5,966 frames analyzed, 120 visually sampled; previous source review retained. Hand blur, mouth artifacts, close framing and repetition remain |
+| Synchronization within 100ms | Latest 624 clock samples: 25.92ms p95 / 37.11ms maximum; sustained four-thread TTS maximum 51.72ms. Perceptual alignment and physical audio remain unqualified |
+| Stable 30-minute call | TensorRT/four-thread TTS: 120 interactions without functional failures/reported reply stalls; eight-thread TTS passed 20 commands but sustained qualification remains pending |
+| Realistic images and motion | Latest 1,005 frames analyzed, 60 visually sampled; sustained/source reviews retained. Hand blur, mouth artifacts, close framing and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 
@@ -60,7 +60,7 @@ scripts/serve_voice_video_benchmark.py and scripts/qualify_video_call.cjs run is
 
 Pass `qualification run-label --capture` to the browser driver to exercise the actual AudioWorklet and end-of-turn logic. The ordinary mode starts at submission and understates conversational latency. CPU ASR tuning reduced recognition median from 448ms to 407ms in the capture comparison; dialogue variability and video generation still dominate the target miss. The 650ms speech boundary remains unchanged.
 
-Shortened Whisper encoder input and Smart Turn v3.2 are isolated experiments, not active runtime settings. LOCAL_POC records accuracy failures and the remaining candidate; do not replace the 30-second padded ASR or speech boundary solely from their compute timings.
+Shortened Whisper encoder input was rejected after a harder corpus exposed repeated punctuation and slower tail responses. Smart Turn v3.2 remains isolated. Preserve 30-second padded ASR and the current speech boundary; compute timings alone cannot qualify either replacement.
 
 ## Next hosted experiment
 

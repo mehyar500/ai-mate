@@ -89,6 +89,12 @@ def main():
                     reuse_motion=True)
     app.prime_reviewed_visual(renderer, event)
     app.ready = True
+    (folder/'benchmark-settings.json').write_text(json.dumps({
+        'speech_model':'Kokoro-82M ONNX v1.0','speech_voice':'af_sarah',
+        'speech_cpu_threads':app.models.speech_threads,'decoder':args.decoder,
+        'performance_label':args.performance_label,'visual_warmup':app.visual_warmup,
+        'scope':'Synthetic isolated call; no private conversation or active preview selection.'
+    },indent=2)+'\n',encoding='utf-8')
     (folder/'fixtures.json').write_text(json.dumps(fixtures, indent=2)+'\n')
     server = ThreadingHTTPServer(('127.0.0.1', 8766), Handler)
     server.daemon_threads = True
