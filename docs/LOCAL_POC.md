@@ -26,7 +26,7 @@ The video fills the height when controls fit in the side space. Tall phone views
 |---|---|---|
 | Conversation / bounded plan | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Hosted JSON response; exact simple body commands bypass the network |
 | Speech | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CPU, four threads; new WAV per reply |
-| Recognition | faster-whisper Base English int8 | CPU; opt-in microphone or synthetic WAV |
+| Recognition | faster-whisper Base English int8 | CPU, eight threads; opt-in microphone or synthetic WAV |
 | Lip movement | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio encoder | Local GPU FP16; batch eight; 20 FPS output |
 | Face tracking | OpenCV YuNet 2023mar | CPU; tracks supplied body footage |
 | Reviewed movement / listening preparation | LTX-2.3-22B distilled FP8 with Gemma-3-12B mixed FP4 text encoder | Offline native ComfyUI graph; prompt encoder on CPU, diffusion offload on 16GB |
@@ -102,7 +102,7 @@ node scripts/qualify_video_call.cjs qualification
 .\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification
 ```
 
-Use `soak` in all three commands for six cycles / 120 interactions across 30 minutes. For a repeat, append `--label new-run` to the Python commands and `new-run` after the Node trial argument; labels preserve prior evidence. Drivers alternate fixed synthetic WAV and typed input; recognition, hosted planning, speech synthesis, GPU rendering and browser playback are real. Physical microphone capture, acoustic echo, endpoint wait and mobile/internet transport are excluded. Frame diagnostics create ordered sheets covering every decoded frame, but cannot certify anatomy, identity or perceptual lip synchronization. The live user's database is never copied into these trials.
+Use `soak` in all three commands for six cycles / 120 interactions across 30 minutes. For a repeat, append `--label new-run` to the Python commands and `new-run` after the Node trial argument; labels preserve prior evidence. Drivers alternate fixed synthetic WAV and typed input; recognition, hosted planning, speech synthesis, GPU rendering and browser playback are real. Default injection excludes physical capture and endpoint wait. The `--capture` mode below includes the actual browser recorder and detector. Neither tests physical acoustics or mobile/internet transport. Frame diagnostics create ordered sheets covering every decoded frame, but cannot certify anatomy, identity or perceptual lip synchronization. The live user's database is never copied into these trials.
 
 To prepare another candidate, use `benchmark_ltx23.py --action wave --silent --return-to-reference --frames 97 --seed 83`, then `prepare_performance.py <local-output-path> --action wave --duration 4.05`. Preparation writes an unreviewed manifest: inspect the new source and rendered output before accepting it. These commands use the configured virtual environment. The current candidate is staged in the live asset directory; an already running server must restart to load it after the user's call has ended.
 
@@ -131,6 +131,49 @@ After the soak, 24 sequential synthetic calls compared three Cloudflare models u
 | @cf/meta/llama-3.2-3b-instruct | 8 | 0.421s / 0.692s | 1 message delivery | $0.000623 |
 
 Keep Qwen: 8B did not show a meaningful median gain; 3B sacrificed a requested behavior. These small samples do not establish tail reliability or adult-service permission. Reproduce with `benchmark_cloud_comparison.py dialogue --model <exact-model> --repeats 2 --label <new-label>` in the virtual environment. Runtime selection and credentials were unchanged.
+
+### End-of-speech measurement and ASR comparison — September 9
+
+`qualify_video_call.cjs --capture` supplies synthetic speech to a virtual MediaStream while retaining the actual AudioWorklet, energy detector, turn submission, ASR, planner and playback. The measurement begins at the last 128-sample input block above the detector's minimum energy floor and ends when both audio and video have started. This includes the 650ms endpoint wait; it still excludes physical microphone/speaker latency and acoustic echo. Deliberate interruption is excluded from response percentiles.
+
+| Capture-inclusive run | Commands | Spoken samples | End-of-speech p50 / p95 | Browser A/V p95 / maximum |
+|---|---:|---:|---:|---:|
+| Base English, four CPU threads | 20 | 9 | 2.85s / 3.39s | 24.43ms / 30.72ms |
+| Base English, eight CPU threads | 20 | 9 | 3.09s / 3.83s | 24.36ms / 32.01ms |
+
+Both runs passed all commands without reported stalls. Actual recognition median fell from 447.5ms to 406.5ms across ten audio submissions; normalized words matched. Hosted planner timing and reply lengths varied, so the second run establishes no overall call improvement. Retain eight threads for the measured ASR benefit; do not shorten the speech boundary without pause/cutoff testing. The two-second target remains unmet.
+
+All 40 clips were retained: 986 + 1,003 decoded frames, zero face-count/dark-frame/abrupt-change flags, and nonzero unclipped audio. Manual spot review found blurred hands, close-view mouth artifacts and pronounced double images during approach. A source/render comparison confirms that approach source frames 48 and 50 already contain the double image before MuseTalk. The heuristics missed this defect. Replace/review the prepared source; faster transport cannot repair it. These runs are not full visual, perceptual lip-sync or physical-audio acceptance.
+
+The separate ASR corpus contains 80 utterances across US female, US male and UK female synthetic voices, including 20 with seeded 15dB white noise, plus three non-speech probes. Whole-utterance results on this CPU:
+
+| Recognizer | Threads | Median / p95 | Word error rate |
+|---|---:|---:|---:|
+| Whisper Base English int8 | 4 | 313ms / 330ms | 0% |
+| Whisper Base English int8 | 8 | 268ms / 286ms | 0% |
+| Whisper Tiny English int8 | 4 | 172ms / 180ms | 1.42% |
+| Whisper Tiny English int8 | 8 | 138ms / 144ms | 1.42% |
+| Moonshine Tiny Streaming | Native default | 283ms / 531ms | 3.13% |
+| Moonshine Small Streaming | Native default | 1,089ms / 1,727ms | 1.42% |
+
+No tested recognizer lost a critical negation. Tiny substitutes “T” for “tea”; the scorer also counts UK “favourite” as an error, although that spelling is harmless. Both Moonshine models emitted a word for digital silence when called directly; the application's existing energy guard rejects that silence before inference. Moonshine was tested through its whole-utterance API, without incremental overlap; these results do not reject every possible streaming configuration. The corpus is synthetic English, not a human/accent/noisy-room qualification.
+
+Tiny's official converted checkpoint is pinned in config/local-models.json. Optional Moonshine SDK **0.1.5** and its isolated dependencies are pinned in config/moonshine-benchmark-requirements.txt; downloaded English models use CDN revision **quantized_26_08_21**, with exact URLs and SHA-256 manifests retained locally. The [upstream license](https://github.com/moonshine-ai/moonshine/blob/main/LICENSE) grants the English/streaming models under MIT; other assets and dependencies need their own review. Neither candidate changes the active app model.
+
+Reproduce using fresh labels/directories:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label capture-new
+# In another terminal; set NODE_PATH as in the existing qualification instructions:
+node scripts/qualify_video_call.cjs qualification capture-new --capture
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label capture-new
+.\.venv\Scripts\python.exe scripts/download_local_models.py --models asr-tiny-en
+.\.venv\Scripts\python.exe scripts/benchmark_call_asr.py --label cpu-comparison
+```
+
+For the optional Moonshine comparison, create `.cache/moonshine-env`, install its pinned requirements there, and run `benchmark_moonshine_asr.py --model tiny-streaming --download-only` with that environment's Python, followed by the same command without `--download-only`; repeat for `small-streaming`. It consumes the fixed `asr-calls-cpu-comparison` corpus. Existing results cause an error rather than overwrite evidence. Model discovery/download and benchmarking are separate; no microphone or cloud inference is used.
+
+Finally, 16 bounded synthetic Qwen planner calls compared fresh HTTPS with connection reuse: eight calls each, median **517ms / 458ms**, all four cases passed. The roughly 60ms difference does not resolve the call bottleneck; production transport is unchanged. `benchmark_dialogue_connection.py` records sanitized timing and token usage. Neural rendering, reply preparation and end-of-turn detection remain the main optimization work. ASR alternatives, connection reuse and model installation are separate from provider/content approval.
 
 ### Full ASR-to-video check — September 9
 

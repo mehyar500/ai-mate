@@ -23,7 +23,7 @@ Known actions are closer, farther and wave. Unsupported actions must be explaine
 | Stage | Model / configuration | Where it runs |
 |---|---|---|
 | Dialogue / plan | @cf/qwen/qwen3-30b-a3b-fp8 | Cloudflare, existing API key + email |
-| Recognition | faster-whisper Base English, int8 | Local CPU |
+| Recognition | faster-whisper Base English, int8, eight threads | Local CPU |
 | Speech | Kokoro-82M ONNX v1.0, af_sarah | Local CPU |
 | Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features | Local GPU |
 | Face tracking | YuNet ONNX | Local CPU |
@@ -41,7 +41,7 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | 30-minute suite: 114 non-interrupted responses, p50 1.89s / p95 2.82s; capture and endpoint wait excluded |
+| Fast voice and visual response | Two capture-inclusive suites: end-of-speech p95 3.39s / 3.83s, nine spoken replies each; synthetic MediaStream includes actual recorder/VAD but excludes physical acoustics |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
 | Synchronization within 100ms | 619 browser clock samples: 27.94ms p95 / 31.86ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
@@ -53,6 +53,8 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 Targets remain warm end-of-speech p95 <=2s, at least 20 FPS with a 25 FPS target, bounded A/V skew and no accumulating session delay. Samples are not SLAs. Zero stalls do not establish correct anatomy or arbitrary movement capability.
 
 scripts/serve_voice_video_benchmark.py and scripts/qualify_video_call.cjs run isolated qualification/soak tests on port 8766 using synthetic profiles and WAV inputs. scripts/review_call_frames.py decodes every frame and creates ordered sheets. Frame heuristics flag anomalies; visual review remains necessary.
+
+Pass `qualification run-label --capture` to the browser driver to exercise the actual AudioWorklet and end-of-turn logic. The ordinary mode starts at submission and understates conversational latency. CPU ASR tuning reduced recognition median from 448ms to 407ms in the capture comparison; dialogue variability and video generation still dominate the target miss. The 650ms speech boundary remains unchanged.
 
 ## Next hosted experiment
 

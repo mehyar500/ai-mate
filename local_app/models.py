@@ -39,7 +39,9 @@ class Models:
         session = ort.InferenceSession(str(CACHE / "kokoro-v1.0.onnx"), sess_options=options,
                                        providers=["CPUExecutionProvider"])
         self.tts = Kokoro.from_session(session, str(CACHE / "voices-v1.0.bin"))
-        self.asr = WhisperModel(str(CACHE / "asr-base-en"), device="cpu", compute_type="int8", cpu_threads=4, num_workers=1, local_files_only=True)
+        # Eight CPU threads reduced recognition time on the demo i9 without
+        # changing any word in the 83-fixture comparison. Keep GPU for visuals.
+        self.asr = WhisperModel(str(CACHE / "asr-base-en"), device="cpu", compute_type="int8", cpu_threads=8, num_workers=1, local_files_only=True)
         self.tts.create("Hello there.", voice="af_sarah", speed=1, lang="en-us")
         self.visual = None
 

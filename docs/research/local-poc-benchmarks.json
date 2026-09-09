@@ -11344,5 +11344,377 @@
       "Every-frame heuristics do not establish correct anatomy or natural movement.",
       "One 20-command sequential session, not public load."
     ]
+  },
+  "capture_and_asr_20260909": {
+    "source_commit": "3842fe7",
+    "scope": "Neutral synthetic inputs and isolated memory. Real AudioWorklet, turn detection, ASR, hosted Qwen, Kokoro, MuseTalk and local browser playback. Physical mic/speaker acoustics and mobile/internet delivery excluded.",
+    "decision": "Keep Whisper Base English int8 on CPU; use eight threads for a measured approximately 40ms recognition saving. No proven overall call improvement; end-of-speech p95 target remains unmet. No runtime Moonshine/Tiny/HTTPS adapter switch.",
+    "capture_method": "Virtual getUserMedia MediaStream; original recorder and SpeechTurns. Voice end is the last 128-sample fixture block with RMS >0.009. Playback is the later first audio/video playing event. Nine uninterrupted spoken samples per run; manual interruption excluded.",
+    "capture_trials": {
+      "capture-baseline": {
+        "commands": 20,
+        "elapsed_s": 118.897,
+        "failures": [],
+        "browser_errors": [],
+        "from_send_s": {
+          "samples": 19,
+          "p50": 1.96,
+          "p95": 2.72
+        },
+        "end_of_speech_s": {
+          "samples": 9,
+          "p50": 2.8480666666651815,
+          "p95": 3.3872333333318427
+        },
+        "av_clock_skew_ms": {
+          "samples": 601,
+          "p50": 9.05100000000003,
+          "p95": 24.43299999999993,
+          "max": 30.722000000000026
+        },
+        "clips": 20,
+        "decoded_frames": 986,
+        "heuristic_flagged_frames": 0,
+        "audio_rms_min": 0.07183638215065002,
+        "audio_clipped_fraction_max": 0.0,
+        "source_sha256": {
+          "summary.json": "3d8c75291d5170f849ad5ecc86c603396a772f3bfb7d9490f0aac379a6338c5c",
+          "qualification.json": "e6b9bff07874eabfb54c63505858d71bec617634f462c7f9f8fd347bf4a52f12",
+          "frame-review.json": "8777cc23d2fb30d8be6d60b9015a5c4d44b372a9ee8bb44f8951c05b28dcaa74"
+        }
+      },
+      "capture-asr8": {
+        "commands": 20,
+        "elapsed_s": 120.106,
+        "failures": [],
+        "browser_errors": [],
+        "from_send_s": {
+          "samples": 19,
+          "p50": 1.84,
+          "p95": 3.16
+        },
+        "end_of_speech_s": {
+          "samples": 9,
+          "p50": 3.085466666663691,
+          "p95": 3.83129999999702
+        },
+        "av_clock_skew_ms": {
+          "samples": 622,
+          "p50": 8.566999999999991,
+          "p95": 24.360999999999855,
+          "max": 32.007999999999925
+        },
+        "clips": 20,
+        "decoded_frames": 1003,
+        "heuristic_flagged_frames": 0,
+        "audio_rms_min": 0.07179167121648788,
+        "audio_clipped_fraction_max": 0.0,
+        "source_sha256": {
+          "summary.json": "691005d8bc9d1a565552a90ff55d365ee0dbe32f7139d84bffe32ad0a7c6842a",
+          "qualification.json": "adf5775f0bbf2405edac87311eb5599441fde4acbdae3dccb56fe19d8fc2d412",
+          "frame-review.json": "9dc538b04ba7765c04f90cf898788fcb39e6ac93fdf974312ba75638a92c81f5"
+        }
+      }
+    },
+    "paired_asr_stages": [
+      {
+        "case": "greeting",
+        "asr4_s": 0.465,
+        "asr8_s": 0.414,
+        "same_normalized_words": true,
+        "planner4_s": 0.939,
+        "planner8_s": 1.057
+      },
+      {
+        "case": "memory",
+        "asr4_s": 0.447,
+        "asr8_s": 0.421,
+        "same_normalized_words": true,
+        "planner4_s": 0.816,
+        "planner8_s": 1.489
+      },
+      {
+        "case": "negated_return",
+        "asr4_s": 0.458,
+        "asr8_s": 0.507,
+        "same_normalized_words": true,
+        "planner4_s": 0.595,
+        "planner8_s": 0.586
+      },
+      {
+        "case": "return",
+        "asr4_s": 0.437,
+        "asr8_s": 0.387,
+        "same_normalized_words": true,
+        "planner4_s": 0.001,
+        "planner8_s": 0.001
+      },
+      {
+        "case": "recall",
+        "asr4_s": 0.448,
+        "asr8_s": 0.425,
+        "same_normalized_words": true,
+        "planner4_s": 0.461,
+        "planner8_s": 0.678
+      },
+      {
+        "case": "wave_again",
+        "asr4_s": 0.435,
+        "asr8_s": 0.4,
+        "same_normalized_words": true,
+        "planner4_s": 0.001,
+        "planner8_s": 0.001
+      },
+      {
+        "case": "interrupted_approach",
+        "asr4_s": 0.428,
+        "asr8_s": 0.399,
+        "same_normalized_words": true,
+        "planner4_s": 0.001,
+        "planner8_s": 0.0
+      },
+      {
+        "case": "resume_approach",
+        "asr4_s": 0.43,
+        "asr8_s": 0.39,
+        "same_normalized_words": true,
+        "planner4_s": 0.001,
+        "planner8_s": 0.001
+      },
+      {
+        "case": "return_again",
+        "asr4_s": 0.448,
+        "asr8_s": 0.402,
+        "same_normalized_words": true,
+        "planner4_s": 0.0,
+        "planner8_s": 0.001
+      },
+      {
+        "case": "conversation",
+        "asr4_s": 0.448,
+        "asr8_s": 0.411,
+        "same_normalized_words": true,
+        "planner4_s": 0.549,
+        "planner8_s": 0.817
+      }
+    ],
+    "recognition_median_s": {
+      "4": 0.4475,
+      "8": 0.4065
+    },
+    "asr_comparisons": [
+      {
+        "model": "asr-base-en",
+        "threads": 4,
+        "load_s": 0.27136089999839896,
+        "samples": 83,
+        "median_s": 0.31327430000237655,
+        "p95_s": 0.3298006999975769,
+        "word_error_rate": 0.0,
+        "critical_negation_failures": 0,
+        "non_speech_hallucinations": 0
+      },
+      {
+        "model": "asr-base-en",
+        "threads": 8,
+        "load_s": 0.2252982999998494,
+        "samples": 83,
+        "median_s": 0.2676043000028585,
+        "p95_s": 0.28559279999899445,
+        "word_error_rate": 0.0,
+        "critical_negation_failures": 0,
+        "non_speech_hallucinations": 0
+      },
+      {
+        "model": "asr-tiny-en",
+        "threads": 4,
+        "load_s": 0.15056280000135303,
+        "samples": 83,
+        "median_s": 0.17223285000000033,
+        "p95_s": 0.18024859999422915,
+        "word_error_rate": 0.014204545454545454,
+        "critical_negation_failures": 0,
+        "non_speech_hallucinations": 0
+      },
+      {
+        "model": "asr-tiny-en",
+        "threads": 8,
+        "load_s": 0.14144159999705153,
+        "samples": 83,
+        "median_s": 0.13830679999955464,
+        "p95_s": 0.14441550000628922,
+        "word_error_rate": 0.014204545454545454,
+        "critical_negation_failures": 0,
+        "non_speech_hallucinations": 0
+      },
+      {
+        "model": "tiny-streaming",
+        "sdk": "0.1.5",
+        "load_s": 0.20926409999810858,
+        "samples": 83,
+        "median_s": 0.2832049000026018,
+        "p95_s": 0.5310797999991337,
+        "word_error_rate": 0.03125,
+        "critical_negation_failures": 0,
+        "non_speech_hallucinations": 1,
+        "scope": "Complete synthetic utterances, default native CPU configuration; no streaming overlap, microphone or active app change."
+      },
+      {
+        "model": "small-streaming",
+        "sdk": "0.1.5",
+        "load_s": 0.4484725000002072,
+        "samples": 83,
+        "median_s": 1.0891532999994524,
+        "p95_s": 1.72653430000355,
+        "word_error_rate": 0.014204545454545454,
+        "critical_negation_failures": 0,
+        "non_speech_hallucinations": 1,
+        "scope": "Complete synthetic utterances, default native CPU configuration; no streaming overlap, microphone or active app change."
+      }
+    ],
+    "corpus": {
+      "samples": 83,
+      "spoken": 80,
+      "voices": [
+        "af_sarah",
+        "am_michael",
+        "bf_emma"
+      ],
+      "noise": "20 af_sarah utterances with 15dB seeded white noise, seed 7309",
+      "non_speech": [
+        "digital silence",
+        "low white noise",
+        "440Hz tone"
+      ],
+      "limits": "Synthetic English only. Word scorer folds case, punctuation and apostrophes; British spelling and T/tea count as errors. Moonshine whole-utterance API used directly, bypassing application silence guard and without streaming overlap.",
+      "fixtures_sha256": "a5568d1838865fd204baf35115dfb4b153fa7b3ab177c64bdb70e2bc6121c28c",
+      "whisper_results_sha256": "a614ff626c0e35ba450207ca9865c4e14ad4b8825e06ae8befb5e0571c509e3c"
+    },
+    "optional_models": {
+      "tiny-streaming": {
+        "sdk": "0.1.5",
+        "path": ".cache/moonshine-models/download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21",
+        "sha256": {
+          "adapter.ort": "22ecc949e146c49667fda28d102d4e30749a107dc88a396292aa8f277ef1347c",
+          "cross_kv.ort": "143a36667b8d05fd9d04e8c337b7ee121f37ef299aea6b3d82bdb3d3401950b4",
+          "decoder_kv.ort": "8852553f312adb6c9aa4d17418015049b30f412209ee569d336548c0044627de",
+          "encoder.ort": "a8414e1a5dedf9f2093d7680601dd8a9b0433e7020260eafe0e370ead91134ca",
+          "frontend.model.ort": "5121b561417b638afce0c6c31b760e37c93cf97f80d9b0031aad1fe7b6f25d61",
+          "frontend.weights.ort": "217da24ac6f522ebf02da8ef288e77d1ac68d50d4a6821433182e4fbf4204bbd",
+          "streaming_config.json": "74fe5ddebd63b17caf59e8a3b18c17547ff7bce1642050edbb1c3962674f8950",
+          "tokenizer.bin": "6884b35fd6377d4c4d32336a0bc152f36b64d1e45b6503683cdc238250a8472d"
+        },
+        "model_sources": [
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/adapter.ort",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/cross_kv.ort",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/decoder_kv.ort",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/encoder.ort",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/frontend.model.ort",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/frontend.weights.ort",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/streaming_config.json",
+          "https://download.moonshine.ai/model/tiny-streaming-en/quantized_26_08_21/tokenizer.bin"
+        ],
+        "license_source": "https://github.com/moonshine-ai/moonshine/blob/main/LICENSE"
+      },
+      "small-streaming": {
+        "sdk": "0.1.5",
+        "path": ".cache/moonshine-models/download.moonshine.ai/model/small-streaming-en/quantized_26_08_21",
+        "sha256": {
+          "adapter.ort": "c665f742364febad597cc9ac1e0b341ffbee0e24a1466e2f3bde95e6e4771762",
+          "cross_kv.ort": "e2d3417144e9514055ebfefe8dcc4c0a55a55adcb8530435844c75c53e352bf6",
+          "decoder_kv.ort": "1a05465b1dd955858dfcbee039c0020fb5dd982b0f5094c34e61735d518d771b",
+          "encoder.ort": "2d4d973e91e8aca08c51e7e7efa28a46ab265b63d809d5294d18b86bcd85b993",
+          "frontend.model.ort": "09b1210ae30dc5f0f3e45f0ebab914c254741323114f53fbbe5ae62cca35058f",
+          "frontend.weights.ort": "7ef97521bd4bad3928f5bb6808586f4fcc6e92bd5990394112eed7d4052ec338",
+          "streaming_config.json": "26f02b6afb22d60871a5efd85c3d38e569cc0ddb6c5eb6e93d3260152ae8a47a",
+          "tokenizer.bin": "6884b35fd6377d4c4d32336a0bc152f36b64d1e45b6503683cdc238250a8472d"
+        },
+        "model_sources": [
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/adapter.ort",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/cross_kv.ort",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/decoder_kv.ort",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/encoder.ort",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/frontend.model.ort",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/frontend.weights.ort",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/streaming_config.json",
+          "https://download.moonshine.ai/model/small-streaming-en/quantized_26_08_21/tokenizer.bin"
+        ],
+        "license_source": "https://github.com/moonshine-ai/moonshine/blob/main/LICENSE"
+      }
+    },
+    "connection_comparison": {
+      "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "summary": {
+        "fresh": {
+          "samples": 8,
+          "median_s": 0.5173088000010466,
+          "maximum_s": 0.6055111000023317,
+          "failed_cases": 0,
+          "prompt_tokens": 9930,
+          "completion_tokens": 300,
+          "nominal_list_cost_usd": 0.00060693
+        },
+        "persistent": {
+          "samples": 8,
+          "median_s": 0.4578589000047941,
+          "maximum_s": 0.5175266000005649,
+          "failed_cases": 0,
+          "prompt_tokens": 9930,
+          "completion_tokens": 300,
+          "nominal_list_cost_usd": 0.00060693
+        }
+      },
+      "nominal_rates_usd_per_million": {
+        "input": 0.051,
+        "output": 0.335
+      },
+      "source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "sha256": "11951ca8c46d6c8f34959dce6c042f59d9be144114ff07e14bedaa6aea0d7234",
+      "adopted": false,
+      "scope": "16 bounded sequential synthetic plans, four cases, alternating fresh/persistent order. Small sample, not a tail SLA; nominal cost is not an invoice."
+    },
+    "visual_review": {
+      "heuristic_qualified": false,
+      "manual_scope": "60 frames across three ordered sheets plus four source/render pairs. Does not constitute complete visual or normal-speed/perceptual acceptance.",
+      "observations": [
+        "Wave keeps full-body framing but moving hand remains blurred.",
+        "Near view retains mouth/teeth artifacts.",
+        "Resumed approach has pronounced double images at rendered frames 26 and 28; corresponding prepared source frames 48 and 50 already contain them."
+      ],
+      "comparison_file": "generated/local-app/audit/voice-video-qualification-capture-asr8/approach-source-comparison.jpg",
+      "comparison_sha256": "db56f9a4d257e65547a3fe004e4dcbf923e43db8d65e6b0ab850d4993a180592",
+      "prepared_source_sha256": "c2f3680d505f327ab3763df98b5af3b9e65641bfb808fc574bd1ec6f98d1d21f",
+      "next_action": "Replace and review the approach source; do not label zero face/luma/change heuristic flags as natural motion."
+    },
+    "validation": {
+      "python_unit_tests": 130,
+      "node_unit_tests": 17,
+      "capture_commands_passed": 40,
+      "commands": [
+        {
+          "command": ".\\.venv\\Scripts\\python.exe -m unittest discover -s tests -v",
+          "outcome": "130 passed"
+        },
+        {
+          "command": "node --test tests/call-input.test.mjs tests/media-sync.test.mjs tests/microphone.test.mjs",
+          "outcome": "17 passed"
+        },
+        {
+          "command": ".\\.venv\\Scripts\\python.exe -m compileall -q local_app scripts tests",
+          "outcome": "passed"
+        },
+        {
+          "command": "node --check scripts/qualify_video_call.cjs",
+          "outcome": "passed"
+        },
+        {
+          "command": "git diff --check",
+          "outcome": "passed"
+        }
+      ],
+      "status": "Local revision checks passed. Independent public-release review and staging remain pending.",
+      "rollback": "Revert the code commit and restart after the call. No memory schema, credential or active provider change.",
+      "live_preview": "Existing port 8765 process was preserved; restart between calls to load the ASR thread change."
+    }
   }
 }

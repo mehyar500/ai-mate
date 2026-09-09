@@ -1,0 +1,17 @@
+# Optional isolated ASR experiment; not part of the running app environment.
+# English tiny/small streaming weights are downloaded separately and hashed.
+certifi==2026.7.22
+cffi==2.1.1
+charset-normalizer==3.5.1
+colorama==0.4.6
+filelock==3.32.6
+google-crc32c==1.8.0
+idna==3.19
+moonshine-voice==0.1.5
+numpy==2.5.3
+platformdirs==4.11.8
+pycparser==3.0
+requests==2.34.2
+sounddevice==0.5.6
+tqdm==4.70.0
+urllib3==2.7.0

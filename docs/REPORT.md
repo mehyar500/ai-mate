@@ -18,6 +18,8 @@ Every decoded frame from the five-turn test was checked for face tracking, dark 
 
 A follow-up 20-command run passed and retained all 997 decoded frames. Browser audio/video clock skew was **27.94ms p95 / 31.86ms maximum** across 619 samples. Physical audio and perceptual lip alignment remain unqualified. The Windows disconnect fix passed regression checks; all 130 Python and 17 Node tests pass.
 
+Two newer 20-command runs include the actual browser recorder and endpoint detector, using synthetic input streams. End-of-speech playback p95 was **3.39s / 3.83s** across nine uninterrupted spoken replies per run; both passed all commands without reported stalls. Eight CPU recognition threads save about **40ms** with the same recognized words, but have not demonstrated an overall call improvement. Retain Base English; Tiny and Moonshine candidates did not justify replacement. All **1,989** resulting frames were decoded and checked with the existing limited heuristics. Visual inspection confirmed double-image artifacts already present in the prepared approach source; the zero heuristic flags do not establish visual acceptance.
+
 Exact revisions, benchmark commands, media hashes and continuing results are in [LOCAL_POC](LOCAL_POC.md) and its machine evidence. Keep all private conversation outside benchmark artifacts.
 
 ## What is still missing
