@@ -315,7 +315,7 @@ class PortraitRenderer:
             return self.prediction_decoder(prediction)
         return self.vae.decode(prediction / self.vae.config.scaling_factor).sample
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0, fragment_ms=200, frame_sink=None):
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0, fragment_ms=200, frame_sink=None, settle_tail=False):
         if fragment_ms not in {100,200}:
             raise ValueError('Streaming fragments must be 100 or 200 milliseconds.')
         if streaming:
@@ -337,6 +337,11 @@ class PortraitRenderer:
             common = math.gcd(rate, 16000)
             data = resample_poly(data, 16000 // common, rate // common)
         speech_duration = len(data) / 16000
+        if settle_tail:
+            if motion_path is not None:
+                raise ValueError('Neutral settling is limited to a held portrait.')
+            data = np.pad(data, (0, 3200))
+
         if motion_path:
             probe = cv.VideoCapture(str(motion_path))
             try:
@@ -366,7 +371,7 @@ class PortraitRenderer:
         command = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24",
                    "-s", f"{width}x{height}", "-r", str(fps), "-i", "pipe:0", "-i", str(audio_path),
                    *encoding, "-pix_fmt", "yuv420p",
-                   "-c:a", "aac", *(["-af", "apad", "-t", str(nframes/fps)] if motion_path else []),
+                   "-c:a", "aac", *(["-af", "apad", "-t", str(nframes/fps)] if motion_path or settle_tail else []),
                    "-shortest", *delivery, str(destination)]
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE,
                                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
@@ -418,6 +423,12 @@ class PortraitRenderer:
                         result = frame.copy()
                         patch = cv.resize(img[:, :, ::-1], (x2-x1, y2-y1), interpolation=cv.INTER_LANCZOS4)
                         result[y1:y2, x1:x2] = (patch * mask + result[y1:y2, x1:x2] * (1-mask)).astype("uint8")
+                        if settle_tail:
+                            # After speech ends, restore the same source pose over
+                            # 200ms instead of freezing a synthesized open mouth.
+                            weight = min(1.0, max(0.0, ((offset+local_index+1)/fps-speech_duration)/.2))
+                            if weight:
+                                result = cv.addWeighted(result, 1-weight, frame, weight, 0)
                         if frame_sink is not None:
                             # A transport may consume the picture before MP4 fragment
                             # completion. Never expose mutable cached/source frames.

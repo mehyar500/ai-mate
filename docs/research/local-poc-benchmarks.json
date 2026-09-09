@@ -24345,5 +24345,33 @@
         "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
       }
     }
+  },
+  "neutral_tail_20260909": {
+    "scope": "Real GPU held portrait render, one retained WAV; final frame visually inspected. Browser end transition not yet reviewed.",
+    "metrics": {
+      "render_s": 0.8607679999986431,
+      "frames": 30,
+      "fps": 34.852596750863526,
+      "duration_s": 1.4806875,
+      "speech_duration_s": 1.2806875,
+      "lip_sync_frames": 30,
+      "resolution": "384x576",
+      "face_region": "256x256",
+      "torch_peak_allocated_mib": 1961.25146484375,
+      "torch_peak_reserved_mib": 2086.0,
+      "audio_features_s": 0.03868779999902472,
+      "neural_s": 0.7879108999914024,
+      "composite_pipe_s": 0.02852979997987859,
+      "encoder": "libx264",
+      "decoder": "tensorrt",
+      "stream_fragment_ms": 200,
+      "body_motion": false,
+      "face_tracking_s": 3.00002284348011e-07,
+      "face_encode_stride": null,
+      "prepared_appearance_cache_hit": false,
+      "prepared_face_ambiguities_resolved": 0,
+      "motion_start_s": 0,
+      "final_frame_matches_source": true
+    }
   }
 }

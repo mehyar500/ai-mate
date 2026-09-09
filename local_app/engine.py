@@ -460,6 +460,7 @@ class CompanionEngine:
                                 check_cancel(event)
                                 metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
                                                           scene, streaming=True, **({'frame_sink': sink} if sink else {}),
+                                                          **({'settle_tail': True} if hold_candidate and not motion_path else {}),
                                                           **({"motion_path":motion_path, "loop_motion":prepared_idle,
                                                               "motion_start_s":listening_offset if prepared_idle else motion_start,
                                                               "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
