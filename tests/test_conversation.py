@@ -124,6 +124,32 @@ class PlanTests(unittest.TestCase):
         with patch.dict(os.environ,{"AI_MATE_LLM_PROVIDER":"ollama","AI_MATE_LLM_MODEL":""}):
             self.assertEqual(Conversation("local").provider,"ollama")
 
+    def test_suppressed_movement_never_claims_success_in_text_or_voice(self):
+        for mode in ['text','voice']:
+            for user in ['Wave hello.', 'Could you come closer?', 'Would you step back?']:
+                for action in ['none','wave']:
+                    data={'reply':'I did that.','action':action,'scene':'fullbody','facts':[]}
+                    plan=validate_plan(data,user,mode,'fullbody',['fullbody'])
+                    self.assertEqual(plan['action'],'none')
+                    self.assertEqual(plan['presentation'],mode)
+                    self.assertIn('Switch to Video',plan['reply'])
+
+    def test_nonvisual_motion_hint_preserves_negation_and_conversation(self):
+        for user in ['Please do not. Wave.', "Don't come closer."]:
+            data={'reply':'I did that.','action':'wave' if 'Wave' in user else 'closer','scene':'fullbody','facts':[]}
+            plan=validate_plan(data,user,'voice','fullbody',['fullbody'])
+            self.assertEqual(plan['reply'],"I'll keep still.")
+        for user in ['Why do people wave hello?', 'Can you describe a wave?', 'I went for a walk.']:
+            plan=validate_plan({'reply':'A friendly gesture.','action':'none'},user,'text','fullbody',['fullbody'])
+            self.assertEqual(plan['reply'],'A friendly gesture.')
+
+    def test_sparse_plan_keeps_current_state_and_bounded_optional_outputs(self):
+        plan=validate_plan({'reply':'Hello'},'Hello','video','fullbody',['fullbody'])
+        self.assertEqual(plan,{'reply':'Hello','presentation':'video','scene':'fullbody','action':'none','facts':[]})
+        plan=validate_plan({'reply':'Cedar, understood.','facts':[{'key':'dog_name','quote':'Cedar'}]},
+                           'My dog is named Cedar.','video','fullbody',['fullbody'])
+        self.assertEqual(plan['facts'],[{'key':'dog_name','quote':'Cedar'}])
+
     def test_cloudflare_global_key_flow_keeps_credentials_out_of_body(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory)/'.env'

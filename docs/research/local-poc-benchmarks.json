@@ -20175,5 +20175,221 @@
       "Physical audio, normal-speed perceptual acceptance, real mobile and public-network calling remain unqualified.",
       "Commercial model/host/processor eligibility, public access controls and independent security/correctness review remain separate."
     ]
+  },
+  "mode_honesty_and_planner_trials_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "341aa93dde1fa6b82e00254186a5da6ceaf4319e",
+    "risk_class": "R1",
+    "selected_change": "Text/Voice suppressing a supported visual action now requests Video instead of claiming the movement; explicit negation and discussion keep normal replies.",
+    "scope": [
+      "local_app/conversation.py",
+      "tests/test_conversation.py",
+      "scripts/benchmark_compact_planner.py",
+      "scripts/qualify_call_modes.cjs",
+      "docs/BUILD.md",
+      "docs/LOCAL_POC.md",
+      "docs/REPORT.md",
+      "docs/research/local-poc-benchmarks.json"
+    ],
+    "experiments": [
+      {
+        "artifact": "generated/local-app/audit/compact-planner-initial.json",
+        "sha256": "aad3e88058095d6588f3b398efecb2bf29734852848cfa11153fd492d5f34031",
+        "complete": true,
+        "groups": {
+          "baseline": {
+            "attempted": 36,
+            "validated": 36,
+            "passed": 32,
+            "median_complete_s": 0.5876242000085767
+          },
+          "compact": {
+            "attempted": 36,
+            "validated": 36,
+            "passed": 30,
+            "median_complete_s": 0.42396875000122236
+          }
+        }
+      },
+      {
+        "artifact": "generated/local-app/audit/compact-planner-corrected.json",
+        "sha256": "35c89356a169ac89a21450595826df4997afd3e249e4e18c22cbe7e71a46afcc",
+        "complete": false,
+        "groups": {
+          "baseline": {
+            "attempted": 15,
+            "validated": 15,
+            "passed": 15,
+            "median_complete_s": 0.6096163999900455
+          },
+          "compact": {
+            "attempted": 16,
+            "validated": 15,
+            "passed": 14,
+            "median_complete_s": 0.43674049999390263
+          }
+        }
+      },
+      {
+        "artifact": "generated/local-app/audit/compact-planner-text-debug.json",
+        "sha256": "bac4509a5734537e1fbdbea6027c681bdd5bc7f527e4e7e4b202c8b63b5b86d1",
+        "complete": true,
+        "groups": {
+          "baseline": {
+            "attempted": 1,
+            "validated": 1,
+            "passed": 1,
+            "median_complete_s": 0.5515018000005512
+          },
+          "compact": {
+            "attempted": 1,
+            "validated": 1,
+            "passed": 1,
+            "median_complete_s": 0.393465399989509
+          }
+        }
+      },
+      {
+        "artifact": "generated/local-app/audit/compact-planner-final-candidate.json",
+        "sha256": "86bd6f256695402cbef01791840de56ce7930e58b79aefe4ef2c3a33e315c564",
+        "complete": false,
+        "groups": {
+          "baseline": {
+            "attempted": 1,
+            "validated": 1,
+            "passed": 1,
+            "median_complete_s": 0.6584338000102434
+          },
+          "compact": {
+            "attempted": 2,
+            "validated": 1,
+            "passed": 1,
+            "median_complete_s": 0.4029389999923296
+          }
+        }
+      },
+      {
+        "artifact": "generated/local-app/audit/compact-planner-bounded-complete.json",
+        "sha256": "69b07c38681952055b0e0676572ebf1e7d35570eda9c1388b951e1ab3cb573f6",
+        "complete": true,
+        "groups": {
+          "baseline": {
+            "attempted": 36,
+            "validated": 36,
+            "passed": 36,
+            "median_complete_s": 0.5363803500003996
+          },
+          "compact": {
+            "attempted": 36,
+            "validated": 36,
+            "passed": 35,
+            "median_complete_s": 0.43268389999866486
+          }
+        }
+      },
+      {
+        "artifact": "generated/local-app/audit/compact-planner-sparse-protocol.json",
+        "sha256": "130a6e38e9883f5a0a69dc26f7e40f0dfc33dbead7e0fcbb128ced3fb0fa64e5",
+        "complete": true,
+        "groups": {
+          "baseline": {
+            "attempted": 36,
+            "validated": 36,
+            "passed": 36,
+            "median_complete_s": 0.6069644499948481
+          },
+          "sparse": {
+            "attempted": 36,
+            "validated": 36,
+            "passed": 34,
+            "median_complete_s": 0.4782892000002903
+          }
+        }
+      }
+    ],
+    "known_nominal_token_cost_usd": 0.017735147999999996,
+    "unknown_usage_requests": 1,
+    "decision": "Keep original planner prompt. Compact output confused naming direction; sparse output lost user fact corrections. Preserve failed and partial trials.",
+    "mode_e2e": {
+      "artifact": "generated/local-app/audit/voice-video-qualification-mode-honesty/mode-review.json",
+      "complete": true,
+      "cases": [
+        "text_movement",
+        "voice_movement",
+        "text_during_call",
+        "voice_negation",
+        "video_movement",
+        "text_movement_during_video"
+      ],
+      "real_models": true,
+      "synthetic_microphone": true,
+      "physical_audio_verified": false,
+      "audio_review": {
+        "scope": "Decoded synthetic WAV signal only; no physical speaker or perceptual acceptance.",
+        "audio": [
+          {
+            "case": "voice_movement",
+            "frames": 62208,
+            "sample_rate": 24000,
+            "seconds": 2.592,
+            "rms": 0.07604315131902695,
+            "peak": 0.541778564453125,
+            "clipped_fraction": 0.0,
+            "sha256": "45c7e8d561185416ebbabda80daa07d362231646a133ad66012a5ceee8f9d5a3"
+          },
+          {
+            "case": "voice_negation",
+            "frames": 38895,
+            "sample_rate": 24000,
+            "seconds": 1.620625,
+            "rms": 0.07775353640317917,
+            "peak": 0.634429931640625,
+            "clipped_fraction": 0.0,
+            "sha256": "bf2c87e6d09f4221b4e81955d349bda4bd73fabe807a6fda9f7a1ae9c8ef7464"
+          },
+          {
+            "case": "video_movement",
+            "frames": 23056,
+            "sample_rate": 24000,
+            "seconds": 0.9606666666666667,
+            "rms": 0.07994375377893448,
+            "peak": 0.46673583984375,
+            "clipped_fraction": 0.0,
+            "sha256": "7fda5f93dd5e91a3187cdcda8637b0b2cd549e0cf3507a957d0a27128828ea47"
+          }
+        ]
+      },
+      "video_review": {
+        "frames_analyzed": 40,
+        "frames_visually_inspected": 40,
+        "heuristic_flags": 0,
+        "normal_speed_perceptual_acceptance": false,
+        "remaining_defects": [
+          "hand/finger blur",
+          "soft mouth detail"
+        ]
+      }
+    },
+    "preview": {
+      "ready": true,
+      "busy": false,
+      "startup_s": 30.878,
+      "memory_unchanged": true,
+      "error": false
+    },
+    "checks": {
+      "python_unittest_discover": {
+        "passed": 195,
+        "seconds": 3.333
+      },
+      "node_tests": {
+        "passed": 32
+      },
+      "compileall": "passed",
+      "node_syntax": "passed",
+      "git_diff_check": "passed"
+    },
+    "rollback": "Revert this code commit; no memory schema or data migration. Private memory preserved.",
+    "remaining": "Original goal remains incomplete: actual arbitrary body actions, perceptual call quality, p95 <=2s, physical audio/mobile and public commercial qualification."
   }
 }

@@ -8,6 +8,8 @@ The RTX 4060 Ti 16GB / 48GB RAM PC runs Text, Voice and Video through one engine
 
 Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` plans conversation. Whisper Base English and Kokoro `af_sarah` use the local GPU; MuseTalk uses the reviewed TensorRT decoder. No new API key or GPU rental was needed.
 
+Text and Voice now explain that body movement needs Video instead of claiming a suppressed action happened. Six real-engine/browser checks passed across all three modes, including navigation away from an active call and back. Three generated WAVs were nonzero/unclipped; all 40 new video frames were analyzed and visually inspected. The preview restarted in 30.878s with saved memory unchanged.
+
 The current six-source configuration completed **30 minutes / 132 commands**. There were no failed commands, page errors or reported reply-buffer stalls. The call remained connected; cycle speech medians stayed between 1.77 and 1.88 seconds.
 
 | Current sustained test | Measured result |
@@ -24,7 +26,7 @@ All **132 clips / 5,716 frames** received face, brightness, frame-change and dec
 
 A new pinned, offline body diagnostic evaluated all 5,716 sustained-call frames and all 948 frames of the prior short qualification. It retained 96 and 16 uncertain frames respectively. All flags and nearby hand frames were visually inspected: 114 sustained-call frames and 19 short-call frames. One figure remains visible where the detector reports two people; the lowering hand remains blurred. Black-frame and left/right-mirror controls passed. Its fixed skeleton cannot certify anatomy or count extra limbs.
 
-**192 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) is the consolidated setup/test runbook; machine evidence preserves earlier successes and failures. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
+**195 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) is the consolidated setup/test runbook; machine evidence preserves earlier successes and failures. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
 
 ## What is still missing
 
@@ -52,5 +54,7 @@ The optional technical pilot is approximately **$28.93 / $14.23 / $14.23** over 
 Under explicit cost/fee assumptions, test video packs at **$5.99/30 minutes** and **$9.99/60 minutes**, targeting roughly 52–53% contribution before fixed expenses. Validate willingness to pay and actual fulfillment costs; no guaranteed first-month profit.
 
 CCBill is the first adult-business processor to request a quote from. Its published US/Canada annual card registration alone totals **$1,950**; actual AI-service acceptance, processing fees, reserves and payout timing require underwriting. No verified zero-upfront paid launch exists in this plan. Segpay is an alternative with specific AI-site requirements. [ECONOMICS](ECONOMICS.md) provides sources, formulas, utilization sensitivity and limits.
+
+Shorter planner prompts and sparse JSON reduced component latency but lost name direction or fact updates. They were rejected; the original prompt remains selected. LOCAL_POC records the bounded comparisons.
 
 Next: reduce endpoint/dialogue/speech delay, improve close-view quality, test actual audio/mobile behavior and compare the same workload on the capped rental if the founder elects to provision it. Keep five core documents. Founder owns provider/processor/jurisdiction decisions; independent security/correctness review and staging remain pending before public release. Work on main as authorized and preserve secrets and local memory.

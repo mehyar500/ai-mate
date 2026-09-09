@@ -134,6 +134,12 @@ The new OpenCV Zoo MediaPipe [person](https://github.com/opencv/opencv_zoo/tree/
 .\.venv\Scripts\python.exe scripts/review_body_motion.py --source voice-video-qualification-new-call --label new-body
 ```
 
+`qualify_call_modes.cjs` uses the same isolated qualification server with a fresh label, instead of the video-suite driver. Run `node scripts/qualify_call_modes.cjs new-modes` after starting the server with `--label new-modes`. It exercises six actual Text/Voice/Video turns, call navigation and browser playback using a silent synthetic microphone. Body commands in Text/Voice must request Video mode; negative commands must not. The validated `mode-honesty` run passed all six, with three nonzero/unclipped WAVs and all 40 generated video frames analyzed/visually inspected. Physical audio remains unverified.
+
+Planner experiments use `scripts/benchmark_compact_planner.py --label fresh-label --variant compact --repeats 2`; `--variant sparse` preserves the original instructions and changes output defaults. The fixed baseline is read as literal text from commit `341aa93` (that commit must be available locally), never executed. Runs have at most 72 synthetic requests, no request retries, a $0.10 nominal reservation and stop after three request/adapter errors. Run outside call timing. No variant is selected in the app.
+
+The complete comparison after the movement fix measured compact versus baseline at 0.433/0.536s median, 36 samples each; compact confused naming direction once. Sparse output measured 0.478/0.607s, also 36 each, but lost two fact corrections. Earlier failed/partial trials remain retained, including one adapter error and one timeout. Across all six trials, 252 scheduled requests had $0.017735 of known nominal token cost; one timeout's usage is unknown. Prices use the [September 9 model page](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), not an invoice. The original prompt remains selected.
+
 Additional focused checks: `review_paused_voice.cjs` exercises corrected/negated resumed utterances; `review_voice_interruption.cjs` checks interruption continuity with synthetic capture. Their scope excludes physical echo. Existing exact commands and prerequisites remain in the scripts and historical evidence.
 
 ## Current evidence and decisions
@@ -142,7 +148,7 @@ Additional focused checks: `review_paused_voice.cjs` exercises corrected/negated
 |---|---|
 | `voice-video-qualification-near-wave` | 22/22 commands; speech-end median/p95 1.556/2.277s, ten samples. 948 frames analyzed, 137 visually inspected. One palm detection flag; no functional/page errors or reported reply stalls |
 | Same short call playback | Approximately 19.96 FPS replies / 24.13 FPS listening. No continuous gap over 250ms; A/V clock skew 21.59ms p95, 664 samples. Three SyncNet clips estimated 0/-40/-40ms with controls passing |
-| Preview after near-wave promotion | Ready in 30.883s, six sources; private memory byte-identical |
+| Preview after Text/Voice movement fix | Ready in 30.878s, six sources; private memory byte-identical |
 | Earlier `voice-video-soak-speech-arena` | 30 minutes / 120 commands without failures. Speech-end 2.043/2.500s, 54 samples. 5,945 frames analyzed. Predates shortened base wave, near wave and new tracking |
 | `voice-video-soak-near-wave` | 30 minutes / 132 commands, no failures. Speech-end midpoint median/p95 1.773/2.530s, 60 samples. Approximately 19.93/24.07 FPS reply/listening; no continuous gap >250ms. A/V skew 24.11ms p95, 4,003 samples. Six SyncNet estimates 0/-40ms with controls passing; all 5,716 frames analyzed |
 

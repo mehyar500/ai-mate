@@ -156,6 +156,14 @@ def validate_plan(data, user, mode, scene, available):
     if mode in {"text", "voice", "video"}:
         presentation = mode  # The selected call mode is a user control, not a model tool.
         if mode != "video":
+            # A suppressed visual action must not retain a claim that it happened.
+            # Resolve only whole, unambiguous commands; questions ABOUT an action
+            # and explicit negations keep the ordinary conversational reply.
+            request = re.sub(r'^(?:can|could|would|will) you\s+', '', user.strip(), flags=re.I)
+            request = request.removesuffix('?')
+            supported_request = direct_motion_plan(request, available)
+            if not motion_veto and (action != 'none' or supported_request):
+                reply = "Switch to Video so I can try that movement."
             action, chosen = "none", scene
     result = {"reply": reply, "presentation": presentation, "scene": chosen, "action": action, "facts": facts}
     if motion_veto:
