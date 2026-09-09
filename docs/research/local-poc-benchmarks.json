@@ -24731,5 +24731,15 @@
     "review_scope": "12 sampled frames, no normal-speed/audio review",
     "observed": "Turns sideways then faces camera again around sampled frame192 after prompt switch near125. About 2.8 generated seconds delay; not wall-clock response measurement. Ghosting, camera/background and body position drift remain.",
     "decision": "Longer allowance produces return in this seed. Revise earlier inference: delayed correction is possible, but quality and live speed still fail. No promotion."
+  },
+  "longlive_short_context_20260909": {
+    "artifact": "generated/local-app/audit/longlive2-turn-return-eight-context16/benchmark.json",
+    "warm_first_chunk_s": 2.37577,
+    "warm_inference_s": 20.12379,
+    "frames": 253,
+    "real_time_factor": 1.90898,
+    "peak_allocated_bytes": 9563426304,
+    "review": "12 sampled warm-run frames: severe scene discontinuity, invented chairs, ghosting, orientation jumps. Rejected despite lower compute.",
+    "decision": "Do not shorten attention window to16 in live renderer; visual continuity fails. No promoted change or rental."
   }
 }
