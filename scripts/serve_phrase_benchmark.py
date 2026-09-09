@@ -24,7 +24,12 @@ from scripts.benchmark_cloud_speech import CASES
 class SyntheticModels(Models):
     action = 'none'
     interruption = False
+    voice_interruption = False
     def plan(self, snapshot, text, mode, scene, available, event):
+        if self.voice_interruption:
+            action = 'closer' if 'closer' in text.lower() else 'farther' if 'back' in text.lower() else 'none'
+            reply = CASES['long'] if action == 'closer' else "Your dog's name is Maple." if 'dog' in text.lower() else 'I will step back.'
+            return {'reply': reply, 'presentation': mode, 'scene': 'fullbody', 'action': action, 'facts': []}
         if self.interruption:
             action = 'closer' if text == 'approach' else 'farther' if text == 'return' else 'none'
             reply = CASES['long'] if action == 'closer' else 'I am right here. The garden is peaceful.'
@@ -33,6 +38,8 @@ class SyntheticModels(Models):
                 'action': self.action, 'facts': []}
 
     def transcribe(self, raw):
+        if self.voice_interruption:
+            return super().transcribe(raw)
         if self.interruption:
             return {b'\x01': 'approach', b'\x02': 'hello', b'\x03': 'return'}[raw]
         return 'Please count from one to twenty-five.'
@@ -44,6 +51,7 @@ def main():
     parser.add_argument('--batch-size', type=int, choices=[4, 8, 16], default=8)
     parser.add_argument('--action', choices=['none', 'closer'], default='none')
     parser.add_argument('--interruption', action='store_true')
+    parser.add_argument('--voice-interruption', action='store_true')
     parser.add_argument('--quality-review', action='store_true')
     parser.add_argument('--prewarm-reviewed', action='store_true')
     parser.add_argument('--prime-reviewed', action='store_true')
@@ -56,6 +64,10 @@ def main():
         label += '-approach'
     if args.interruption:
         label = 'interruption' + ('-middle' if args.trial == 'middle' else '')
+    if args.voice_interruption:
+        if not args.interruption:
+            parser.error('Voice interruption requires the isolated interruption scenario.')
+        label += '-voice'
     if args.quality_review:
         label += '-quality'
     if args.prewarm_reviewed:
@@ -79,6 +91,13 @@ def main():
     app.models = SyntheticModels()
     app.models.action = args.action
     app.models.interruption = args.interruption
+    app.models.voice_interruption = args.voice_interruption
+    if args.voice_interruption:
+        app.store.remember('My dog is named Maple.')
+        for case, prompt in [('approach', 'Please come closer and count from one to twenty-five.'),
+                             ('interrupt', 'Actually, tell me the name of my dog.'),
+                             ('return', 'Please step back.')]:
+            app.models.speech(prompt, folder/(case+'.wav'))
     renderer = app.models.load_visual()
     renderer.render = partial(renderer.render, batch_size=args.batch_size)
     audio = folder/'warm.wav'

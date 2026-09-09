@@ -10164,5 +10164,36 @@
       "compile": "passed",
       "diff_check": "passed"
     }
+  },
+  "voice_interruption": {
+    "source_commit": "f4b6a84",
+    "measured_at": "2026-09-09T01:04:07.956000+00:00",
+    "scope": "Synthetic PCM through real browser microphone/VAD and local ASR. Simulated echoCancellation setting; deterministic planner. Actual GPU media, playback and pose-preserving voice cancellation. No physical microphone or acoustic echo test.",
+    "fixture_to_cancel_response_ms": 445,
+    "pose_capture_ms": 75,
+    "stopped_playback_s": 0.992675,
+    "held_vs_saved_mae_0_255": 1.3413492838541667,
+    "next_transcript": "Actually, tell me the name of my dog.",
+    "next_uses_stopped_pose": true,
+    "return_pose": "base",
+    "audio_submissions": 3,
+    "first_job_state": "cancelled",
+    "page_errors": [],
+    "cloud_requests": 0,
+    "new_model_downloads": 0,
+    "checks": {
+      "python": 124,
+      "node": 16,
+      "compile": "passed",
+      "synthetic_voice_video_browser": "passed"
+    },
+    "limitations": [
+      "One isolated trial, not p95. Fixture leading silence is included in the 445ms observation.",
+      "Reported echo cancellation is simulated; real speaker echo and mobile devices are unqualified.",
+      "The planner is deterministic. The trial does not measure hosted dialogue latency.",
+      "The body uses reviewed footage; source blur and arbitrary-action limitations remain.",
+      "Short-word fallback and notice priority were added after this GPU trial and covered by unit/synthetic UI checks.",
+      "Independent security/correctness review, staging and public release remain pending."
+    ]
   }
 }

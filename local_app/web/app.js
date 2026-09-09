@@ -1,5 +1,6 @@
 import {synchronizeSpeech, streamingSource} from './media-sync.mjs';
 import {Microphone} from './microphone.mjs';
+import {CallInput} from './call-input.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
@@ -30,8 +31,16 @@ function updateCaptions(){
   $('captions').hidden=viewMode==='text'||!$('show-captions').checked||!captionText;
 }
 $('show-captions').addEventListener('change',updateCaptions);
-const microphone=new Microphone({onTurn:raw=>submit('',raw,replyMode),canListen:()=>ready&&!busy&&!stopping&&!playing&&replyMode!=='text'&&performance.now()>listenAfter,
-  onState:state=>{if(micState!==state){micState=state;controls();}}});
+const callInput=new CallInput({
+  state:()=>({stamp:callRequest+':'+microphone.generation+':'+replyMode,
+    canInterrupt:ready&&microphone.enabled&&microphone.echoCancellation&&playing&&!stopping,
+    busy:busy||stopping||submitting}),
+  stop:()=>interrupt(),submit:raw=>submit('',raw,replyMode),onError:error=>notice(error.message,true)
+});
+const microphone=new Microphone({onTurn:raw=>callInput.turn(raw),onSpeech:()=>callInput.speech(),
+  canListen:()=>ready&&replyMode!=='text'&&(callInput.capturing()||
+    (!stopping&&!submitting&&((playing&&microphone.echoCancellation)||(!busy&&!playing&&performance.now()>listenAfter)))),
+  onState:state=>{if(state==='off')callInput.reset();if(micState!==state){micState=state;controls();}}});
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
 let partEndedAt=null,phraseGapSeconds=0;
 const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
@@ -41,7 +50,7 @@ function controls(){
   $("stop").hidden=viewMode==='text'||(!busy&&!playing);
   $("reset").disabled=submitting;
   const listening={off:'Microphone muted',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Mira is replying',listening:'Listening',disconnected:'Microphone disconnected'};
-  $("call-state").textContent=playing?(firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
+  $("call-state").textContent=replyMode!=='text'&&micState==='hearing'?'Hearing you…':playing?(firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
   $("history-toggle").hidden=true;
   document.querySelector('.conversation').dataset.mode=viewMode;
   for(const mode of ['text','voice','video'])$('mode-'+mode).setAttribute('aria-pressed',String(viewMode===mode));
@@ -236,20 +245,22 @@ async function follow(key,node){
       const job=await api("/api/jobs/"+key);if(active!==key)return;
       if(job.user)node.textContent=job.user;
       if(!pendingStop&&job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
-      if(job.action){setAction(job.action);motionRequested=job.action!=='none';}
+      if(!pendingStop&&job.action){setAction(job.action);motionRequested=job.action!=='none';}
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
       if(job.state==='done'&&job.message&&!shownMessage){bubble(job.message,'assistant sent-message');shownMessage=true;if(viewMode!=='text')unread++;controls();}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
       while(!pendingStop&&consumed<job.chunks.length){queue.push({...job.chunks[consumed++],jobId:key});drain();}
-      if(job.state==="thinking")notice("Mira is thinking…");
-      else if(job.state==="transcribing")notice("Listening to your message…");
-      else if(job.state==="rendering"&&!playing)notice("Connecting the picture…");
-      else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
+      if(!pendingStop){
+        if(job.state==="thinking")notice("Mira is thinking…");
+        else if(job.state==="transcribing")notice("Listening to your message…");
+        else if(job.state==="rendering"&&!playing)notice("Connecting the picture…");
+        else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
+      }
       if(["done","failed","cancelled"].includes(job.state)){
         if(!pendingStop&&job.state==='done'&&job.presentation==='video'){nextIdleURL=job.idle_video||null;if(!playing&&!queue.length)settleIdle();}
         if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Please speak again.");}
         else if(job.state==="failed"){notice(job.error,true);if(!replyNode)bubble("That reply couldn't finish. Please try again.","assistant");}
-        else if(job.state==="cancelled")notice(replyMode==='text'?"Stopped. You can send another message.":"Stopped. You can speak now.");
+        else if(job.state==="cancelled")notice(callInput.capturing()?'Listening…':replyMode==='text'?"Stopped. You can send another message.":"Stopped. You can speak now.");
         else if($("resume").hidden){notice(job.remembered?.length?"Saved what you shared. You can review it in Memory.":"");}
         lastServerSeconds=job.metrics.total_s??null;updateMetrics();
         break;
@@ -297,8 +308,8 @@ async function interrupt(){
       const result=await api('/api/cancel',position||{id:key});
       if(mine!==epoch)return;
       if(result.pose_preserved){idleURL=result.idle_video||null;idleSuppressed=!idleURL;}
-      notice(result.warning||'Reply stopped. You can speak now.',Boolean(result.warning));
-    }catch(error){if(mine===epoch)notice(error.message,true);}
+      notice(result.warning||(callInput.capturing()?'Listening…':'Reply stopped. You can speak now.'),Boolean(result.warning));
+    }catch(error){if(mine===epoch)notice(error.message,true);return false;}
     finally{stopping=false;listenAfter=performance.now()+450;controls();}
   }
   else notice(replyMode==='text'?"Reply stopped. Send another message when you're ready.":"Reply stopped. You can speak now.");
