@@ -15,6 +15,13 @@ import time
 from .models import CACHE, ROOT, check_cancel
 
 
+def audio_left_padding(fps):
+    """MuseTalk v1.5 uses two video frames of Whisper context, rounded up."""
+    if not math.isfinite(fps) or not 1 <= fps <= 60:
+        raise ValueError('Invalid video frame rate.')
+    return 2 * math.ceil(50 / fps)
+
+
 def motion_duration(speech_seconds, source_frames, source_fps, *, loop=False, start_s=0):
     """Ambient footage follows speech; deliberate gestures must finish."""
     if not math.isfinite(speech_seconds) or not 0 < speech_seconds <= 30:
@@ -30,7 +37,10 @@ def motion_duration(speech_seconds, source_frames, source_fps, *, loop=False, st
 
 
 class PortraitRenderer:
-    def __init__(self):
+    def __init__(self, face_shift=-.10):
+        if not math.isfinite(face_shift) or not -.2 <= face_shift <= .05:
+            raise ValueError('Face crop adjustment is out of range.')
+        self.face_shift = face_shift
         import cv2
         import numpy as np
         import torch
@@ -67,7 +77,7 @@ class PortraitRenderer:
 
     def prepare(self, scene="mira", reference_path=None):
         path = Path(reference_path) if reference_path else ROOT / "generated/local-app" / (scene + ".png")
-        reference_key = (str(path), path.stat().st_mtime_ns)
+        reference_key = (str(path), path.stat().st_mtime_ns, self.face_shift)
         if self.portrait is not None and getattr(self, "reference_key", None) == reference_key:
             return
         cv, np, torch = self.cv, self.np, self.torch
@@ -87,7 +97,7 @@ class PortraitRenderer:
         if crop_config.exists() and "crop" in json.loads(crop_config.read_text()):
             box = json.loads(crop_config.read_text())["crop"]
         else:
-            mid_face = nose_y - .04*h
+            mid_face = nose_y + self.face_shift*h
             box = [max(0, int(x)), max(0, int(2*mid_face-(y+h))), min(frame.shape[1], int(x+w)), min(frame.shape[0], int(y+h+10))]
         x1, y1, x2, y2 = map(int, box)
         if not (0 <= x1 < x2 <= frame.shape[1] and 0 <= y1 < y2 <= frame.shape[0]):
@@ -139,7 +149,7 @@ class PortraitRenderer:
         check_cancel(cancel)
         if not hasattr(self, '_motion_cache'):
             self._motion_cache = OrderedDict()
-        key = hashlib.sha256(path.read_bytes()).digest() if reuse and path.stat().st_size <= 40_000_000 else None
+        key = (hashlib.sha256(path.read_bytes()).digest(), getattr(self, 'face_shift', -.10)) if reuse and path.stat().st_size <= 40_000_000 else None
         cached = self._motion_cache.get(key) if key else None
         self.motion_cache_hit = cached is not None
         if cached:
@@ -186,7 +196,7 @@ class PortraitRenderer:
                     raise RuntimeError("The generated movement lost its clear face. Please retry the movement.")
                 face = faces[0]
                 x, y, w, h = map(float, face[:4])
-                mid = float(face[9]) - .04*h
+                mid = float(face[9]) + getattr(self, 'face_shift', -.10)*h
                 x1, y1 = max(0, int(x)), max(0, int(2*mid-(y+h)))
                 x2, y2 = min(width, int(x+w)), min(height, int(y+h+.12*h))
                 if x2 <= x1 or y2 <= y1:
@@ -261,7 +271,7 @@ class PortraitRenderer:
             with torch.inference_mode():
                 hidden = torch.stack(self.whisper(inputs, output_hidden_states=True).hidden_states, dim=2)
                 hidden = hidden[:, :max(1, int(len(data) / 16000 * 50))]
-                hidden = torch.cat((torch.zeros_like(hidden[:, :4]), hidden,
+                hidden = torch.cat((torch.zeros((1, audio_left_padding(fps), 5, 384), device='cuda', dtype=self.dtype), hidden,
                                     torch.zeros((1, 24, 5, 384), device="cuda", dtype=self.dtype)), dim=1)
                 chunks = torch.cat([hidden[:, int(i*50/fps):int(i*50/fps)+10] for i in range(nframes)], dim=0).reshape(nframes, 50, 384)
                 torch.cuda.synchronize()

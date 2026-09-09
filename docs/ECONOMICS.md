@@ -4,11 +4,11 @@ Checked 2026-09-07. Generated from [config](../config/economics.json). Active st
 
 ## Spending decision
 
-First-demo allowance including the reserve: **$81.00**. Three-month planned expense: **$9.60**, plus one **$75.00** contingency pool = **$84.60**. Set a **$100 quarter cap**. The reserve is counted once, not every month. No cloud GPU, new paid tool or paid engineer is in this active budget. Planned funding is within the cap; stop/re-scope if actual commitments exceed it. No service purchase was made by this task.
+First-demo allowance including the reserve: **$81.00**. Three-month planned expense: **$9.60**, plus one **$75.00** contingency pool = **$84.60**. Set a **$100 quarter cap**. The reserve is counted once, not every month. No cloud GPU, new paid tool or paid engineer is in this active budget. Planned funding is within the cap; stop/re-scope if actual commitments exceed it. The electricity-only baseline below predates the founder-funded $10 Gateway top-up; its allocation from contingency is recorded under stop rules. The agent made no payment-method or automatic top-up changes.
 
 ## Why this is cheaper
 
-Read-only local inventory found an NVIDIA RTX 4060 Ti with 16,380 MiB reported VRAM and about 47.7 GiB system RAM. Cloudflare currently handles dialogue; CPU speech and local graphics share the existing rig. Scene preparation is a separate phase. No rented GPU is used in this stage. Downloads need internet access; graphics and speech inference stay local; hosted dialogue may incur usage charges. See LOCAL_POC for measured results and limitations.
+Read-only local inventory found an NVIDIA RTX 4060 Ti with 16,380 MiB reported VRAM and about 47.7 GiB system RAM. Cloudflare currently handles dialogue; CPU speech and local graphics share the existing rig. Scene preparation is a separate phase. No rented GPU is used in this stage. Downloads need internet access; active call graphics and speech stay local, with separately funded cloud video benchmarks; hosted dialogue may incur usage charges. See LOCAL_POC for measured results and limitations.
 Founder screenshares a private app using synthetic demo profiles. Public material is a non-explicit product preview with no adult service access, uploads, checkout or exposed inference endpoint. Private does not waive model/host terms or applicable law; unresolved intended-content eligibility is reported as unresolved, not hidden in a demo.
 
 ## Three-month incremental costs
@@ -36,7 +36,7 @@ Use localhost; no domain or remote deployment is needed. The active Cloudflare d
 | New optional tools at $10/month | $39.60 | $114.60 | No — reduce hours/scope |
 | Electricity only, no contingency | $9.60 | $9.60 | Yes |
 
-The $100 cap is a planning limit, not an implemented account control or permission to purchase. The founder now permits considering inexpensive cloud/larger-GPU approaches if local latency remains unacceptable. Compare measured benefit before purchasing; no rental is currently provisioned. No cloud credits or future funding are assumed.
+The $100 cap is a planning limit, not an implemented account control or permission to purchase. The founder now permits considering inexpensive cloud/larger-GPU approaches if local latency remains unacceptable. Compare measured benefit before purchasing; no rental is currently provisioned. The founder-funded $10 credit top-up now exists. Budget $10.50 before tax with the published 5% funding fee, drawn from the existing $75 contingency; that leaves $64.50 reserve and keeps the original $84.60 envelope. The $0.90 test usage spends those prepaid credits, so do not count it again as a second cash purchase. Exact tax/receipt fees and other hosted dialogue charges still need reconciliation. No further top-up or future funding is assumed.
 
 ## Costs postponed by the stage change
 
@@ -70,7 +70,7 @@ September 8's additional synthetic Cloudflare comparisons total **$0.01443 at pu
 
 ### Cloudflare-routed clip candidates — September 8
 
-Provider list-price arithmetic below is a planning comparison; Cloudflare model pages direct pricing to the account dashboard. Confirm the account quote before inference. The last billing-read check found no positive Gateway credits; no purchase or remote video test was made. One Cloudflare credential is preferred. [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) adds 5% to credit purchases.
+Provider list-price arithmetic below is a planning comparison; Cloudflare model pages direct pricing to the account dashboard. Confirm the account quote before inference. The founder loaded $10 Gateway credits. Live account pricing confirms P-Video 720p draft/standard at $0.005/$0.020 per second and LTX-2.5 Fast 720p at $0.090; LTX 1080p is $0.150. Two five-second LTX tests recorded $0.45 each in Gateway cost metadata, reconciled to $9.10 remaining credits. Each took about 31s. Pruna input mapping failed; its low price is not a working result. One Cloudflare credential is preferred. [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) adds 5% to credit purchases.
 
 | Model / 720p configuration | Provider $/output second | 15-second clip | Clip with 5% funding fee | 30 minutes of generated footage, with fee |
 |---|---:|---:|---:|---:|

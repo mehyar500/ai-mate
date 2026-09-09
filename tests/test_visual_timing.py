@@ -1,9 +1,17 @@
 import unittest
 
-from local_app.visual import motion_duration
+from local_app.visual import audio_left_padding, motion_duration
 
 
 class VisualTimingTests(unittest.TestCase):
+    def test_whisper_context_tracks_actual_video_rate(self):
+        self.assertEqual(audio_left_padding(20),6)
+        self.assertEqual(audio_left_padding(25),4)
+        self.assertEqual(audio_left_padding(50),2)
+        for value in [0,-1,61,float('inf'),float('nan')]:
+            with self.assertRaises(ValueError):
+                audio_left_padding(value)
+
     def test_short_reply_does_not_wait_for_ambient_loop(self):
         self.assertEqual(motion_duration(1.25,132,24,loop=True),1.25)
         self.assertEqual(motion_duration(1.25,132,24,loop=False),5.5)

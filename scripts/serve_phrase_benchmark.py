@@ -44,6 +44,7 @@ def main():
     parser.add_argument('--batch-size', type=int, choices=[8, 16], default=8)
     parser.add_argument('--action', choices=['none', 'closer'], default='none')
     parser.add_argument('--interruption', action='store_true')
+    parser.add_argument('--quality-review', action='store_true')
     parser.add_argument('--trial', choices=['early', 'middle'], default='early')
     args = parser.parse_args()
     label = 'whole' if args.whole else 'phrases'
@@ -53,6 +54,8 @@ def main():
         label += '-approach'
     if args.interruption:
         label = 'interruption' + ('-middle' if args.trial == 'middle' else '')
+    if args.quality_review:
+        label += '-quality'
     folder = ROOT / 'generated/local-app/audit' / ('speech-' + label)
     folder.mkdir(parents=True, exist_ok=True)
     for name in ['fullbody.png', 'performance-near.png', 'performance-closer.mp4',

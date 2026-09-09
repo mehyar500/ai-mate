@@ -7962,5 +7962,672 @@
       "stale_playback_http": 409,
       "conversation_database_unchanged_at_restart": true
     }
+  },
+  "funded_cloud_video_2026_09_09": {
+    "source_commit": "8012e19",
+    "gateway": "default",
+    "auth": "existing API key plus email",
+    "founder_loaded_credits_usd": 10,
+    "observed_remaining_usd": 9.1,
+    "gateway_generation_cost_usd": 0.9,
+    "billing_settings_changed_by_agent": false,
+    "private_history_used": false,
+    "trials": [
+      {
+        "case": "motion-draft",
+        "model": "pruna/p-video",
+        "started_at": "2026-09-08T23:54:42.666971+00:00",
+        "state": "http_error",
+        "http_status": 400,
+        "request_s": 2.043,
+        "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "error": "{\"errors\":[{\"message\":\"Model execution failed (User Input Error): property input is required\",\"code\":7003}],\"success\":false,\"result\":{},\"messages\":[]}"
+      },
+      {
+        "case": "motion-draft",
+        "model": "pruna/p-video",
+        "started_at": "2026-09-08T23:55:36.033621+00:00",
+        "state": "http_error",
+        "http_status": 400,
+        "request_s": 1.038,
+        "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "error": "{\"errors\":[{\"message\":\"Model execution failed (User Input Error): Required value missing: prompt\",\"code\":7003}],\"success\":false,\"result\":{},\"messages\":[]}",
+        "provider_envelope": true
+      },
+      {
+        "case": "motion-draft",
+        "model": "pruna/p-video",
+        "started_at": "2026-09-09T00:01:30.371751+00:00",
+        "state": "http_error",
+        "http_status": 400,
+        "request_s": 2.771,
+        "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "error": "{\"errors\":[{\"message\":\"Model execution failed (User Input Error): property input is required\",\"code\":7003}],\"success\":false,\"result\":{},\"messages\":[]}",
+        "provider_envelope": false,
+        "dual_envelope": true
+      },
+      {
+        "case": "ltx-smoke",
+        "model": "lightricks/ltx-2-5-fast",
+        "started_at": "2026-09-09T00:02:49.090275+00:00",
+        "state": "unknown",
+        "http_status": 200,
+        "request_s": 31.107,
+        "reference_sha256": null,
+        "gateway_log_cost_usd": 0.44999999999999996,
+        "gateway_log_success": true,
+        "provider_envelope": false,
+        "dual_envelope": false
+      },
+      {
+        "case": "ltx-review",
+        "model": "lightricks/ltx-2-5-fast",
+        "started_at": "2026-09-09T00:05:12.713570+00:00",
+        "state": "Completed",
+        "http_status": 200,
+        "request_s": 31.204,
+        "reference_sha256": null,
+        "gateway_log_cost_usd": 0.44999999999999996,
+        "gateway_log_success": true,
+        "provider_envelope": false,
+        "dual_envelope": false
+      }
+    ],
+    "review": {
+      "case": "ltx-review",
+      "sha256": "2966fe936123ca8f5b12dc7d0296247703c2a7f78d42a211137aa5d517939646",
+      "bytes": 3184033,
+      "download_s": 0.635,
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "codec_type": "video",
+            "width": 720,
+            "height": 1280,
+            "r_frame_rate": "24/1"
+          },
+          {
+            "codec_name": "aac",
+            "codec_type": "audio",
+            "r_frame_rate": "0/0"
+          }
+        ],
+        "format": {
+          "duration": "5.041667"
+        }
+      },
+      "audio": {
+        "samples": 80160,
+        "rms": 0.041041553020477295,
+        "peak": 0.45614445209503174
+      },
+      "limitations": "Contact-sheet review and decoded audio signal only; not physical speaker or lip-sync qualification.",
+      "synthetic_audio_transcript": "Hi, good to see you."
+    },
+    "visual_review": "Full-body wave and lowering visible; fixed framing and clothing retained. Text-only new fictional woman, not Mira identity qualification. Fine lip-sync unqualified.",
+    "decision": "Cloud LTX works for delayed clips; 31s generation does not meet live-call latency. Pruna mapping remains unresolved.",
+    "limitations": [
+      "First LTX payload lost by initial parser; completion/cost recovered from own gateway log, media not recoverable with logging disabled.",
+      "Immediate credit reads lagged; reconciled later. Balance is cents, log cost is USD.",
+      "No adult/provider/Apple/public production approval inferred."
+    ]
+  },
+  "local_mouth_tuning_2026_09_09": {
+    "source_commit": "8012e19",
+    "selected_face_shift": -0.1,
+    "audio_left_padding_20fps": 6,
+    "idle_variants": {
+      "audio_sha256": "8fb07f29ab197f574572e57d299d604c78594bb4695a0fb51803598e5bfa069c",
+      "rows": [
+        {
+          "scene": "near",
+          "candidate": "legacy",
+          "face_shift": -0.04,
+          "left_padding": 4,
+          "metrics": {
+            "render_s": 5.709922500001994,
+            "frames": 74,
+            "fps": 12.959895690348539,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.0634765625,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 1.2449679000019387,
+            "neural_s": 4.261466699994344,
+            "composite_pipe_s": 0.1908213999995496,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.9555836999970779,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "38953a11ccc349f1fd57034f6bd96a7838ab500e677d50f92df4b2ebe8bfeb39"
+        },
+        {
+          "scene": "near",
+          "candidate": "aligned",
+          "face_shift": -0.04,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 3.0388045999970927,
+            "frames": 74,
+            "fps": 24.351680920869608,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2724.80517578125,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.042160699998930795,
+            "neural_s": 2.797079500000109,
+            "composite_pipe_s": 0.19142550000469782,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.0063575999993190635,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "video_sha256": "6232c40043abb715b3463394dc9069010a809f6b14b5f2117c885aba0d1dd546"
+        },
+        {
+          "scene": "near",
+          "candidate": "higher",
+          "face_shift": -0.1,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 5.062644300000102,
+            "frames": 74,
+            "fps": 14.616867315761946,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.64892578125,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.9737517000030493,
+            "neural_s": 3.863319699998101,
+            "composite_pipe_s": 0.21449530000245431,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.9342924000011408,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "75cd196406da356206af36002c74a70a8e8c5bcd485652d700613593454cad60"
+        },
+        {
+          "scene": "near",
+          "candidate": "highest",
+          "face_shift": -0.16,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 5.0538329999981215,
+            "frames": 74,
+            "fps": 14.642351656658917,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.64892578125,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.9785142000000633,
+            "neural_s": 3.8446177000005264,
+            "composite_pipe_s": 0.22069459999693208,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.945484399999259,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "444e17df68cb782b3794293262966d86f1b221def61058c5403a3e49568ebc04"
+        },
+        {
+          "scene": "body",
+          "candidate": "legacy",
+          "face_shift": -0.04,
+          "left_padding": 4,
+          "metrics": {
+            "render_s": 4.8976631000005,
+            "frames": 74,
+            "fps": 15.109246693589938,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.6416015625,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.9401609999986249,
+            "neural_s": 3.8597484000019904,
+            "composite_pipe_s": 0.08741259999806061,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.9035495999996783,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "5cfb3ca70dafb22ac8acf23d4e8f1a6a821a2c36a5563cfd1feef3232695f6c4"
+        },
+        {
+          "scene": "body",
+          "candidate": "aligned",
+          "face_shift": -0.04,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 2.927861000000121,
+            "frames": 74,
+            "fps": 25.27442388829147,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2725.38330078125,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.043677699999534525,
+            "neural_s": 2.795205699992948,
+            "composite_pipe_s": 0.07613270001093042,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.007286699998076074,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "video_sha256": "26979bfa816ef4fcb1c08491ff83ed68e2c51a876954aa0c4b08c298fc5dd040"
+        },
+        {
+          "scene": "body",
+          "candidate": "higher",
+          "face_shift": -0.1,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 4.923513400000957,
+            "frames": 74,
+            "fps": 15.029917456909049,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.64892578125,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.9654368000010436,
+            "neural_s": 3.8599194000053103,
+            "composite_pipe_s": 0.08576300000640913,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.9083204000016849,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "dd08cedf639a30cfdecef6edbc5b26fa86339f98d6b7d298737ec8eab73cd215"
+        },
+        {
+          "scene": "body",
+          "candidate": "highest",
+          "face_shift": -0.16,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 4.895160299998679,
+            "frames": 74,
+            "fps": 15.116971756781892,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.64892578125,
+            "torch_peak_reserved_mib": 3544.0,
+            "audio_features_s": 0.9536979000004067,
+            "neural_s": 3.8522023999976227,
+            "composite_pipe_s": 0.07928950000496116,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.9177573999986635,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "5b94e1f8342c4f74b909ffb0ec1e6233ed9b5a96180d7f840eb30fdcebeee46f"
+        }
+      ],
+      "limits": "Same synthetic speech and reviewed footage. No microphone, private conversation or remote inference. Visual/phoneme review required; speed is not controlled for source-cache warmness."
+    },
+    "motion_variants": {
+      "audio_sha256": "8fb07f29ab197f574572e57d299d604c78594bb4695a0fb51803598e5bfa069c",
+      "rows": [
+        {
+          "scene": "approach",
+          "candidate": "legacy",
+          "face_shift": -0.04,
+          "left_padding": 4,
+          "metrics": {
+            "render_s": 4.808796900000743,
+            "frames": 74,
+            "fps": 15.388464420277048,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.0478515625,
+            "torch_peak_reserved_mib": 3542.0,
+            "audio_features_s": 0.9383540999988327,
+            "neural_s": 3.788942600003793,
+            "composite_pipe_s": 0.07439070000327774,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.7426119999981893,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "611240132f3e76cb906de6d1ad2aa010440584377209ab4ac35739fd388b7759"
+        },
+        {
+          "scene": "approach",
+          "candidate": "higher",
+          "face_shift": -0.1,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 4.445597199999611,
+            "frames": 74,
+            "fps": 16.645682609303083,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.53955078125,
+            "torch_peak_reserved_mib": 3542.0,
+            "audio_features_s": 0.7025648999988334,
+            "neural_s": 3.6545501000000513,
+            "composite_pipe_s": 0.0818204999959562,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.6786642000006395,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "43136b4c45bed1e1dbdc483d40dc4fe53e4ff378c17892229f000247ff178f6a"
+        },
+        {
+          "scene": "return",
+          "candidate": "legacy",
+          "face_shift": -0.04,
+          "left_padding": 4,
+          "metrics": {
+            "render_s": 4.447942800001329,
+            "frames": 74,
+            "fps": 16.636904593282516,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.5322265625,
+            "torch_peak_reserved_mib": 3542.0,
+            "audio_features_s": 0.7156606999997166,
+            "neural_s": 3.6566138999987743,
+            "composite_pipe_s": 0.06848200000240467,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.6935737999992853,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "8f60e4d42d32cd72da1e49b550da95b2c3b74d8f2bba3a568929e808061b44bf"
+        },
+        {
+          "scene": "return",
+          "candidate": "higher",
+          "face_shift": -0.1,
+          "left_padding": 6,
+          "metrics": {
+            "render_s": 4.437201700002333,
+            "frames": 74,
+            "fps": 16.67717742016575,
+            "duration_s": 3.7,
+            "speech_duration_s": 3.69,
+            "lip_sync_frames": 74,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2728.53955078125,
+            "torch_peak_reserved_mib": 3542.0,
+            "audio_features_s": 0.7073689999997441,
+            "neural_s": 3.6533946999988984,
+            "composite_pipe_s": 0.06993219999640132,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.6844168999996327,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": false,
+            "motion_start_s": 0
+          },
+          "video_sha256": "e31b9befa67a71bb9e23330d30e4e35e743204bf202abc73505000ce4d28a010"
+        }
+      ],
+      "limits": "Same synthetic speech and reviewed footage. No microphone, private conversation or remote inference. Visual/phoneme review required; speed is not controlled for source-cache warmness."
+    },
+    "visual_review": "Smaller, less exaggerated mouth shapes in sampled idle/motion crops. Teeth, crude blending and moving-source blur remain.",
+    "browser": {
+      "events": [
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 2.768300000000745,
+          "currentTime": 0,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "playing",
+          "at": 2.768800000000745,
+          "currentTime": 0,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "ended",
+          "at": 6.845400000002235,
+          "currentTime": 4.042,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "ended",
+          "at": 6.909199999999255,
+          "currentTime": 4.092675,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 7.920699999999255,
+          "currentTime": 0,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "playing",
+          "at": 7.920900000002235,
+          "currentTime": 0,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "ended",
+          "at": 14.283400000002235,
+          "currentTime": 6.34,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "ended",
+          "at": 14.362,
+          "currentTime": 6.392675,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "waiting",
+          "at": 14.374199999999256,
+          "currentTime": 0,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "playing",
+          "at": 14.377800000000745,
+          "currentTime": 8.6e-05,
+          "muted": true,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "playing",
+          "at": 14.378,
+          "currentTime": 0,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "audio",
+          "type": "ended",
+          "at": 16.823300000000746,
+          "currentTime": 2.405958,
+          "muted": false,
+          "volume": 1
+        },
+        {
+          "id": "video",
+          "type": "ended",
+          "at": 16.938900000002235,
+          "currentTime": 2.492675,
+          "muted": true,
+          "volume": 1
+        }
+      ],
+      "metrics": "First playback: 2.56s from Send. Buffer waits: 0 (0.00s). Between phrases: 1.03s. Server completed: 15.63s.",
+      "audio": {
+        "ended": true,
+        "muted": false
+      },
+      "chunks": 3,
+      "notice": "",
+      "label": "phrases-approach-quality",
+      "pageErrors": []
+    },
+    "graph_experiment": {
+      "torch": "2.11.0+cu128",
+      "capture_s": 0.03581330000088201,
+      "rows": [
+        {
+          "index": 0,
+          "eager_s": 0.3083680000017921,
+          "replay_s": 0.28788469999926747,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 1,
+          "eager_s": 0.28999539999858825,
+          "replay_s": 0.28770950000034645,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 2,
+          "eager_s": 0.2901525999986916,
+          "replay_s": 0.28768010000203503,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 3,
+          "eager_s": 0.2901753000005556,
+          "replay_s": 0.2876529999994091,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 4,
+          "eager_s": 0.2901640000018233,
+          "replay_s": 0.28769459999966784,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 5,
+          "eager_s": 0.29003949999969336,
+          "replay_s": 0.2876813000002585,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 6,
+          "eager_s": 0.2901122999974177,
+          "replay_s": 0.2877015999983996,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        },
+        {
+          "index": 7,
+          "eager_s": 0.290205799999967,
+          "replay_s": 0.28769979999924544,
+          "pixel_mae": 0.0,
+          "pixel_max": 0.0
+        }
+      ],
+      "eager_median_s": 0.29015830000025744,
+      "replay_median_s": 0.28769719999945664,
+      "allocated_mib": 1853.79541015625,
+      "reserved_mib": 4926.0,
+      "peak_allocated_mib": 2749.98291015625,
+      "limits": "Single batch 8 neural-path experiment; synthetic conditioning; excludes speech, video tracking, browser and actual speech-quality validation."
+    },
+    "graph_adopted": false,
+    "graph_rejection": "Less than one percent neural-path gain; no call benefit demonstrated.",
+    "tests": {
+      "python": 120,
+      "node": 7,
+      "compile": "passed",
+      "synthetic_actual_renderer_browser": "passed",
+      "independent_review": "pending before public release",
+      "staging": "not provisioned"
+    },
+    "preview_restart": {
+      "ready": true,
+      "busy": false,
+      "startup_s": 11.584,
+      "memory_unchanged": true
+    }
   }
 }

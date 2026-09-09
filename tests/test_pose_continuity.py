@@ -259,6 +259,9 @@ class PoseTests(unittest.TestCase):
         read('copy.mp4',b'base')
         self.assertTrue(renderer.motion_cache_hit)
         self.assertEqual(renderer.cv.VideoCapture.call_count,1)
+        renderer.face_shift=-.04
+        read('copy.mp4',b'base')
+        self.assertFalse(renderer.motion_cache_hit)  # Crop tuning must rebuild face latents.
         read('copy.mp4',b'changed')
         self.assertFalse(renderer.motion_cache_hit)
         read('third.mp4',b'near')
