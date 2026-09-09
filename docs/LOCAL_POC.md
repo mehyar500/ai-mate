@@ -142,6 +142,18 @@ The complete comparison after the movement fix measured compact versus baseline 
 
 Additional focused checks: `review_paused_voice.cjs` exercises corrected/negated resumed utterances; `review_voice_interruption.cjs` checks interruption continuity with synthetic capture. Their scope excludes physical echo. Existing exact commands and prerequisites remain in the scripts and historical evidence.
 
+### Streaming motion replacement experiment
+
+The existing call cannot represent arbitrary actions or left/right corrections. A separate **LongLive 2.0 5B / Wan2.2** experiment tests fresh image-conditioned motion with changing block prompts. It is not selected in the app. [Pinned code, weights and optional decoder](../config/longlive2-benchmark.json) total about 25.04GB including **MG-LightVAE v2**; the main model downloads are still in progress at this checkpoint. Full motion quality, command following and complete-call latency are untested.
+
+The [upstream code](https://github.com/NVlabs/LongLive) uses Apache-2.0, while the [5B weights](https://huggingface.co/Efficient-Large-Model/LongLive-2.0-5B) use NVIDIA's Open Model License and its additional terms. [MG-LightVAE v2's model repository](https://huggingface.co/Skywork/Matrix-Game-3.0) identifies Apache-2.0. These observations do not qualify the intended adult service. The older LongLive 1.3B weights identify a noncommercial license and are not selected.
+
+Setup is isolated: clone the exact revision in the manifest into `.cache/local-poc/LongLive2`, apply [the compatibility patch](../config/longlive2-windows.patch) with `git apply --unidiff-zero`, then install [optional imports](../config/longlive2-benchmark-requirements.txt) with `.venv/Scripts/python.exe -m pip install --no-deps --target .cache/longlive2-deps -r config/longlive2-benchmark-requirements.txt`. The patch removes an unused incompatible import and defers training imports. Do not install upstream's training environment into the app. `download_longlive2_benchmark.py` downloads/verifies the primary weights; `--light-vae-only` fetches the optional decoder. Observe an existing download's actual process/session before starting another.
+
+`benchmark_longlive2_vae.py --label fresh-vae --vae light-v2 --latent-chunk 8 --width 384 --height 576` measures decoding synthetic repeated reference latents while the preview is idle. The original VAE lacks the expected cached method; the isolated adapter preserves causal decoder state. Both original and lightweight split decoding matched their respective ordinary 13-frame controls exactly. Three measured chunks: original **8.38–8.42 FPS / 4,322MiB peak** at 320x480; lightweight **63.25–63.43 FPS / 815MiB** at 320x480 and **42.28–42.64 FPS / 1,131MiB** at 384x576. These are decoder-only rates, not fresh motion or call FPS. Inspected reconstruction frames remain visibly softened, especially face and foliage.
+
+After every required file passes verification and the preview is deliberately stopped between calls, run `.venv/Scripts/python.exe scripts/benchmark_longlive2.py --label fresh-motion --case raise-lower --blocks 2 --repeats 2 --vae light-v2 --text-device cuda`. It requires 14GB free VRAM and keeps text encoding, model loading, first decoded chunk and generation timing separate. It stages text encoding before motion inference, loads checkpoints with `weights_only=True`, uses native PyTorch attention and writes only synthetic audit output. Four blocks and `--case turn-return` extend the experiment. Restart the normal preview afterward. This command has not yet completed a motion run; no prepared footage or private conversation is substituted for model input.
+
 ## Current evidence and decisions
 
 | Evidence | Result and limitation |

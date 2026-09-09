@@ -20391,5 +20391,285 @@
     },
     "rollback": "Revert this code commit; no memory schema or data migration. Private memory preserved.",
     "remaining": "Original goal remains incomplete: actual arbitrary body actions, perceptual call quality, p95 <=2s, physical audio/mobile and public commercial qualification."
+  },
+  "causal_video_candidate_setup_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "f0a8e73d49e77857e469afb52fc2b47973d07c75",
+    "risk_class": "R1",
+    "previous_goal_turn_classification": "progress",
+    "objective_gap": "Current three-label/prepared-action pipeline cannot meet continuous fresh body movement or multi-turn side corrections. Test a different causal video architecture.",
+    "scope": "Isolated non-explicit GPU experiments; live engine and UI unchanged. No public eligibility or full-goal completion claimed.",
+    "candidate": "LongLive 2.0 5B + Wan2.2 VAE; then MG-LightVAE v2 after measured decoder bottleneck",
+    "source_manifest": "config/longlive2-benchmark.json",
+    "artifacts": [
+      {
+        "path": "generated/local-app/audit/longlive2-vae-probe/manual-review.json",
+        "sha256": "210950ff6386fb292ec09009bd8818205cc5a3f6a0aedeb8193fd659ea8377e3",
+        "result": {
+          "scope": "One-frame VAE reconstruction inspected visually at 320x480; not action or temporal acceptance",
+          "one_full_figure_visible": true,
+          "framing": "head and feet present",
+          "defects": [
+            "soft face and hand detail"
+          ],
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40"
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-probe/probe.json",
+        "sha256": "17ad5fa9c28b5ff094d4c2f1ada8ca02fcc382603ed02066d4e473cb1fd06e5e",
+        "result": {
+          "scope": "one-frame reference reconstruction only; no generated body action",
+          "preview_loaded_but_idle": true,
+          "load_s": 1.5436585999996169,
+          "encode_decode_s": 0.4997676000057254,
+          "shape": [
+            1,
+            1,
+            48,
+            30,
+            20
+          ],
+          "peak_allocated_mib": 2318.8828125,
+          "complete": true,
+          "pixel_mae": 11.21748046875
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-chunks8-320/benchmark.json",
+        "sha256": "63d32005c66c0de04af0bef1a21f39f8fa6e24501983ba4b58f7f400b09b43db",
+        "result": {
+          "scope": "synthetic repeated reference latent decoder sizing; no body action or speech",
+          "settings": {
+            "label": "chunks8-320",
+            "latent_chunk": 8,
+            "width": 320,
+            "height": 480
+          },
+          "preview_loaded_but_idle": true,
+          "complete": false,
+          "chunks": [],
+          "error_type": "AttributeError",
+          "error": "'WanVAE_' object has no attribute 'cached_decode'"
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-chunks8-streaming-320/benchmark.json",
+        "sha256": "4eeaeab290e9d687c8bc1dd8265df1efa4d6f7557853cceebbaf8b21aa669a0a",
+        "result": {
+          "scope": "synthetic repeated reference latent decoder sizing; no body action or speech",
+          "settings": {
+            "label": "chunks8-streaming-320",
+            "latent_chunk": 8,
+            "width": 320,
+            "height": 480
+          },
+          "preview_loaded_but_idle": true,
+          "complete": true,
+          "chunks": [
+            {
+              "index": 0,
+              "seconds": 3.46175879999646,
+              "frames": 29,
+              "fps": 8.377244538247338,
+              "peak_allocated_mib": 4318.5732421875
+            },
+            {
+              "index": 1,
+              "seconds": 3.8018291000043973,
+              "frames": 32,
+              "fps": 8.41700117450387,
+              "peak_allocated_mib": 4321.8583984375
+            },
+            {
+              "index": 2,
+              "seconds": 3.808617900009267,
+              "frames": 32,
+              "fps": 8.401998005607792,
+              "peak_allocated_mib": 4322.1708984375
+            }
+          ],
+          "streaming_control": {
+            "frames": 13,
+            "max_absolute_error": 0.0
+          }
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-light-v2-chunks8-320/benchmark.json",
+        "sha256": "ba38344802436d4f0af4b171daa45edf24ce2b42cd4e5c13c308ce551a61005b",
+        "result": {
+          "scope": "synthetic repeated reference latent decoder sizing; no body action or speech",
+          "settings": {
+            "label": "light-v2-chunks8-320",
+            "latent_chunk": 8,
+            "width": 320,
+            "height": 480,
+            "vae": "light-v2"
+          },
+          "preview_loaded_but_idle": true,
+          "complete": true,
+          "chunks": [
+            {
+              "index": 0,
+              "seconds": 0.45720889999938663,
+              "frames": 29,
+              "fps": 63.428336587583715,
+              "peak_allocated_mib": 812.041015625
+            },
+            {
+              "index": 1,
+              "seconds": 0.5059622999979183,
+              "frames": 32,
+              "fps": 63.24581890811165,
+              "peak_allocated_mib": 814.126953125
+            },
+            {
+              "index": 2,
+              "seconds": 0.5051185000047553,
+              "frames": 32,
+              "fps": 63.35147099086401,
+              "peak_allocated_mib": 814.861328125
+            }
+          ],
+          "pruning_rate": 0.75,
+          "streaming_control": {
+            "frames": 13,
+            "max_absolute_error": 0.0
+          }
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-light-v2-chunks8-320/manual-review.json",
+        "sha256": "eb2bf25517251a86500a89366f73cceea4e17636ecb0e3c6b2684a16f486ae0e",
+        "result": {
+          "scope": "First reconstruction frame only; synthetic repeated latent decoder test",
+          "inspected_frames": 1,
+          "one_full_figure_visible": true,
+          "head_and_feet_in_frame": true,
+          "defects": [
+            "visible smoothing of face and foliage",
+            "identity likeness/perceptual realism not accepted"
+          ],
+          "selected_in_live_app": false
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-light-v2-chunks8-384/benchmark.json",
+        "sha256": "bd1f5d6003ccf9d99f8e1d084df8c804ecc40bd0c4151d1faa402aa1e745f472",
+        "result": {
+          "scope": "synthetic repeated reference latent decoder sizing; no body action or speech",
+          "settings": {
+            "label": "light-v2-chunks8-384",
+            "latent_chunk": 8,
+            "width": 384,
+            "height": 576,
+            "vae": "light-v2"
+          },
+          "preview_loaded_but_idle": true,
+          "complete": true,
+          "chunks": [
+            {
+              "index": 0,
+              "seconds": 0.6800386000104481,
+              "frames": 29,
+              "fps": 42.64463811253427,
+              "peak_allocated_mib": 1123.8203125
+            },
+            {
+              "index": 1,
+              "seconds": 0.7569463000108954,
+              "frames": 32,
+              "fps": 42.27512572495486,
+              "peak_allocated_mib": 1129.4921875
+            },
+            {
+              "index": 2,
+              "seconds": 0.7553179999958957,
+              "frames": 32,
+              "fps": 42.36626162778311,
+              "peak_allocated_mib": 1130.9296875
+            }
+          ],
+          "pruning_rate": 0.75,
+          "streaming_control": {
+            "frames": 13,
+            "max_absolute_error": 0.0
+          }
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-vae-light-v2-chunks8-384/manual-review.json",
+        "sha256": "eb2bf25517251a86500a89366f73cceea4e17636ecb0e3c6b2684a16f486ae0e",
+        "result": {
+          "scope": "First reconstruction frame only; synthetic repeated latent decoder test",
+          "inspected_frames": 1,
+          "one_full_figure_visible": true,
+          "head_and_feet_in_frame": true,
+          "defects": [
+            "visible smoothing of face and foliage",
+            "identity likeness/perceptual realism not accepted"
+          ],
+          "selected_in_live_app": false
+        }
+      },
+      {
+        "path": "generated/local-app/audit/longlive2-fp8-matmul/probe.json",
+        "sha256": "7e98ed261bc97833ff3197d409650baebe89acc78fabfe2680a34192a8dc1833",
+        "result": {
+          "shape": [
+            1200,
+            3072,
+            3072
+          ],
+          "fp8_supported": true,
+          "relative_rms_error": 0.037823114544153214,
+          "bf16_ms": 0.5824099998183858,
+          "fp8_prequantized_ms": 0.29450333337687573
+        }
+      }
+    ],
+    "compatibility": {
+      "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+      "patch": "config/longlive2-windows.patch",
+      "pipeline_import": "passed after deferring training imports and removing unused X-CLIP loss import",
+      "generator_meta_parameters": 4999787712,
+      "generator_bf16_weight_bytes": 9999575424,
+      "native_attention_control": {
+        "noncausal_max_abs_error": 3.3306690738754696e-16,
+        "causal_max_abs_error": 8.881784197001252e-16,
+        "variable_length_rejected": true
+      },
+      "runtime": {
+        "torch": "2.11.0+cu128",
+        "transformers": "5.16.1",
+        "diffusers": "0.40.0",
+        "torchvision": "0.26.0+cu128"
+      }
+    },
+    "decision": "Continue with lighter decoder as an experiment; do not select in live app. Its visible smoothing and full generated motion still require qualification.",
+    "pending": [
+      "Primary generator and UMT5 downloads remain live; exact verified process/session in ignored continuation state.",
+      "Full fresh-motion benchmark not run.",
+      "No new body commands demonstrated in live app.",
+      "No complete-call latency or speech synchronization measurement for this candidate."
+    ],
+    "new_api_inference_cost_usd": 0,
+    "paid_gpu_rentals": 0,
+    "rollback": "Remove experimental selection if later introduced; none currently exists. Cache assets and run scripts do not change memory or the live model configuration.",
+    "sources": [
+      "https://github.com/NVlabs/LongLive",
+      "https://huggingface.co/Efficient-Large-Model/LongLive-2.0-5B",
+      "https://www.nvidia.com/en-us/agreements/enterprise-software/nvidia-open-model-license/",
+      "https://www.nvidia.com/en-us/agreements/trustworthy-ai/terms/",
+      "https://huggingface.co/Skywork/Matrix-Game-3.0",
+      "https://streamavatar.github.io/"
+    ],
+    "checks": {
+      "existing_python_tests": 195,
+      "existing_node_tests": 32,
+      "new_gpu_decoder_controls": "passed; 13 frames exact against respective ordinary decode",
+      "full_motion_acceptance": "not executed"
+    }
   }
 }

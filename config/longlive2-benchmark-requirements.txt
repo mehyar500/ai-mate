@@ -1,0 +1,8 @@
+# Isolated optional imports only; install with --no-deps --target .cache/longlive2-deps.
+# Reuses existing app Torch 2.11.0+cu128; never downgrade the running app.
+omegaconf==2.3.0
+antlr4-python3-runtime==4.9.3
+easydict==1.13
+ftfy==6.3.1
+einops==0.8.2
+wcwidth==0.2.13

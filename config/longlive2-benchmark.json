@@ -1,0 +1,111 @@
+{
+  "scope": "isolated non-explicit local motion experiment; not selected in live app",
+  "code": {
+    "repo": "https://github.com/NVlabs/LongLive.git",
+    "revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+    "license": "Apache-2.0"
+  },
+  "weight_license": "NVIDIA Open Model License; separate component and acceptable-use terms apply",
+  "files": [
+    {
+      "repo": "Efficient-Large-Model/LongLive-2.0-5B",
+      "revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+      "filename": "model_bf16.pt",
+      "folder": "generator",
+      "size": 9999853030,
+      "sha256": "ec9063a44ea3c91e8ff55edcdd58dba3f1bcf6ac9091249629cb57fcebe35fd8"
+    },
+    {
+      "repo": "Efficient-Large-Model/LongLive-2.0-5B",
+      "revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+      "filename": "README.md",
+      "folder": "generator",
+      "size": 5667,
+      "sha256": "05908a73f89611adf60946b1393988801848e472136c2bb85bf2978f80d4717c"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "Wan2.2_VAE.pth",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 2818839170,
+      "sha256": "20eb789667fa5e60e7516bf509512f6cb61f01b0aa0695eadaea930c13892b36"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "models_t5_umt5-xxl-enc-bf16.pth",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 11361920418,
+      "sha256": "7cace0da2b446bbbbc57d031ab6cf163a3d59b366da94e5afe36745b746fd81d"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "config.json",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 251,
+      "sha256": "d1fea36899d00c2501b836c13ad65af56e2f9529ba622e50886d3f5c3e6c02bc"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "google/umt5-xxl/special_tokens_map.json",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 6623,
+      "sha256": "7b8a9f5040adb67b5805abdfd42c1f8d0f3d0e711f10726580eb3789cd0ad61d"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "google/umt5-xxl/spiece.model",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 4548313,
+      "sha256": "e3909a67b780650b35cf529ac782ad2b6b26e6d1f849d3fbb6a872905f452458"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "google/umt5-xxl/tokenizer.json",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 16837417,
+      "sha256": "6e197b4d3dbd71da14b4eb255f4fa91c9c1f2068b20a2de2472967ca3d22602b"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "google/umt5-xxl/tokenizer_config.json",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 61728,
+      "sha256": "ed9a3a8b0faa71a70a32847e0435fe036e6e112d4df4edb7bb48a921e344dc05"
+    },
+    {
+      "repo": "Wan-AI/Wan2.2-TI2V-5B",
+      "revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+      "filename": "README.md",
+      "folder": "wan_models/Wan2.2-TI2V-5B",
+      "size": 15935,
+      "sha256": "e357cb3ac077f8739755b0fb38fe8424c76534b19b4a84f6138856abb00abf69"
+    }
+  ],
+  "total_bytes": 24202088552,
+  "optional_files": [
+    {
+      "repo": "Skywork/Matrix-Game-3.0",
+      "revision": "382aa382a03cec057360755aa72c7735025770bb",
+      "filename": "MG-LightVAE_v2.pth",
+      "folder": "wan_models/Matrix-Game-3.0",
+      "size": 841275442,
+      "sha256": "d47a9e7899af41f1a2c762f902d48c2b3221121473d0367bc0d9356b536810d1",
+      "license": "Apache-2.0 per model card"
+    },
+    {
+      "repo": "Skywork/Matrix-Game-3.0",
+      "revision": "382aa382a03cec057360755aa72c7735025770bb",
+      "filename": "README.md",
+      "folder": "wan_models/Matrix-Game-3.0",
+      "size": 5464,
+      "sha256": "e787a7d974f5f4c7b0fd66e4d4f0ffb5c7270ac546660c498a27172dcd6bf671"
+    }
+  ]
+}

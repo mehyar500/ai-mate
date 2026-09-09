@@ -30,6 +30,8 @@ A new pinned, offline body diagnostic evaluated all 5,716 sustained-call frames 
 
 ## What is still missing
 
+The next architecture experiment is LongLive 2.0 5B with a lighter MG-LightVAE v2 decoder. On this PC, the original decoder measured about 8.4 FPS at 320x480; the lighter one measured about 63 FPS at that size and 42 FPS at 384x576. These are synthetic decoder-only tests, with visible smoothing in inspected reconstructions. Fresh motion generation, input-command response and speech integration are not yet demonstrated. The main weights are downloading; the live app remains on its previous renderer. LOCAL_POC records the reproducible experiment and license distinctions.
+
 - Warm end-of-speech p95 <=2 seconds, including endpoint detection and actual capture.
 - Reliable fresh movement outside the small supported action set.
 - Natural appearance throughout every transition and stronger close-view lip quality.

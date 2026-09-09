@@ -1,0 +1,19 @@
+diff --git a/pipeline/__init__.py b/pipeline/__init__.py
+index 5e98036..0c65813 100644
+--- a/pipeline/__init__.py
++++ b/pipeline/__init__.py
+@@ -2 +1,0 @@ from .causal_diffusion_inference import CausalDiffusionInferencePipeline
+-from .self_forcing_training import SelfForcingTrainingPipeline
+@@ -7,0 +7,6 @@ __all__ = [
++
++def __getattr__(name):
++    if name == "SelfForcingTrainingPipeline":
++        from .self_forcing_training import SelfForcingTrainingPipeline
++        return SelfForcingTrainingPipeline
++    raise AttributeError(name)
+diff --git a/wan_5b/modules/causal_model.py b/wan_5b/modules/causal_model.py
+index 142a591..c5c45a9 100644
+--- a/wan_5b/modules/causal_model.py
++++ b/wan_5b/modules/causal_model.py
+@@ -5 +4,0 @@
+-from transformers.models.x_clip.modeling_x_clip import x_clip_loss
