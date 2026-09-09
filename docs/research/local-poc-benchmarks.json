@@ -23286,5 +23286,30 @@
     },
     "decision": "Keep tiny VAE as an optional experimental acceleration. Do not select any new renderer in the app; one-step quality and stronger control fail.",
     "next_experiment": "Prototype incremental generation with retained temporal state using the separately pinned causal-rCM 1.3B candidate; first verify reference/pose-control compatibility and stop-command cancellation in a bounded test. Decoder is no longer the dominant latency cost."
+  },
+  "causal_vace_compatibility_20260909": {
+    "source_commit": "5d114ac1a71fd2010033b263a07718d1bc0c295b",
+    "classification": "progress",
+    "scope": "CPU compatibility audit of the pinned causal rCM 1.3B candidate with the checked-in Wan2.1-VACE-1.3B control stack; no generation claimed",
+    "checkpoint": "causal_rCM_Wan2.1_T2V_1.3B_480p_TF-dCM-init_SF-DMD_c1-1_step2.pt",
+    "checkpoint_sha256": "58c1f495ea09dd7877a82e5cd5eeeca2d8c97429ec0ca9bf61c76bf25bbf4585",
+    "source_revision": "ed3cb14dd936f92cdc9f9381af7369991509b41f",
+    "transfer": {
+      "base_generator_tensors": 825,
+      "retained_vace_control_tensors": 439,
+      "exact_generator_transfer": true
+    },
+    "interfaces": {
+      "causal_kv_cache": true,
+      "causal_vace_context": false,
+      "vace_control": true,
+      "drop_in_live_vace": false
+    },
+    "decision": "Reject as a runtime drop-in until a causal VACE adapter is implemented and visually qualified; keep the checkpoint pinned for a bounded adapter experiment.",
+    "cost": {
+      "api_usd": 0,
+      "rental_usd": 0
+    },
+    "next_experiment": "Implement only a bounded adapter or return to the current prepared-action path; measure first-frame time, cancellation, reference retention and pose fidelity before any app selection."
   }
 }

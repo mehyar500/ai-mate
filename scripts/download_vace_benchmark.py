@@ -56,12 +56,14 @@ def main():
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument('--rcm-only', action='store_true', help='Fetch optional accelerated generator, not the VACE baseline.')
     selection.add_argument('--tiny-vae-only', action='store_true', help='Fetch the pinned MIT approximate VAE source and weights.')
+    selection.add_argument('--causal-only', action='store_true', help='Fetch the optional one-frame causal rCM generator.')
     args = parser.parse_args()
     manifest = json.loads((ROOT / 'config/vace-benchmark.json').read_text(encoding='utf-8'))
     if args.tiny_vae_only:
         download_tiny(manifest)
         return
-    files = manifest['rcm_experiment']['files'] if args.rcm_only else manifest['files']
+    files = (manifest['causal_rcm_experiment']['files'] if args.causal_only else
+             manifest['rcm_experiment']['files'] if args.rcm_only else manifest['files'])
     if sum(row['size'] for row in files) > 8_000_000_000:
         raise ValueError('VACE download exceeds the 8GB experiment cap.')
     for row in manifest['reused_files']:

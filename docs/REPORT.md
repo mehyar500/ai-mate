@@ -51,6 +51,8 @@ Prefer Cloudflare for the PWA/control plane and evaluate its Realtime SFU for We
 
 No GPU was purchased or rented. No host has approved this project's intended service. LTX's published restrictions exclude the intended explicit scope, so the current preparation pipeline cannot be declared the adult production stack. Model licenses, assets, host policies and processor acceptance are separate gates. [BUILD](BUILD.md), [USA](USA.md).
 
+The pinned causal rCM candidate was audited on CPU. Its generator tensors transfer exactly, but its forward interface exposes KV-cache state without VACE control inputs, so it is rejected as a drop-in until an adapter is built and visually qualified.
+
 ## Economics and next actions
 
 The optional technical pilot is approximately **$28.93 / $14.23 / $14.23** over three months, with a **$57.38** unrounded-total forecast. It includes the existing Gateway credit purchase, ten rented GPU hours per month, local electricity and a stopped-storage allowance. These are planning assumptions under the $100 cap, not new purchases or a public-launch budget.

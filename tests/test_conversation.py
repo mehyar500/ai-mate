@@ -86,6 +86,17 @@ class PlanTests(unittest.TestCase):
             self.assertIsNone(direct_motion_plan(text,['fullbody']))
         self.assertIsNone(direct_motion_plan('Wave hello',['mira']))
 
+    def test_video_stop_and_unsupported_hand_correction_are_explicit(self):
+        for text in ['Stop.', 'Stop that movement.', 'Hold still.', "Don't move."]:
+            plan = direct_motion_plan(text, ['fullbody'])
+            self.assertEqual((plan['action'], plan['motion_veto'], plan['decision_source']),
+                             ('none', 'stop_command', 'direct_command'))
+            self.assertEqual(plan['reply'], "I'll hold still.")
+        plan = direct_motion_plan('The other hand.', ['fullbody'])
+        self.assertEqual(plan['action'], 'none')
+        self.assertEqual(plan['unsupported_motion'], 'other_hand')
+        self.assertIn('prepared right-hand', plan['reply'])
+
     def test_explicit_repeat_motion_is_not_lost_to_none_action(self):
         data={'reply':'Hello','presentation':'continue','scene':'keep','action':'none','facts':[]}
         for text, expected in [('Raise your hand and say hello.','wave'),('Come closer.','closer'),('Step back.','farther')]:

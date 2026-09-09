@@ -155,5 +155,55 @@
         "sha256": "04766eac0221b5390b985ae3fdcca652cbb4b1e8b82b28ea7ff89dfad1b1a93f"
       }
     ]
+  },
+  "causal_rcm_experiment": {
+    "scope": "Unverified causal generator plus VACE control transfer; neutral reference/pose continuity experiment only",
+    "source_revision": "ed3cb14dd936f92cdc9f9381af7369991509b41f",
+    "source_license": "Apache-2.0; config/third-party/rcm-LICENSE.txt",
+    "model_license": "Apache-2.0 per pinned worstcoder/rcm-Wan card; unofficial Tsinghua reproduction",
+    "source_files": [
+      {
+        "path": ".cache/local-poc/rcm-source/Causal_rCM.md",
+        "url": "https://raw.githubusercontent.com/NVlabs/rcm/ed3cb14dd936f92cdc9f9381af7369991509b41f/Causal_rCM.md",
+        "size": 17942,
+        "sha256": "24bbdcc711e44b1c1d8e326d8d12fca2d90c24ae691a437d376ff3c8e79e000e"
+      },
+      {
+        "path": ".cache/local-poc/rcm-source/rcm/inference/wan2pt1_t2v_causal_infer.py",
+        "url": "https://raw.githubusercontent.com/NVlabs/rcm/ed3cb14dd936f92cdc9f9381af7369991509b41f/rcm/inference/wan2pt1_t2v_causal_infer.py",
+        "size": 35615,
+        "sha256": "5cbfa82e8d8661268787ade1de4d490d15b9f975333975b61c4acae2adec226e"
+      },
+      {
+        "path": ".cache/local-poc/rcm-source/rcm/utils/kv_cache.py",
+        "url": "https://raw.githubusercontent.com/NVlabs/rcm/ed3cb14dd936f92cdc9f9381af7369991509b41f/rcm/utils/kv_cache.py",
+        "size": 8611,
+        "sha256": "b45fbcdf8b36c1ceb6cc08dc53b08434c421764e3d360746f16092740bade1a4"
+      },
+      {
+        "path": ".cache/local-poc/rcm-source/rcm/utils/blockmask.py",
+        "url": "https://raw.githubusercontent.com/NVlabs/rcm/ed3cb14dd936f92cdc9f9381af7369991509b41f/rcm/utils/blockmask.py",
+        "size": 19129,
+        "sha256": "1c2596526fc2db60738260dcaec56133e5437c9fd32d7a5594fe44a5cf7d2f83"
+      }
+    ],
+    "first_chunk_t": 1,
+    "chunk_t": 1,
+    "sigma_max": 1600,
+    "steps_after_reference": 2,
+    "mid_t_after_reference": [
+      0.8333333333333334
+    ],
+    "context": "Clean t=0 forward after every chunk; noisy-context checkpoint not selected",
+    "files": [
+      {
+        "repo": "worstcoder/rcm-Wan",
+        "revision": "142d77a331f1516fea772607c1bf25a2785a2505",
+        "filename": "Causal_rCM_Wan2.1_T2V_1.3B_480p_TF-dCM-init_SF-DMD_c1-1_step2.pt",
+        "folder": "rcm-Wan",
+        "size": 2838292823,
+        "sha256": "58c1f495ea09dd7877a82e5cd5eeeca2d8c97429ec0ca9bf61c76bf25bbf4585"
+      }
+    ]
   }
 }

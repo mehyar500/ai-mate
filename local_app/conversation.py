@@ -29,8 +29,18 @@ def direct_motion_plan(user, available):
     """Only complete, unambiguous commands bypass hosted dialogue."""
     if 'fullbody' not in available:
         return None
+    normalized = ' '.join(user.lower().split())
+    if re.fullmatch(r"(?:please\s+)?(?:stop(?:\s+(?:that(?:\s+movement)?|the movement|moving))?|hold still|stay still|don't move|do not move)[.!]?", normalized):
+        return {'reply': "I'll hold still.", 'presentation': 'video', 'scene': 'fullbody',
+                'action': 'none', 'facts': [], 'motion_veto': 'stop_command',
+                'decision_source': 'direct_command'}
+    if re.fullmatch(r"(?:please\s+)?(?:the other hand|use the other hand|left hand)[.!]?", normalized):
+        return {'reply': "This demo only has the prepared right-hand movement.",
+                'presentation': 'video', 'scene': 'fullbody', 'action': 'none',
+                'facts': [], 'unsupported_motion': 'other_hand',
+                'decision_source': 'direct_command'}
     match = re.fullmatch(
-        r"(?:please\s+)?(wave(?:\s+hello|\s+goodbye)?|raise your hands?|come closer|move closer|step closer|"
+        r"(?:please\s+)?(wave(?:\s+hello|\s+goodbye)?|raise your (?:right )?hands?|come closer|move closer|step closer|"
         r"(?:take a )?step back|move back|go back)(?:\s+and\s+say\s+(hi|hello)(?:\s+briefly)?)?[.!]?",
         ' '.join(user.lower().split()),
     )
