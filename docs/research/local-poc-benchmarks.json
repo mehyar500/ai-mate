@@ -24575,5 +24575,60 @@
     "adapter_tensor_bytes": 654311424,
     "reference_downscale_factor": "2",
     "scope": "Header-only structural check; no tensors loaded, no quality or FP8 patch memory validated."
+  },
+  "pose_control_prepared_20260909": {
+    "adapter": {
+      "revision": "b4d1c4d8c9e544e9bbbd6811bb4363708b6093ff",
+      "filename": "ltx-2.3-22b-ic-lora-union-control-ref0.5.safetensors",
+      "size": 654465352,
+      "sha256": "a1b888a87f661d27f08b394ae559e8e1050be33900bcc36a5cdf659e48f88d18",
+      "elapsed_s": 65.1319119999971,
+      "verified": true
+    },
+    "node_source_commit": "15d09abb5a187a8dcaea2fc31fe51ee96e6c9d0d",
+    "selected_modules_imported": [
+      "iclora",
+      "latents",
+      "nodes_registry"
+    ],
+    "import_result": "Guide and loader schemas successfully constructed in existing Comfy environment. Package-wide initializer not imported; no API text encoder used.",
+    "warning": "Installed torch lacks cu130 optimized operations according to import warning; no environment update made.",
+    "inference_tested": false,
+    "live_worker_changed": false,
+    "next": "Build isolated pose input and graph using selected nodes; measure render and memory without promoting to live app."
+  },
+  "pose_control_input_20260909": {
+    "artifact": "generated/local-app/audit/pose-control/control.json",
+    "frames": 73,
+    "fps": 24,
+    "checks": [
+      "Right arm in anatomical coordinates, viewer left",
+      "Other arm unchanged",
+      "Initial and final pose equal",
+      "Both arm segment lengths constant within 1e-8 pixels"
+    ],
+    "review": "Four control frames visually inspected. Body-only COCO18 guide lacks detailed hands/face; source alignment is approximate.",
+    "rendered_character": false,
+    "next": "Register selected guide nodes in isolated worker and render; do not treat control video as character performance."
+  },
+  "pose_control_live_test_20260909": {
+    "prompt_id": "8756cd95-925f-422c-a6a3-6b372689b90b",
+    "worker_port": 8189,
+    "status": "success",
+    "elapsed_s_at_diffusion_start_observation": 122.97,
+    "model_loaded_mb": 10082.5,
+    "model_offloaded_mb": 14122.71,
+    "lowvram_patches": 358,
+    "gpu_snapshot_mib": 15205,
+    "setup_failure": "Initial worker dynamic VRAM initialization failed; isolated worker restarted with --disable-dynamic-vram.",
+    "encoder": "Gemma on CPU, minimum 1024 tokens in installed tokenizer",
+    "output_verified": true,
+    "scope": "Cold setup timing, not final generation latency or warm-call latency.",
+    "total_s": 198.83,
+    "diffusion_s_approx": 69.9,
+    "output": "motion/pose-controlled-test_00001_.mp4",
+    "review": "All 73 decoded frames visually reviewed in four contact sheets. Right arm raises and lowers; left arm remains down. Hand blur/deformation and background movement persist. Single sample; no controlled adapter-off comparison yet. No speech/lip-sync evaluation.",
+    "decision": "Candidate for remote hardware benchmark; not promoted to live call.",
+    "review_artifact": "generated/local-app/audit/frames-pose-controlled-test_00001_-pose/review.json"
   }
 }
