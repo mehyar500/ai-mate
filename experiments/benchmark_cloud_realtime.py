@@ -62,7 +62,42 @@ def fixture_path(value):
     return path
 
 
-async def measure(auth, result, media='both', clip=None):
+def live_session():
+    """Reuse the existing GPU stream experiment; no new server or private data."""
+    import threading
+    import cv2
+    from scripts.serve_webrtc_benchmark import Session, PortraitRenderer, load_reviewed_idle, preview_idle
+    preview_idle()
+    source = ROOT / 'generated/local-app/audit/voice-video-qualification-lip-crop-selected'
+    qualification = json.loads((source/'qualification.json').read_text())
+    fixtures = []
+    for row in qualification['results']:
+        if row['case'] in {'description', 'unsupported', 'conversation'}:
+            job = row['job']
+            fixtures.append({'case': row['case'], 'wav': source/'retained-media'/(job['id']+'-0.wav'),
+                             'source': load_reviewed_idle(source, job['prepared_pose'])})
+    if len(fixtures) != 3 or not all(f['source'] for f in fixtures):
+        raise ValueError('Three reviewed synthetic fixtures required')
+    renderer = PortraitRenderer(decoder_backend='tensorrt')
+    renderer.prime_motion(list({f['source'] for f in fixtures}), threading.Event())
+    capture = cv2.VideoCapture(str(load_reviewed_idle(source, 'base')))
+    idle = []
+    try:
+        while len(idle) < 144:
+            ok, frame = capture.read()
+            if not ok:
+                break
+            idle.append(frame)
+    finally:
+        capture.release()
+    if not idle:
+        raise ValueError('No reviewed idle')
+    folder = ROOT/'generated/local-app/audit'/('cloud-live-'+datetime.now().strftime('%Y%m%d-%H%M%S'))
+    folder.mkdir(exist_ok=False)
+    return Session(renderer, idle, fixtures, folder)
+
+
+async def measure(auth, result, media='both', clip=None, session=None):
     import av
     import numpy as np
     from aiortc import (RTCPeerConnection, RTCConfiguration, RTCIceServer, RTCBundlePolicy, RTCRtpSender,
@@ -145,6 +180,9 @@ async def measure(auth, result, media='both', clip=None):
         sender, receiver = RTCPeerConnection(config), RTCPeerConnection(config)
         peers.extend([sender, receiver])
         tracks = [Tone(), Video()] if media == 'both' else [Video()] if media == 'video' else [Tone()]
+        if session:
+            from scripts.serve_webrtc_benchmark import Picture, Speech
+            tracks = [Speech(session), Picture(session)]
         for track in tracks:
             transceiver = sender.addTransceiver(track, direction='sendonly')
             if track.kind == 'video':
@@ -167,6 +205,12 @@ async def measure(auth, result, media='both', clip=None):
                             first_silent_audio = time.monotonic()
                 elif track.kind == 'video':
                     pixels = frame.to_ndarray(format='rgb24')
+                    if session:
+                        marker = pixels[-12:-4, 4:12].mean(axis=(0, 1))
+                        row = session.clip
+                        if row and marker[1] > 200 and marker[2] < 40 and abs(marker[0]-row['index']*9) < 5:
+                            row.setdefault('first_decoded_frame_s', time.perf_counter()-row['started'])
+                        continue
                     counter = sum(1 << bit for bit in range(16)
                                   if pixels[5:15, bit*20+5:bit*20+15].mean() > 128)
                     sent = sent_frames.get(counter)
@@ -206,7 +250,7 @@ async def measure(auth, result, media='both', clip=None):
         began = time.monotonic()
         last_keyframe_request = began-1
         while not all(counts.values()) and time.monotonic() - began < 15:
-            if clip and receiver.connectionState == 'connected' and time.monotonic()-last_keyframe_request >= 1:
+            if (clip or session) and receiver.connectionState == 'connected' and time.monotonic()-last_keyframe_request >= 1:
                 # Experimental aiortc hook: force an IDR for a late subscriber.
                 for transceiver in sender.getTransceivers():
                     if transceiver.kind == 'video':
@@ -214,7 +258,20 @@ async def measure(auth, result, media='both', clip=None):
                 last_keyframe_request = time.monotonic()
             await asyncio.sleep(.05)
         result['first_both_media_after_renegotiation_s'] = round(time.monotonic() - began, 3)
-        if clip:
+        if session:
+            if not all(counts.values()):
+                raise TimeoutError('Live stream receiver unavailable')
+            session.receiver_ready = True
+            for index in range(len(session.fixtures)):
+                await asyncio.to_thread(session.begin, index)
+                deadline = time.monotonic()+30
+                while not session.clip['finished'] and time.monotonic() < deadline:
+                    await asyncio.sleep(.02)
+                if not session.clip['finished']:
+                    raise TimeoutError('GPU stream did not finish')
+                await asyncio.sleep(.3)
+            result['live_rows'] = session.safe_rows()
+        elif clip:
             await asyncio.sleep(2)
             interrupted = time.monotonic()
             await asyncio.sleep(3)
@@ -244,8 +301,16 @@ async def measure(auth, result, media='both', clip=None):
                             and ('audio' not in counts or max(peaks, default=0) > 100))
         if clip:
             result['passed'] = result['passed'] and first_stopped_video is not None and first_silent_audio is not None
+        if session:
+            result['passed'] = result['passed'] and all(
+                row.get('first_decoded_frame_s') is not None and not row.get('error')
+                for row in result['live_rows'])
         result['stage'] = 'finished'
     finally:
+        if session:
+            session.cancel.set()
+            for row in session.rows:
+                await asyncio.to_thread(row['worker'].join, 10)
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
@@ -263,20 +328,27 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--media', choices=['audio', 'video', 'both'], default='both')
     parser.add_argument('--clip', type=fixture_path, help='Reviewed generated audit MP4 plus matching synthetic WAV; sends both through Cloudflare')
+    parser.add_argument('--live-render', action='store_true', help='Stream new GPU lip frames for three retained synthetic speech fixtures')
     args = parser.parse_args()
     if args.clip and args.media != 'both':
         parser.error('--clip requires --media both')
+    if args.live_render and (args.clip or args.media != 'both'):
+        parser.error('--live-render requires both media and no --clip')
     configure_runtime()
     result = {'time': datetime.now(timezone.utc).isoformat(), 'passed': False, 'media': args.media,
               'scope': 'CPU peers through Cloudflare SFU; synthetic media or prerecorded generated fixture. No live inference, browser, microphone or end-to-end call latency test.'}
+    if args.live_render:
+        result['scope'] = ('Live local GPU lip rendering over reviewed body clips and retained synthetic speech through Cloudflare SFU. '
+                           'No ASR, dialogue, TTS, browser display, private conversation or arbitrary-motion test.')
     try:
-        asyncio.run(measure(Conversation(''), result, args.media, args.clip))
+        session = live_session() if args.live_render else None
+        asyncio.run(measure(Conversation(''), result, args.media, args.clip, session))
     except Exception as error:
         result['error_type'] = type(error).__name__
         if isinstance(error, urllib.error.HTTPError):
             result['http_status'] = error.code
             result['diagnostic'] = getattr(error, 'transport_diagnostic', 'unknown')
-    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"fixture" if args.clip else args.media}.json'
+    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"live" if args.live_render else "fixture" if args.clip else args.media}.json'
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(result))
