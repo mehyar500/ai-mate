@@ -229,6 +229,10 @@ def report(c):
              "September 8's additional synthetic Cloudflare comparisons total **$0.01443 at published variable list prices for responses with known usage**, including the capability-prompt retest. One timed-out GLM request has unknown billed usage; this is not an invoice. The earlier Aura-2 experiment added $0.01806 nominally. These small tests use existing credentials, do not purchase a plan, and do not establish future production costs. Qwen and local Kokoro remain selected. [Measured comparison](LOCAL_POC.md#cloudflare-comparison--september-8-follow-up).",
              "",
              remote_clip_comparison(), "",
+             "A warm RTX 4090 Pod at $0.74/hour costs $0.37 of GPU time per 30-minute call at full occupancy with one simultaneous call. At 25% occupied time it becomes $1.48 per served call; 24/7 operation costs $532.80 per 30 days. A 32GB RTX 5090 at $0.99/hour gives $0.495/$1.98/$712.80 under the same assumptions. These exclude storage, transport, other services and unused startup time. They are rental arithmetic, not measured concurrency or public-service quotes. Ten 4090 test hours cost $7.40 compute; no rental has been made, and Gateway credits cannot pay that separate provider.",
+             "",
+             "Cloudflare [Realtime SFU pricing](https://developers.cloudflare.com/realtime/sfu/pricing/) is $0.05/GB egress after its shared SFU/TURN allowance. A single 2Mbps downstream for 30 minutes is 0.45GB, or $0.0225 at that rate before protocol overhead and other billable traffic. GPU-provider egress is separate. This is transport only; WebRTC does not perform model inference.",
+             "",
              "The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.",
              "","| Future monthly offer | Price to test | Earlier direct contribution hypothesis |","|---|---:|---:|"]
     for plan in future['plans']:

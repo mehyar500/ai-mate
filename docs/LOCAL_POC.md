@@ -84,6 +84,23 @@ The paired-motion demonstration is a real improvement, but the requested quality
 
 Output files contain speech, local ASR recovered synthetic test sentences, and the browser completed unmuted playback without media errors. Physical speaker output and subjective phoneme/voice quality still need device testing. Jobs record first text, per-chunk speech generation time, rendering stages, cache hits and completion; the browser separately measures first playback and stalls.
 
+### Preparing appearances before calls — September 9
+
+Same synthetic approach/count/browser workflow, current mouth crop:
+
+| Configuration | First browser playback from Send | Total phrase gaps | Within-phrase stalls | Server completion |
+|---|---:|---:|---:|---:|
+| Batch 8, previous preparation | 2.56s | 1.03s | 0 | 15.63s |
+| Batch 4 | 2.53s | 1.00s | 0 | 15.87s |
+| Batch 8, two views prerendered | 1.67s | 0.03s | 0 | 12.16s |
+| Batch 8, four source appearances primed | **1.61s** | **0.03s** | **0** | **11.10s** |
+
+Batch 4 was rejected as noise. The selected implementation tracks/encodes verified source appearances during startup, caches four bounded clips instead of two, and generates speech-conditioned mouths anew. It does not precompute user replies. Priming four sources took **13.514s** before admission; subsequent face tracking took about 4ms per phrase. Loaded Torch allocation was 1,829MiB; peak rendering allocation was 2,742MiB, excluding other processes/display/driver usage. This is not a 16GB capacity bottleneck. Prepared movement and facial/arbitrary-command limitations remain.
+
+The browser completed three unmuted phrases without errors. Engine startup now primes sources; `visual_warmup` reports source count, time and allocation. Reproduce with `serve_phrase_benchmark.py --action closer --prime-reviewed`, then `review_phrase_playback.cjs phrases-approach-primed`. `--prewarm-reviewed` retains the two-clip experiment; `--batch-size 4` retains the rejected comparison. These exclude physical capture, real ASR/dialogue, internet transport and concurrency. Startup is longer; warm replies are faster.
+
+New primary research: [OmniMate](https://arxiv.org/html/2607.23023v1) reports 27.64FPS and 3.49s time to first frame with H100 hardware/pipeline parallelism; downloadable inference weights were not located in the checked paper. [InteractiveAvatar](https://arxiv.org/html/2606.22905v1) describes state/history switching and separates DiT/VAE across GPUs; it is an architectural lead, not an installed package. [Omni-LiveAvatar](https://github.com/Aoko955/Omni-LiveAvatar) reports H200 streaming but explicitly has not released code/checkpoints. [MotionStream](https://joonghyuk.com/motionstream-web/index.html) reports 29FPS/0.4s on H100 with motion controls, not a complete speech-driven companion. None proves a drop-in 16GB solution. The tested FlashHead Lite remains a practical next streaming comparison, with body-command and dependency-license gaps.
+
 ### Speech pipeline — September 8 measured revision
 
 The engine now preserves the full planned reply across short phrases (first target 72 characters, later 120), prepares one CPU TTS phrase ahead while rendering, performs a body command once, and advances the prepared loop's source time. Punctuation/word boundaries are preserved. Cancellation joins in-flight TTS before clearing media; incomplete replies do not commit memory. Each completed phrase closes its own fMP4 response. Previously the response stayed open until the whole job finished, causing an 8.34s stall in the first segmented experiment; that regression is fixed and covered by an HTTP test.
@@ -249,7 +266,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, sustained p50/p95, real microphone/speaker testing, natural voice barge-in, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 120 Python tests and seven Node tests. New checks cover Cloudflare nested output/failure parsing, cents-to-dollar budget conversion, video-rate audio context and crop-cache invalidation. The interruption checks cover strict descriptors, authentication/origin, stale generations, reset races, bounded timestamp decoding, cleanup, completed-reply stops and partial-movement continuation. Phrase tests retain complete speech, one-ahead synthesis and per-phrase HTTP completion. `review_call_playback.cjs` covers voice/video playback and captions with synthetic APIs/capture; the phrase and interruption browser scripts exercise real isolated rendering. None starts a physical microphone or reads the live conversation. No memory schema or provider configuration changed.
+Checks for this revision: 123 Python tests and seven Node tests. New checks cover Cloudflare nested output/failure parsing, cents-to-dollar budget conversion, video-rate audio context and crop-cache invalidation. The interruption checks cover strict descriptors, authentication/origin, stale generations, reset races, bounded timestamp decoding, cleanup, completed-reply stops and partial-movement continuation. Phrase tests retain complete speech, one-ahead synthesis and per-phrase HTTP completion. `review_call_playback.cjs` covers voice/video playback and captions with synthetic APIs/capture; the phrase and interruption browser scripts exercise real isolated rendering. None starts a physical microphone or reads the live conversation. No memory schema or provider configuration changed.
 
 ## Cost and next decision
 

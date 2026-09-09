@@ -1,9 +1,22 @@
 import unittest
+import threading
+from unittest.mock import MagicMock
 
-from local_app.visual import audio_left_padding, motion_duration
+from local_app.visual import PortraitRenderer, audio_left_padding, motion_duration
+from local_app.models import Cancelled
 
 
 class VisualTimingTests(unittest.TestCase):
+    def test_priming_is_bounded_and_cancelled_before_reading_source(self):
+        renderer=PortraitRenderer.__new__(PortraitRenderer)
+        with self.assertRaises(ValueError):
+            renderer.prime_motion(['synthetic']*5,threading.Event())
+        renderer.torch=MagicMock(); renderer.cv=MagicMock()
+        event=threading.Event();event.set()
+        with self.assertRaises(Cancelled):
+            renderer.prime_motion(['synthetic'],event)
+        renderer.cv.VideoCapture.assert_not_called()
+
     def test_whisper_context_tracks_actual_video_rate(self):
         self.assertEqual(audio_left_padding(20),6)
         self.assertEqual(audio_left_padding(25),4)

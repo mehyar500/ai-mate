@@ -265,7 +265,9 @@ class PoseTests(unittest.TestCase):
         read('copy.mp4',b'changed')
         self.assertFalse(renderer.motion_cache_hit)
         read('third.mp4',b'near')
-        self.assertEqual(len(renderer._motion_cache),2)
+        read('fourth.mp4',b'farther')
+        read('fifth.mp4',b'closer')
+        self.assertEqual(len(renderer._motion_cache),4)
         read('first.mp4',b'base')
         self.assertFalse(renderer.motion_cache_hit)  # Oldest content was evicted.
         read('first.mp4',b'base',reuse=False)

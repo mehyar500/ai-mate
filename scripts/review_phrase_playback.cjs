@@ -5,7 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const assert=require('node:assert/strict');
 const label=process.argv[2];
-assert.ok(['whole','phrases','phrases-b16','whole-b16','phrases-approach','phrases-approach-quality'].includes(label));
+assert.ok(['whole','phrases','phrases-b16','whole-b16','phrases-approach','phrases-approach-quality','phrases-b4-approach','phrases-approach-prewarm','phrases-approach-primed'].includes(label));
 const folder=path.resolve(__dirname,'../generated/local-app/audit/speech-'+label);
 async function main(){
   const browser=await chromium.launch({headless:true});
@@ -58,7 +58,7 @@ async function main(){
     console.log(JSON.stringify(result));
     assert.deepEqual(errors,[]);
     assert.ok(result.events.some(e=>e.id==='audio'&&e.type==='playing'&&!e.muted&&e.volume>0));
-    if(label.startsWith('phrases-approach')){
+    if(label.includes('approach')){
       assert.equal(job.prepared_pose,'near');
       assert.equal(job.chunks.filter(c=>c.render.motion_source==='reviewed_prepared_transition').length,1);
       assert.ok(job.chunks.slice(1).every(c=>c.render.motion_source==='prepared_listening_loop'));

@@ -56,6 +56,7 @@ class CompanionEngine:
         self.error = None
         self.visual_error = None
         self.startup_s = None
+        self.visual_warmup = None
         self.factory = model_factory
         self.scene = self.store.current_scene()
         self.pose = None  # (scene, private PNG), committed only after successful video completion.
@@ -90,6 +91,7 @@ class CompanionEngine:
                     warm_audio = ROOT/".cache/local-poc/renderer-warm.wav"
                     self.models.speech("Hello there.", warm_audio)
                     renderer.render(warm_audio, warm_audio.with_suffix(".mp4"), event)
+                    self.prime_reviewed_visual(renderer, event)
                 except Exception as error:
                     self.visual_error = "Video warm-up failed. Voice and text remain available; check the terminal."
                     print(f"Video startup error: {type(error).__name__}: {error}", flush=True)
@@ -99,6 +101,14 @@ class CompanionEngine:
         except Exception as error:
             self.error = "Local model startup failed. Check the terminal and model setup."
             print(f"Startup error: {type(error).__name__}: {error}", flush=True)
+
+    def prime_reviewed_visual(self, renderer, event):
+        """Only constructor-verified character footage enters this cache."""
+        paths = [self.idle_video, self.near_idle_video]
+        paths += [row['path'] for row in (self.performance or {}).values()]
+        paths = list(dict.fromkeys(path for path in paths if path is not None))
+        if paths:
+            self.visual_warmup = renderer.prime_motion(paths, event)
 
     def listening_asset(self, scene, pose):
         if scene != 'fullbody':
@@ -113,6 +123,7 @@ class CompanionEngine:
         with self.lock:
             return {"app_version": "0.2", "ready": self.ready, "error": self.error, "busy": self.busy or self.playback_pending,
                     "startup_s": self.startup_s,
+                    "visual_warmup": self.visual_warmup,
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
                     "visual_error": self.visual_error,
                     "scene": self.scene,

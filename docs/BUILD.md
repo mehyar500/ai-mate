@@ -28,6 +28,26 @@ Job metrics report ASR, first text, first completed media and total time; video 
 
 The first demo proves the interaction and selected measured components. Adult commercial capability, provider acceptance and full live visual calling remain separately unresolved. The sections below retain the model/license evidence and future paid-service contract; their always-on capacity, 25-user free cohort and paid entitlements are **deferred**, not current POC requirements. Source requirements ADULT-01 through ADULT-04 apply only to a separately approved explicit web launch.
 
+## Online deployment path — September 9
+
+The local path updates lips over prepared body footage; LTX through Gateway creates a full new video. Compare identical work before claiming one cloud or machine is universally faster. For public use, run the renderer on a rented US GPU server; customers need a browser, not a GPU. Cloudflare Gateway routes inference; [Realtime SFU](https://developers.cloudflare.com/realtime/) transports the call.
+
+```mermaid
+flowchart LR
+    P[Browser or PWA] --> C[Cloudflare API: login, quota, memory]
+    C --> Q[Cloudflare dialogue model]
+    C --> G[US GPU worker: loaded models and prepared views]
+    Q --> G
+    G --> R[WebRTC video and audio through SFU]
+    R --> P
+```
+
+Start with one admitted call per warm GPU worker. Package the renderer, pinned weights and reviewed assets in a Linux GPU container; keep CPU speech/recognition alongside it and dialogue on Cloudflare. Preload character appearance once, preserve per-call state across turns and maintain continuous timestamped audio/video tracks. Heavy new scene/clip generation needs a separate queue so it cannot stall calls. The credential target remains Cloudflare plus one GPU provider, with secrets server-side.
+
+The loopback service is not a public backend: replace its shared local token and single conversation with authenticated accounts, isolated session/memory state, short-lived media grants, quotas, disconnect/cancellation handling and admission limits. Add streaming ASR/first-phrase dialogue/TTS and WebRTC output. Moving existing MP4 responses online alone does not implement these. Target warm end-of-user-speech to synchronized reply p95 <=2s, then validate network delay and concurrency. The current 1.61s media-path timing excludes real recognition/dialogue.
+
+Use scheduled demo windows or start a worker when a visitor opens a character, retaining it through the call. Scaling to zero saves idle GPU cost but adds cold-start delay; storage still costs money. Instant first calls require some warm capacity. Benchmark a 24GB RTX 4090 before buying hardware or moving to 32/48GB. Current MuseTalk fits 16GB; compute, bandwidth, preparation and streaming matter separately from VRAM capacity. ECONOMICS contains rental/utilization arithmetic. Public controls and model/dependency/hosting rights remain pending; no public service or rented GPU is provisioned.
+
 ## Distribution decision: native, non-explicit first
 
 The revised founder goal targets an Apple-native client and Apple in-app purchases. Keep the current Windows browser prototype for model/latency experiments; native SwiftUI playback, microphone permissions, StoreKit transactions and device testing are future implementation work. Model/hosting rights remain required for the actual experience. [USA](USA.md) defines the content boundary; [ECONOMICS](ECONOMICS.md) includes Apple's fee. No native app, StoreKit entitlement service or approval exists yet. Current design work follows Apple's guidance on touch targets, readable controls, undistorted media and accessible text alternatives: 44px web controls, optional captions, keyboard-accessible settings and a persistent call/Message distinction. Native 44pt targets, Dynamic Type, VoiceOver, safe areas, audio interruption and real iPhone tests remain acceptance work. [Apple design guidance](https://developer.apple.com/design/tips/).

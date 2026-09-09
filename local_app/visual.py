@@ -171,12 +171,12 @@ class PortraitRenderer:
         if not frames or not 1 <= source_fps <= 60 or len(frames) > 1800:
             raise RuntimeError("The motion clip is missing or has an invalid duration/frame rate.")
         height, width = frames[0].shape[:2]
-        # Cache only short, reviewed, speech-free source footage. At most two
+        # Cache only short, reviewed, speech-free source footage. At most four
         # 384x576/144-frame entries; no generated mouths or user audio survives.
         if not cached and key and len(frames) <= 144 and width*height <= 384*576:
             cached = {'frames':frames, 'fps':source_fps, 'tracked':{}, 'latents':{}}
             self._motion_cache[key] = cached
-            while len(self._motion_cache) > 2:
+            while len(self._motion_cache) > 4:
                 self._motion_cache.popitem(last=False)
         self._appearance_latents = cached['latents'] if cached else None
         detector = cv.FaceDetectorYN.create(str(CACHE / "yunet.onnx"), "", (width, height), .65, .3, 5000)
@@ -211,6 +211,49 @@ class PortraitRenderer:
                 tracked[index] = (frame, (x1,y1,x2,y2), mask, cv.cvtColor(crop,cv.COLOR_BGR2RGB))
             result.append(tracked[index])
         return result
+
+    def encode_appearance(self, crops):
+        """Cache source appearance only; speech conditioning remains per reply."""
+        torch, np = self.torch, self.np
+        appearance = self._appearance_latents
+        missing = [crop for crop in crops if appearance is None or id(crop) not in appearance]
+        if missing:
+            originals = torch.from_numpy(np.stack(missing)).permute(0,3,1,2).to('cuda',self.dtype)/255
+            masked = originals.clone()
+            masked[:,:,128:,:] = 0
+            a = self.vae.encode(masked*2-1).latent_dist.mode()*self.vae.config.scaling_factor
+            b = self.vae.encode(originals*2-1).latent_dist.mode()*self.vae.config.scaling_factor
+            encoded = torch.cat((a,b),dim=1)
+            if appearance is not None:
+                for crop, value in zip(missing, encoded):
+                    appearance[id(crop)] = value.unsqueeze(0).clone()
+        return torch.cat([appearance[id(crop)] for crop in crops]) if appearance is not None else encoded
+
+    def prime_motion(self, paths, cancel):
+        """Prepare at most four verified sources before admitting a call."""
+        if len(paths)>4:
+            raise ValueError('Motion warm-up is limited to four reviewed sources.')
+        started=time.perf_counter()
+        with self.torch.inference_mode():
+            for path in paths:
+                check_cancel(cancel)
+                probe=self.cv.VideoCapture(str(path))
+                try:
+                    fps=probe.get(self.cv.CAP_PROP_FPS)
+                    count=probe.get(self.cv.CAP_PROP_FRAME_COUNT)
+                finally:
+                    probe.release()
+                if not math.isfinite(count) or not 1<=count<=144 or not 1<=fps<=60:
+                    raise ValueError('Invalid reviewed source for motion warm-up.')
+                rows=self.motion_frames(path,int(count),fps,cancel,loop=True,reuse=True)
+                if self._appearance_latents is None:
+                    raise ValueError('Motion warm-up requires a cache-eligible reviewed source.')
+                for offset in range(0,len(rows),8):
+                    check_cancel(cancel)
+                    self.encode_appearance([row[3] for row in rows[offset:offset+8]])
+            self.torch.cuda.synchronize()
+        return {'sources':len(paths),'seconds':round(time.perf_counter()-started,3),
+                'torch_allocated_mib':round(self.torch.cuda.memory_allocated()/1048576,3)}
 
     def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0):
         if streaming:
@@ -293,20 +336,7 @@ class PortraitRenderer:
                         # Reuse appearance for at most 50ms; body frames, tracking and
                         # audio-conditioned mouth synthesis still update every frame.
                         crops = [item[3] for item in movement[offset:offset+count:face_encode_stride]]
-                        appearance = self._appearance_latents
-                        missing = [crop for crop in crops if appearance is None or id(crop) not in appearance]
-                        if missing:
-                            originals = torch.from_numpy(np.stack(missing)).permute(0,3,1,2).to("cuda",self.dtype)/255
-                            masked = originals.clone()
-                            masked[:,:,128:,:] = 0
-                            # Posterior means keep cached appearance deterministic.
-                            a = self.vae.encode(masked*2-1).latent_dist.mode()*self.vae.config.scaling_factor
-                            b = self.vae.encode(originals*2-1).latent_dist.mode()*self.vae.config.scaling_factor
-                            encoded = torch.cat((a,b),dim=1)
-                            if appearance is not None:
-                                for crop, value in zip(missing, encoded):
-                                    appearance[id(crop)] = value.unsqueeze(0).clone()
-                        latent = torch.cat([appearance[id(crop)] for crop in crops]) if appearance is not None else encoded
+                        latent = self.encode_appearance(crops)
                         latent = latent.repeat_interleave(face_encode_stride,dim=0)[:count].contiguous(memory_format=torch.channels_last)
                     else:
                         latent = self.latent.expand(count, -1, -1, -1)

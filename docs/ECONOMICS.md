@@ -85,6 +85,10 @@ At a hypothetical $1.99 price for one 15-second standard P-Video clip, 30% Apple
 
 Runpod [InfiniteTalk](https://docs.runpod.io/public-endpoints/models/infinitetalk) lists $0.25/480p or $0.50/720p per video, but that page does not establish an accepted audio-duration limit. Do not turn its flat price into an unlimited-call estimate. Managed clip endpoints need no reserved GPU, but have unmeasured queue/render latency. For continuous calls, compare a persistent streaming worker against local FlashHead; cold-start and occupancy costs remain. Runpod is excluded for explicit content under its [terms](https://www.runpod.io/legal/terms-of-service).
 
+A warm RTX 4090 Pod at $0.74/hour costs $0.37 of GPU time per 30-minute call at full occupancy with one simultaneous call. At 25% occupied time it becomes $1.48 per served call; 24/7 operation costs $532.80 per 30 days. A 32GB RTX 5090 at $0.99/hour gives $0.495/$1.98/$712.80 under the same assumptions. These exclude storage, transport, other services and unused startup time. They are rental arithmetic, not measured concurrency or public-service quotes. Ten 4090 test hours cost $7.40 compute; no rental has been made, and Gateway credits cannot pay that separate provider.
+
+Cloudflare [Realtime SFU pricing](https://developers.cloudflare.com/realtime/sfu/pricing/) is $0.05/GB egress after its shared SFU/TURN allowance. A single 2Mbps downstream for 30 minutes is 0.45GB, or $0.0225 at that rate before protocol overhead and other billable traffic. GPU-provider egress is separate. This is transport only; WebRTC does not perform model inference.
+
 The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.
 
 | Future monthly offer | Price to test | Earlier direct contribution hypothesis |

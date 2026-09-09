@@ -41,10 +41,12 @@ class SyntheticModels(Models):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--whole', action='store_true')
-    parser.add_argument('--batch-size', type=int, choices=[8, 16], default=8)
+    parser.add_argument('--batch-size', type=int, choices=[4, 8, 16], default=8)
     parser.add_argument('--action', choices=['none', 'closer'], default='none')
     parser.add_argument('--interruption', action='store_true')
     parser.add_argument('--quality-review', action='store_true')
+    parser.add_argument('--prewarm-reviewed', action='store_true')
+    parser.add_argument('--prime-reviewed', action='store_true')
     parser.add_argument('--trial', choices=['early', 'middle'], default='early')
     args = parser.parse_args()
     label = 'whole' if args.whole else 'phrases'
@@ -56,6 +58,14 @@ def main():
         label = 'interruption' + ('-middle' if args.trial == 'middle' else '')
     if args.quality_review:
         label += '-quality'
+    if args.prewarm_reviewed:
+        if args.action != 'closer' or args.interruption:
+            parser.error('This controlled prewarm comparison uses the approach case.')
+        label += '-prewarm'
+    if args.prime_reviewed:
+        if args.prewarm_reviewed:
+            parser.error('Choose render warm-up or appearance-only priming.')
+        label += '-primed'
     folder = ROOT / 'generated/local-app/audit' / ('speech-' + label)
     folder.mkdir(parents=True, exist_ok=True)
     for name in ['fullbody.png', 'performance-near.png', 'performance-closer.mp4',
@@ -76,6 +86,18 @@ def main():
     renderer.prepare('fullbody')
     renderer.render(audio, folder/'warm.mp4', threading.Event(), 'fullbody', streaming=True,
                     motion_path=app.idle_video, loop_motion=True, reuse_motion=True)
+    if args.prewarm_reviewed:
+        prewarm_start=time.perf_counter()
+        synthetic_audio=ROOT/'generated/local-app/audit/cloud-compare-kokoro-normal.wav'
+        for filename in ['idle-near.mp4','performance-closer.mp4']:
+            renderer.render(synthetic_audio,folder/('warm-'+filename),threading.Event(),'fullbody',
+                streaming=True,motion_path=folder/filename,loop_motion=True,reuse_motion=True)
+        (folder/'prewarm.json').write_text(json.dumps({'prewarm_s':time.perf_counter()-prewarm_start,
+            'sources':['idle-near.mp4','performance-closer.mp4'],
+            'torch_allocated_mib':renderer.torch.cuda.memory_allocated()/1048576})+'\n')
+    if args.prime_reviewed:
+        app.prime_reviewed_visual(renderer,threading.Event())
+        (folder/'prewarm.json').write_text(json.dumps(app.visual_warmup)+'\n')
     app.ready = True
     server = ThreadingHTTPServer(('127.0.0.1', 8766), Handler)
     server.daemon_threads = True
