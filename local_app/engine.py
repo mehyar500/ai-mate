@@ -339,7 +339,10 @@ class CompanionEngine:
             if mode == "video":
                 with self.lock:
                     job["state"] = "warming_video"
+                visual_load_started = time.perf_counter()
                 renderer = self.models.load_visual()
+                with self.lock:
+                    job['metrics']['visual_load_s'] = round(time.perf_counter()-visual_load_started, 3)
                 with self.lock:
                     pose_reference = self.pose[1] if self.pose and self.pose[0] == scene else None
                     performance_candidate = self.performance_state if scene == self.scene else 'base'
@@ -356,8 +359,11 @@ class CompanionEngine:
                     if scene == 'fullbody' and cursor_candidate is not None and plan and plan.get('action') in {'closer', 'farther'}:
                         origin = 'base' if plan.get('action') == 'closer' else 'near'
                         prepared_transition = self.performance.get((origin, plan.get('action')))
+                visual_prepare_started = time.perf_counter()
                 if not prepared_transition and not (listening_video and (not plan or plan.get('action','none') == 'none')):
                     renderer.prepare(scene, **({"reference_path":pose_reference} if pose_reference else {}))
+                with self.lock:
+                    job['metrics']['visual_prepare_s'] = round(time.perf_counter()-visual_prepare_started, 3)
                 check_cancel(event)
             with self.lock:
                 job["state"] = "thinking"

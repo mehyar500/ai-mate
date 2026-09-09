@@ -110,6 +110,8 @@ class PoseTests(unittest.TestCase):
         self.app.models.plan = plan
         stopped = self.reply('stop')
         self.assertEqual(stopped['state'], 'done')
+        self.assertGreaterEqual(stopped['metrics']['visual_load_s'], 0)
+        self.assertGreaterEqual(stopped['metrics']['visual_prepare_s'], 0)
         self.assertNotIn('motion_path', self.visual.render_options[-1])
         self.assertIsNone(stopped['idle_video'])
         self.assertIsNotNone(self.app.pose)
