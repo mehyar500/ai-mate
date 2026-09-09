@@ -21987,5 +21987,742 @@
       "No public deployment/paid provider eligibility established",
       "VACE inference and streaming remain untested"
     ]
+  },
+  "vace_rcm_pose_transfer_20260909": {
+    "source_commit": "3ebe090a0817c65635897e1ba5c0f608b5ffd114",
+    "risk": "R1 isolated rendering experiment; no runtime selection, private-data changes or public deployment",
+    "classification": "progress",
+    "revalidation": "Prior renderer session 57302 was terminal exit 0; authoritative output inspected before the next experiment. Prompt rewriting alone was not implementation evidence.",
+    "scope": "Four silent, offline 33-frame pose-conditioned clips; excludes conversation, live input, streaming, audio and production eligibility",
+    "trials": [
+      {
+        "folder": "generated/local-app/audit/vace-right-isolated-render",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "right-isolated-render",
+            "prepare_only": false,
+            "side": "right",
+            "motion": "raise-lower",
+            "size": 512,
+            "frames": 33,
+            "steps": 30,
+            "context_scale": 1.0,
+            "seed": 42,
+            "pose_format": "full-body"
+          },
+          "model_revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+          "code_revision": "9737cba9c1c3c4d04b33fcad41c111989865d315",
+          "scope": "Offline pose/control quality; no live streaming, speech or command planner",
+          "api_cost_usd": 0,
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.41190249999635853,
+          "controls": {
+            "side": "right",
+            "frames": 33,
+            "size": 512,
+            "max_arm_length_deviation": 4.163336342344337e-17,
+            "type": "deterministic joint-angle raise, hold, lower; no language planner",
+            "pose_format": "full-body",
+            "other_body_points_fixed": true
+          },
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompt": "A realistic full body video of the same adult woman in the reference photograph, wearing the same cream sweater, blue jeans and white shoes in the same garden. She slowly raises her right hand to shoulder height, holds it up, then lowers it. Her other arm stays down. Fixed camera. Her entire body and feet remain visible.",
+          "negative_prompt": "blurred face, distorted anatomy, extra limbs, detached hands, changing clothes, cuts, camera zoom, text",
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0005132999940542504,
+          "model_load_s": 2.496451499988325,
+          "run": {
+            "inference_s": 205.54813880000438,
+            "generated_frames": 33,
+            "generated_fps": 0.16054633329523146,
+            "first_decoded_output_s": 205.54813880000438,
+            "peak_allocated_bytes": 9639386112,
+            "peak_reserved_bytes": 11312037888,
+            "sha256": "e9a154d83b9956d3150ecf70328c33f25e12833a1ed152ecb351a7c14d52a67c"
+          }
+        },
+        "visual_review": {
+          "review_type": "Ordered contact sheets; all 33 frames visually inspected",
+          "frames_reviewed": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "right_arm_raise_hold_lower": true,
+          "left_arm_stays_down": true,
+          "feet_remain_visible": true,
+          "identity_and_outfit": "Broad continuity retained in this short sample; fine detail soft",
+          "defects": [
+            "Hand/finger detail is soft during movement",
+            "Perceptual naturalness at normal speed has not been reviewed",
+            "Single reference and seed only",
+            "Compared with the source portrait, the patio becomes lawn and the vegetation changes. Within-clip continuity does not establish reference-scene fidelity."
+          ],
+          "normal_speed_reviewed": false,
+          "speech_or_lip_sync_tested": false,
+          "live_call_accepted": false,
+          "reason": "205.55 seconds before the complete 2.06-second clip is available; no live input or streaming",
+          "reference_scene_retained": false
+        },
+        "body_review": {
+          "frames": 33,
+          "right_raised_frames": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "left_raised_frames": [],
+          "flagged_frames": [],
+          "controls": {
+            "black_frame_detected": true,
+            "mirror_side_reversed": true
+          }
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-right-rcm-validated",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "right-rcm-validated",
+            "prepare_only": false,
+            "side": "right",
+            "motion": "raise-lower",
+            "size": 512,
+            "frames": 33,
+            "generator": "rcm",
+            "steps": 4,
+            "context_scale": 1.0,
+            "seed": 42,
+            "pose_format": "full-body"
+          },
+          "model_revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+          "code_revision": "9737cba9c1c3c4d04b33fcad41c111989865d315",
+          "scope": "Offline pose/control quality; no live streaming, speech or command planner",
+          "api_cost_usd": 0,
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.518869799998356,
+          "controls": {
+            "side": "right",
+            "frames": 33,
+            "size": 512,
+            "max_arm_length_deviation": 4.163336342344337e-17,
+            "type": "deterministic joint-angle raise, hold, lower; no language planner",
+            "pose_format": "full-body",
+            "other_body_points_fixed": true
+          },
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompt": "A realistic full body video of the same adult woman in the reference photograph, wearing the same cream sweater, blue jeans and white shoes in the same garden. She slowly raises her right hand to shoulder height, holds it up, then lowers it. Her other arm stays down. Fixed camera. Her entire body and feet remain visible.",
+          "negative_prompt": "blurred face, distorted anatomy, extra limbs, detached hands, changing clothes, cuts, camera zoom, text",
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0004937000048812479,
+          "rcm_transfer": {
+            "replaced_base_tensors": 825,
+            "retained_control_tensors": 439,
+            "discarded_training_counters": [
+              "accum_image_sample_counter",
+              "accum_iteration",
+              "accum_train_in_hours",
+              "accum_video_sample_counter"
+            ],
+            "control_distilled": false,
+            "transfer_validated_visually": false
+          },
+          "model_load_s": 2.8040559999935795,
+          "rcm_timing": {
+            "control_encode_s": 7.351344900002005,
+            "denoising_steps_s": [
+              3.277610699995421,
+              3.19235289999051,
+              3.1927932999969926,
+              3.1928183999989415
+            ],
+            "decode_s": 5.965213999996195
+          },
+          "rcm_sampling": {
+            "steps": 4,
+            "sigma_max": 80,
+            "guidance": "single conditional pass; distilled CFG",
+            "rectified_flow_times": [
+              0.9876543209876543,
+              0.933781061416858,
+              0.852895394823775,
+              0.608979049230431,
+              0.0
+            ],
+            "streaming": false
+          },
+          "run": {
+            "inference_s": 26.179711400007363,
+            "generated_frames": 33,
+            "generated_fps": 1.260518097231229,
+            "first_decoded_output_s": 26.179711400007363,
+            "peak_allocated_bytes": 9631513088,
+            "peak_reserved_bytes": 11312037888,
+            "sha256": "8223e9ab1682daa8a6acd98208decac70be54af215d3acf0275c533fb3d7b59a"
+          }
+        },
+        "visual_review": {
+          "review_type": "Ordered contact sheets; all 33 frames visually inspected",
+          "frames_reviewed": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "right_arm_raise_hold_lower": true,
+          "left_arm_stays_down": true,
+          "feet_remain_visible": true,
+          "reference_scene_retained": false,
+          "defects": [
+            "Garden changes: red umbrellas, pots and different vegetation appear",
+            "Hands and face remain soft",
+            "Control raises the hand above shoulder height despite the benchmark prompt saying shoulder height"
+          ],
+          "normal_speed_reviewed": false,
+          "speech_or_lip_sync_tested": false,
+          "live_call_accepted": false,
+          "reason": "26.18 seconds before complete clip plus scene change; no live input or streaming"
+        },
+        "body_review": {
+          "frames": 33,
+          "right_raised_frames": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "left_raised_frames": [],
+          "flagged_frames": [],
+          "controls": {
+            "black_frame_detected": true,
+            "mirror_side_reversed": true
+          }
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-right-rcm-background",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "right-rcm-background",
+            "prepare_only": false,
+            "side": "right",
+            "motion": "raise-lower",
+            "size": 512,
+            "frames": 33,
+            "generator": "rcm",
+            "conditioning": "masked-body",
+            "steps": 4,
+            "context_scale": 1.0,
+            "seed": 42,
+            "pose_format": "full-body"
+          },
+          "model_revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+          "code_revision": "9737cba9c1c3c4d04b33fcad41c111989865d315",
+          "scope": "Offline pose/control quality; no live streaming, speech or command planner",
+          "api_cost_usd": 0,
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.38653340000018943,
+          "controls": {
+            "side": "right",
+            "frames": 33,
+            "size": 512,
+            "max_arm_length_deviation": 4.163336342344337e-17,
+            "type": "deterministic joint-angle raise, hold, lower; no language planner",
+            "pose_format": "full-body",
+            "other_body_points_fixed": true
+          },
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompt": "A realistic full body video of the same adult woman in the reference photograph, wearing the same cream sweater, blue jeans and white shoes in the same garden. She slowly raises her right hand to shoulder height, holds it up, then lowers it. Her other arm stays down. Fixed camera. Her entire body and feet remain visible.",
+          "negative_prompt": "blurred face, distorted anatomy, extra limbs, detached hands, changing clothes, cuts, camera zoom, text",
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0005011000030208379,
+          "rcm_transfer": {
+            "replaced_base_tensors": 825,
+            "retained_control_tensors": 439,
+            "discarded_training_counters": [
+              "accum_image_sample_counter",
+              "accum_iteration",
+              "accum_train_in_hours",
+              "accum_video_sample_counter"
+            ],
+            "control_distilled": false,
+            "transfer_validated_visually": false
+          },
+          "model_load_s": 2.7842290999979014,
+          "conditioning": {
+            "type": "masked-body",
+            "editable_xyxy": [
+              29,
+              55,
+              344,
+              512
+            ],
+            "post_render_compositing": false
+          },
+          "rcm_timing": {
+            "control_encode_s": 7.248729899991304,
+            "denoising_steps_s": [
+              3.247010199993383,
+              3.191772799997125,
+              3.19163450000633,
+              3.192701499996474
+            ],
+            "decode_s": 5.955793599991011
+          },
+          "rcm_sampling": {
+            "steps": 4,
+            "sigma_max": 80,
+            "guidance": "single conditional pass; distilled CFG",
+            "rectified_flow_times": [
+              0.9876543209876543,
+              0.933781061416858,
+              0.852895394823775,
+              0.608979049230431,
+              0.0
+            ],
+            "streaming": false
+          },
+          "run": {
+            "inference_s": 26.031084599992028,
+            "generated_frames": 33,
+            "generated_fps": 1.2677151377707139,
+            "first_decoded_output_s": 26.031084599992028,
+            "peak_allocated_bytes": 9631513088,
+            "peak_reserved_bytes": 11263803392,
+            "sha256": "d4099db1a5ad9119eda8428a561ea0a7bb369ef11004e144a61f78437c575403"
+          }
+        },
+        "visual_review": {
+          "review_type": "All 33 frames in ordered sheets plus original reference image",
+          "frames_reviewed": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "right_arm_raise_hold_lower": true,
+          "left_arm_stays_down": true,
+          "feet_remain_visible": true,
+          "reference_scene_retained": "Original patio and garden layout broadly restored, without pixel-exact or naturalness certification",
+          "defects": [
+            "Black padding preserved around portrait; moving right hand is clipped at left image boundary",
+            "Soft face/hands; control raises wrist above requested shoulder height"
+          ],
+          "normal_speed_reviewed": false,
+          "speech_or_lip_sync_tested": false,
+          "live_call_accepted": false,
+          "reason": "26.03-second complete-clip delay and clipped moving hand"
+        },
+        "body_review": {
+          "frames": 33,
+          "right_raised_frames": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "left_raised_frames": [],
+          "flagged_frames": [],
+          "controls": {
+            "black_frame_detected": true,
+            "mirror_side_reversed": true
+          }
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-right-rcm-open-canvas",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "right-rcm-open-canvas",
+            "prepare_only": false,
+            "side": "right",
+            "motion": "raise-lower",
+            "size": 512,
+            "frames": 33,
+            "generator": "rcm",
+            "conditioning": "masked-body-open-canvas",
+            "steps": 4,
+            "context_scale": 1.0,
+            "seed": 42,
+            "pose_format": "full-body"
+          },
+          "model_revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+          "code_revision": "9737cba9c1c3c4d04b33fcad41c111989865d315",
+          "scope": "Offline pose/control quality; no live streaming, speech or command planner",
+          "api_cost_usd": 0,
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.39456310000969097,
+          "controls": {
+            "side": "right",
+            "frames": 33,
+            "size": 512,
+            "max_arm_length_deviation": 4.163336342344337e-17,
+            "type": "deterministic joint-angle raise, hold, lower; no language planner",
+            "pose_format": "full-body",
+            "other_body_points_fixed": true
+          },
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompt": "A realistic full body video of the same adult woman in the reference photograph, wearing the same cream sweater, blue jeans and white shoes in the same garden. She slowly raises her right hand to shoulder height, holds it up, then lowers it. Her other arm stays down. Fixed camera. Her entire body and feet remain visible.",
+          "negative_prompt": "blurred face, distorted anatomy, extra limbs, detached hands, changing clothes, cuts, camera zoom, text",
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0004817000008188188,
+          "rcm_transfer": {
+            "replaced_base_tensors": 825,
+            "retained_control_tensors": 439,
+            "discarded_training_counters": [
+              "accum_image_sample_counter",
+              "accum_iteration",
+              "accum_train_in_hours",
+              "accum_video_sample_counter"
+            ],
+            "control_distilled": false,
+            "transfer_validated_visually": false
+          },
+          "model_load_s": 2.8212203000002773,
+          "conditioning": {
+            "type": "masked-body-open-canvas",
+            "editable_xyxy": [
+              29,
+              55,
+              344,
+              512
+            ],
+            "editable_padding_columns": 171,
+            "post_render_compositing": false
+          },
+          "rcm_timing": {
+            "control_encode_s": 7.239338999992469,
+            "denoising_steps_s": [
+              3.248059399993508,
+              3.192448699992383,
+              3.192819399992004,
+              3.192955599995912
+            ],
+            "decode_s": 5.955046199989738
+          },
+          "rcm_sampling": {
+            "steps": 4,
+            "sigma_max": 80,
+            "guidance": "single conditional pass; distilled CFG",
+            "rectified_flow_times": [
+              0.9876543209876543,
+              0.933781061416858,
+              0.852895394823775,
+              0.608979049230431,
+              0.0
+            ],
+            "streaming": false
+          },
+          "run": {
+            "inference_s": 26.024135300001944,
+            "generated_frames": 33,
+            "generated_fps": 1.2680536594042966,
+            "first_decoded_output_s": 26.024135300001944,
+            "peak_allocated_bytes": 9631513088,
+            "peak_reserved_bytes": 11263803392,
+            "sha256": "f30c48066421bf2f77a1a320fcb9be15dff75b4d05091876eced81c89da632b5"
+          }
+        },
+        "visual_review": {
+          "review_type": "All 33 frames in ordered sheets plus original reference image",
+          "frames_reviewed": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "right_arm_raise_hold_lower": true,
+          "left_arm_stays_down": true,
+          "feet_remain_visible": true,
+          "moving_hand_visible": true,
+          "reference_scene_retained": "Patio/plants broadly retained with invented edge scenery; right border is an obvious flat strip",
+          "defects": [
+            "Flat right-edge strip",
+            "Added shed/edge scenery",
+            "Soft hands and face",
+            "Wrist target above shoulder instead of exact prompt height"
+          ],
+          "normal_speed_reviewed": false,
+          "speech_or_lip_sync_tested": false,
+          "live_call_accepted": false,
+          "reason": "26.02-second clip delay and unresolved visual defects"
+        },
+        "body_review": {
+          "frames": 33,
+          "right_raised_frames": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "left_raised_frames": [],
+          "flagged_frames": [],
+          "controls": {
+            "black_frame_detected": true,
+            "mirror_side_reversed": true
+          }
+        }
+      }
+    ],
+    "setup_failures": [
+      {
+        "folder": "generated/local-app/audit/vace-right-controls",
+        "error_type": "ModuleNotFoundError",
+        "error": "No module named 'matplotlib'",
+        "complete": false
+      },
+      {
+        "folder": "generated/local-app/audit/vace-right-controls-ready",
+        "error_type": "TypeError",
+        "error": "'Image' object is not iterable",
+        "complete": false
+      },
+      {
+        "folder": "generated/local-app/audit/vace-right-first-render",
+        "error_type": "ImportError",
+        "error": "cannot import name 'disable_input_dtype_casting' from 'peft.helpers' (C:\\Users\\mehya\\ai-mate\\.cache\\rain-deps\\peft\\helpers.py)",
+        "complete": false
+      },
+      {
+        "folder": "generated/local-app/audit/vace-right-rcm-four-step",
+        "error_type": "ValueError",
+        "error": "Invalid rCM training counter: accum_video_sample_counter",
+        "complete": false
+      }
+    ],
+    "failure_resolutions": [
+      "Limit RAIN optional dependencies to pose preparation, avoiding old PEFT import conflict",
+      "Correct reference/control return order",
+      "Exclude only four explicitly named scalar training counters, which contain signed/uninitialized values in the released rCM checkpoint"
+    ],
+    "manifest": {
+      "path": "config/vace-benchmark.json",
+      "sha256": "228b1f95df8fb3826c9159f5cf4d8fe17678565024008a6d003da54a2033919f"
+    },
+    "research": {
+      "rcm_source": "https://github.com/NVlabs/rcm",
+      "source_revision": "ed3cb14dd936f92cdc9f9381af7369991509b41f",
+      "model_card": "https://huggingface.co/worstcoder/rcm-Wan/blob/142d77a331f1516fea772607c1bf25a2785a2505/README.md",
+      "model_license_observation": "Apache-2.0 per pinned model card; card describes unofficial Tsinghua University reproductions, not an NVIDIA weight release",
+      "causal_checkpoint_observed": {
+        "filename": "Causal_rCM_Wan2.1_T2V_1.3B_480p_TF-dCM-init_SF-DMD_c1-1_step2.pt",
+        "bytes": 2838292823,
+        "sha256": "58c1f495ea09dd7877a82e5cd5eeeca2d8c97429ec0ca9bf61c76bf25bbf4585",
+        "downloaded": false,
+        "vace_compatibility": "unverified"
+      }
+    },
+    "validation": {
+      "compileall": "passed",
+      "python_tests": 206,
+      "javascript_tests": 32,
+      "failures": 0,
+      "all_frames_visually_inspected": 132,
+      "independent_body_diagnostic_frames": 132,
+      "independent_human_review": "not performed",
+      "normal_speed_audio_review": "not performed",
+      "CI": "not run this checkpoint",
+      "preview": {
+        "ready": true,
+        "busy": false,
+        "private_memory_unchanged": true
+      }
+    },
+    "cost": {
+      "paid_inference_usd": 0,
+      "gpu_rental_usd": 0,
+      "electricity": "unmeasured",
+      "additional_rcm_download_bytes": 2838264553,
+      "call_cost": "Not established: 26s offline generation for 2.06s playback does not meet real-time throughput"
+    },
+    "remaining": [
+      "Scene-edge and hand detail defects",
+      "Wrong precise wrist height in generated control trajectory",
+      "Short-chunk and causal compatibility untested",
+      "No live language action planner, speech sync or interruption integration for this renderer",
+      "Current app still uses its earlier prepared action set"
+    ],
+    "next_experiment": "Bound a short-chunk test with the reference aspect ratio and compact hand trajectory; profile VAE encoding/decoding separately before causal rCM transfer. Preserve failed scene/framing evidence.",
+    "owner": "current AI Mate engineering task",
+    "rollback": "Revert this experiment checkpoint; no selected application model, UI, private memory or dependency environment was changed",
+    "timing_scope": "Control/reference encoding, denoising and GPU video decoding; excludes preflight, model load, prompt encoding, MP4 encoding, browser/network playback."
   }
 }

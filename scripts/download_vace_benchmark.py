@@ -1,5 +1,6 @@
 """Fetch pinned original VACE weights; reuse hash-verified local VAE/text assets."""
 from concurrent.futures import ThreadPoolExecutor
+import argparse
 import functools
 import hashlib
 import json
@@ -15,8 +16,11 @@ CACHE = ROOT / '.cache/local-poc/vace-models'
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--rcm-only', action='store_true', help='Fetch optional accelerated generator, not the VACE baseline.')
+    args = parser.parse_args()
     manifest = json.loads((ROOT / 'config/vace-benchmark.json').read_text(encoding='utf-8'))
-    files = manifest['files']
+    files = manifest['rcm_experiment']['files'] if args.rcm_only else manifest['files']
     if sum(row['size'] for row in files) > 8_000_000_000:
         raise ValueError('VACE download exceeds the 8GB experiment cap.')
     for row in manifest['reused_files']:

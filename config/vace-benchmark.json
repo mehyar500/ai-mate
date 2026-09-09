@@ -91,5 +91,37 @@
     }
   ],
   "total_download_bytes": 7146120039,
-  "next_test": "Reference plus generated right-arm pose frames; establish control quality before independent streaming/acceleration work. Do not use Scope source (CC BY-NC-SA)."
+  "next_test": "Reference plus generated right-arm pose frames; establish control quality before independent streaming/acceleration work. Do not use Scope source (CC BY-NC-SA).",
+  "wan_code": {
+    "repo": "https://github.com/Wan-Video/Wan2.1",
+    "revision": "9737cba9c1c3c4d04b33fcad41c111989865d315",
+    "license": "Apache-2.0",
+    "role": "Original WanVace inference and base modules; no Scope source"
+  },
+  "rcm_experiment": {
+    "scope": "Unproven transfer of rCM 1.3B base generator into original VACE control branches; offline four-step control-quality test only",
+    "model_license": "Apache-2.0 per pinned model card; card describes unofficial Tsinghua University reproductions, not an NVIDIA weight release",
+    "source_revision": "ed3cb14dd936f92cdc9f9381af7369991509b41f",
+    "source_url": "https://github.com/NVlabs/rcm",
+    "source_license": "Apache-2.0",
+    "files": [
+      {
+        "repo": "worstcoder/rcm-Wan",
+        "revision": "142d77a331f1516fea772607c1bf25a2785a2505",
+        "filename": "README.md",
+        "size": 1824,
+        "sha256": "be01f66826a30060c2c3f8baa71bb458b473da6f82f4173be9d88861dce232b0",
+        "folder": "rcm-Wan"
+      },
+      {
+        "repo": "worstcoder/rcm-Wan",
+        "revision": "142d77a331f1516fea772607c1bf25a2785a2505",
+        "filename": "rCM_Wan2.1_T2V_1.3B_480p.pt",
+        "size": 2838262729,
+        "sha256": "3baa20e8e64c7f1ee6e4a377f5a04b8e4d193e0a1a1241814879a004fd77370a",
+        "folder": "rcm-Wan"
+      }
+    ],
+    "source_license_file": "config/third-party/rcm-LICENSE.txt"
+  }
 }
