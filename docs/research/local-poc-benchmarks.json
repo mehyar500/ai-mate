@@ -24630,5 +24630,32 @@
     "review": "All 73 decoded frames visually reviewed in four contact sheets. Right arm raises and lowers; left arm remains down. Hand blur/deformation and background movement persist. Single sample; no controlled adapter-off comparison yet. No speech/lip-sync evaluation.",
     "decision": "Candidate for remote hardware benchmark; not promoted to live call.",
     "review_artifact": "generated/local-app/audit/frames-pose-controlled-test_00001_-pose/review.json"
+  },
+  "short_motion_20260909": {
+    "model": "ltxv-2b-0.9.8-distilled-fp8",
+    "resolution": [
+      320,
+      480
+    ],
+    "frames": 49,
+    "return_to_reference": true,
+    "runs": [
+      {
+        "seed": 914,
+        "server_s": 8.287,
+        "wall_s": 9.172,
+        "prompt_id": "e99a735f-0bde-441d-a012-e34483128187",
+        "review": "Raises anatomical left hand (wrong side). Hand blur."
+      },
+      {
+        "seed": 2718,
+        "server_s": 2.513,
+        "wall_s": 3.033,
+        "prompt_id": "59c5120c-3fa6-4adb-a837-b96be1d24cb6",
+        "review": "No clear wave."
+      }
+    ],
+    "review_scope": "All 49 frames of each output inspected as reduced contact sheets; no audio generated.",
+    "decision": "Do not promote. Shorter horizon did not preserve command reliability."
   }
 }
