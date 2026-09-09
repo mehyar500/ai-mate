@@ -24690,5 +24690,27 @@
     "comparison": "Earlier guided seed914 keeps body position. This single pair supports framing benefit, not necessity for correct hand. Timing is not a clean adapter overhead comparison because loading/offload execution differed.",
     "decision": "Keep pose control as candidate; neither local result meets live latency. No promotion.",
     "artifact": "generated/local-app/audit/pose-control/control-off-history.json"
+  },
+  "streaming_release_audit_20260909": {
+    "LiveAnimate": {
+      "sources": [
+        "https://liveanimate.github.io/",
+        "https://github.com/liveanimate/LiveAnimate"
+      ],
+      "reported": "14B, three-step sampling, 19.63 FPS on two H100 GPUs; streaming pose and facial controls",
+      "release": "Repository says code coming soon; no inference release verified",
+      "decision": "Architectural reference only; no download or rental justified by unreleased code"
+    },
+    "StreamAvatar": {
+      "source": "https://github.com/StreamAvatar/streamavatar.github.io",
+      "observed": "Linked repository contains website assets, README, index.html and style.css; no runnable inference release established",
+      "decision": "Not an installable candidate based on this source"
+    },
+    "cost_illustration": {
+      "assumption": "Two H100s at TensorDock advertised starting 2.25 USD/hour each; one stream occupies both; not an available machine quote or throughput benchmark",
+      "gpu_usd_per_hour": 4.5,
+      "gpu_usd_per_30_min": 2.25,
+      "excluded": "Startup, idle capacity, other services, taxes; compatible interconnect/availability unverified"
+    }
   }
 }
