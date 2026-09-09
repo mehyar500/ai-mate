@@ -1,14 +1,10 @@
 # US distribution: PWA first, adult-service eligibility unresolved
 
-## Current distribution decision — September 9
+## Current distribution decision
 
-The founder now chooses a PWA first if foreground call performance is comparable, with lawful consenting-adult explicit content and nudity as the intended eventual paid scope. This supersedes the Apple-native-first direction. Comparable foreground latency is an engineering target, not measured iPhone parity. The existing local demo remains private and fully clothed; its models, fixtures and prompt limits do not establish adult capability or launch clearance.
+Build a PWA. The intended eventual service is for verified adults and includes nudity where lawful and permitted. The local demo is private and fully clothed; it does not establish adult capability, mobile parity or launch clearance.
 
-Apple guideline 1.1.4 excludes overtly sexual/pornographic material. Clothing alone is not a safe-harbor test: a bikini does not guarantee approval, and erotic presentation or revealing sheer clothing can still conflict with that rule. The incidental mature-UGC provision is not general permission for a primarily sexual AI service. Use a non-explicit product, honest review notes and consistent server-side behavior. Apple decides approval. [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/).
-
-Direct web distribution does not require an App Store listing. It does require a processor that explicitly accepts this actual AI-generated adult service, applicable age/consent/data controls, and model/host rights. A wrapper submitted to the App Store would still face App Review. A later non-explicit native edition can use StoreKit; Apple Pay is a different product. Implement verified entitlements, refunds and revocations for the selected channel before charging. [Payment guidelines](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase).
-
-“Apple approved design” can only describe an actual approval. The current web UI follows relevant design guidance with large touch targets, clear call controls and optional captions; it has not undergone App Review or iOS accessibility/device testing. Cloudflare model selection, an age gate or paying Apple's commission does not authorize otherwise excluded content. [Design guidance](https://developer.apple.com/design/tips/), [App Review](https://developer.apple.com/app-store/review/).
+Direct web access needs a processor, host and complete model/asset stack that accept the actual service, plus applicable access, consent, content and data controls. Keep technical demonstration separate from public approval. Responsive design does not imply platform certification.
 
 ## Required explicit web-service review before launch
 
@@ -28,7 +24,7 @@ The launch scope is original fictional adults, lawful consensual adult content, 
 
 **Adult-service eligibility is a selection criterion, not a post-launch check.** Request acceptance for the actual explicit-content service, including generation, storage, private delivery, visual calls and billing. Do not describe it merely as a generic chatbot to obtain approval. A host accepting stored content does not automatically approve model APIs or every underlying provider.
 
-The intended explicit web service requires accepted scope, rights, hosting, access controls and a payment route. No hidden explicit-mode switch or functioning production adult-access control exists. Non-nudity alone also does not guarantee App Store approval: a bikini, sheer lingerie and sexualized movement are judged in context, not by a clothing allowlist.
+The intended explicit web service requires accepted scope, rights, hosting, access controls and a payment route. No hidden explicit-mode switch or functioning production adult-access control exists.
 
 ## What self-hosting does and does not permit
 
@@ -83,7 +79,7 @@ Runware custom compute is an alternative requiring access, model/container suppo
 | dphn/Dolphin3.0-Mistral-24B | Public repository has no declared license tag or separate license file in the checked metadata. | Exact fine-tune license unresolved; base-model rights alone are insufficient evidence. [Card](https://huggingface.co/dphn/Dolphin3.0-Mistral-24B). |
 | Sao10K/L3.3-70B-Euryale-v2.3 | Roleplay training is documented, but repository tags `llama3` while its stated base is Llama 3.3; no separate license file found. | Defer: resolve applicable Meta and fine-tune terms; 70B is also outside the cheap baseline. No adult-quality benchmark established here. [Card](https://huggingface.co/Sao10K/L3.3-70B-Euryale-v2.3). |
 
-TensorDock remains a candidate, not an approved adult host. Its AUP also has a written-permission provision for selling/reselling or exploiting the service; confirm how that applies to this commercial application. No account application, provider contact or paid inference was performed. Small model downloads and neutral local benchmarks are documented separately in LOCAL_POC. This review establishes documented terms and unresolved questions, not a legal opinion that a particular output or nationwide service is lawful.
+TensorDock remains a candidate, not an approved adult host. Its AUP also has a written-permission provision for selling/reselling or exploiting the service; confirm how that applies to this commercial application. No account application or provider contact has been made. Funded neutral Cloudflare inference benchmarks and local tests are documented in LOCAL_POC. This review establishes documented terms and unresolved questions, not a legal opinion that a particular output or nationwide service is lawful.
 
 ## Can age assurance be internal?
 
@@ -97,7 +93,7 @@ Proposed internal pilot route, only after acceptance: secure separate verificati
 
 No homemade face-age model is certified here. NIST documents variable age-estimation performance; an estimate around the adult threshold needs appropriate assurance, not a universal pass. [NIST evaluation](https://www.nist.gov/news-events/news/2024/05/nist-reports-first-results-age-estimation-software-evaluation).
 
-The canonical budget now reserves $100/month for an age-service minimum and $1.25/new unique account ($1 assumed check plus a 25% retry provision). These are procurement allowances, not [Yoti tariffs](https://www.yoti.com/business/age-verification/). The three-month scenario has 185 new verified accounts and $231.25 variable checks. An accepted internal method could save these vendor amounts, but security, fraud, appeals and development remain work. Four minutes of review per account values founder effort at $370 across the quarter; cash pay defaults to zero. If a required method or anonymous option is unavailable, integrate an accepted service or do not enable that jurisdiction.
+The technical-pilot budget excludes public verification because restricted public access is disabled. An accepted vendor or internal method needs a separate costed review of fraud handling, privacy, anonymous options where required, appeals and operations. Earlier vendor allowances remain deferred scenarios, not accepted quotes or evidence of compliance.
 
 ## Other release duties
 

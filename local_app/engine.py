@@ -320,7 +320,7 @@ class CompanionEngine:
                     cursor_candidate = self.visual_cursor if scene == self.scene else None
                     listening_video = self.listening_asset(scene, performance_candidate)
                     prepared_transition = self.performance.get((performance_candidate, plan.get('action'))) if scene == 'fullbody' and plan else None
-                    if scene == 'fullbody' and cursor_candidate is not None and plan:
+                    if scene == 'fullbody' and cursor_candidate is not None and plan and plan.get('action') in {'closer', 'farther'}:
                         origin = 'base' if plan.get('action') == 'closer' else 'near'
                         prepared_transition = self.performance.get((origin, plan.get('action')))
                 if not prepared_transition and not (listening_video and (not plan or plan.get('action','none') == 'none')):
@@ -381,7 +381,7 @@ class CompanionEngine:
                                 with self.lock:
                                     previous_approach = self.return_motion[1] if self.return_motion and self.return_motion[0] == scene else None
                                 if prepared_transition:
-                                    if cursor_candidate is not None:
+                                    if cursor_candidate is not None and prepared_transition.get('kind') != 'gesture':
                                         from .playback import video_duration
                                         fraction = cursor_candidate if prepared_transition['to'] == 'near' else 1 - cursor_candidate
                                         motion_start = fraction * video_duration(prepared_transition['path'])

@@ -2,6 +2,33 @@
   "as_of": "2026-09-07",
   "currency": "USD",
   "active_stage": "local_poc",
+  "gpu_pilot": {
+    "quoted_at_utc": "2026-09-09T01:31:00Z",
+    "quote_url": "https://console.tensordock.com/deploy",
+    "gpu_4090_hour": 0.6395,
+    "gpu_5090_hour": 0.7425,
+    "monthly_test_hours": 10,
+    "stopped_storage_allowance_monthly": 5,
+    "existing_gateway_funding_with_fee": 10.5,
+    "startup_seconds": 60,
+    "idle_seconds": 90,
+    "replies_per_minute": 2,
+    "input_tokens_per_reply": 2000,
+    "output_tokens_per_reply": 60,
+    "input_dollars_per_million": 0.051,
+    "output_dollars_per_million": 0.34,
+    "downstream_mbps": 2,
+    "sfu_egress_per_gb": 0.05,
+    "retry_fraction": 0.2,
+    "processor_fraction_assumed": 0.16,
+    "refund_fraction_assumed": 0.02,
+    "fixed_transaction_assumed": 0.5,
+    "registration_yearly": 1950,
+    "offers": [
+      {"minutes": 30, "price": 5.99, "fulfillment_ceiling": 1.25},
+      {"minutes": 60, "price": 9.99, "fulfillment_ceiling": 2.5}
+    ]
+  },
   "poc": {
     "local_kw": 0.3,
     "electricity_per_kwh": 0.2,

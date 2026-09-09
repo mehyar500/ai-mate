@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const assert=require('node:assert/strict');
 const trial=process.argv[2];
-assert.ok(['baseline','revised','selected'].includes(trial));
+assert.ok(['baseline','revised','selected','wave'].includes(trial));
 const folder=path.resolve(__dirname,'../generated/local-app/audit/voice-video-'+trial);
 async function main(){
   const browser=await chromium.launch({headless:true});
@@ -63,9 +63,10 @@ async function main(){
       assert.deepEqual(errors,[]);
       assert.ok(result.events.some(e=>e.id==='audio'&&e.type==='playing'&&!e.muted&&e.volume>0));
       if(trial!=='baseline')assert.equal(result.events.filter(e=>e.id==='audio'&&e.type==='ended').length,job.chunks.length);
-      if(trial==='selected')assert.match(result.metrics,/Buffer waits: 0/);
+      if(['selected','wave'].includes(trial))assert.match(result.metrics,/Buffer waits: 0/);
       if(fixture.case==='memory')assert.match(job.text,/Maple/i);
       if(fixture.case==='approach')assert.equal(job.prepared_pose,'near');
+      if(['wave','return'].includes(fixture.case))assert.equal(job.prepared_pose,'base');
       await page.waitForFunction(()=>!document.querySelector('#end-call').disabled);
     }
     await context.close();

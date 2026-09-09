@@ -27,7 +27,10 @@ MODELS = {
     '@cf/qwen/qwen3-30b-a3b-fp8': (.051, .335),
     '@cf/zai-org/glm-4.7-flash': (.060, .400),
     '@cf/ibm-granite/granite-4.0-h-micro': (.017, .112),
+    '@cf/meta/llama-3.1-8b-instruct-fp8-fast': (.045, .384),
+    '@cf/meta/llama-3.2-3b-instruct': (.051, .335),
 }
+DEFAULT_MODELS = list(MODELS)[:3]  # Preserve the default 24-request maximum.
 CASES = {
     'memory': "I'm nervous about Friday. What was I getting ready for?",
     'negated_motion': "Don't come closer. Just tell me something calming about this garden.",
@@ -45,7 +48,7 @@ def dialogue(auth, repeats, save, selected_model=None, selected_case=None):
     failed_models = set()
     for repeat in range(repeats):
         # Rotate order to reduce simple first-model/order bias.
-        names = [selected_model] if selected_model else list(MODELS)
+        names = [selected_model] if selected_model else DEFAULT_MODELS.copy()
         offset = repeat % len(names)
         names = names[offset:] + names[:offset]
         for model in names:
@@ -96,6 +99,9 @@ def dialogue(auth, repeats, save, selected_model=None, selected_case=None):
                         checks['recall'] = any(s in plan['reply'].lower() for s in ['piano', 'recital'])
                     if case == 'call_message':
                         checks['message'] = 'good luck at your recital' in plan.get('message', '').lower()
+                    if case == 'unsupported_motion':
+                        checks['unsupported_disclosed'] = bool(re.search(
+                            r"cannot|can't|not able|unavailable|not supported", plan['reply'], re.I))
                     row['checks'] = checks
                 except (RuntimeError, ValueError, OSError) as error:
                     row['error'] = type(error).__name__  # Never serialize URLs/headers/provider errors.
@@ -174,6 +180,8 @@ def main():
     folder.mkdir(exist_ok=True)
     suffix = '-' + args.label if args.label else ''
     target = folder / f'cloud-{args.kind}-comparison{suffix}.json'
+    if target.exists():
+        parser.error('Evidence already exists; choose a new --label.')
     results = []
     def save(row):
         results.append(row)

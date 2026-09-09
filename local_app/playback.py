@@ -65,10 +65,14 @@ def capture_playback_frame(source, destination, seconds):
 
 
 def stopped_pose(metadata, seconds):
-    """Normalized progress through the reviewed base-to-near performance."""
+    """Retain approach progress; an interrupted gesture is an unknown held pose."""
     transition = metadata.get('transition')
     if transition:
         progress = min(1.0, (metadata['start_s'] + seconds) / video_duration(transition['path']))
+        if transition.get('kind') == 'gesture':
+            # A raised hand is not a position on the approach/return path. Keep
+            # the captured frame, and only resume the idle after full completion.
+            return (transition['to'], None) if progress >= 1 else (None, None)
         cursor = progress if transition['to'] == 'near' else 1.0 - progress
         pose = 'base' if cursor <= 0 else 'near' if cursor >= 1 else None
         return pose, cursor

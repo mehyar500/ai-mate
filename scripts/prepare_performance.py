@@ -1,4 +1,4 @@
-"""Prepare a reviewed approach and its reverse for the local pose transition test.
+"""Prepare an approach/return pair or wave candidate for local review.
 
 Run between calls; restart the app only after reviewing the prepared outputs.
 The generated manifest is intentionally unreviewed and cannot enable itself.
@@ -18,6 +18,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source',type=Path)
     parser.add_argument('--duration',type=float,default=3.0)
+    parser.add_argument('--action',choices=['approach','wave'],default='approach')
     args=parser.parse_args()
     source=args.source.resolve()
     allowed=[ROOT/'.cache/local-poc/ComfyUI/output/motion',ROOT/'generated/local-app/audit']
@@ -26,6 +27,19 @@ def main():
     if not source.is_file() or source.stat().st_size>40_000_000 or not 1<=args.duration<=4.5:
         parser.error('Use a bounded clip and a 1–4.5 second transition.')
     folder=ROOT/'generated/local-app'
+    if args.action == 'wave':
+        target=folder/'performance-wave.mp4'
+        subprocess.run(['ffmpeg','-v','error','-y','-i',str(source),'-t',str(args.duration),
+                        '-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p',
+                        '-movflags','+faststart',str(target)],check=True,timeout=30)
+        manifest={'version':1,'reviewed':False,'model':'LTX-2.3-22B-distilled-FP8',
+                  'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+                  'sha256':{name:hashlib.sha256((folder/name).read_bytes()).hexdigest()
+                            for name in ['fullbody.png','performance-wave.mp4']}}
+        record=folder/'performance-wave.json'
+        record.write_text(json.dumps(manifest,indent=2)+'\n')
+        print(json.dumps({'manifest':str(record),'requires_output_review':True}))
+        return
     forward=folder/'performance-closer.mp4';backward=folder/'performance-farther.mp4'
     encode=['-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart']
     subprocess.run(['ffmpeg','-v','error','-y','-i',str(source),'-t',str(args.duration),*encode,str(forward)],check=True,timeout=30)

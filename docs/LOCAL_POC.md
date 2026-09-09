@@ -1,6 +1,6 @@
 # Local companion demo
 
-Updated September 8, 2026. One private, non-explicit companion on the founder's RTX 4060 Ti **16GB VRAM / 48GB RAM**. Text, Voice call and Video call share memory. The current result combines reviewed photographic movement with newly generated speech and lip movement. It is not unrestricted live video generation or a released native app.
+Updated September 9, 2026. One private, non-explicit companion on the founder's RTX 4060 Ti **16GB VRAM / 48GB RAM**. Text, Voice call and Video call share memory. The current result combines reviewed photographic movement with newly generated speech and lip movement. It is not unrestricted live video generation or a released native app.
 
 ## Run and try it
 
@@ -14,7 +14,7 @@ On this configured PC:
 
 Open **http://127.0.0.1:8765** and wait for model warm-up. Background launch avoids duplicate servers; logs and process information stay in ignored `.cache/local-poc/`. The PC and process must stay running. This is a loopback URL, not a public deployment or Windows startup service.
 
-In Video call, try **“Come closer.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns to full body even after intervening conversation. Each pose has a blinking listening loop. These are a limited set of prepared movements, disclosed in Memory & settings. Wave uses experimental fresh generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
+In Video call, try **“Wave hello.” → “Come closer.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns after intervening conversation. Each pose has a blinking listening loop. A reviewed right-hand wave is now available from the base pose after restarting the app. These prepared movements are disclosed in Memory & settings. A wave from other positions still uses experimental generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
 
 Select Call Mira (phone icon on wider screens), or Voice/Video to start microphone input. Calls have mute/end icons and automatic sound. The keyboard icon opens an optional compact transparent input: Enter sends a command to the current voice/video call, Shift+Enter adds a line, and Escape hides it. Typed commands also work with the microphone muted or denied; sending during a reply stops it before submitting. Text has a separate draft and shows messages without ending an active call; Return to call restores the same media elements. “Send me a message saying hello from our call” delivers a separate in-app message with an unread badge. End call releases capture and stops playback. Memory & settings contains facts, notes, diagnostics, the prepared-footage disclosure and Test sound. Camera access is disabled.
 
@@ -36,7 +36,7 @@ The video fills the height when controls fit in the side space. Tall phone views
 
 Pins: [models](../config/local-models.json), [assets](../config/local-assets.json), [Python dependencies](../config/local-poc-requirements.txt), [LTX-2B downloader](../scripts/download_ltx_motion.py), [LTX-2.3 downloader and SHA-256](../scripts/download_ltx23_benchmark.py). ComfyUI is pinned to `00d34d92fe0afbfbab3893ebbab2d5d70f5e9882`, with custom/API nodes disabled and 4GB VRAM reserved. The isolated environment is `.cache/comfy-env`; motion API is loopback port 8188. Do not expose this unauthenticated development service.
 
-Open weights do not automatically establish commercial rights. MuseTalk's model grant, dependency licenses, LTX's community license/use policy, voice and reference-image provenance each matter. [BUILD](BUILD.md) retains model comparisons and primary sources; [USA](USA.md) contains unresolved release conditions. No public or adult deployment is approved.
+Open weights do not automatically establish commercial rights. MuseTalk's model grant, dependency licenses, LTX's community license/use policy, voice and reference-image provenance each matter. [BUILD](BUILD.md) defines the current architecture; comparisons are recorded below and [USA](USA.md) contains source-based release conditions. No public or adult deployment is approved.
 
 ## Central flow and visual continuity
 
@@ -50,6 +50,7 @@ typed input / opt-in mic -> local ASR if needed
     -> Video call:
          base + closer -> reviewed approach -> near
          near + farther -> reviewed reverse -> base
+         base + wave -> reviewed right-hand gesture -> base
          conversation at base/near -> corresponding listening footage
          other supported action -> experimental LTX-2B generation
        -> requested action once, then continue the destination pose/loop phase
@@ -60,15 +61,15 @@ typed input / opt-in mic -> local ASR if needed
 
 Scene changes require a current visual request. Talking about a garden does not reset a close view to the garden portrait. The planner receives the trusted current pose; it cannot execute code, paths, URLs or shell commands.
 
-Prepared assets must have an explicit local review flag and matching reference/video hashes. Fixed files: `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png`, plus `idle-fullbody.json/.mp4` and `idle-near.json/.mp4`. They are private generated artifacts, not in Git. Preparation scripts default to unreviewed. Missing/changed/unreviewed assets fall back to the experimental renderer or held portrait; a fresh checkout does not contain the demonstration clips.
+Prepared assets must have an explicit local review flag and matching reference/video hashes. Fixed files: `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png`, optional `performance-wave.json/.mp4`, plus `idle-fullbody.json/.mp4` and `idle-near.json/.mp4`. They are private generated artifacts, not in Git. Preparation scripts default to unreviewed. Missing/changed/unreviewed assets fall back to the experimental renderer or held portrait; a fresh checkout does not contain the demonstration clips.
 
-Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Ambient reply video now ends with speech instead of forcing a whole idle-loop duration; deliberate approach/return clips still finish their movement. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for four short reviewed clips. User speech and generated mouth frames are not cached there.
+Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Ambient reply video now ends with speech instead of forcing a whole idle-loop duration; deliberate approach/return clips still finish their movement. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for five short reviewed clips. User speech and generated mouth frames are not cached there.
 
 Successful fresh video captures its final decoded frame as the next reference. Unknown positions disable known-pose loops. The older one-shot reverse cache remains only for an unprepared approach followed immediately by a return. Cancelled generation cannot commit its endpoint. Interrupt reports the displayed frame timestamp; the engine separately preserves that observed pose. Restart clears transient pose/return files and starts at the base pose while preserving conversation. Voice now triggers this interruption flow when echo cancellation is reported; actual acoustic behavior and playback recovery after browser closure remain open.
 
 ## Measured results and failures
 
-These are individual local samples, not p95, guarantees or comparable measurements of every configuration. [Machine-readable history](research/local-poc-benchmarks.json) preserves settings and rejected trials. Raw synthetic traces and reviewed contact sheets stay in ignored `generated/local-app/audit/`.
+The tables distinguish individual samples from repeated suites. Different configurations and capture boundaries are not directly comparable; none is a performance guarantee. [Machine-readable history](research/local-poc-benchmarks.json) preserves settings and rejected trials. Raw synthetic traces and reviewed contact sheets stay in ignored `generated/local-app/audit/`.
 
 | Test | Observed result | Limit |
 |---|---|---|
@@ -83,6 +84,53 @@ These are individual local samples, not p95, guarantees or comparable measuremen
 The paired-motion demonstration is a real improvement, but the requested quality is not accepted: loops repeat, scene identity differs across older portraits, fingers and mouth detail remain soft, and new movements can ignore instructions. A 13.092s spoken count before appearance caching took **9.97s to playback**, **23.489s server completion**, and stalled twice; short greetings alone do not qualify long calls. Later cache measurements are recorded in the machine evidence and REPORT.
 
 Output files contain speech, local ASR recovered synthetic test sentences, and the browser completed unmuted playback without media errors. Physical speaker output and subjective phoneme/voice quality still need device testing. Jobs record first text, per-chunk speech generation time, rendering stages, cache hits and completion; the browser separately measures first playback and stalls.
+
+### Reviewed wave and repeatable command coverage - September 9
+
+The new right-hand wave is a prepared LTX-2.3 clip from the verified full-body reference: 97 frames, seed 83, 384x576 at 24FPS, generated in **154.781s**. A separate review manifest binds the footage to the reference SHA-256. It is selected only from the base pose; an interrupted gesture retains the displayed frame without incorrectly treating it as approach progress. Startup now primes five appearance sources in **16.735s**, using 1,831MiB of Torch allocation before speech rendering.
+
+Five real ASR/Cloudflare/Kokoro/MuseTalk browser interactions started in **2.09-2.66s**, with no buffer stalls. Every one of their **278 decoded frames** passed the limited face-count/luma/pixel-change diagnostics. All **81 rendered wave frames** were visually inspected in sequence: one raised right hand, body and feet retained, with hand blur, face softness and background deformation still visible. This is a neutral demo asset, not approved adult-generation infrastructure.
+
+`config/video-call-qualification.json` defines 20 commands covering motion, negation, memory update/recall, unsupported motion, interrupted approach/resumption and in-app messaging while switching views. The initial run produced 20 media clips / **984 decoded frames**, with zero heuristic flags. Two harness assertions incorrectly rejected completed-render/partial-playback interruption and the Text-view active-call banner; corrected assertions are used in the extended run. Initial response p95 was approximately **2.83s**, excluding physical capture and endpoint detection.
+
+Reproduce in two terminals, using a fresh trial directory (existing evidence is deliberately not overwritten):
+
+```powershell
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification
+# In a second terminal with Playwright available on NODE_PATH:
+node scripts/qualify_video_call.cjs qualification
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification
+```
+
+Use `soak` in all three commands for six cycles / 120 interactions across 30 minutes. For a repeat, append `--label new-run` to the Python commands and `new-run` after the Node trial argument; labels preserve prior evidence. Drivers alternate fixed synthetic WAV and typed input; recognition, hosted planning, speech synthesis, GPU rendering and browser playback are real. Physical microphone capture, acoustic echo, endpoint wait and mobile/internet transport are excluded. Frame diagnostics create ordered sheets covering every decoded frame, but cannot certify anatomy, identity or perceptual lip synchronization. The live user's database is never copied into these trials.
+
+To prepare another candidate, use `benchmark_ltx23.py --action wave --silent --return-to-reference --frames 97 --seed 83`, then `prepare_performance.py <local-output-path> --action wave --duration 4.05`. Preparation writes an unreviewed manifest: inspect the new source and rendered output before accepting it. These commands use the configured virtual environment. The current candidate is staged in the live asset directory; an already running server must restart to load it after the user's call has ended.
+
+### Thirty-minute call and smaller planners - September 9
+
+A 1,800.056-second call completed **120 interactions** (six fixed 20-command cycles), with zero functional assertion failures, browser errors or reported buffer stalls. The call remained active through the final turn. Six deliberate interruptions were excluded from first-response percentiles.
+
+| Input boundary | Samples | Median | p95 | Maximum |
+|---|---:|---:|---:|---:|
+| Mixed typed / injected WAV | 114 | 1.89s | 2.82s | 5.64s |
+| Typed submission | 60 | 1.855s | 2.58s | 4.55s |
+| Injected WAV, including ASR | 54 | 2.215s | 2.83s | 5.64s |
+
+Cycle medians were 2.13 / 2.28 / 1.89 / 1.85 / 1.99 / 1.89 seconds. This run shows no steady growth in response delay; it is one sequential user on this PC, not a concurrency or mobile qualification. Spoken end-of-speech latency still adds physical capture and the approximately 0.65s endpoint wait. Raw callback-gap counters include intentional source changes and idle pauses, so they are not presented as playback stalls.
+
+Normal 50-turn retention deleted 70 older clips before the post-run review. The **50 retained clips / 2,469 decoded frames** had zero limited heuristic flags, 20FPS decoded timestamp spacing, nonzero speech RMS and no clipped audio samples. The other 70 clips cannot be retrospectively inspected; this is not a complete every-frame pass. The harness now archives only its synthetic media per turn. Windows browser closure also produced one ConnectionAbortedError while returning the final cancellation response; disconnect handling is corrected and regression tested.
+
+The subsequent `qualification --label sync` run completed all 20 commands with zero failures/stalls and retained every clip: **997 decoded frames**, zero heuristic flags. Its response p50/p95 was **1.83s/3.05s** across 19 non-interrupted replies. **619 audio/video clock samples** measured 11.19ms median, 27.94ms p95 and 31.86ms maximum absolute skew while speech was playing. This passes the browser-clock target, not perceptual phoneme alignment or physical speaker latency. The server closed cleanly. Validation: 130 Python tests, 17 Node tests, compileall and Node syntax checks passed; independent public-release review remains pending.
+
+After the soak, 24 sequential synthetic calls compared three Cloudflare models using the same real planner prompt/schema and memory, negation, message and unsupported-action cases. Rates are from the [Cloudflare table](https://developers.cloudflare.com/workers-ai/platform/pricing/), checked September 9 UTC. These are complete planner times, not first tokens or whole-call times:
+
+| Exact model | Samples | Median / maximum | Failed cases | Listed total cost |
+|---|---:|---:|---:|---:|
+| @cf/qwen/qwen3-30b-a3b-fp8 | 8 | 0.603s / 1.268s | 0 | $0.000608 |
+| @cf/meta/llama-3.1-8b-instruct-fp8-fast | 8 | 0.596s / 0.828s | 0 | $0.000638 |
+| @cf/meta/llama-3.2-3b-instruct | 8 | 0.421s / 0.692s | 1 message delivery | $0.000623 |
+
+Keep Qwen: 8B did not show a meaningful median gain; 3B sacrificed a requested behavior. These small samples do not establish tail reliability or adult-service permission. Reproduce with `benchmark_cloud_comparison.py dialogue --model <exact-model> --repeats 2 --label <new-label>` in the virtual environment. Runtime selection and credentials were unchanged.
 
 ### Full ASR-to-video check — September 9
 
@@ -284,12 +332,12 @@ git diff --check
 .\.venv\Scripts\python.exe scripts/verify_streaming.py
 ```
 
-R2 independent security/correctness review, staging, sustained p50/p95, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
+R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
 Checks for this revision: 124 Python tests and 17 Node tests. New checks cover retained interruption audio, duplicate onset, short words, stale capture, failed cancellation, cleanup timeout, reported echo-cancellation settings and typed interruption without microphone support. Existing interruption checks cover strict descriptors, authentication/origin, reset races, bounded timestamp decoding, completed-reply stops and partial-movement continuation. Phrase tests retain complete speech, one-ahead synthesis and per-phrase HTTP completion. `review_call_playback.cjs` covers typed commands in both call modes, failed-submit retry with separate draft preservation, hiding/restoring the input, captions and completed unmuted media with synthetic APIs/capture. Five viewports (320x568 to 1280x720) passed input/control bounds, overlap and 44px touch-target checks; actual iPhone keyboard behavior remains unqualified. The phrase and interruption browser scripts exercise real isolated rendering. None starts a physical microphone or reads the live conversation. No memory schema, environment variable or provider configuration changed.
 
 ## Cost and next decision
 
-The three-month local plan is **$9.60 estimated incremental electricity + $75 contingency = $84.60**, rounded to a $100 ceiling. Power assumptions are unmeasured; hosted dialogue usage adds cost. No paid engineer, rented GPU, hardware or Apple membership has been purchased.
+The optional three-month technical-pilot forecast is **$57.38 under a $100 planning cap**, including local power, the existing Gateway funding and ten optional 5090 test hours per month with a disk allowance. Power and stopped-storage assumptions are unmeasured; no GPU has been rented. The electricity-only baseline remains available in the calculator's historical output.
 
-Use the bounded demo to test whether people value the conversation and continuity before buying capacity. The latest distribution decision is PWA first; [ECONOMICS](ECONOMICS.md) includes autoscaling and optional native commission sensitivity. Device testing and adult model/hosting/payment qualification remain required for that intended product. No profit, legal immunity, App Store acceptance or universal two-second latency is promised.
+Use the bounded demo to test whether people value the conversation and continuity before buying capacity. [ECONOMICS](ECONOMICS.md) contains the PWA rental, session-cost and pricing assumptions. Device testing and intended-content model/hosting/payment qualification remain required. No profit, legal immunity or universal two-second latency is promised.

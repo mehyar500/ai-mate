@@ -1,11 +1,12 @@
-"""Three synthetic WAV turns through real ASR, hosted planning, speech and video.
+"""Synthetic call suites through real ASR, hosted planning, speech and video.
 
 Uses only a new disposable directory and localhost:8766. Existing Cloudflare
-credentials are used for four bounded plans including warm-up; no private
-conversation is read. The browser driver supplies only these fixed fixtures.
+credentials are used for one warm-up and up to 120 bounded scripted turns;
+no private conversation is read. Drivers supply only the fixed fixtures.
 """
 import argparse
 import json
+import re
 from pathlib import Path
 import shutil
 import sys
@@ -27,14 +28,20 @@ CASES = [
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--trial', choices=['baseline', 'revised', 'selected'], required=True)
+    parser.add_argument('--trial', choices=['baseline', 'revised', 'selected', 'wave', 'qualification', 'soak'], required=True)
+    parser.add_argument('--label', default='')
     args = parser.parse_args()
-    folder = ROOT/'generated/local-app/audit'/('voice-video-'+args.trial)
+    if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
+        parser.error('Use a short lowercase label, digits and hyphens only.')
+    folder = ROOT/'generated/local-app/audit'/('voice-video-'+args.trial+('-'+args.label if args.label else ''))
     folder.mkdir(parents=True, exist_ok=False)
     for name in ['fullbody.png', 'performance-near.png', 'performance-closer.mp4',
                  'performance-farther.mp4', 'performance.json', 'idle-fullbody.mp4',
                  'idle-fullbody.json', 'idle-near.mp4', 'idle-near.json']:
         shutil.copyfile(ROOT/'generated/local-app'/name, folder/name)
+    if args.trial in {'wave','qualification','soak'}:
+        for name in ['performance-wave.mp4','performance-wave.json']:
+            shutil.copyfile(ROOT/'generated/local-app/audit'/name, folder/name)
     configure_runtime()
     app = CompanionEngine(folder)
     app.scene = 'fullbody'
@@ -46,10 +53,14 @@ def main():
     app.models.plan({'memory': '', 'turns': []}, 'Say hello briefly.', 'video',
                     'fullbody', ['fullbody'], event)
     fixtures = []
-    for case, prompt in CASES:
+    cases = [('wave','Please wave hello with your right hand.'), *CASES,
+             ('return','Please step back to the full body view.')] if args.trial == 'wave' else CASES
+    specifications = json.loads((ROOT/'config/video-call-qualification.json').read_text()) if args.trial in {'qualification','soak'} else [dict(case=case,prompt=prompt) for case,prompt in cases]
+    for spec in specifications:
+        case, prompt = spec['case'], spec['prompt']
         target = folder/(case+'.wav')
         duration = app.models.speech(prompt, target)
-        fixtures.append({'case': case, 'prompt': prompt, 'duration_s': duration})
+        fixtures.append(dict(spec, duration_s=duration))
     renderer = app.models.load_visual()
     renderer.prepare('fullbody')
     renderer.render(folder/'greeting.wav', folder/'warm.mp4', event, 'fullbody',
@@ -64,7 +75,7 @@ def main():
     worker = threading.Thread(target=server.serve_forever, daemon=True)
     worker.start()
     print(json.dumps({'ready': True, 'trial': args.trial, 'visual_warmup': app.visual_warmup}), flush=True)
-    deadline = time.monotonic()+240
+    deadline = time.monotonic()+(2160 if args.trial == 'soak' else 600)
     try:
         while time.monotonic()<deadline and not (folder/'browser-done.json').exists():
             time.sleep(.2)

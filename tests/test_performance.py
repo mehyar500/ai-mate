@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from local_app.performance import load_reviewed_performance
+from local_app.performance import load_reviewed_performance, load_reviewed_wave
 
 
 class PerformanceAssetTests(unittest.TestCase):
@@ -33,3 +33,21 @@ class PerformanceAssetTests(unittest.TestCase):
             for content in ['null','[]','{','{"version":1,"reviewed":true,"sha256":[]}']:
                 (folder/'performance.json').write_text(content)
                 self.assertEqual(load_reviewed_performance(folder),{})
+
+    def test_wave_needs_separate_review_matching_reference_and_unchanged_media(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp)
+            media = folder/'performance-wave.mp4'; media.write_bytes(b'wave')
+            record = folder/'performance-wave.json'
+            manifest = {'version':1,'reviewed':True,'sha256':{
+                'fullbody.png':'reference','performance-wave.mp4':hashlib.sha256(b'wave').hexdigest()}}
+            record.write_text(json.dumps(manifest))
+            self.assertEqual(load_reviewed_wave(folder,'reference')['kind'],'gesture')
+            self.assertIsNone(load_reviewed_wave(folder,'different identity'))
+            manifest['reviewed'] = False; record.write_text(json.dumps(manifest))
+            self.assertIsNone(load_reviewed_wave(folder,'reference'))
+            manifest['reviewed'] = True; record.write_text(json.dumps(manifest))
+            media.write_bytes(b'changed')
+            self.assertIsNone(load_reviewed_wave(folder,'reference'))
+            record.write_text('null')
+            self.assertIsNone(load_reviewed_wave(folder,'reference'))

@@ -171,12 +171,12 @@ class PortraitRenderer:
         if not frames or not 1 <= source_fps <= 60 or len(frames) > 1800:
             raise RuntimeError("The motion clip is missing or has an invalid duration/frame rate.")
         height, width = frames[0].shape[:2]
-        # Cache only short, reviewed, speech-free source footage. At most four
+        # Cache only short, reviewed, speech-free source footage. At most five
         # 384x576/144-frame entries; no generated mouths or user audio survives.
         if not cached and key and len(frames) <= 144 and width*height <= 384*576:
             cached = {'frames':frames, 'fps':source_fps, 'tracked':{}, 'latents':{}}
             self._motion_cache[key] = cached
-            while len(self._motion_cache) > 4:
+            while len(self._motion_cache) > 5:
                 self._motion_cache.popitem(last=False)
         self._appearance_latents = cached['latents'] if cached else None
         detector = cv.FaceDetectorYN.create(str(CACHE / "yunet.onnx"), "", (width, height), .65, .3, 5000)
@@ -230,9 +230,9 @@ class PortraitRenderer:
         return torch.cat([appearance[id(crop)] for crop in crops]) if appearance is not None else encoded
 
     def prime_motion(self, paths, cancel):
-        """Prepare at most four verified sources before admitting a call."""
-        if len(paths)>4:
-            raise ValueError('Motion warm-up is limited to four reviewed sources.')
+        """Prepare at most five verified sources before admitting a call."""
+        if len(paths)>5:
+            raise ValueError('Motion warm-up is limited to five reviewed sources.')
         started=time.perf_counter()
         with self.torch.inference_mode():
             for path in paths:

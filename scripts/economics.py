@@ -172,24 +172,6 @@ def demo_forecast(c):
                 within_cap=funding<=p["quarter_cap"])
 
 
-def remote_clip_comparison():
-    rows = [
-        '### Cloudflare-routed clip candidates — September 8', '',
-        'Provider list-price arithmetic below is a planning comparison; Cloudflare model pages direct pricing to the account dashboard. Confirm the account quote before inference. The founder loaded $10 Gateway credits. Live account pricing confirms P-Video 720p draft/standard at $0.005/$0.020 per second and LTX-2.5 Fast 720p at $0.090; LTX 1080p is $0.150. Two five-second LTX tests recorded $0.45 each in Gateway cost metadata, reconciled to $9.10 remaining credits. Each took about 31s. Pruna input mapping failed; its low price is not a working result. One Cloudflare credential is preferred. [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) adds 5% to credit purchases.', '',
-        '| Model / 720p configuration | Provider $/output second | 15-second clip | Clip with 5% funding fee | 30 minutes of generated footage, with fee |',
-        '|---|---:|---:|---:|---:|',
-    ]
-    for name, rate in [('Pruna P-Video draft', .005), ('Pruna P-Video standard', .020),
-                       ('Pruna P-Video-Avatar', .025), ('LTX-2.5 Fast', .090)]:
-        rows.append(f'| {name} | ${rate:.3f} | ${rate*15:.3f} | ${rate*15*1.05:.4f} | ${rate*1800*1.05:.2f} |')
-    rows += ['',
-        'Sources: [P-Video rates](https://docs.api.pruna.ai/guides/models/p-video), [avatar rates](https://docs.api.pruna.ai/guides/models/p-video-avatar), [LTX rates](https://docs.ltx.io/pricing). Draft means lower quality. The 30-minute column aggregates many clips, not a supported continuous request or a measured live call. It excludes retries, discarded output, transport, other inference, taxes, payment fees and support. No volume discount or reusable-video saving is assumed.', '',
-        'At a hypothetical $1.99 price for one 15-second standard P-Video clip, 30% Apple commission and the above $0.315 generation estimate leave $1.078 (54.2% of customer price) before every other cost. Avatar leaves $0.9993 (50.2%). Those are contribution ceilings, not net margins or validated willingness to pay. Ten standard clips consume $3.15 before other service costs, exceeding the $3.00 service ceiling for a $29.99 plan targeting 60% contribution at 30% Apple fees. Keep clips metered.', '',
-        'Runpod [InfiniteTalk](https://docs.runpod.io/public-endpoints/models/infinitetalk) lists $0.25/480p or $0.50/720p per video, but that page does not establish an accepted audio-duration limit. Do not turn its flat price into an unlimited-call estimate. Managed clip endpoints need no reserved GPU, but have unmeasured queue/render latency. For continuous calls, compare a persistent streaming worker against local FlashHead; cold-start and occupancy costs remain. Runpod is excluded for explicit content under its [terms](https://www.runpod.io/legal/terms-of-service).',
-    ]
-    return '\n'.join(rows)
-
-
 def gpu_session_cost(hourly_rate, call_minutes, startup_seconds=60, idle_seconds=90):
     """Single admitted call per GPU; overhead is charged once per cold session."""
     values = [hourly_rate, call_minutes, startup_seconds, idle_seconds]
@@ -200,80 +182,143 @@ def gpu_session_cost(hourly_rate, call_minutes, startup_seconds=60, idle_seconds
     return hourly_rate * (call_minutes*60 + startup_seconds + idle_seconds)/3600
 
 
-def autoscaling_comparison():
-    # Documentation gives $0.00031/s while the price table rounds to $1.10/h.
-    # Use the higher number for this planning comparison, pending a real quote.
-    flex, pod = .00031*3600, .74
-    rows = ['### Autoscaling decision — September 9', '',
-        'PWA first is now the selected distribution plan. Web payments avoid App Store commission but need an accepted processor quote, reserves, refunds, verification and support in the margin model. Adult-service prices cannot inherit the neutral demo\'s model/hosting assumptions. Higher prices do not by themselves prove willingness to pay or fund idle capacity.', '',
-        'Calls reserve one measured GPU slot for the entire session; do not cold-start a worker per sentence. Short generated clips use a separate queue and can scale to zero. Begin with scheduled local demos. For a later non-explicit online pilot, compare capped Flex workers against scheduled Pods; do not keep a worker on 24/7 before traffic justifies it. Runpod is not selected for the intended explicit service under its published terms.', '',
-        'Runpod endpoint documentation lists 4090 at $0.00031/s ($1.116/hour), versus the rounded $1.10/hour price table. This conservative comparison uses $1.116/hour and $0.74/hour Pods. Assumptions: one call per GPU, 60 seconds startup and 90 seconds idle charged once per call. Those overheads are scenarios, not measured cloud startup. [Endpoint settings](https://docs.runpod.io/serverless/endpoints/endpoint-configurations).', '',
-        '| Delivered call | Flex including startup/idle | Pod running only that window |',
-        '|---|---:|---:|']
+def pilot_estimate(c):
+    """Optional rental comparison; never a purchase or a paid-launch budget."""
+    p = c['gpu_pilot']
+    for key, value in p.items():
+        if key not in {'quoted_at_utc', 'quote_url', 'offers'} and (
+                isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0):
+            raise ValueError('Pilot assumptions must be finite and nonnegative.')
+    fees = p['processor_fraction_assumed'] + p['refund_fraction_assumed']
+    if fees >= 1 or p['retry_fraction'] > 1:
+        raise ValueError('Invalid pilot fee or retry fraction.')
+    months = []
+    for index, month in enumerate(demo_forecast(c)['months']):
+        amount = month['electricity'] + p['gpu_5090_hour']*p['monthly_test_hours'] + p['stopped_storage_allowance_monthly']
+        if index == 0:
+            amount += p['existing_gateway_funding_with_fee']
+        months.append(amount)
+    calls = []
     for minutes in [30, 60]:
-        rows.append(f'| {minutes} minutes | ${gpu_session_cost(flex, minutes):.3f} | ${gpu_session_cost(pod, minutes):.3f} |')
-    rows += ['', 'Pod windows require lifecycle automation and available capacity; their lower compute price is not a managed-autoscaling implementation. Neither option guarantees immediate cold admission. Storage, transport, dialogue, speech, monitoring and fees remain additional.', '',
-        '| Monthly 30-minute calls | Flex compute + 80GB storage | One always-on Pod + same storage |',
-        '|---|---:|---:|']
-    for calls in [20, 100, 500]:
-        rows.append(f'| {calls} | ${calls*gpu_session_cost(flex,30)+5.60:.2f} | ${pod*720+5.60:.2f} |')
-    crossover = pod / flex * 1800 / 1950
-    rows += ['', f'This one-worker, non-overlapping-call scenario crosses an always-on Pod at about **{crossover:.1%} call occupancy**, before extra warm spares, failures or other costs. Scheduled Pods may be cheaper below that point too. Real concurrency, peak demand and worker availability must be measured; a user count alone is not a capacity forecast.', '',
-        'Planning controls: min workers 0 outside demo windows, max workers 1 for the first pilot, no automatic expensive GPU fallback, 90-second post-call idle timeout, at most 60 minutes per admitted call, disconnect grace 30 seconds, and a separately approved daily/monthly spend ceiling. Reserve the worst-case session spend before admission; count startup, idle, already admitted calls and pending workers. Reject new calls before the cap and drain existing calls. A max-worker setting limits burn rate, not total spend. All these cloud controls are proposed, not deployed.', '',
-        'Scale from admitted sessions divided by benchmarked slots per worker, not individual speech requests. Keep call state on the assigned worker, durable memory outside it, and stop idle retention when the call lease expires. Runpod [worker affinity](https://docs.runpod.io/serverless/load-balancing/worker-affinity) supports strict routing but does not preserve lost memory. Its [load-balancing endpoint](https://docs.runpod.io/serverless/load-balancing/overview) has a documented 5.5-minute request limit: send short control/inference requests and transport media separately; qualify worker retention and networking before a 60-minute call. Never treat one hour-long HTTP job as already supported.', '']
-    return '\n'.join(rows)
+        inputs = minutes*p['replies_per_minute']*p['input_tokens_per_reply']
+        outputs = minutes*p['replies_per_minute']*p['output_tokens_per_reply']
+        dialogue = (inputs*p['input_dollars_per_million']+outputs*p['output_dollars_per_million'])/1e6
+        transport = minutes*60*p['downstream_mbps']/8000*p['sfu_egress_per_gb']
+        gpu = gpu_session_cost(p['gpu_5090_hour'],minutes,p['startup_seconds'],p['idle_seconds'])
+        half_used = gpu_session_cost(p['gpu_5090_hour'],minutes/.5,p['startup_seconds'],p['idle_seconds'])
+        calls.append(dict(minutes=minutes,input_tokens=inputs,output_tokens=outputs,dialogue=dialogue,transport=transport,
+                          gpu=gpu,technical=(gpu+dialogue+transport)*(1+p['retry_fraction']),
+                          technical_half_used=(half_used+dialogue+transport)*(1+p['retry_fraction'])))
+    offers = []
+    for offer in p['offers']:
+        if any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or v<0 for v in offer.values()) or offer['price']<=0:
+            raise ValueError('Invalid pilot offer.')
+        cost = offer['fulfillment_ceiling']+p['fixed_transaction_assumed']+offer['price']*fees
+        contribution = offer['price']-cost
+        offers.append(dict(offer,cost=cost,contribution=contribution,margin=contribution/offer['price'],
+                           return_on_cost=contribution/cost))
+    return dict(months=months,total=sum(months),cap=c['poc']['quarter_cap'],
+                remaining=c['poc']['quarter_cap']-sum(months),calls=calls,offers=offers,fees=fees)
 
 
 def report(c):
-    p=c["poc"];d=demo_forecast(c);future=calculate(c)
-    rows=["# Local proof-of-concept economics","",
-          f"Checked {c['as_of']}. Generated from [config](../config/economics.json). Active stage: founder-operated proof of concept and fundraising demos. No customer sales, paid engineering, production uptime or public adult service is budgeted. Existing computer and existing coding subscriptions are already owned/paid; founder living costs are outside this incremental project budget.",
-          "","## Spending decision","",
-          f"First-demo allowance including the reserve: **${d['first_demo_funding']:.2f}**. Three-month planned expense: **${d['expense']:.2f}**, plus one **${p['contingency']:.2f}** contingency pool = **${d['funding']:.2f}**. Set a **${p['quarter_cap']:.0f} quarter cap**. The reserve is counted once, not every month. No cloud GPU, new paid tool or paid engineer is in this active budget. Planned funding is {'within' if d['within_cap'] else 'OVER'} the cap; stop/re-scope if actual commitments exceed it. The electricity-only baseline below predates the founder-funded $10 Gateway top-up; its allocation from contingency is recorded under stop rules. The agent made no payment-method or automatic top-up changes.",
-          "","## Why this is cheaper","",
-          "Read-only local inventory found an NVIDIA RTX 4060 Ti with 16,380 MiB reported VRAM and about 47.7 GiB system RAM. Cloudflare currently handles dialogue; CPU speech and local graphics share the existing rig. Scene preparation is a separate phase. No rented GPU is used in this stage. Downloads need internet access; active call graphics and speech stay local, with separately funded cloud video benchmarks; hosted dialogue may incur usage charges. See LOCAL_POC for measured results and limitations.",
-          "Founder screenshares a private app using synthetic demo profiles. Public material is a non-explicit product preview with no adult service access, uploads, checkout or exposed inference endpoint. Private does not waive model/host terms or applicable law; unresolved intended-content eligibility is reported as unresolved, not hidden in a demo.",
-          "","## Three-month incremental costs","",
-          "| Item | M1 build/demo | M2 demos | M3 demos | Total |","|---|---:|---:|---:|---:|"]
-    entries=[("Local electricity",[m['electricity'] for m in d['months']]),
-             ("24GB cloud fallback",[m['fallback'] for m in d['months']]),
-             ("Large-GPU video experiments",[m['large'] for m in d['months']]),
-             ("Storage allowance",[p['storage_monthly']]*3),
-             ("Incremental tools/API allowance",[p['incremental_tools_monthly']]*3),
-             ("Local/free-tier web preview",[p['web_monthly']]*3),
-             ("Total planned expense",[m['expense'] for m in d['months']])]
-    for label,values in entries:
-        rows.append("| "+label+" | "+" | ".join(f"${v:.2f}" for v in [*values,sum(values)])+" |")
-    rows += ["",f"Local power assumes {p['local_kw']*1000:.0f}W incremental average draw and ${p['electricity_per_kwh']:.2f}/kWh, for 100/30/30 hours. This is an estimate, not measured power or the user's tariff. Local disk capacity and existing subscriptions are already available. Cloud fallback and large-GPU hours are zero; legacy rates remain in config only for an explicitly approved future comparison. No guaranteed video throughput or model fit is implied by the budget.",
-             "","Use localhost; no domain or remote deployment is needed. The active Cloudflare dialogue adapter uses existing credentials and may incur usage charges, which are not measured in this electricity-only baseline. Ollama is an optional local alternative; CPU speech uses downloaded weights. A future eligible web preview could use Cloudflare Free, but it is not needed or deployed now. [Cloudflare pricing](https://developers.cloudflare.com/workers/platform/pricing/).",
-             "","## Sensitivity and stop rules","",f"| Scenario | Quarter expense | With one contingency pool | Within ${p['quarter_cap']:.0f} cap? |","|---|---:|---:|---|"]
-    variants=[("Baseline",c)]
-    for label,changes in [("Local power draw doubles",dict(local_kw=p['local_kw']*2)),
-                          ("New optional tools at $10/month",dict(incremental_tools_monthly=10)),
-                          ("Electricity only, no contingency",dict(contingency=0))]:
-        x=copy.deepcopy(c);x['poc'].update(changes);variants.append((label,x))
-    for label,x in variants:
-        z=demo_forecast(x)
-        rows.append(f"| {label} | ${z['expense']:.2f} | ${z['funding']:.2f} | {'Yes' if z['within_cap'] else 'No — reduce hours/scope'} |")
-    rows += ["",f"The ${p['quarter_cap']:.0f} cap is a planning limit, not an implemented account control or permission to purchase. The founder now permits considering inexpensive cloud/larger-GPU approaches if local latency remains unacceptable. Compare measured benefit before purchasing; no rental is currently provisioned. The founder-funded $10 credit top-up now exists. Budget $10.50 before tax with the published 5% funding fee, drawn from the existing $75 contingency; that leaves $64.50 reserve and keeps the original $84.60 envelope. The $0.90 test usage spends those prepaid credits, so do not count it again as a second cash purchase. Exact tax/receipt fees and other hosted dialogue charges still need reconciliation. No further top-up or future funding is assumed.",
-             "","## Costs postponed by the stage change","",
-             "Customer billing and card registration: $0 now because there is no checkout or payment acceptance. Public age-service minimums: $0 now because there is no public adult access. Paid launch legal/security packages, company-formation purchases, insurance and production support are not automatically incurred for this private prototype. They have not been declared unnecessary for a real launch. Any required advice or third-party access clearance must fit new approved funding or stop that activity. Never take payments through an incompatible processor or call a public adult beta a private demo.",
-             "","## Future price hypotheses only","",
-             "### Apple billing sensitivity — September 8\n\nUse **30%** as the conservative commission assumption. Apple's subscription guidance describes 70% proceeds in a subscriber's first year and 85% after one paid year, before applicable taxes. Approved eligible Small Business Program participants can receive the 15% commission rate earlier; do not assume enrollment. [Subscriptions](https://developer.apple.com/app-store/subscriptions/), [Small Business Program](https://developer.apple.com/app-store/small-business-program/).\n\n| Customer price | After 30% Apple fee | After 15% fee | Service-cost ceiling for 60% contribution on customer price, at 30% fee |\n|---|---:|---:|---:|\n| $19.99 | $13.99 | $16.99 | $2.00 |\n| $29.99 | $20.99 | $25.49 | $3.00 |\n| $49.99 | $34.99 | $42.49 | $5.00 |\n\nFormula: contribution = price × (1 − commission) − all variable service costs. These ceilings exclude fixed overhead, tax/refunds and acquisition, so they are not net-profit promises. Earlier roughly 63% web contribution estimates cannot be carried into Apple billing unchanged. Use quotas and prepaid top-ups only after measuring service cost; never promise unlimited generated video against these ceilings.\n\n### Optional GPU benchmark budget, not provisioned\n\nCurrent [Runpod pricing](https://www.runpod.io/pricing) lists a 24GB RTX 4090 Pod at $0.74/hour, 32GB RTX 5090 at $0.99/hour, and 48GB L40S at $1.09/hour. Ten test hours are **$7.40/$9.90/$10.90 GPU compute**, plus storage and applicable charges. Its Serverless 4090 tier lists $1.10/hour: **$0.55 for a continuously occupied 30-minute call**, before other costs and startup. Rates/availability are quotes to recheck at provisioning; the marketing blog and live price table differ, so use the table rather than combining them.\n\nFlex can scale to zero, but startup, execution and the idle timeout are billed; persistent storage still costs money. An 80GB standard network volume at $0.07/GB/month adds **$5.60/month**. Zero idle GPU time does not mean a zero-dollar account. [Billing rules](https://docs.runpod.io/serverless/pricing). A capped 10-hour, 80GB experiment would therefore start around $13–$17 using those Pod quotes, before incidental charges. No machine has been rented and no model has demonstrated the target call speed there.\n\n[Modal](https://modal.com/pricing) lists L4 at $0.000222/s, A10 at $0.000306/s and L40S at $0.000542/s: **$0.7992/$1.1016/$1.9512 per GPU-hour**. CPU, RAM and storage are additional; explicit region selection lists a 1.15–1.75 multiplier. Free credits are not assumed. These are alternative benchmark costs, not confirmation of content-policy or US deployment eligibility.\n\nMore system RAM helps keep weights available for offloading; it does not turn the 4060 Ti into a faster GPU. Benchmark a rental before buying a card. For scale, an always-running $0.74/hour worker costs about **$533 per 30 days**, so low utilization can erase subscription margin. Public prices need measured GPU occupancy per delivered call, startup behavior, rejected generations, support/refunds and demand data.","",
-             "September 8's additional synthetic Cloudflare comparisons total **$0.01443 at published variable list prices for responses with known usage**, including the capability-prompt retest. One timed-out GLM request has unknown billed usage; this is not an invoice. The earlier Aura-2 experiment added $0.01806 nominally. These small tests use existing credentials, do not purchase a plan, and do not establish future production costs. Qwen and local Kokoro remain selected. [Measured comparison](LOCAL_POC.md#cloudflare-comparison--september-8-follow-up).",
-             "",
-             remote_clip_comparison(), "",
-             "A warm RTX 4090 Pod at $0.74/hour costs $0.37 of GPU time per 30-minute call at full occupancy with one simultaneous call. At 25% occupied time it becomes $1.48 per served call; 24/7 operation costs $532.80 per 30 days. A 32GB RTX 5090 at $0.99/hour gives $0.495/$1.98/$712.80 under the same assumptions. These exclude storage, transport, other services and unused startup time. They are rental arithmetic, not measured concurrency or public-service quotes. Ten 4090 test hours cost $7.40 compute; no rental has been made, and Gateway credits cannot pay that separate provider.",
-             "",
-             "Cloudflare [Realtime SFU pricing](https://developers.cloudflare.com/realtime/sfu/pricing/) is $0.05/GB egress after its shared SFU/TURN allowance. A single 2Mbps downstream for 30 minutes is 0.45GB, or $0.0225 at that rate before protocol overhead and other billable traffic. GPU-provider egress is separate. This is transport only; WebRTC does not perform model inference.",
-             "",
-             autoscaling_comparison(), "",
-             "The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.",
-             "","| Future monthly offer | Price to test | Earlier direct contribution hypothesis |","|---|---:|---:|"]
-    for plan in future['plans']:
-        rows.append(f"| {plan['name']} | ${plan['price']:.2f} | {plan['margin']:.1%} |")
-    rows += ["","Show prospective users clearly labeled price concepts; record qualified interest and objections without charging. Interview responses and investor meetings are not revenue. This stage deliberately has zero revenue, so its expense is a small planned loss. Its return is evidence: local inference measurements, a future demo, license findings and demand signals. Public launch/fundraising legal work and guarantees of investment are outside this budget. See [LOCAL_POC](LOCAL_POC.md), [REPORT](REPORT.md), [BUILD](BUILD.md) and [USA](USA.md).",""]
-    return "\n".join(rows)
+    from decimal import Decimal
+    d=pilot_estimate(c);p=c['gpu_pilot']
+    rows=[
+        '# PWA pilot costs and pricing',
+        '',
+        'Checked September 8, 2026 US Eastern (September 9 UTC). Generated by scripts/economics.py from config/economics.json. The founder is the only engineer. Existing PC, coding subscriptions and living costs are excluded from incremental cash needs. No GPU has been rented and no paid public service is enabled.',
+        '',
+        '## What to rent',
+        '',
+        'Keep the 16GB rig for development. For the next hosted comparison, choose **one RTX 5090 32GB, 8 vCPU, 64GB RAM and 150GB NVMe**, in a US region, for a capped ten-hour experiment. Use on-demand scheduled sessions. The current TensorDock Orlando offer is below; the 4090 is the fallback if 5090 availability or runtime compatibility fails.',
+        '',
+        '| Listed configuration | Per running hour | Ten hours | 720 running hours |',
+        '|---|---:|---:|---:|']
+    for name,rate in [('RTX 4090 24GB',p['gpu_4090_hour']),('RTX 5090 32GB',p['gpu_5090_hour'])]:
+        rows.append(f'| {name}; 8 vCPU / 64GB RAM / 150GB disk | ${rate:.4f} | ${Decimal(str(rate))*10:.2f} | ${Decimal(str(rate))*720:.2f} |')
+    rows += [
+        '',
+        '[Public deployment listing](https://console.tensordock.com/deploy), captured 2026-09-09 01:31 UTC. These are configured offers, not the misleading 4GB-system-RAM defaults or a checkout invoice. Availability, taxes, stopped-disk billing, bandwidth and minimum funding require checkout confirmation. The listed 5090 host shows 99.15% uptime and a Low Uptime warning, versus 99.85% for the 4090: acceptable to evaluate, insufficient evidence for production reliability.',
+        '',
+        'The 5090 adds 8GB VRAM for about 16% more hourly cost. It needs a compatible Blackwell/CUDA runtime. Neither faster calls nor model fit has been demonstrated on this rental. TensorDock is a content-policy candidate, not an approved host for this project; obtain acceptance for the complete service. GPU ownership does not override model licenses. [Host policy](https://docs.tensordock.com/legal-information/acceptable-use-policy-aup).',
+        '',
+        '## First three months: optional technical pilot',
+        '',
+        'Assume ten rented test hours per month, a $5/month stopped-storage allowance, local power at 300W and $0.20/kWh for 100/30/30 hours, and the already funded $10 Gateway purchase budgeted at $10.50 with its published funding fee. Storage is an allowance pending a host quote; power is not measured.',
+        '',
+        '| Item | Month 1 | Month 2 | Month 3 |',
+        '|---|---:|---:|---:|',
+        '| Local electricity | $6.00 | $1.80 | $1.80 |',
+        f"| GPU experiment | ${p['gpu_5090_hour']*10:.2f} | ${p['gpu_5090_hour']*10:.2f} | ${p['gpu_5090_hour']*10:.2f} |",
+        '| Stopped-storage allowance | $5.00 | $5.00 | $5.00 |',
+        '| Existing Gateway credit purchase, fee estimate included | $10.50 | $0.00 | $0.00 |',
+        '| New paid engineering / local preview hosting | $0.00 | $0.00 | $0.00 |',
+        f"| Planned total | ${d['months'][0]:.2f} | ${d['months'][1]:.2f} | ${d['months'][2]:.2f} |",
+        '',
+        f"Quarter planning total: **${d['total']:.2f}**, including the existing credit purchase, leaving **${d['remaining']:.2f}** under the ${d['cap']:.0f} planning cap. Do not add the old contingency pool a second time. Credit consumption spends prepaid funds, not another cash purchase. The cap is not an implemented provider control or authorization to rent. This budget covers technical demonstrations, not a public adult launch, legal clearance, domain purchases or merchant onboarding.",
+        '',
+        '## Full call cost flow',
+        '',
+        '| Stage | Selected prototype component | Cost treatment |',
+        '|---|---|---|',
+        '| Capture / endpoint detection | Browser AudioWorklet and VAD | Client device; current endpoint wait approximately 0.65s |',
+        '| Recognition | faster-whisper Base English int8 | CPU on the same worker; capacity must be tested |',
+        '| Context and planning | Cloudflare @cf/qwen/qwen3-30b-a3b-fp8 | $0.051/M input tokens, $0.34/M output tokens |',
+        '| Voice | Kokoro-82M ONNX, af_sarah | Same-worker CPU; no external per-character tariff |',
+        '| Speech video | MuseTalk 1.5 + SD VAE + Whisper-tiny, prepared body media | Occupied GPU session, not per-frame API pricing |',
+        '| New scenes / body footage | FLUX.2 Klein 4B / LTX benchmark pipeline | Separate preparation work; never assumed free or instantaneous |',
+        '| Public media transport, proposed | Cloudflare Realtime SFU / WebRTC | $0.05/GB egress at marginal list price |',
+        '| App, memory and billing | Cloudflare application/data services + accepted hosted checkout | Separate from model and GPU costs; not deployed |',
+        '',
+        '[Qwen rates](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), [SFU rates](https://developers.cloudflare.com/realtime/sfu/pricing/). The current demo uses loopback HTTP media, not WebRTC. Hosted dialogue and the LTX preparation pipeline are neutral-demo selections, not an approved adult-content route. In particular, LTX terms exclude the intended explicit scope; a lawful commercial pipeline needs separately qualified assets/models. See USA.md.',
+        '',
+        'Sizing scenario: two replies/minute, 2,000 input tokens and 60 output tokens per reply. Bound context; do not resend an unlimited transcript. One 2Mbps downstream is 0.45GB per 30 minutes before protocol overhead. Calculations ignore free tiers and add a 20% inference/transport contingency. Same-worker CPU speech is included in the configured rental, but co-resident throughput is untested.',
+        '',
+        '| Call | Input / output tokens | Dialogue | GPU, including 60s startup + 90s idle | SFU | Technical total +20% | At 50% call occupancy +20% |',
+        '|---|---:|---:|---:|---:|---:|---:|']
+    for r in d['calls']:
+        rows.append(f"| {r['minutes']} min | {r['input_tokens']:,.0f} / {r['output_tokens']:,.0f} | ${r['dialogue']:.4f} | ${r['gpu']:.4f} | ${r['transport']:.4f} | ${r['technical']:.2f} | ${r['technical_half_used']:.2f} |")
+    rows += [
+        '',
+        'At 50% occupancy, allocated running time doubles; startup/idle overhead is added once per call. These totals exclude GPU-provider egress, storage, application usage, verification, moderation services, support, payment fees, acquisition and taxes. The 20% allowance is not a measurement of retries or sufficient funding for every failed render. Full-body arbitrary generation may cost substantially more than the prepared-motion demo.',
+        '',
+        '## Pricing experiments after approval',
+        '',
+        'Keep video metered. Test the following hypotheses with prospective users before charging. Fulfillment ceilings reserve more than the 50%-occupancy technical estimates for application, disk and routine handling; replace them with actual bills and accepted verification/moderation quotes. Price calculations assume 16% processing, 2% refund/loss provision and $0.50 fixed per purchase. **These are assumptions, not a processor offer.**',
+        '',
+        '| Video pack | Test price | Fulfillment ceiling | Fees + fulfillment | Contribution | Contribution margin |',
+        '|---|---:|---:|---:|---:|---:|']
+    for r in d['offers']:
+        rows.append(f"| {r['minutes']} minutes | ${r['price']:.2f} | ${r['fulfillment_ceiling']:.2f} | ${r['cost']:.2f} | ${r['contribution']:.2f} | {r['margin']:.1%} |")
+    rows += [
+        '',
+        'These are approximately 52–53% contributions, before fixed overhead, annual registration, acquisition, onboarding checks and founder labor. They are not net profit or measured willingness to pay. At 18% variable fees, a 500% return on all costs is mathematically unavailable even before service costs. A 300% return requires a price above $42.85 for a 60-minute pack with $3 of non-percentage costs; that conflicts with the affordable offer. Prefer sustainable unit contribution and measured retention over an arbitrary markup target.',
+        '',
+        'For early product research: limited free text and short voice notes; paid phone calls and video minutes. A $4.99 voice-hour concept with a $0.50 fulfillment ceiling yields about 62% contribution under the same assumed fees. No unlimited inference, proactive paid media or unmetered video. Free access needs a per-user and account-wide spend cap; it is not costless. General 15-second video pricing remains unvalidated until a permitted model passes latency, identity and delivery-cost tests.',
+        '',
+        'The earlier $19.99/$29.99/$49.99 bundles and two always-on GPU pools are deferred calculator scenarios retained in JSON output for sensitivity analysis. They are not the selected pilot or advertised plans.',
+        '',
+        '## Payments and first-month risk',
+        '',
+        '**CCBill is the first processor to request a quote from**, because it serves adult businesses. Its published US/Canada annual card registration is Visa $950 + Mastercard $1,000 = **$1,950/year**. Processing percentage, reserve, payout delay, chargeback charges and acceptance of interactive AI calls require underwriting. No monthly PSP fee does not mean no upfront card cost. [Pricing](https://ccbill.com/pricing), [US/Canada registration](https://ccbill.com/doc/risk-difference-between-low-risk-and-high-risk-accounts).',
+        '',
+        'Segpay is an alternative with published AI-site requirements, including restrictions on uploads and generation/review arrangements. Do not assume internal-only monitoring will satisfy its acquiring bank. [AI approval guidance](https://segpay.com/blog/your-roadmap-for-adult-ai-site-approval/). No processor has approved AI Mate, and no application has been sent.',
+        '',
+        f"The registration alone averages ${p['registration_yearly']/12:.2f}/month but may need cash upfront. At the proposed 60-minute pack contribution, about {math.ceil(p['registration_yearly']/d['offers'][1]['contribution'])} sales cover that annual registration alone. Legal/access-control work and every other fixed expense remain additional. Reserves delay cash even when a sale has positive contribution. There is no evidence for guaranteed first-month profit or a zero-upfront paid adult launch. Validate the call with the small technical budget before committing merchant-launch money.",
+        '',
+        '## Scaling without idle burn',
+        '',
+        'Reserve one tested GPU slot for a complete call. Keep the worker and temporal state warm between sentences. For the pilot use scheduled sessions, maximum one worker and a bounded rental window. Release it after calls finish; verify whether stopping actually releases GPU charges and what disk charges continue. Avoid interruptible spot instances for live calls.',
+        '',
+        'Scale asynchronous scene/clip workers to zero if an accepted provider supports it. Serverless is useful for uneven demand, but cold starts, active seconds, idle timeout and persistent storage still count. TensorDock managed serverless behavior has not been qualified here. Runpod is excluded for the intended explicit service under its terms; its neutral benchmark rates are not our launch architecture.',
+        '',
+        'For later public calls: reserve worst-case spend before admission, cap concurrent workers and session length, keep a short disconnect grace, stop admitting before the spending ceiling and drain existing sessions. Measure slots per worker and peak demand before growing capacity. An always-on 5090 at this rate consumes $534.60 per 30 days before extras. These lifecycle and billing controls are proposed, not deployed.',
+        '',
+        'Reproduce on this configured PC: ./.venv/Scripts/python.exe scripts/economics.py --write. Machine output labels the older commercial forecast as deferred. Figures are rounded independently; totals use unrounded rates. Technical evidence: LOCAL_POC.md; architecture: BUILD.md; release eligibility: USA.md.',
+        ''
+    ]
+    return '\n'.join(rows)
 
 
 def main():
@@ -285,7 +330,7 @@ def main():
         p.error("--write cannot combine with output/assumption overrides")
     c=load()
     if args.payers is not None: c["assumptions"]["payers"]=args.payers
-    try: output=json.dumps(dict(active_stage=c['active_stage'],demo=demo_forecast(c),deferred_unit_economics=calculate(c),deferred_launch=forecast(c)),indent=2) if args.json else report(c)
+    try: output=json.dumps(dict(active_stage=c['active_stage'],demo=demo_forecast(c),optional_gpu_pilot=pilot_estimate(c),deferred_unit_economics=calculate(c),deferred_launch=forecast(c)),indent=2) if args.json else report(c)
     except ValueError as e: p.error(str(e))
     if args.write:
         (ROOT/"docs/ECONOMICS.md").write_text(output,encoding="utf-8")

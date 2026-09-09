@@ -3,9 +3,31 @@ import math
 import subprocess
 import sys
 import unittest
-from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, demo_forecast, gpu_session_cost, ROOT
+from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, demo_forecast, gpu_session_cost, pilot_estimate, ROOT
 
 class EconomicsTests(unittest.TestCase):
+    def test_optional_pilot_counts_credit_purchase_once_and_utilization_separately(self):
+        d=pilot_estimate(load())
+        self.assertAlmostEqual(d['total'],57.375)
+        self.assertAlmostEqual(d['months'][0],28.925)
+        self.assertAlmostEqual(d['remaining'],42.625)
+        r=d['calls'][1]
+        self.assertEqual((r['input_tokens'],r['output_tokens']),(240000,7200))
+        self.assertAlmostEqual(r['dialogue'],.014688)
+        self.assertAlmostEqual(r['gpu'],.7734375)
+        self.assertAlmostEqual(r['transport'],.045)
+        self.assertGreater(r['technical_half_used'],r['technical'])
+        offer=d['offers'][1]
+        self.assertAlmostEqual(offer['contribution'],5.1918)
+        self.assertAlmostEqual(offer['margin'],offer['contribution']/9.99)
+
+    def test_pilot_overruns_and_invalid_fee_inputs_are_visible(self):
+        c=load();c['gpu_pilot']['monthly_test_hours']=720
+        self.assertLess(pilot_estimate(c)['remaining'],0)
+        for key,value in [('gpu_5090_hour',float('nan')),('processor_fraction_assumed',1),('idle_seconds',-1)]:
+            c=load();c['gpu_pilot'][key]=value
+            with self.assertRaises(ValueError):pilot_estimate(c)
+
     def test_gpu_call_cost_charges_startup_and_idle_once(self):
         self.assertAlmostEqual(gpu_session_cost(1.116,30),.6045)
         self.assertAlmostEqual(gpu_session_cost(1.116,60),1.1625)

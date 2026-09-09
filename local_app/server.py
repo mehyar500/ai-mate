@@ -58,8 +58,10 @@ class Handler(BaseHTTPRequestHandler):
         if not head:
             try:
                 self.wfile.write(data)
-            except (BrokenPipeError, ConnectionResetError):
-                pass
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                # Windows reports local browser closure as WSAECONNABORTED.
+                # The request has already completed; there is no peer to reply to.
+                self.close_connection = True
 
     def do_GET(self):
         if not self.allowed():

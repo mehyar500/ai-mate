@@ -10269,5 +10269,1080 @@
       "No real iPhone keyboard, acoustic device test, backend latency or public deployment evidence.",
       "Prepared body-action and visual-quality limits remain."
     ]
+  },
+  "prepared_wave_20260909": {
+    "checked_at_utc": "2026-09-09",
+    "scope": "Neutral local prepared-wave feature and actual ASR/Cloudflare/TTS/MuseTalk/Chromium trial; synthetic audio input, no physical microphone/speaker or public deployment.",
+    "source": {
+      "version": 1,
+      "reviewed": true,
+      "model": "LTX-2.3-22B-distilled-FP8",
+      "source": "ltx23-e366c5dfe7054babb89a653774584c27",
+      "sha256": {
+        "fullbody.png": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+        "performance-wave.mp4": "7b91bc2392eda44834049cbf2e3232857e85a3204047b77fc1e736d2f7ebc441"
+      },
+      "review": "September 8/9 neutral source and every rendered wave frame reviewed. One right hand raises/waves/lowers; both feet remain visible. Real ASR/Cloudflare/Kokoro/MuseTalk browser trial completed with unmuted speech and no stalls. Hand blur, face softness and minor background deformation remain. Local neutral demo only."
+    },
+    "preparation": {
+      "model": "LTX-2.3-22B-distilled-FP8",
+      "seed": 83,
+      "source_frames": 97,
+      "source_fps": 24,
+      "resolution": [
+        384,
+        576
+      ],
+      "cold_generation_s": 154.781,
+      "reference_guided_start_and_end": true
+    },
+    "trials": [
+      {
+        "case": "wave",
+        "action": "wave",
+        "prepared_pose": "base",
+        "first_playback_s": 2.66,
+        "server": {
+          "asr_s": 0.661,
+          "first_text_s": 1.34,
+          "decision_source": "model",
+          "first_media_ready_s": 3.31,
+          "total_s": 3.318
+        },
+        "browser_metrics": "First playback: 2.66s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 3.32s."
+      },
+      {
+        "case": "greeting",
+        "action": "none",
+        "prepared_pose": "base",
+        "first_playback_s": 2.54,
+        "server": {
+          "asr_s": 0.437,
+          "first_text_s": 1.22,
+          "decision_source": "model",
+          "first_media_ready_s": 3.591,
+          "total_s": 3.596
+        },
+        "browser_metrics": "First playback: 2.54s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 3.60s."
+      },
+      {
+        "case": "memory",
+        "action": "none",
+        "prepared_pose": "base",
+        "first_playback_s": 2.37,
+        "server": {
+          "asr_s": 0.43,
+          "first_text_s": 1.062,
+          "decision_source": "model",
+          "first_media_ready_s": 3.093,
+          "total_s": 3.098
+        },
+        "browser_metrics": "First playback: 2.37s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 3.10s."
+      },
+      {
+        "case": "approach",
+        "action": "closer",
+        "prepared_pose": "near",
+        "first_playback_s": 2.09,
+        "server": {
+          "asr_s": 0.438,
+          "first_text_s": 0.918,
+          "decision_source": "model",
+          "first_media_ready_s": 2.734,
+          "total_s": 2.739
+        },
+        "browser_metrics": "First playback: 2.09s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 2.74s."
+      },
+      {
+        "case": "return",
+        "action": "farther",
+        "prepared_pose": "base",
+        "first_playback_s": 2.36,
+        "server": {
+          "asr_s": 0.444,
+          "first_text_s": 1.049,
+          "decision_source": "model",
+          "first_media_ready_s": 3.02,
+          "total_s": 3.025
+        },
+        "browser_metrics": "First playback: 2.36s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 3.02s."
+      }
+    ],
+    "frame_review": {
+      "clips": 5,
+      "decoded_frames": 278,
+      "heuristic_flags": 0,
+      "wave_visual_review": "All 81 rendered wave frames visually reviewed; one right-hand wave, stable framing and return, but hand blur, face softness and background deformation remain. Frame diagnostics do not certify anatomy or identity."
+    },
+    "warmup": {
+      "sources": 5,
+      "seconds": 16.735,
+      "torch_allocated_mib": 1830.798
+    },
+    "implementation": [
+      "separately reviewed hash-bound wave manifest",
+      "gesture interruption keeps held pose without approach cursor",
+      "bounded five-source appearance priming"
+    ],
+    "live_preview": "Assets staged; existing user call left running on earlier process. Restart required.",
+    "checks": {
+      "python": 129,
+      "node": 17,
+      "frame_diagnostics": "completed",
+      "browser_five_turns": "passed"
+    },
+    "limitations": [
+      "Prepared movement only; wave applies at base pose",
+      "No real physical audio or acoustic echo evidence",
+      "Sub-two-second full call latency, arbitrary movement and public eligibility remain unproven"
+    ]
+  },
+  "gpu_quote_20260909": {
+    "source": {
+      "observed_at": "2026-09-09T01:31:00.173Z",
+      "url": "https://console.tensordock.com/deploy",
+      "purchased": false,
+      "results": [
+        {
+          "gpu": "4090",
+          "ram_gb": 64,
+          "vcpus": 8,
+          "storage_gb": 150,
+          "options": [
+            "Orlando, Florida, United States - $0.6395/hr Local NVMe storageShared IPv4Top HostLow Stock1x GeForce RTX 4090  24 GB, 8x AMD EPYC 7713 vCPUs, 64 GB RAM, 150 GB NVMe SSD, 99.85% Uptime",
+            "Dallas, Texas, United States - $0.4350/hr Local NVMe storageShared IPv4Top HostLow Stock1x GeForce RTX 3090  24 GB, 8x AMD EPYC 75F3 vCPUs, 64 GB RAM, 150 GB NVMe SSD, 99.55% Uptime",
+            "Vancouver, British Columbia, Canada - $0.6095/hr Local NVMe storageShared IPv4Medium Stock1x  RTX A6000  48 GB, 8x AMD EPYC 7343 vCPUs, 64 GB RAM, 150 GB NVMe SSD, 99.99% Uptime",
+            "Orlando, Florida, United States - $0.7425/hr Low UptimeLocal NVMe storageShared IPv4Top HostLow Stock1x GeForce RTX 5090  32 GB, 8x AMD EPYC 7J13 vCPUs, 64 GB RAM, 150 GB NVMe SSD, 99.15% Uptime"
+          ],
+          "summary": "\n            Pricing details will appear once you select a \n            location.\n          "
+        },
+        {
+          "gpu": "5090",
+          "ram_gb": 64,
+          "vcpus": 8,
+          "storage_gb": 150,
+          "options": [
+            "Orlando, Florida, United States - $0.7425/hr Low UptimeLocal NVMe storageShared IPv4Top HostLow Stock1x GeForce RTX 5090  32 GB, 8x AMD EPYC 7J13 vCPUs, 64 GB RAM, 150 GB NVMe SSD, 99.15% Uptime",
+            "Vancouver, British Columbia, Canada - $0.6095/hr Local NVMe storageShared IPv4Medium Stock1x  RTX A6000  48 GB, 8x AMD EPYC 7343 vCPUs, 64 GB RAM, 150 GB NVMe SSD, 99.99% Uptime"
+          ],
+          "summary": "\n            Pricing details will appear once you select a \n            location.\n          "
+        }
+      ]
+    },
+    "decision": "Conditional 10-hour RTX5090 US benchmark; no purchase or account/host acceptance. Pricing is configured public inventory, not checkout."
+  },
+  "twenty_commands_initial_20260909": {
+    "summary": {
+      "elapsed_s": 99.152,
+      "turns": 20,
+      "failures": [
+        {
+          "case": "interrupted_approach",
+          "failures": [
+            "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'done'\n- 'cancelled'\n"
+          ]
+        },
+        {
+          "case": "message",
+          "failures": [
+            "call_dropped_on_navigation"
+          ]
+        }
+      ],
+      "response_sample_count": 19,
+      "p50_s": 1.9796000000014902,
+      "p95_s": 2.8316000000014903,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 939,
+            "longGaps": 20,
+            "last": 98588.2
+          },
+          "idle-video": {
+            "presented": 195,
+            "callbacks": 1084,
+            "longGaps": 18,
+            "last": 99204.914
+          }
+        },
+        "video": null,
+        "callActive": true
+      },
+      "errors": [],
+      "scope": "Mixed synthetic WAV and typed commands; actual ASR/Cloudflare/Kokoro/MuseTalk/browser playback. Physical capture, endpoint detection and network/device testing excluded. Frame callbacks do not prove anatomy, identity or perceptual lip sync."
+    },
+    "review": "Two reported failures were incorrect harness checks. Completed generation may still have interrupted playback; Text uses active-call banner. Corrected checks are under the separate soak trial. Initial failure output preserved."
+  },
+  "thirty_minute_call_20260909": {
+    "summary": {
+      "elapsed_s": 1800.056,
+      "turns": 120,
+      "failures": [],
+      "response_sample_count": 114,
+      "p50_s": 1.89,
+      "p95_s": 2.82,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 5671,
+            "longGaps": 120,
+            "last": 1787768.2
+          },
+          "idle-video": {
+            "presented": 1135,
+            "callbacks": 32052,
+            "longGaps": 108,
+            "last": 1800101.18
+          }
+        },
+        "callActive": true
+      },
+      "errors": [],
+      "scope": "Mixed synthetic WAV and typed commands; actual ASR/Cloudflare/Kokoro/MuseTalk/browser playback. Physical capture, endpoint detection and network/device testing excluded. Frame callbacks do not prove anatomy, identity or perceptual lip sync."
+    },
+    "timing": {
+      "text": {
+        "n": 60,
+        "median": 1.855,
+        "p95": 2.58,
+        "max": 4.55
+      },
+      "audio": {
+        "n": 54,
+        "median": 2.215,
+        "p95": 2.83,
+        "max": 5.64
+      },
+      "cycles": {
+        "1": {
+          "n": 19,
+          "median": 2.13,
+          "p95": 4.13,
+          "max": 4.13
+        },
+        "2": {
+          "n": 19,
+          "median": 2.28,
+          "p95": 2.86,
+          "max": 2.86
+        },
+        "3": {
+          "n": 19,
+          "median": 1.89,
+          "p95": 5.64,
+          "max": 5.64
+        },
+        "4": {
+          "n": 19,
+          "median": 1.85,
+          "p95": 2.54,
+          "max": 2.54
+        },
+        "5": {
+          "n": 19,
+          "median": 1.99,
+          "p95": 4.55,
+          "max": 4.55
+        },
+        "6": {
+          "n": 19,
+          "median": 1.89,
+          "p95": 2.65,
+          "max": 2.65
+        }
+      },
+      "direct": null
+    },
+    "frame_audit": {
+      "clips_total": 120,
+      "clips_retained": 50,
+      "clips_removed_by_normal_retention": 70,
+      "decoded_frames_reviewed": 2469,
+      "heuristic_flagged_frames": 0,
+      "full_frame_qualification": false
+    },
+    "limits": [
+      "Synthetic WAV injection excludes physical capture and endpoint wait.",
+      "No physical audio/mobile or perceptual sync qualification.",
+      "Raw callback longGaps includes intentional source switches and pauses; not a stall count.",
+      "Normal 50-turn retention removed 70 old clips before post-run audit. Future harness archives synthetic media per turn without changing live retention.",
+      "Browser closure produced one Windows ConnectionAbortedError while returning the final cancel response; normal disconnect handling was corrected."
+    ],
+    "checks": {
+      "python_passed": 130,
+      "node_passed": 17,
+      "independent_review": "pending",
+      "staging": "not_provisioned"
+    },
+    "live_preview": "Existing active call was not restarted; reviewed wave staged for next server startup."
+  },
+  "cloud_small_planners_20260909": {
+    "source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+    "comparisons": [
+      {
+        "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+        "samples": 8,
+        "median_s": 0.603,
+        "maximum_s": 1.268,
+        "failed_cases": 0,
+        "listed_cost_usd": 0.0006076,
+        "results": [
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "memory",
+            "repeat": 0,
+            "first_response_byte_s": 1.268,
+            "complete_s": 1.268,
+            "usage": {
+              "prompt_tokens": 1243,
+              "completion_tokens": 37,
+              "total_tokens": 1280
+            },
+            "list_price_usd": 7.5788e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You were getting ready for your piano recital on Friday.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "recall": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "negated_motion",
+            "repeat": 0,
+            "first_response_byte_s": 0.586,
+            "complete_s": 0.586,
+            "usage": {
+              "prompt_tokens": 1244,
+              "completion_tokens": 34,
+              "total_tokens": 1278
+            },
+            "list_price_usd": 7.483400000000001e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "The garden is peaceful with blooming flowers.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "call_message",
+            "repeat": 0,
+            "first_response_byte_s": 0.541,
+            "complete_s": 0.541,
+            "usage": {
+              "prompt_tokens": 1242,
+              "completion_tokens": 39,
+              "total_tokens": 1281
+            },
+            "list_price_usd": 7.6407e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I sent it to your Text tab.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": [],
+              "message": "Good luck at your recital."
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "message": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "unsupported_motion",
+            "repeat": 0,
+            "first_response_byte_s": 0.621,
+            "complete_s": 0.622,
+            "usage": {
+              "prompt_tokens": 1236,
+              "completion_tokens": 41,
+              "total_tokens": 1277
+            },
+            "list_price_usd": 7.6771e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "unsupported_disclosed": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "memory",
+            "repeat": 1,
+            "first_response_byte_s": 0.508,
+            "complete_s": 0.508,
+            "usage": {
+              "prompt_tokens": 1243,
+              "completion_tokens": 37,
+              "total_tokens": 1280
+            },
+            "list_price_usd": 7.5788e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You were getting ready for your piano recital on Friday.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "recall": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "negated_motion",
+            "repeat": 1,
+            "first_response_byte_s": 0.401,
+            "complete_s": 0.401,
+            "usage": {
+              "prompt_tokens": 1244,
+              "completion_tokens": 34,
+              "total_tokens": 1278
+            },
+            "list_price_usd": 7.483400000000001e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "The garden is peaceful with blooming flowers.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "call_message",
+            "repeat": 1,
+            "first_response_byte_s": 0.634,
+            "complete_s": 0.634,
+            "usage": {
+              "prompt_tokens": 1242,
+              "completion_tokens": 39,
+              "total_tokens": 1281
+            },
+            "list_price_usd": 7.6407e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I sent it to your Text tab.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": [],
+              "message": "Good luck at your recital."
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "message": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "case": "unsupported_motion",
+            "repeat": 1,
+            "first_response_byte_s": 0.62,
+            "complete_s": 0.62,
+            "usage": {
+              "prompt_tokens": 1236,
+              "completion_tokens": 41,
+              "total_tokens": 1277
+            },
+            "list_price_usd": 7.6771e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "unsupported_disclosed": true
+            }
+          }
+        ]
+      },
+      {
+        "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+        "samples": 8,
+        "median_s": 0.5954999999999999,
+        "maximum_s": 0.828,
+        "failed_cases": 0,
+        "listed_cost_usd": 0.000638442,
+        "results": [
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "memory",
+            "repeat": 0,
+            "first_response_byte_s": 0.794,
+            "complete_s": 0.794,
+            "usage": {
+              "prompt_tokens": 1260,
+              "completion_tokens": 61,
+              "total_tokens": 1321
+            },
+            "list_price_usd": 8.0124e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You're getting ready for a piano recital on Friday.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "recall": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "negated_motion",
+            "repeat": 0,
+            "first_response_byte_s": 0.565,
+            "complete_s": 0.565,
+            "usage": {
+              "prompt_tokens": 1261,
+              "completion_tokens": 60,
+              "total_tokens": 1321
+            },
+            "list_price_usd": 7.9785e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "The garden's peaceful atmosphere is soothing my voice.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "call_message",
+            "repeat": 0,
+            "first_response_byte_s": 0.52,
+            "complete_s": 0.52,
+            "usage": {
+              "prompt_tokens": 1259,
+              "completion_tokens": 41,
+              "total_tokens": 1300
+            },
+            "list_price_usd": 7.2399e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I sent it to your Text tab.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": [],
+              "message": "Good luck at your recital."
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "message": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "unsupported_motion",
+            "repeat": 0,
+            "first_response_byte_s": 0.563,
+            "complete_s": 0.564,
+            "usage": {
+              "prompt_tokens": 1253,
+              "completion_tokens": 66,
+              "total_tokens": 1319
+            },
+            "list_price_usd": 8.1729e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I cannot do a cartwheel here yet.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "unsupported_disclosed": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "memory",
+            "repeat": 1,
+            "first_response_byte_s": 0.648,
+            "complete_s": 0.649,
+            "usage": {
+              "prompt_tokens": 1260,
+              "completion_tokens": 71,
+              "total_tokens": 1331
+            },
+            "list_price_usd": 8.3964e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You have a piano recital on Friday.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "recall": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "negated_motion",
+            "repeat": 1,
+            "first_response_byte_s": 0.626,
+            "complete_s": 0.626,
+            "usage": {
+              "prompt_tokens": 1261,
+              "completion_tokens": 64,
+              "total_tokens": 1325
+            },
+            "list_price_usd": 8.1321e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "The gentle breeze rustles the leaves of the garden's trees.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "call_message",
+            "repeat": 1,
+            "first_response_byte_s": 0.542,
+            "complete_s": 0.543,
+            "usage": {
+              "prompt_tokens": 1259,
+              "completion_tokens": 47,
+              "total_tokens": 1306
+            },
+            "list_price_usd": 7.4703e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I sent it to your Text tab.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": [],
+              "message": "Good luck at your recital."
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "message": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+            "case": "unsupported_motion",
+            "repeat": 1,
+            "first_response_byte_s": 0.828,
+            "complete_s": 0.828,
+            "usage": {
+              "prompt_tokens": 1253,
+              "completion_tokens": 73,
+              "total_tokens": 1326
+            },
+            "list_price_usd": 8.4417e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "unsupported_disclosed": true
+            }
+          }
+        ]
+      },
+      {
+        "model": "@cf/meta/llama-3.2-3b-instruct",
+        "samples": 8,
+        "median_s": 0.42100000000000004,
+        "maximum_s": 0.692,
+        "failed_cases": 1,
+        "listed_cost_usd": 0.000622911,
+        "results": [
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "memory",
+            "repeat": 0,
+            "first_response_byte_s": 0.692,
+            "complete_s": 0.692,
+            "usage": {
+              "prompt_tokens": 1260,
+              "completion_tokens": 43,
+              "total_tokens": 1303
+            },
+            "list_price_usd": 7.866499999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You have a piano recital on Friday.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "recall": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "negated_motion",
+            "repeat": 0,
+            "first_response_byte_s": 0.392,
+            "complete_s": 0.392,
+            "usage": {
+              "prompt_tokens": 1261,
+              "completion_tokens": 36,
+              "total_tokens": 1297
+            },
+            "list_price_usd": 7.637099999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You're in a serene garden, surrounded by nature's beauty.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "call_message",
+            "repeat": 0,
+            "first_response_byte_s": 0.344,
+            "complete_s": 0.344,
+            "usage": {
+              "prompt_tokens": 1259,
+              "completion_tokens": 28,
+              "total_tokens": 1287
+            },
+            "list_price_usd": 7.358899999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "Good luck at your recital.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "message": false
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "unsupported_motion",
+            "repeat": 0,
+            "first_response_byte_s": 0.45,
+            "complete_s": 0.45,
+            "usage": {
+              "prompt_tokens": 1253,
+              "completion_tokens": 50,
+              "total_tokens": 1303
+            },
+            "list_price_usd": 8.065299999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "unsupported_disclosed": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "memory",
+            "repeat": 1,
+            "first_response_byte_s": 0.505,
+            "complete_s": 0.505,
+            "usage": {
+              "prompt_tokens": 1260,
+              "completion_tokens": 48,
+              "total_tokens": 1308
+            },
+            "list_price_usd": 8.033999999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You have a piano recital on Friday.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "recall": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "negated_motion",
+            "repeat": 1,
+            "first_response_byte_s": 0.335,
+            "complete_s": 0.335,
+            "usage": {
+              "prompt_tokens": 1261,
+              "completion_tokens": 36,
+              "total_tokens": 1297
+            },
+            "list_price_usd": 7.637099999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "You are in a serene garden, surrounded by nature's beauty.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "call_message",
+            "repeat": 1,
+            "first_response_byte_s": 0.307,
+            "complete_s": 0.308,
+            "usage": {
+              "prompt_tokens": 1259,
+              "completion_tokens": 36,
+              "total_tokens": 1295
+            },
+            "list_price_usd": 7.6269e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "Good luck at your recital.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": [],
+              "message": "Good luck at your recital."
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "message": true
+            }
+          },
+          {
+            "kind": "dialogue",
+            "model": "@cf/meta/llama-3.2-3b-instruct",
+            "case": "unsupported_motion",
+            "repeat": 1,
+            "first_response_byte_s": 0.528,
+            "complete_s": 0.528,
+            "usage": {
+              "prompt_tokens": 1253,
+              "completion_tokens": 50,
+              "total_tokens": 1303
+            },
+            "list_price_usd": 8.065299999999999e-05,
+            "finish_reason": "stop",
+            "plan": {
+              "reply": "I cannot do a cartwheel here yet. I can wave or step closer.",
+              "presentation": "video",
+              "scene": "fullbody",
+              "action": "none",
+              "facts": []
+            },
+            "checks": {
+              "mode_kept": true,
+              "scene_kept": true,
+              "no_unrequested_motion": true,
+              "unsupported_disclosed": true
+            }
+          }
+        ]
+      }
+    ],
+    "decision": "Keep Qwen. Llama 8B had no meaningful median advantage in this small sample; 3B missed one requested in-app message. No runtime switch.",
+    "scope": "24 sequential synthetic adapter calls after the soak; real schema/context, not end-to-end latency or adult capability."
+  },
+  "twenty_commands_av_clock_20260909": {
+    "summary": {
+      "elapsed_s": 98.651,
+      "turns": 20,
+      "failures": [],
+      "response_sample_count": 19,
+      "p50_s": 1.83,
+      "p95_s": 3.05,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 952,
+            "longGaps": 0,
+            "last": 98102.2,
+            "source": "blob:http://127.0.0.1:8766/b4f2f355-edad-4a83-a74c-6057d9454815",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 178,
+            "callbacks": 1059,
+            "longGaps": 12,
+            "last": 98685.558,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 619,
+          "p50": 11.190000000000033,
+          "p95": 27.938000000000017,
+          "max": 31.856000000000023
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "scope": "Mixed synthetic WAV and typed commands; actual ASR/Cloudflare/Kokoro/MuseTalk/browser playback. Physical capture, endpoint detection and network/device testing excluded. Frame callbacks do not prove anatomy, identity or perceptual lip sync."
+    },
+    "frame_audit": {
+      "clips": 20,
+      "missing": 0,
+      "decoded_frames": 997,
+      "flagged_frames": 0
+    },
+    "checks": {
+      "python": 130,
+      "node": 17,
+      "compileall": true,
+      "node_syntax": true
+    },
+    "media_retention": "Synthetic files copied before the app can prune them; no live retention change.",
+    "limits": [
+      "Media clocks do not establish physical audio or perceptual phoneme sync.",
+      "Every-frame heuristics do not establish correct anatomy or natural movement.",
+      "One 20-command sequential session, not public load."
+    ]
   }
 }

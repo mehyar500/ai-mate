@@ -16,6 +16,21 @@ from local_app.models import Cancelled, Models, check_cancel
 from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
+class ClientDisconnectTests(unittest.TestCase):
+    def test_browser_closure_during_response_ends_connection_quietly(self):
+        from unittest.mock import Mock
+        for error in [BrokenPipeError, ConnectionResetError, ConnectionAbortedError]:
+            with self.subTest(error=error.__name__):
+                handler = Handler.__new__(Handler)
+                handler.send_response = Mock()
+                handler.send_header = Mock()
+                handler.end_headers = Mock()
+                handler.wfile = Mock()
+                handler.wfile.write.side_effect = error('peer closed')
+                handler.respond(200, {'cancelled': True})
+                self.assertTrue(handler.close_connection)
+
+
 class MemoryTests(unittest.TestCase):
     def test_call_messages_persist_prune_and_reset_with_their_turn(self):
         with tempfile.TemporaryDirectory() as directory:

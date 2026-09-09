@@ -1,0 +1,22 @@
+[
+  {"case":"greeting","prompt":"Hi Mira, how are you today?","action":"none","pose":"base"},
+  {"case":"wave","prompt":"Wave hello.","action":"wave","pose":"base"},
+  {"case":"memory","prompt":"What is my dog's name?","action":"none","pose":"base","reply_contains":"Maple"},
+  {"case":"approach","prompt":"Come closer and say hello.","action":"closer","pose":"near"},
+  {"case":"negated_return","prompt":"Don't move back. Stay where you are.","action":"none","pose":"near"},
+  {"case":"description","prompt":"Describe the garden without moving.","action":"none","pose":"near"},
+  {"case":"return","prompt":"Please step back.","action":"farther","pose":"base"},
+  {"case":"remember","prompt":"My favorite tea is jasmine.","action":"none","pose":"base"},
+  {"case":"recall","prompt":"Which tea do I like?","action":"none","pose":"base","reply_contains":"jasmine"},
+  {"case":"unsupported","prompt":"Please do a cartwheel.","action":"none","pose":"base","unsupported":true},
+  {"case":"wave_again","prompt":"Wave goodbye.","action":"wave","pose":"base"},
+  {"case":"negated_wave","prompt":"Do not wave. Just say hello.","action":"none","pose":"base"},
+  {"case":"interrupted_approach","prompt":"Come closer.","action":"closer","interrupt_s":0.7},
+  {"case":"held_speech","prompt":"What is my dog's name?","action":"none","pose":null,"reply_contains":"Maple"},
+  {"case":"resume_approach","prompt":"Come closer.","action":"closer","pose":"near"},
+  {"case":"message","prompt":"Send me a message saying See you tomorrow.","action":"none","pose":"near","message_contains":"tomorrow"},
+  {"case":"return_again","prompt":"Step back.","action":"farther","pose":"base"},
+  {"case":"raise_hand","prompt":"Raise your hand.","action":"wave","pose":"base"},
+  {"case":"conversation","prompt":"Tell me one thing you remember about me.","action":"none","pose":"base"},
+  {"case":"goodbye","prompt":"Say goodbye briefly.","action":"none","pose":"base"}
+]

@@ -1,161 +1,91 @@
-# Founder video-call demo and PWA deployment plan
+# AI Mate: video-call MVP
 
-A single-user local app is implemented under `local_app/`. This document separates that running prototype from the deferred commercial design below. Reproduction and results live in [LOCAL_POC](LOCAL_POC.md).
+Continue the existing local application. Build a PWA with photorealistic companions, voice input and optional compact typed commands. Video quality, responsiveness and continuity take priority. No public service or rented GPU is provisioned.
 
-## Active scope: local demo with optional remote inference
+## Current implementation
 
-The local app binds to `127.0.0.1:8765`. Text has its own composer. Voice and Video request microphone access when started, with mute/end icons and automatic sound playback. A keyboard icon opens a compact transparent input during calls; typed commands use the current call response mode, including when the microphone is muted or unavailable. Sending during a reply interrupts it through the same pose-preserving flow. Opening Text keeps the call connected and its draft separate. Video uses the full height when controls fit beside it; tall phones trim side background to retain head-to-toe framing. Camera access is disabled. `local_app/engine.py` owns the shared turn flow, cancellation and memory. Cloudflare Qwen selects a bounded plan; CPU Kokoro makes speech; LTX body video and MuseTalk lips run on the local GPU. Picture fragments and a synchronized WAV reach the browser during rendering. Exact timings, failures and candidate comparisons live in LOCAL_POC.
+The app listens on 127.0.0.1:8765. Text, Voice and Video share local memory. The character fills the call view; a keyboard icon opens a transparent composer. Text navigation keeps the call connected and shows a return-to-call control. Camera access is disabled.
 
-Interrupt freezes the displayed frame and reports its timestamp. The engine retains that pose from its own video, so ordinary speech continues there and reviewed approach/return commands can resume their remaining movement. Voice can now trigger the same path when the browser reports echo cancellation: one utterance waits for cancellation and GPU cleanup before submission. End/mute/mode changes discard stale capture. Physical speaker echo and iPhone interruption remain unqualified. Recovery after browser closure remains future work; generation completion still saves text before playback acknowledgment.
+local_app/engine.py owns planning, speech, media, memory, cancellation and pose continuity:
 
-Cloudflare is configured using API key plus email. MiniMax and Ollama remain optional adapters. Three startup settings are read from private `.env`; the model adapters pin the actual graphics/voice choices. No production payment flags or pretend deployment controls are configured.
+1. Browser captures speech and detects its end, or sends a typed command.
+2. CPU Whisper transcribes. The engine retrieves bounded recent context and saved facts.
+3. Unambiguous supported movement commands take a direct path. Otherwise Cloudflare Qwen returns a validated reply, scene, action and optional in-app message.
+4. CPU Kokoro synthesizes complete short phrases, preparing one phrase ahead.
+5. MuseTalk creates new speech-driven mouth frames over the matching body source. Reviewed approach, return and wave assets avoid live diffusion for known starting poses. Other movement attempts use the experimental local generator.
+6. The browser plays synchronized speech and fragmented video, then resumes the appropriate listening view. Interrupted playback preserves the displayed pose; approach/return can resume their remaining movement.
+7. Completed turns update memory. Requested messages appear in Text. Generation completion is not proof the reply was heard; playback acknowledgment and recovery remain work.
 
-The founder now permits remote models while minimizing credentials: prefer Cloudflare's combined AI catalog and add one GPU provider only if continuous video needs it. The founder funded Gateway `default` with $10. Existing key/email successfully ran `lightricks/ltx-2-5-fast` through Unified Billing without another provider key. Two five-second 720p requests took about 31s and cost $0.45 each; a reviewed clip waves and speaks. Pruna P-Video currently fails the Gateway input mapping. Cloud clips are benchmark assets, not the live call renderer. LOCAL_POC records model IDs, access evidence and the benchmark sequence; USA records content restrictions. Streaming speech/pose continuity remain engine work regardless of provider.
+Known actions are closer, farther and wave. Unsupported actions must be explained honestly. A prepared base wave cannot be applied to an unknown or near pose. Interrupted gestures retain a held frame without inventing an approach cursor. Prepared footage is disclosed; arbitrary low-latency body generation remains unsolved.
 
-September 8 API trials keep Qwen selected: Granite was cheaper but slower, while GLM-4.7-Flash did not complete the current bounded planner format. Kokoro remains the voice; Aura-1, Aura-2 and Melo were benchmarked with synthetic prompts. FlashHead Lite is installed only in an isolated Windows test and reaches short-run real-time throughput, with stronger close-up than full-body speech quality. None of these benchmark adapters is automatically promoted. LOCAL_POC records every measured configuration and its limits.
+## Exact active models
 
-The engine loads hash-matched, reviewed LTX-2.3 approach/return clips and listening loops for full-body and close views. Ordinary speech applies new MuseTalk lips to the appropriate loop; longer replies repeat its body footage. The browser keeps idle motion visible during buffering and selects the destination loop after playback. A bounded cache reuses source appearance, never generated user speech. Unknown poses use held frames. These prepared movements improve latency for a limited set of actions; arbitrary real-time generation remains unresolved.
-
-Call replies now synthesize/render in complete short phrases with one-ahead CPU speech preparation. The engine issues the body command once and carries the destination and loop time forward; per-phrase stream completion prevents waiting for the entire job. Memory commits only after every phrase succeeds. The isolated count benchmark starts at 2.33s versus 4.10s for whole-reply preparation, excluding real ASR/planning; phrase gaps and visual artifacts remain. No new provider key or model selection is required.
-
-Use the founder's existing RTX 4060 Ti (16,380 MiB reported VRAM) and about 47.7 GiB system RAM. This is an inventory result, not an inference benchmark. Run a loopback-only server and browser UI with a synthetic profile, local SQLite/file memory and an explicit reset/delete control. No public model endpoint, user signup, customer payment, camera upload or production scheduler.
-
-Installed components include optional local dialogue `qwen3.5:9b-q4_K_M` (Cloudflare is active), Kokoro-82M ONNX v1.0 float32 (`af_sarah`), faster-whisper Base English int8, MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio features, YuNet face detection and FLUX.2 Klein 4B for offline scene preparation. Image generation runs separately and exits before the conversation server starts. Exact revisions/assets are in `config/local-models.json` and `config/local-assets.json`. Other models in the research catalog below are deferred candidates, not the app's runtime.
-
-SQLite stores an editable 1,200-character memory and at most 50 exchanges. The UI restores the last 12; the model receives the last four plus saved facts. Memory persistence, correction and reset are exercised in tests. It additionally retains up to 12 model-selected verbatim personal-fact excerpts, with two updates per turn and review/delete controls. It does not know facts the user has not shared. Prepared scenes stay visibly labeled; no automatic check-ins, pushes, subscriptions or WebRTC have been implemented.
-
-Job metrics report ASR, first text, first completed media and total time; video reports rendering throughput and PyTorch memory. The UI now measures first browser playback and buffer waits; lip-sync skew, wall power and total-device peak allocation remain unmeasured. Keep synthetic benchmark evidence separate from private conversation data. Short clips can have a gap between phrases; this is not a continuous video-call implementation.
-
-The first demo proves the interaction and selected measured components. Adult commercial capability, provider acceptance and full live visual calling remain separately unresolved. The sections below retain the model/license evidence and future paid-service contract; their always-on capacity, 25-user free cohort and paid entitlements are **deferred**, not current POC requirements. Source requirements ADULT-01 through ADULT-04 apply only to a separately approved explicit web launch.
-
-## Online deployment path — September 9
-
-The local path updates lips over prepared body footage; LTX through Gateway creates a full new video. Compare identical work before claiming one cloud or machine is universally faster. For public use, run the renderer on a rented US GPU server; customers need a browser, not a GPU. Cloudflare Gateway routes inference; [Realtime SFU](https://developers.cloudflare.com/realtime/) transports the call.
-
-```mermaid
-flowchart LR
-    P[Browser or PWA] --> C[Cloudflare API: login, quota, memory]
-    C --> Q[Cloudflare dialogue model]
-    C --> G[US GPU worker: loaded models and prepared views]
-    Q --> G
-    G --> R[WebRTC video and audio through SFU]
-    R --> P
-```
-
-Start with one admitted call per warm GPU worker. Package the renderer, pinned weights and reviewed assets in a Linux GPU container; keep CPU speech/recognition alongside it and dialogue on Cloudflare. Preload character appearance once, preserve per-call state across turns and maintain continuous timestamped audio/video tracks. Heavy new scene/clip generation needs a separate queue so it cannot stall calls. The credential target remains Cloudflare plus one GPU provider, with secrets server-side.
-
-The loopback service is not a public backend: replace its shared local token and single conversation with authenticated accounts, isolated session/memory state, short-lived media grants, quotas, disconnect/cancellation handling and admission limits. Add streaming ASR/first-phrase dialogue/TTS and WebRTC output. Moving existing MP4 responses online alone does not implement these. Target warm end-of-user-speech to synchronized reply p95 <=2s, then validate network delay and concurrency. The current 1.61s media-path timing excludes real recognition/dialogue.
-
-Use scheduled demo windows or start a worker when a visitor opens a character, retaining it through the call. Scaling to zero saves idle GPU cost but adds cold-start delay; storage still costs money. Instant first calls require some warm capacity. Benchmark a 24GB RTX 4090 before buying hardware or moving to 32/48GB. Current MuseTalk fits 16GB; compute, bandwidth, preparation and streaming matter separately from VRAM capacity. ECONOMICS contains rental/utilization arithmetic. Public controls and model/dependency/hosting rights remain pending; no public service or rented GPU is provisioned.
-
-## Distribution decision: PWA first — September 9
-
-The latest founder instruction chooses direct PWA distribution to retain the intended lawful consenting-adult content scope if foreground call quality is comparable. Continue improving the 16GB local demo before renting a GPU. App Store packaging does not accelerate server inference. PWA/native clients can use the same WebRTC backend; microphone processing, codec, buffering, thermal and network differences need real device measurements. Background calls, locked-screen recovery, installation and notifications are separate product tests. Do not promise native-equivalent background behavior. [Safari 26](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/), [Home Screen notifications](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
-
-Current browser playback now selects desktop MediaSource or iPhone ManagedMediaSource. The latter disables remote playback because there is no AirPlay rendition; unsupported codecs still use completed-video fallback. This removes a code-path gap, not proof of iPhone latency. [WebKit requirement](https://webkit.org/blog/14735/webkit-features-in-safari-17-1/). HTTPS, device microphone permission, foreground-call recovery, install icons, bounded static caching and update handling remain PWA acceptance work. Never cache conversations, credentials or generated private media in a service worker. The manifest alone is not a production PWA.
-
-Use large touch targets, clear call controls and optional captions. Keep the immediate prototype neutral while qualifying model, host, processor and US access obligations for the intended adult web service in [USA](USA.md). No provider, processor or App Store approval exists. A future non-explicit native edition is optional; StoreKit implementation and Apple's fee are no longer prerequisites for the PWA. Web processor fees and reserves need an actual quote. ECONOMICS contains autoscaling and channel sensitivity; no rental or public deployment has been made.
-
-For the intended explicit web scope, use a versioned evaluation rubric covering permitted dialogue/voice, imagery/scenes, consistent fictional adult identity, and the specific clips/call behavior to be sold. Record checkpoint revision, applicable terms, usable-output rate, inappropriate refusals of allowed requests, harmful-output handling, actual billed time and p50/p95 latency. No explicit prompts or generated media are stored in these public planning documents.
-
-Proposed quality gate: at least 85% usable results across the founder-defined supported categories, with no unresolved severe age/consent/privacy failures. A finite test does not prove universal safety. Report modality-level results separately; approve adult images and adult video separately. Budget all rejected attempts. Model rights and provider acceptance must pass even when the images look convincing.
-
-The following adult evaluation and public-service capacity material describes requirements for the intended web product, not completed prototype capabilities. Reassess licensed checkpoints, hosting and payments for the actual scope. Current neutral demos do not prove explicit capability or eligibility.
-
-## Model evidence checked September 7, 2026
-
-This catalog is a source-based availability and terms review, not a claim that every listed model was released in 2026. RealVisXL and Magnum are older releases still available. Separate neutral local dialogue/speech benchmarks are recorded in LOCAL_POC. No reviewed source establishes this project's complete adult experience, delivery cost or US deployment eligibility. Author claims, general demonstrations and a measured product acceptance test are different evidence levels. An NSFW label alone does not specify the supported content or quality.
-
-| Component / exact model | Evidence found | License and decision |
+| Stage | Model / configuration | Where it runs |
 |---|---|---|
-| Images: SG161222/RealVisXL_V5.0 and RealVisXL_V5.0_Lightning | Author explicitly states photorealistic SFW/NSFW support; Lightning has a lower-step configuration. Stronger adult-specific evidence than the previous image shortlist, but still an author claim. | OpenRAIL++ metadata; audit exact merge/dependency permissions. Compare image quality and identity continuity before selecting either. [Standard](https://huggingface.co/SG161222/RealVisXL_V5.0), [Lightning](https://huggingface.co/SG161222/RealVisXL_V5.0_Lightning). |
-| Dialogue challenger: anthracite-org/magnum-v4-12b | Published prose-oriented fine-tune and training configuration; no reviewed adult-quality benchmark. | Apache-2.0 declaration; [base Mistral-Nemo](https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407) also declares Apache-2.0. Dataset provenance and intended behavior remain unverified. [Card](https://huggingface.co/anthracite-org/magnum-v4-12b). |
-| Current general dialogue challenger: Qwen/Qwen3.8-27B | Official August 2026 release with general text/vision evaluations; no adult-product evaluation found. | Apache-2.0; larger than the existing Qwen3-8B budget baseline. Do not infer an adult-content qualification from general benchmarks. [Card](https://huggingface.co/Qwen/Qwen3.8-27B). |
-| Scene editing: black-forest-labs/FLUX.2-klein-4B | Reference editing and approximately 13GB VRAM documented; intended adult output remains unverified. | Apache-2.0. Retain as an editing comparator, not the sole proof of adult images. [Card](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B). |
-| General recorded video: Wan-AI/Wan2.2-I2V-A14B | Official image-to-video demonstrations, 480P/720P. No reviewed adult-quality benchmark. | Apache-2.0; official single-GPU example requires at least 80GB VRAM. Separate offline-video cost experiment, not a live-call renderer. [Card](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B). |
-| Smaller general video: Wan-AI/Wan2.2-TI2V-5B | 720P/24FPS output, consumer-GPU support; author reports five seconds of video in under nine minutes without specific optimization. | Apache-2.0. Output FPS is not generation FPS; fast delivery remains unproven. [Card](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B). |
-| Portrait renderer: Soul-AILab/SoulX-FlashHead-1_3B, Model_Lite | General streaming portrait demonstrations; author reports 96FPS on RTX4090. No adult demonstration established in this review. | Apache-2.0 at top level, but bundled LTX VAE rights require separate resolution. Conditional research candidate only. [Card](https://huggingface.co/Soul-AILab/SoulX-FlashHead-1_3B). |
-| Lip-sync comparator: TMElyralab/MuseTalk, version 1.5 | General lip-sync examples and author-reported 30FPS+ on V100. Alters a 256px face region in supplied media; does not create arbitrary body motion. | MIT code; authors expressly permit commercial use of trained model, with separate dependency terms. Supplied test media are noncommercial. Not a substitute for the requested fresh-motion experience without a scope decision. [Repository](https://github.com/TMElyralab/MuseTalk). |
-| 2026 speech challengers: Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice and Qwen/Qwen3-ASR-0.6B | Published speech generation/recognition; these do not establish adult dialogue quality or a complete low-latency call. | Apache-2.0 cards. Compare against Kokoro/faster-whisper; use permitted preset voices. [TTS](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice), [ASR](https://huggingface.co/Qwen/Qwen3-ASR-0.6B). |
+| Dialogue / plan | @cf/qwen/qwen3-30b-a3b-fp8 | Cloudflare, existing API key + email |
+| Recognition | faster-whisper Base English, int8 | Local CPU |
+| Speech | Kokoro-82M ONNX v1.0, af_sarah | Local CPU |
+| Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features | Local GPU |
+| Face tracking | YuNet ONNX | Local CPU |
+| Reviewed body preparation | LTX-2.3 22B distilled FP8, Gemma 3 12B FP4 encoder | Offline local preparation |
+| Experimental fresh actions | LTX-Video 2B 0.9.8 | Local GPU / ComfyUI |
+| Reference images | FLUX.2 Klein 4B | Offline local GPU |
 
-The research shortlist broadens to RealVisXL for image evaluation, Magnum for dialogue comparison, and Wan2.2 for separately measured recorded video. None is promoted to an approved deployment. Keep Qwen/Qwen3-8B, Systran/faster-whisper-small, hexgrad/Kokoro-82M, snakers4/silero-vad, facebook/wav2vec2-base-960h and meta-llama/Llama-Guard-3-8B as the existing budget/auxiliary candidates. Qwen/Qwen-Image-Edit-2511 remains a larger identity-editing comparator. Exact revisions, voices and dependency terms must pass before use.
+Pinned requirements and revisions are in config/local-poc-requirements.txt, config/local-models.json and config/local-assets.json. Installed benchmarks also include FlashHead Lite, Cloudflare Aura/Melo speech and Gateway LTX-2.5 Fast. Installation does not select them. LOCAL_POC records measured comparisons and reproduction.
 
-Audit snapshot: RealVisXL V5.0 revision `ac93e0dda1f6d448cae19bbfab8c5e720a5e48bc`; Magnum v4 12B `3200513f4a737a1f7fa41145c373ac55f886ae35`. Their public repository metadata declares a license but neither repository lists a separate license file. [SDXL's base license](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/LICENSE.md) permits hosted use subject to its restrictions; that alone does not resolve every fine-tune or merged component's rights. Do not substitute a random reupload or assume that permission to sell outputs authorizes every form of model hosting.
+Five prepared body sources are bounded by frame count/resolution, verified against reviewed manifests and primed before calls. Only source appearance is cached. Image generation and heavy video preparation run separately from calls. Unknown positions retain their captured frame instead of resetting the character.
 
-FlashHead Lite requires special attention: its authors identify an LTX-Video VAE dependency, while Lightricks' current policy expressly restricts explicit content. The exact VAE provenance and applicable historical/current terms have not been established; do not automatically apply a top-level Apache tag to that component or assume a policy applies retroactively. This is an unresolved release gate. Excluded models and terms are listed in [USA](USA.md).
+These are **neutral-demo selections**. LTX terms exclude the intended explicit service, and FlashHead's incorporated VAE rights remain unresolved. Hosted routes retain provider/model conditions. Commercial scope needs a separately qualified model/asset pipeline. Self-hosting does not remove license restrictions; USA records the evidence.
 
-## Deferred commercial deployment hypothesis
+## Acceptance and evidence
 
-Use one selected TensorDock US provider for the inference services. Keep a warm dialogue/audio pool; launch/stop the scene and renderer worker separately. Forecast one visual session per renderer until full-pipeline tests prove concurrency. Load image editing before the call, release it, then initialize FlashHead rather than assuming image and video models coexist within 24GB.
+| Requirement | Evidence / remaining work |
+|---|---|
+| Fast voice and visual response | 30-minute suite: 114 non-interrupted responses, p50 1.89s / p95 2.82s; capture and endpoint wait excluded |
+| Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
+| 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
+| Synchronization within 100ms | 619 browser clock samples: 27.94ms p95 / 31.86ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
+| Stable 30-minute call | 120 interactions, zero functional failures/reported stalls; complete frame-quality review remains incomplete |
+| Realistic images and motion | Every-frame diagnostics and ordered review sheets; hand blur, face softness and repetition remain |
+| Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
+| Public access and billing | Not implemented or approved |
 
-The $0.60/hour auxiliary and $0.90/hour renderer are complete-service budgets requiring offers and load testing. Warm auxiliary pool is $432/30-day month. At scale, model capacity and replication must grow with tokens/second and peak calls; a single warm pool is a pilot assumption. Cloudflare serves the PWA, account/data plane and WebRTC; payment remains a separate approved service.
+Targets remain warm end-of-speech p95 <=2s, at least 20 FPS with a 25 FPS target, bounded A/V skew and no accumulating session delay. Samples are not SLAs. Zero stalls do not establish correct anatomy or arbitrary movement capability.
 
-For the first capacity experiment, use separate auxiliary and visual workers at one accepted US host. Benchmark Qwen3-8B plus ASR/TTS first; do not assume that an additional 8B guard and image model fit in the same 24GB device alongside all runtime caches. If capacity requires a second auxiliary GPU, the three-month stress budget explicitly doubles that cost. Large Wan recorded-video trials use a separate 80GB worker at an assumed $2.50/hour. No paid application traffic is routed yet.
+scripts/serve_voice_video_benchmark.py and scripts/qualify_video_call.cjs run isolated qualification/soak tests on port 8766 using synthetic profiles and WAV inputs. scripts/review_call_frames.py decodes every frame and creates ordered sheets. Frame heuristics flag anomalies; visual review remains necessary.
 
-Cloudflare's neutral managed candidate is `@cf/qwen/qwen3-30b-a3b-fp8` for product FAQs or public structured operations only. Do not send companion conversations or derived intimate memory to this route. A privacy-preserving route is a data boundary, not permission to evade terms: the product and each service still need to be eligible. Budget $20/month for this neutral use until actual token billing is measured. [Official model listing](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), [developer service terms](https://www.cloudflare.com/service-specific-terms-developer-platform/).
+## Next hosted experiment
 
-A controller may deallocate unused visual workers after the ready window/session ends, leaving only approved encrypted disk/cache storage. Verify the host's actual stop/delete billing behavior and capacity availability before promising scale-to-zero. Running VMs cost money while idle. Prepaid-balance monitoring must reserve enough to fulfill already-purchased usage; a zero balance or unavailable replacement GPU is a service interruption, not a free operating mode.
+Keep the 16GB rig. Recommend one US RTX 5090 32GB, 8 vCPU, 64GB RAM and 150GB disk for ten scheduled test hours. The observed TensorDock quote is $0.7425/hour; a matching 4090 configuration is $0.6395/hour. This is a benchmark recommendation, not production reliability or content approval. ECONOMICS contains the source and complete assumptions.
 
-Owned workstation comparison is an illustrative capital scenario in REPORT, not the launch architecture. Do not purchase hardware or rent compute from these planning settings. Actual node quotes, US region, complete license manifest and account acceptance remain required.
+Transfer pinned code, permitted weights and synthetic fixtures to a compatible Linux/CUDA runtime. Keep services private and use an SSH tunnel for the founder demo. Do not upload local memory or the broad credential file. Supply only required secrets through private server configuration. Record setup time, disk, peak VRAM, CPU load and the identical suite results. Windows execution does not prove Linux/5090 compatibility.
 
-## Persistent state
+Compare end-to-end latency, preparation, visual defects, throughput and billed time against this rig. More VRAM adds capacity; it does not itself prove faster inference. Reject a rental without enough measured benefit. No automatic expensive fallback or open-ended runtime.
 
-Keep four account-scoped records:
+## Public PWA architecture
 
-- User memory: confirmed facts, last conversation summary, upcoming events with source, date/timezone and confidence.
-- Character identity: original adult reference images, permitted voice, appearance parameters and provenance.
-- Fictional scene: location, outfit category, lighting, scene version and conversation continuity.
-- Technical job: queued/preparing/validating/ready/connected/failed/cancelled/expired, entitlement reservation, spend cap and timestamps.
+Cloudflare is the preferred application and WebRTC transport candidate. The GPU provider runs inference; Gateway routing and WebRTC transport do not generate frames.
 
-User facts are not character fiction. A sentence such as 'I'm in the bathroom' changes the fictional scene state, not a claim about a real person's location. The AI disclosure stays visible. The character only knows supplied/consented information.
+Browser/PWA -> authenticated Cloudflare control API -> assigned warm GPU session -> timestamped WebRTC audio/video -> browser. Account memory and entitlements live outside disposable workers. Heavy scene/clip jobs use a separate queue.
 
-Use a 4,096-token prompt cap, short summary, recent turns and relevant confirmed facts. Summarize after ten turns/end call. Confirm meaningful new facts before long-term storage; no covert sensitive-trait inference. Inspect/correct/forget/export controls invalidate derived summaries and cached prompts.
+Start with one measured call slot per worker. Warm once, retain the session across turns, reserve worst-case spend before admission and release after hang-up/short disconnect grace. Scheduled workers suit early demos; scale-to-zero suits asynchronous work if the accepted provider supports it. Confirm stopped-disk charges, availability and egress. Instant cold admission cannot be promised.
 
-Token sizing example, not a measured conversation: two model replies/minute, each reading 2,000 input tokens and producing 60 output tokens, gives 4,000 input/120 output tokens per minute, or 240,000 input/7,200 output for an hour. At the 4,096-token input cap that input total becomes 491,520/hour. Memory updates, checks and retries add work. Self-hosted bills are GPU time/capacity, not an external per-token tariff; measure prefill/decode throughput, queue delay and peak concurrency rather than multiplying this example by an invented API price.
+The existing loopback server is single-user with a shared local token. Public use requires authenticated accounts, isolated session/memory state, short-lived media access, quotas, billing reservations, replay-safe payment webhooks, bounded retries and reconnect/cancel recovery. These are requirements, not existing protections.
 
-## Scene-to-call flow
+Use HTTPS, request microphone access on Join, and keep captions plus clear mute/end controls. Cache only the static shell, never private conversation/media, credentials or identity documents. Test installed iOS PWA and Android Chrome, codec fallback, denied permission, network loss, locked-screen behavior and update recovery. [WebKit media requirements](https://webkit.org/blog/14735/webkit-features-in-safari-17-1/), [home-screen push](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
 
-1. User requests a call. Check age/state eligibility, account balance, character scene, host capacity and maximum generation cost.
-2. Reserve a scene entitlement, not call minutes. Reuse a validated matching scene when possible; keep a small per-user cache of recent scenes with expiry.
-3. If a new scene is required, send character references plus the structured fictional setting to the image model that passes evaluation. Klein is the existing reference-editing baseline; RealVisXL is a comparator, not a verified drop-in reference editor. Generate at most two candidates within the configured budget.
-4. Validate original identity, adult appearance, policy and framing. Reject identity drift; a matching seed alone is not proof. Early pilot uses human-reviewed character/scene presets.
-5. Warm the renderer and encode the selected scene reference. Confirm first frames and audio path before readiness.
-6. Character says 'Give me a moment; I'll let you know when our call is ready.' UI shows 'Preparing your scene' and an honest estimate; do not invent a real-world cover story. Continue text while it loads.
-7. Notify 'Ready to call' only after the job is ready. Keep a short configurable ready window, initially two minutes. If the user does not join, release GPU capacity; retain only the allowed scene cache.
-8. User taps Join. Begin call metering only after usable media connects. Generate new synchronized portrait frames around the prepared scene. A talking portrait does not simulate arbitrary body actions.
-9. On failure/deadline/cancellation, restore undelivered entitlement; record actual compute costs. Do not keep generating scenes on repeated taps or retries.
-10. On hang-up, save a short summary, release reservation/capacity, expire private media according to the retention policy.
+## Memory and deferred features
 
-Targets to test: cached-scene preparation 1–5 seconds; a new scene on warm hardware 5–30 seconds; cold worker 30–120 seconds or longer depending on actual provider startup. These are hypotheses, not SLAs. Show the measured ETA and permit cancellation. The user's tolerated pre-call delay lets us avoid an always-on renderer.
+SQLite retains editable notes, bounded verbatim facts and recent exchanges. It knows only what the user shared. Keep factual memory separate from fictional scene state. Users can inspect, correct and delete it. Preserve generated/local-app/memory.sqlite3 during updates.
 
-Budget $0.10/accepted scene, $0.05/photo and $0.15/accepted portrait clip. These are existing hypotheses and do not price general Wan video. For illustration, 60 seconds at $0.90/hour costs $0.015 of node time before loading, retries, checks and other costs. All successful-but-rejected work counts. A two-minute warm-up plus two-minute ready hold costs $0.06 at this node rate even if nobody joins; scene-budget feasibility must be measured against abandonment.
+Production memory needs per-account authorization and source/time metadata. Opt-in check-ins, event reminders, push and proactive media remain deferred until the call works. Never charge for unsolicited media or infer consent to retain sensitive facts. Avoid emotional pressure to pay and sensitive notification previews.
 
-Keep general recorded video in a separate queue and price contract. At an illustrative $2.50/hour, two five-minute attempts cost $0.42 compute, while two 20-minute attempts cost $1.67. Add loading, checks, rejected jobs and delivery costs; longer output may need more generation or extensions. The proposed $1.25 accepted-clip ceiling and $9.99 sale price are experiments, not Wan performance claims. No output or delivery-time guarantee is established; general-video sales are excluded from the three-month forecast. Never apply the $0.15 portrait budget to arbitrary video.
+## Configuration and release gates
 
-## During the visual call
+.env.example documents implemented fields: AI_MATE_LLM_PROVIDER, AI_MATE_LLM_MODEL and AI_MATE_ENV_FILE, plus Cloudflare account ID/key/email or alternative scoped token. MiniMax uses its explicit process credential. No GPU, WebRTC or payment environment variable is wired yet.
 
-Microphone -> streaming partial ASR/VAD -> concurrent memory retrieval -> Qwen first coherent phrase -> Kokoro speech -> wav2vec2 features -> FlashHead Lite -> VAE decode -> hardware H.264 encode -> synchronized WebRTC video/Opus audio.
+The initial remote benchmark can use SSH without another inference API key. Public deployment will need scoped application/Realtime credentials, accepted GPU lifecycle access and processor-specific merchant/webhook secrets. Add exact fields with the implemented adapters; placeholders must not imply a functioning service.
 
-Keep native model audio context and chunk sizes initially. Generate ahead of playback with a bounded buffer; cancel stale generations and audio/video on barge-in. Maintain independent temporal caches per session. Generate fresh listening-state portrait frames; no assumed free listening or prerecorded-loop substitution.
+The founder owns host/content/processor acceptance and jurisdiction decisions. Engineering owns isolation, verified access, spend limits and evidence. Independent security/correctness review and staging remain pending before public release. No adult capability or nationwide clearance is claimed.
 
-The [Gradio reference](https://raw.githubusercontent.com/Soul-AILab/SoulX-FlashHead/main/gradio_app_streaming.py) groups chunks into video files and starts with a completed audio file. Replace this with incremental audio and WebRTC output; removing file waits does not prove model latency. Target end-of-user-speech to synchronized reply p95 <=2 seconds on warm hardware, sustained 25FPS and limited audio/video skew. Report actual results.
-
-FlashHead Lite's author throughput supports technical investigation; it does not establish simultaneous LLM, guard, image and video performance or adult eligibility. Use one stream until measured and licensed for the intended service. General Wan video remains a separate recorded-video experiment; it does not inherit the portrait call's latency or cost assumptions.
-
-## Opt-in check-ins and media
-
-Ask permission separately for check-ins, web push and proactive media. Default quiet hours; respect timezone and notification revocation. Cap paid check-ins at one/day and free at one/week, counted within text limits. Scheduler retrieves a relevant confirmed event, generates one useful message, screens it and deduplicates by account/event/day.
-
-Media suggestions consume the selected plan allowance only if the user opted into automatic included media; never trigger an overage. Cap paid proactive media at the plan's monthly totals. Free accounts receive no recurring generated video. Reuse approved assets when appropriate without claiming they were newly generated. Avoid intimate lock-screen previews: 'You have a new message' opens the authenticated app.
-
-Cloudflare scheduled triggers/Queues and a database outbox handle delivery/retries. Notifications are not guaranteed delivery; an unread item remains in-app. No service-worker background inference or assumption that iOS keeps the app running.
-
-## PWA guidelines and monitoring
-
-HTTPS, install manifest, offline shell only; never cache intimate transcripts/media or age documents in the service worker. Request microphone access after a user gesture, provide captions, mute/end controls and visible balance. User camera uploads stay disabled. Test foreground Safari, installed iOS PWA and Android Chrome; detect disconnects, suspend billing and restore cleanly.
-
-iOS web push requires an eligible home-screen web app and permission following user interaction. [WebKit documentation](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/). A PWA does not inherently add seconds of network delay, but background behavior/device codecs require tests. No App Store listing is needed for direct website access.
-
-Internal monitoring: per-job actual cost, latency, rejection/retry rate, queue depth, active calls, paid entitlement, free-user ceiling, notification count and settlement balance. Redact sensitive payloads; separate minimal audit evidence from private conversations. Per-account and provider spend caps fail closed before new work. Monitoring compute/storage and founder incident response are budgeted; open-source tools do not eliminate operating effort.
-
-Before paid release test age-result replay, account isolation, scene leakage, stale memory, forged payment events, duplicate jobs, abandonment, cold start, refund order and reconnection. Current offline tests cover arithmetic plus local memory, cancellation and HTTP boundaries. They do not qualify those future production controls.
+Keep five core documents: REPORT for decisions, BUILD for architecture, LOCAL_POC for experiments, ECONOMICS for costs and USA for eligibility. Machine evidence belongs in docs/research/local-poc-benchmarks.json. Work on main as authorized; commit/push reviewed changes with checks, preserving secrets and memory.
