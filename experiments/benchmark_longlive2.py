@@ -276,7 +276,7 @@ def run(args, record, output):
         result = original_decode(*inputs, **kwargs)
         torch.cuda.synchronize()
         event = {'ready_s': time.perf_counter() - inference_start, 'frames': result.shape[2]}
-        decoded_events.append(event)
+        observe_chunk(record, decoded_events, event, args.max_first_chunk_seconds)
         print(json.dumps({'decoded_chunk': event}), flush=True)
         return result
 
@@ -317,9 +317,18 @@ def run(args, record, output):
     record['complete'] = True
 
 
+def observe_chunk(record, events, event, first_chunk_limit=None):
+    events.append(event)
+    record['last_attempt_chunks'] = list(events)
+    if len(events) == 1 and first_chunk_limit is not None and event['ready_s'] > first_chunk_limit:
+        record['stopped_for_latency'] = True
+        raise TimeoutError('First decoded chunk exceeded the configured latency cutoff.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
+    parser.add_argument('--max-first-chunk-seconds', type=float, help='Stop after decoding the first chunk if it exceeds this limit; cannot preempt an in-flight GPU operation.')
     parser.add_argument('--hourly-cost', type=float, default=0, help='Actual GPU-instance hourly rate; inference-only cost estimate, excluding startup and idle time.')
     parser.add_argument('--case', choices=['raise-lower', 'unilateral-raise-lower', 'turn-return'], default='raise-lower')
     parser.add_argument('--sampling-steps', type=int, choices=[2, 4], default=4)
@@ -334,6 +343,8 @@ def main():
     parser.add_argument('--text-device', choices=['cpu', 'cuda'], default='cpu')
     parser.add_argument('--vae', choices=['wan', 'light-v2'], default='wan')
     args = parser.parse_args()
+    if args.max_first_chunk_seconds is not None and (not math.isfinite(args.max_first_chunk_seconds) or args.max_first_chunk_seconds <= 0):
+        parser.error('First chunk cutoff must be finite and positive.')
     if not math.isfinite(args.hourly_cost) or args.hourly_cost < 0:
         parser.error('Hourly cost must be finite and non-negative.')
     if not re.fullmatch('[a-z0-9][a-z0-9-]{0,47}', args.label):
