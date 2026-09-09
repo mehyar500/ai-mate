@@ -8,6 +8,7 @@ import urllib.request
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8765)
+    parser.add_argument('--rtc', action='store_true', help='Enable experimental same-PC WebRTC calls.')
     parser.add_argument('--check', action='store_true', help='Check readiness without exposing memory or credentials.')
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
@@ -25,7 +26,7 @@ def main():
             return 1
     from .server import main as serve
     # The HTTP server retains its established argument handling.
-    sys.argv = [sys.argv[0], '--port', str(args.port)]
+    sys.argv = [sys.argv[0], '--port', str(args.port)] + (['--rtc'] if args.rtc else [])
     serve()
     return 0
 

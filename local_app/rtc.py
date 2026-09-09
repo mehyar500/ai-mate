@@ -182,3 +182,115 @@ class Speech(AudioStreamTrack):
         return frame
 
 
+
+
+class LocalCall:
+    """Single-user, same-PC RTC connection for the optional local call UI."""
+    def __init__(self, engine):
+        self.engine, self.session, self.peer = engine, None, None
+        self.gate = asyncio.Lock()
+        self.loop = asyncio.new_event_loop()
+        self.thread = threading.Thread(target=self.loop.run_forever, daemon=True)
+        self.thread.start()
+
+    def request(self, action, payload):
+        future = asyncio.run_coroutine_threadsafe(self.dispatch(action, payload), self.loop)
+        try:
+            return future.result(timeout=12)
+        except TimeoutError:
+            future.cancel()
+            raise RuntimeError('Call connection timed out.')
+
+    async def dispatch(self, action, payload):
+        async with self.gate:
+            return await self._dispatch(action, payload)
+
+    async def _dispatch(self, action, payload):
+        if action == 'close':
+            await self.close()
+            return {'ok': True}
+        if action == 'state':
+            clip = self.session.clip if self.session else None
+            return {'connected': bool(self.peer and self.peer.connectionState == 'connected'),
+                    'playing': bool(clip and not clip['finished'] and not (clip.get('event') and clip['event'].is_set())),
+                    'started': bool(clip and clip['start_s'] is not None)}
+        if action != 'offer':
+            raise ValueError('Unknown call action.')
+        if self.peer or self.engine.busy or not self.engine.ready:
+            raise BlockingIOError('Call unavailable or already connected.')
+        from aiortc import RTCPeerConnection, RTCConfiguration, RTCSessionDescription, RTCRtpSender
+        from aioice.mdns import create_mdns_protocol
+        from scripts.webrtc_signaling import resolve_local_offer
+        import ifaddr
+        addresses = {'127.0.0.1', '::1'} | {ip.ip if isinstance(ip.ip, str) else ip.ip[0]
+            for adapter in ifaddr.get_adapters() for ip in adapter.ips}
+        protocol = await create_mdns_protocol()
+        try:
+            payload = await resolve_local_offer(payload, addresses, protocol.resolve)
+        finally:
+            await protocol.close()
+        # Reserve the peer before awaiting setup; a second offer cannot replace it.
+        peer = self.peer = RTCPeerConnection(RTCConfiguration(iceServers=[]))
+        try:
+            idle, near = await asyncio.to_thread(self.load_idle)
+            session = self.session = PlaybackSession(None, idle, [], self.engine.directory)
+            def select_idle(seconds, last):
+                with self.engine.lock:
+                    held, busy, pose = self.engine.hold_still, self.engine.busy, self.engine.performance_state
+                if last is not None and (held or busy):
+                    return last
+                frames = near if pose == 'near' else idle
+                return frames[int(seconds*24) % len(frames)] if frames else (last if last is not None else idle[0])
+            session.idle_frame = select_idle
+            self.engine.frame_output = session.output
+            @peer.on('connectionstatechange')
+            async def changed():
+                session.receiver_ready = peer.connectionState == 'connected'
+                if peer.connectionState in {'failed', 'closed'} and self.peer is peer:
+                    await self.close()
+            peer.addTrack(Picture(session)); peer.addTrack(Speech(session))
+            for transceiver in peer.getTransceivers():
+                if transceiver.kind == 'video':
+                    transceiver.setCodecPreferences([c for c in RTCRtpSender.getCapabilities('video').codecs if c.mimeType == 'video/H264'])
+            await peer.setRemoteDescription(RTCSessionDescription(**payload))
+            await peer.setLocalDescription(await peer.createAnswer())
+            return {'type':peer.localDescription.type, 'sdp':peer.localDescription.sdp}
+        except BaseException:
+            await self.close()
+            raise
+
+    def load_idle(self):
+        import cv2
+        def read(path):
+            frames = []
+            if path:
+                capture = cv2.VideoCapture(str(path))
+                try:
+                    while len(frames) < 144:
+                        ok, frame = capture.read()
+                        if not ok:
+                            break
+                        frames.append(frame)
+                finally:
+                    capture.release()
+            return frames
+        idle, near = read(self.engine.idle_video), read(self.engine.near_idle_video)
+        if not idle:
+            raise RuntimeError('Reviewed call video is unavailable.')
+        return idle, near
+
+    async def close(self):
+        peer, session = self.peer, self.session
+        self.peer = self.session = None
+        if session:
+            session.cancel.set()
+            self.engine.cancel()
+            if self.engine.frame_output == session.output:
+                self.engine.frame_output = None
+        if peer:
+            await peer.close()
+
+    def shutdown(self):
+        self.request('close', {})
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        self.thread.join(timeout=3)

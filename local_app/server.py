@@ -77,7 +77,7 @@ class Handler(BaseHTTPRequestHandler):
             file, mime = static[path]
             return self.respond(200, (WEB / file).read_bytes(), mime)
         if path == "/api/bootstrap":
-            return self.respond(200, {"token": self.app.token, **self.app.status()})
+            return self.respond(200, {"token": self.app.token, "rtc_enabled": bool(getattr(self.server, "rtc", None)), **self.app.status()})
         if path in {"/portrait/mira.png", "/portrait/garden.png", "/portrait/cafe.png", "/portrait/fullbody.png"}:
             file = self.app.directory / path.rsplit("/", 1)[-1]
             if file.exists():
@@ -182,6 +182,11 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(raw)
             if not isinstance(body, dict):
                 raise ValueError("Use a JSON object.")
+            if path.startswith('/api/rtc/'):
+                rtc = getattr(self.server, 'rtc', None)
+                if rtc is None:
+                    raise ValueError('Streaming calls are not enabled.')
+                return self.respond(200, rtc.request(path.rsplit('/', 1)[-1], body))
             if path == "/api/turn":
                 key = self.app.submit(body.get("text"), body.get("mode", "voice"), body.get("scene", "mira"))
                 return self.respond(202, {"id": key})
@@ -212,12 +217,19 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--rtc", action="store_true")
     args = parser.parse_args()
     configure_runtime()
     app = Application()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     server.daemon_threads = True
     server.app = app
+    server.rtc = None
+    if args.rtc:
+        import sys
+        sys.path.insert(0, str(ROOT / '.cache/webrtc-deps'))
+        from .rtc import LocalCall
+        server.rtc = LocalCall(app)
     threading.Thread(target=app.warm, daemon=True).start()
     print(f"AI-mate local: http://127.0.0.1:{args.port} (single user, non-explicit prototype)", flush=True)
     try:
@@ -225,6 +237,8 @@ def main():
     except KeyboardInterrupt:
         app.cancel()
     finally:
+        if server.rtc:
+            server.rtc.shutdown()
         server.server_close()
 
 

@@ -3,6 +3,7 @@ import {Microphone} from './microphone.mjs';
 import {CallInput,speechAccess} from './call-input.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+let rtcEnabled=false,rtcPeer=null,rtcPolling=false;
 let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false,submittedSpeech=false;
 let replyMode="text",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let idleURL=null,idleFailed=false,idleSuppressed=false;
@@ -15,6 +16,7 @@ function settleIdle(){
 }
 function idlePresence(){
   const video=$('idle-video');
+  if(rtcPeer){video.pause();video.hidden=true;return;}
   const visible=ready&&connected&&!document.hidden&&viewMode==='video'&&replyMode==='video'&&scene==='fullbody'&&idleURL&&!idleFailed&&!idleSuppressed&&!pictureStarted;
   if(!visible){video.pause();video.hidden=true;return;}
   if(video.getAttribute('src')!==idleURL)video.src=idleURL;
@@ -60,7 +62,7 @@ function controls(){
   $("stop").hidden=viewMode==='text'||(!busy&&!playing);
   $("reset").disabled=submitting;
   const listening={off:'Microphone muted',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Mira is replying',listening:'Listening',disconnected:'Microphone disconnected'};
-  $("call-state").textContent=replyMode!=='text'&&micState==='hearing'?'Hearing you…':playing?(firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
+  $("call-state").textContent=replyMode!=='text'&&micState==='hearing'?'Hearing you…':playing?(!rtcPeer&&firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
   $("history-toggle").hidden=true;
   document.querySelector('.conversation').dataset.mode=viewMode;
   for(const mode of ['text','voice','video'])$('mode-'+mode).setAttribute('aria-pressed',String(viewMode===mode));
@@ -137,11 +139,11 @@ function resetPlayback(holdFrame=false){
   partEndedAt=null;phraseGapSeconds=0;
   captionText='';
   nextIdleURL=undefined;pictureStarted=false;motionRequested=false;
-  if(holdFrame)holdPicture();else $("held-frame").hidden=true;
+  if(holdFrame&&!rtcPeer)holdPicture();else $("held-frame").hidden=true;
   epoch++;queue=[];playing=false;abortMedia?.abort();abortMedia=null;
-  for(const media of [$("video"),$("audio")]){media.pause();media.removeAttribute("src");media.load();}
+  for(const media of [$("video"),$("audio")]){if(media.id==='video'&&rtcPeer)continue;media.pause();media.removeAttribute("src");media.load();}
   if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
-  $("video").hidden=true;$("resume").hidden=true;setScene(scene);controls();
+  $("video").hidden=!rtcPeer;$("resume").hidden=true;setScene(scene);controls();
 }
 function played(){
   if(partEndedAt!==null){phraseGapSeconds+=(performance.now()-partEndedAt)/1000;partEndedAt=null;}
@@ -259,12 +261,12 @@ async function follow(key,node){
     for(;;){
       const job=await api("/api/jobs/"+key);if(active!==key)return;
       if(job.user)node.textContent=job.user;
-      if(!pendingStop&&job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=true;}
+      if(!pendingStop&&job.scene&&scene!==job.scene){setScene(job.scene);$("video").hidden=!rtcPeer;}
       if(!pendingStop&&job.action){setAction(job.action);motionRequested=job.action!=='none';}
       if(job.text){replyNode??=bubble("","assistant");if(replyNode.textContent!==job.text){replyNode.textContent=job.text;$("chat").scrollTop=$("chat").scrollHeight;}}
       if(job.state==='done'&&job.message&&!shownMessage){bubble(job.message,'assistant sent-message');shownMessage=true;if(viewMode!=='text')unread++;controls();}
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
-      while(!pendingStop&&consumed<job.chunks.length){queue.push({...job.chunks[consumed++],jobId:key});drain();}
+      while(!pendingStop&&consumed<job.chunks.length){const chunk=job.chunks[consumed++];if(!(rtcPeer&&chunk.video)){queue.push({...chunk,jobId:key});drain();}}
       if(!pendingStop){
         if(job.state==="thinking")notice("Mira is thinking…");
         else if(job.state==="transcribing")notice("Listening to your message…");
@@ -340,6 +342,7 @@ async function interrupt(){
   if(active||submitting)lastMedia=null;
   resetPlayback(true);
   const mine=epoch;
+  if(rtcPeer)await api('/api/cancel',{});
   if(submitting){pendingStop=true;return;}
   if(key){
     stopping=true;controls();
@@ -364,6 +367,8 @@ async function startCall(mode){
   if(changed){microphone.stop();callInputOpen=false;}
   replyMode=mode;viewMode=mode;controls();
   if(changed){await interrupt();if(request!==callRequest)return;}
+  if(mode!=='video')await closeRtc();
+  else if(rtcEnabled&&!rtcPeer){try{await connectRtc();}catch(error){notice(error.message,true);return;}}
   notice();
   try{await microphone.start();}catch(error){notice(error.message,true);}controls();
 }
@@ -373,7 +378,7 @@ for(const mode of ['text','voice','video'])$('mode-'+mode).addEventListener('cli
   if(mode==='text')$('chat').scrollTop=$('chat').scrollHeight;
 });
 $('join-call').addEventListener('click',()=>startCall(viewMode==='voice'?'voice':'video'));
-$('end-call').addEventListener('click',async()=>{callRequest++;microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
+$('end-call').addEventListener('click',async()=>{await closeRtc();callRequest++;microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
 $('return-call').addEventListener('click',()=>{if(replyMode!=='text'){viewMode=replyMode;controls();notice();}});
 $("history-toggle").addEventListener("click",()=>{
   historyOpen=!historyOpen;
@@ -417,7 +422,7 @@ async function boot(){
     try{
       if(!connected){
         const data=await api("/api/bootstrap");
-        const restarted=token&&token!==data.token;token=data.token;connected=true;
+        const restarted=token&&token!==data.token;token=data.token;rtcEnabled=Boolean(data.rtc_enabled);connected=true;
         if(firstBoot||restarted){renderHistory(data.turns);setScene(data.scene||"mira");firstBoot=false;}
         if(restarted){idleSuppressed=false;idleFailed=false;resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
       }
@@ -435,3 +440,39 @@ async function boot(){
   }
 }
 boot();
+
+async function closeRtc(){
+  const peer=rtcPeer;rtcPeer=null;
+  if(!peer)return;
+  peer.close();$('video').srcObject=null;playing=false;
+  await api('/api/rtc/close',{});
+}
+async function connectRtc(){
+  const peer=new RTCPeerConnection({iceServers:[]});rtcPeer=peer;
+  const stream=new MediaStream(),video=$('video');video.srcObject=stream;video.muted=false;video.hidden=false;
+  peer.ontrack=event=>stream.addTrack(event.track);
+  try{
+    peer.addTransceiver('video',{direction:'recvonly'});peer.addTransceiver('audio',{direction:'recvonly'});
+    await peer.setLocalDescription(await peer.createOffer());
+    await new Promise((resolve,reject)=>{
+      if(peer.iceGatheringState==='complete')return resolve();
+      const timer=setTimeout(()=>reject(Error('Call connection timed out.')),8000);
+      peer.onicegatheringstatechange=()=>{if(peer.iceGatheringState==='complete'){clearTimeout(timer);resolve();}};
+    });
+    const answer=await api('/api/rtc/offer',{type:peer.localDescription.type,sdp:peer.localDescription.sdp});
+    if(rtcPeer!==peer)throw new DOMException('Call ended','AbortError');
+    await peer.setRemoteDescription(answer);await video.play();
+    $('held-frame').hidden=true;controls();
+  }catch(error){if(rtcPeer===peer)await closeRtc();throw error;}
+}
+setInterval(async()=>{
+  if(!rtcPeer||rtcPolling)return;rtcPolling=true;const peer=rtcPeer;
+  try{
+    const state=await api('/api/rtc/state',{});
+    if(rtcPeer!==peer)return;
+    playing=state.playing;
+    if(playing&&state.started){pictureStarted=true;$("video").hidden=false;$("held-frame").hidden=true;}
+    controls();
+  }catch(error){notice(error.message,true);}
+  finally{rtcPolling=false;}
+},250);
