@@ -24285,5 +24285,65 @@
         "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
       }
     }
+  },
+  "browser_engine_pose_20260909": {
+    "commands": [
+      "Come closer",
+      "Stop moving"
+    ],
+    "first_video_ms": [
+      2144,
+      945
+    ],
+    "first_detected_audio_ms": [
+      2227,
+      1012
+    ],
+    "observation": "Browser retained close view after both replies. Stop freezes last speech frame with partly open mouth; neutral end frame needed. Prepared body motion, not unrestricted generation.",
+    "server": {
+      "rows": [
+        {
+          "index": 1,
+          "case": "engine",
+          "start_s": 5.25,
+          "producer_done": true,
+          "finished": true,
+          "underflows": 0,
+          "frame_count": 60,
+          "first_frame_ready_s": 1.7793836999917403,
+          "max_queue": 32,
+          "fixture_index": 0,
+          "audio_sha256": "d5a6794a7bb4d0234898c89e68e7108da683709631ebecc443fcfb7ca7fd67c1",
+          "first_frame_sent_s": 1.8192714999895543,
+          "completed_s": 4.818587099987781
+        },
+        {
+          "index": 2,
+          "case": "engine",
+          "start_s": 18.3,
+          "producer_done": true,
+          "finished": true,
+          "underflows": 0,
+          "frame_count": 24,
+          "first_frame_ready_s": 0.28371219999098685,
+          "max_queue": 15,
+          "fixture_index": 0,
+          "audio_sha256": "9b09921efef30c8b6e7b498b973d7113f2b3b152e456856e54de38ed889284d9",
+          "first_frame_sent_s": 0.3060636999871349,
+          "completed_s": 1.5022229999885894
+        }
+      ],
+      "scope": "Synthetic local GPU-to-browser transport benchmark. No ASR, dialogue or TTS time; WAVs are retained fixed inputs. No external ICE servers. Marked copies go to RTC only; archived renders are unmarked.",
+      "aiortc": "1.15.0",
+      "av": "17.1.0",
+      "face_shift": -0.05,
+      "transport": "webrtc",
+      "jitter_ms": 20,
+      "source_video_sha256": {
+        "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+        "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+        "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+      }
+    }
   }
 }

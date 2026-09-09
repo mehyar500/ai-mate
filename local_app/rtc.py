@@ -24,6 +24,7 @@ class PlaybackSession:
         self.renderer, self.idle, self.fixtures, self.folder = renderer, idle, fixtures, folder
         self.benchmark = benchmark
         self.sequence = 0
+        self.idle_frame = None
         self.clock_start = None
         self.clip = None
         self.rows = []
@@ -140,7 +141,9 @@ class Picture(VideoStreamTrack):
                     clip['audio_pause_until'] = seconds + 1/20
                     picture = self.last
         if picture is None:
-            picture = self.session.idle[int(seconds*24) % len(self.session.idle)]
+            select_idle = getattr(self.session, 'idle_frame', None)
+            picture = select_idle(seconds, self.last) if select_idle else self.session.idle[int(seconds*24) % len(self.session.idle)]
+        self.last = picture
         frame = av.VideoFrame.from_ndarray(picture, format='bgr24')
         frame.pts, frame.time_base = self.tick*4500, Fraction(1, 90000)
         self.tick += 1

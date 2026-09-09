@@ -119,6 +119,31 @@ def attach_test_engine(session):
     session.engine.models = Models()
     session.engine.models.visual = renderer
     session.engine.ready = True
+    import cv2
+    near = []
+    if session.engine.near_idle_video:
+        capture = cv2.VideoCapture(str(session.engine.near_idle_video))
+        try:
+            while len(near) < 144:
+                ok, frame = capture.read()
+                if not ok:
+                    break
+                near.append(frame)
+        finally:
+            capture.release()
+    def idle_frame(seconds, last):
+        engine = session.engine
+        with engine.lock:
+            held, busy, pose = engine.hold_still, engine.busy, engine.performance_state
+        # Rendering can finish before the engine commits the destination pose.
+        # Keep the last presented frame through that interval and a stop command.
+        if last is not None and (held or busy):
+            return last
+        frames = near if pose == 'near' else session.idle
+        if not frames:
+            return last if last is not None else session.idle[0]
+        return frames[int(seconds*24) % len(frames)]
+    session.idle_frame = idle_frame
 
 
 async def measure(auth, result, media='both', clip=None, session=None, interrupt=False):

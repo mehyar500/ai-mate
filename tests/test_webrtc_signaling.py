@@ -88,6 +88,21 @@ class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(len(session.rows), 8)
 
 
+    async def test_idle_selection_preserves_destination_and_cancel_holds_latest_frame(self):
+        from scripts.serve_webrtc_benchmark import Picture
+        import numpy as np
+        async def pace(seconds):
+            pass
+        far = np.zeros((32,32,3), dtype=np.uint8)
+        near = np.full_like(far, 120)
+        session = SimpleNamespace(clip=None, pace=pace, cancel=threading.Event(),
+                                  idle=[far], idle_frame=lambda seconds, last: near)
+        picture = Picture(session)
+        self.assertTrue(((await picture.recv()).to_ndarray(format='bgr24') == near).all())
+        session.cancel.set()
+        session.idle_frame = lambda seconds, last: far
+        self.assertTrue(((await picture.recv()).to_ndarray(format='bgr24') == near).all())
+
     async def test_frame_underflow_pauses_audio_clock(self):
         try:
             from scripts.serve_webrtc_benchmark import Picture, Speech
