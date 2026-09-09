@@ -27,7 +27,7 @@ import ifaddr
 from local_app.media import load_reviewed_idle
 from local_app.visual import PortraitRenderer
 from scripts.review_lip_sync import preview_idle
-from scripts.webrtc_signaling import validate_offer
+from scripts.webrtc_signaling import resolve_local_offer
 
 
 from local_app.rtc import PlaybackSession, Picture, Speech
@@ -163,7 +163,6 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(payload, dict):
                 raise ValueError('Use a JSON object.')
             if self.path == '/offer':
-                validate_offer(payload, self.server.local_addresses)
                 if self.server.session.transport != 'webrtc':
                     raise ValueError('This run uses MSE.')
                 future = asyncio.run_coroutine_threadsafe(self.server.offer(payload), self.server.loop)
@@ -221,6 +220,20 @@ async def main(args):
     async def offer(payload):
         if peers:
             raise BlockingIOError('One benchmark connection at a time.')
+        from aioice.mdns import create_mdns_protocol
+        protocol = None
+        resolver_lock = asyncio.Lock()
+        async def resolve(name):
+            nonlocal protocol
+            async with resolver_lock:
+                if protocol is None:
+                    protocol = await create_mdns_protocol()
+            return await protocol.resolve(name)
+        try:
+            payload = await resolve_local_offer(payload, server.local_addresses, resolve)
+        finally:
+            if protocol is not None:
+                await protocol.close()
         peer = RTCPeerConnection(RTCConfiguration(iceServers=[]))
         peers.append(peer)
         @peer.on('connectionstatechange')

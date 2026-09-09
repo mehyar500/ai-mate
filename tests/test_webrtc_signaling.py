@@ -187,3 +187,28 @@ class LocalRTCSignalingTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+class LocalMDNSTests(unittest.IsolatedAsyncioTestCase):
+    async def test_resolved_candidate_is_pinned_and_must_belong_to_pc(self):
+        from scripts.webrtc_signaling import resolve_local_offer
+        from unittest.mock import AsyncMock
+        packet = offer('browser.local')
+        resolve = AsyncMock(return_value='127.0.0.1')
+        accepted = await resolve_local_offer(packet, {'127.0.0.1'}, resolve)
+        self.assertNotIn('browser.local', accepted['sdp'])
+        resolve.assert_awaited_once_with('browser.local')
+        self.assertIn('browser.local', packet['sdp'])
+        for address in ['8.8.8.8', '192.168.1.99', None]:
+            with self.assertRaises(ValueError):
+                await resolve_local_offer(packet, {'127.0.0.1'}, AsyncMock(return_value=address))
+
+    async def test_malformed_or_capture_offer_never_resolves(self):
+        from scripts.webrtc_signaling import resolve_local_offer
+        from unittest.mock import AsyncMock
+        resolve = AsyncMock()
+        for packet in [offer('browser.local', 'sendrecv'), offer('example.com'),
+                       offer('browser.local') | {'extra': True}]:
+            with self.assertRaises(ValueError):
+                await resolve_local_offer(packet, {'127.0.0.1'}, resolve)
+        resolve.assert_not_awaited()
