@@ -24675,5 +24675,20 @@
       "review": "All 49 frames per clip inspected at contact-sheet scale. Both raise both arms overhead; neither follows single-hand wave. Greater motion does not improve action correctness.",
       "decision": "Reject. Next investigate explicit pose control rather than shortening text-only generation."
     }
+  },
+  "pose_control_off_20260909": {
+    "prompt_id": "0772af52-f623-4743-821d-380ede78b99f",
+    "server_execution_s": 256.824,
+    "diffusion_s_approx": 128.4,
+    "seed": 914,
+    "frames": 73,
+    "resolution": [
+      384,
+      576
+    ],
+    "review": "All 73 frames inspected at reduced contact-sheet scale. Correct anatomical right hand waves and lowers, but strong apparent camera approach/zoom loses full-body framing. Hand blur remains.",
+    "comparison": "Earlier guided seed914 keeps body position. This single pair supports framing benefit, not necessity for correct hand. Timing is not a clean adapter overhead comparison because loading/offload execution differed.",
+    "decision": "Keep pose control as candidate; neither local result meets live latency. No promotion.",
+    "artifact": "generated/local-app/audit/pose-control/control-off-history.json"
   }
 }
