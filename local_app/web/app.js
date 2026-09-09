@@ -22,7 +22,7 @@ function idlePresence(){
   if(video.getAttribute('src')!==idleURL)video.src=idleURL;
   video.muted=true;video.hidden=false;$('held-frame').hidden=true;
   if(video.paused)video.play().then(()=>{if(video.hidden||document.hidden)video.pause();}).catch(()=>{if(!video.hidden)idleFailed=true;video.hidden=true;});
-  $('media-label').textContent=(idleURL.includes('/near.')?'Garden close view':'Full-body garden')+' Â· Prepared listening loop';
+  $('media-label').textContent=(idleURL.includes('/near.')?'Garden close view':'Full-body garden')+' · Prepared listening loop';
 }
 $('idle-video').addEventListener('error',()=>{idleFailed=true;$('idle-video').hidden=true;});
 document.addEventListener('visibilitychange',idlePresence);
@@ -55,14 +55,14 @@ function callSpeechState(){
 }
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
 let partEndedAt=null,phraseGapSeconds=0;
-const sceneNames={mira:"Living room",garden:"Garden",cafe:"CafÃ©",fullbody:"Full-body garden"};
+const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
 function notice(text="",error=false){$("notice").textContent=text;$("notice").className=error?"error":"";}
 function controls(){
   $("send").disabled=!ready||busy||stopping;
   $("stop").hidden=viewMode==='text'||(!busy&&!playing);
   $("reset").disabled=submitting;
-  const listening={off:'Microphone muted',permission:'Allow microphone in your browser',hearing:'Hearing youâ€¦',processing:'Processing your wordsâ€¦',paused:'Mira is replying',listening:'Listening',disconnected:'Microphone disconnected'};
-  $("call-state").textContent=replyMode!=='text'&&micState==='hearing'?'Hearing youâ€¦':playing?(!rtcPeer&&firstPlayed===null?"Preparing playbackâ€¦":"Mira is replying"):busy?"Preparing replyâ€¦":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
+  const listening={off:'Microphone muted',permission:'Allow microphone in your browser',hearing:'Hearing you…',processing:'Processing your words…',paused:'Mira is replying',listening:'Listening',disconnected:'Microphone disconnected'};
+  $("call-state").textContent=replyMode!=='text'&&micState==='hearing'?'Hearing you…':playing?(!rtcPeer&&firstPlayed===null?"Preparing playback…":"Mira is replying"):busy?"Preparing reply…":replyMode==='text'?(viewMode==='text'?'Text conversation':'Ready when you are'):listening[micState];
   $("history-toggle").hidden=true;
   document.querySelector('.conversation').dataset.mode=viewMode;
   for(const mode of ['text','voice','video'])$('mode-'+mode).setAttribute('aria-pressed',String(viewMode===mode));
@@ -75,7 +75,7 @@ function controls(){
   $('end-call').hidden=viewMode==='text'||replyMode==='text';
   document.querySelector('.call-actions').hidden=replyMode==='text';
   $('join-call').hidden=viewMode==='text'||replyMode!=='text';$('join-call').disabled=!ready;
-  const joinLabel=ready?'Call Mira':connected?'Getting readyâ€¦':'Connectingâ€¦';
+  const joinLabel=ready?'Call Mira':connected?'Getting ready…':'Connecting…';
   $('join-call').querySelector('span').textContent=joinLabel;
   $('join-call').setAttribute('aria-label',joinLabel);$('join-call').title=joinLabel;
   $('composer').hidden=viewMode!=='text';
@@ -92,7 +92,7 @@ function controls(){
   if(viewMode==='voice')$('media-label').textContent='Voice call';
   $('replay').hidden=true;
   $('unread').hidden=!unread;$('unread').textContent=String(unread);
-  $('message').placeholder='Message Miraâ€¦';
+  $('message').placeholder='Message Mira…';
   $('disclosure').hidden=viewMode!=='text';
   $('disclosure').textContent=replyMode==='text'?'Private conversation':'Call stays active';
   updateCaptions();
@@ -120,7 +120,7 @@ function setScene(value){
   document.querySelector(".conversation").dataset.history=historyOpen?"open":"closed";
   scene=value;$("portrait").src="/portrait/"+scene+".png";
   $("video").poster="/portrait/"+scene+".png";
-  $("media-label").textContent=sceneNames[scene]+" Â· AI portrait";
+  $("media-label").textContent=sceneNames[scene]+" · AI portrait";
 }
 function setAction(value="none"){document.querySelector(".visual").dataset.action=value||"none";}
 function holdPicture(){
@@ -214,7 +214,7 @@ async function drain(){
       if(mine!==epoch)return;
       itemStarted=true;
       captionText=item.text||'';
-      if(item.video){media.hidden=false;$("media-label").textContent=sceneNames[scene]+(item.prepared_motion?" Â· Prepared motion Â· live voice":" Â· Generated video");}
+      if(item.video){media.hidden=false;$("media-label").textContent=sceneNames[scene]+(item.prepared_motion?" · Prepared motion · live voice":" · Generated video");}
       if(item.video){
         displayedPlayback={id:item.jobId,playback:{index:item.index,time_s:media.currentTime}};
         const track=(_now,frame)=>{
@@ -233,7 +233,7 @@ async function drain(){
       if(item.stream){
         const supported=await playStream(item,media,controller.signal);
         if(!supported){
-          notice("This browser needs the completed video. Preparing itâ€¦");
+          notice("This browser needs the completed video. Preparing it…");
           while(active&&mine===epoch){await sleep(150);if(!active)break;}
           if(mine!==epoch)break;media.src=item.video;await attemptPlay(media);
         }
@@ -268,16 +268,16 @@ async function follow(key,node){
       if(job.portrait&&!shownPortrait&&replyNode){const image=document.createElement("img");image.src=job.portrait;image.alt="Mira in the "+sceneNames[job.scene].toLowerCase();replyNode.parentElement.append(image);shownPortrait=true;$("chat").scrollTop=$("chat").scrollHeight;}
       while(!pendingStop&&consumed<job.chunks.length){const chunk=job.chunks[consumed++];if(!(rtcPeer&&chunk.video)){queue.push({...chunk,jobId:key});drain();}}
       if(!pendingStop){
-        if(job.state==="thinking")notice("Mira is thinkingâ€¦");
-        else if(job.state==="transcribing")notice("Listening to your messageâ€¦");
-        else if(job.state==="rendering"&&!playing)notice("Connecting the pictureâ€¦");
-        else if(job.state==="speaking"&&!playing)notice("Preparing your replyâ€¦");
+        if(job.state==="thinking")notice("Mira is thinking…");
+        else if(job.state==="transcribing")notice("Listening to your message…");
+        else if(job.state==="rendering"&&!playing)notice("Connecting the picture…");
+        else if(job.state==="speaking"&&!playing)notice("Preparing your reply…");
       }
       if(["done","failed","cancelled"].includes(job.state)){
         if(!pendingStop&&job.state==='done'&&job.presentation==='video'){nextIdleURL=job.idle_video||null;if(!playing&&!queue.length)settleIdle();}
         if(job.state==="failed"&&job.error_code==="no_speech"){node.parentElement.remove();notice("No speech detected. Please speak again.");}
         else if(job.state==="failed"){notice(job.error,true);if(!replyNode)bubble("That reply couldn't finish. Please try again.","assistant");}
-        else if(job.state==="cancelled")notice(callInput.capturing()?'Listeningâ€¦':replyMode==='text'?"Stopped. You can send another message.":"Stopped. You can speak now.");
+        else if(job.state==="cancelled")notice(callInput.capturing()?'Listening…':replyMode==='text'?"Stopped. You can send another message.":"Stopped. You can speak now.");
         else if($("resume").hidden){notice(job.remembered?.length?"Saved what you shared. You can review it in Memory.":"");}
         lastServerSeconds=job.metrics.total_s??null;updateMetrics();
         break;
@@ -291,9 +291,9 @@ async function submit(text,raw=null,inputMode=null,draftId='message'){
   if(busy||stopping||!ready||(!raw&&!text.trim()))return;
   resetPlayback(true);if(rtcPeer)$('video').muted=false;lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
   pendingStop=false;submitting=true;busy=true;submittedSpeech=Boolean(raw);controls();
-  const node=bubble(raw?"Listeningâ€¦":text,"user");
+  const node=bubble(raw?"Listening…":text,"user");
   if(!raw)$(draftId).value="";
-  notice(raw?"Listening to your messageâ€¦":"Mira is thinkingâ€¦");
+  notice(raw?"Listening to your message…":"Mira is thinking…");
   try{
     let data;
     const mode=inputMode||viewMode;
@@ -359,7 +359,7 @@ async function interrupt(){
       const result=await api('/api/cancel',position||{id:key});
       if(mine!==epoch)return;
       if(result.pose_preserved){idleURL=result.idle_video||null;idleSuppressed=!idleURL;}
-      notice(result.warning||(callInput.capturing()?'Listeningâ€¦':'Reply stopped. You can speak now.'),Boolean(result.warning));
+      notice(result.warning||(callInput.capturing()?'Listening…':'Reply stopped. You can speak now.'),Boolean(result.warning));
     }catch(error){if(mine===epoch)notice(error.message,true);return false;}
     finally{stopping=false;listenAfter=performance.now()+450;controls();}
   }
@@ -447,11 +447,11 @@ async function boot(){
       if(!active&&!playing&&!submitting&&!state.busy)idleURL=state.idle_video||null;
       if(state.app_version!=="0.2"){ready=false;$("connection").textContent="Server update needed";notice("Restart the local server to finish this update.",true);controls();await sleep(1500);continue;}
       if(!active&&!submitting)busy=state.busy;
-      $("connection").textContent=state.error?"Models unavailable":!ready?"Preparing Miraâ€¦":provider==="ollama"?"On your computer":"Hosted conversation Â· local video";
+      $("connection").textContent=state.error?"Models unavailable":!ready?"Preparing Mira…":provider==="ollama"?"On your computer":"Hosted conversation · local video";
       $("provider-note").textContent=provider==="ollama"?"Qwen dialogue, voice and video run on this PC.":"Conversation, recent context and saved notes go to "+provider+". Voice and video stay on this PC.";
       if(state.error)notice(state.error,true);else if(state.visual_error)notice(state.visual_error,true);
       controls();
-    }catch(error){connected=false;ready=false;$("connection").textContent="Reconnectingâ€¦";notice("Connection lost. Retrying automatically; your draft stays here.",true);controls();}
+    }catch(error){connected=false;ready=false;$("connection").textContent="Reconnecting…";notice("Connection lost. Retrying automatically; your draft stays here.",true);controls();}
     await sleep(1500);
   }
 }
