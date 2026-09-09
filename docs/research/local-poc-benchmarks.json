@@ -24442,5 +24442,99 @@
     },
     "visual_review": "All 73 cold-run frames inspected in ordered sheets. Right arm raises, waves and lowers; broad identity/clothing/background preserved. Hand/fingers soft and somewhat distorted. No anatomy certification. Warm run quality not inspected.",
     "assessment": "4.518s warm and 10.112s cold before lip rendering/transport is too slow for a 1-2s live action response. No remote GPU or generation API used."
+  },
+  "small_motion_20260909": {
+    "model": "ltxv-2b-0.9.8-distilled-fp8",
+    "resolution": "256x384",
+    "frames": 73,
+    "fps": 24,
+    "generation_s": [
+      3.3646435,
+      2.2698757
+    ],
+    "baseline_warm_s": 4.518682,
+    "scope": "Isolated resolution-only experiment; same 8-step schedule and full clip duration. Excludes speech, lip rendering and transport. Two random seeds, not a controlled statistical comparison.",
+    "review": "All 73 frames of second sample reviewed in contact sheets. Hand blur/deformation, left arm raised despite right-hand prompt, unsolicited other-arm movement and background motion. Not promoted to runtime.",
+    "artifact": "generated/local-app/audit/fresh-motion-resume/small-results.json",
+    "next": "Compare matched seeds at intermediate resolution and evaluate action correctness before changing runtime."
+  },
+  "matched_resolution_20260909": {
+    "runs": [
+      {
+        "motion_s": 4.279,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true,
+        "seed": 914,
+        "elapsed_s": 4.280556500001694
+      },
+      {
+        "motion_s": 2.305,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "256x384",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true,
+        "seed": 914,
+        "elapsed_s": 2.3063713000010466
+      },
+      {
+        "motion_s": 3.714,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "320x480",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true,
+        "seed": 914,
+        "elapsed_s": 3.7166512999974657
+      },
+      {
+        "motion_s": 4.133,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true,
+        "seed": 2718,
+        "elapsed_s": 4.134966700003133
+      },
+      {
+        "motion_s": 2.359,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "256x384",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true,
+        "seed": 2718,
+        "elapsed_s": 2.3601450999994995
+      },
+      {
+        "motion_s": 3.016,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "320x480",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true,
+        "seed": 2718,
+        "elapsed_s": 3.0184874999977183
+      }
+    ],
+    "controls": "Same source image, 73 frames at 24 fps, 8 steps, end guide, two seeds across three resolutions. Same seed across different latent shapes is not identical noise. Sequential warm-worker runs; not cold-start or end-to-end latency.",
+    "visual_review": "Seven evenly spaced frames per clip, not exhaustive frame review. Seed 914: 384 and 256 show no clear wave; 320 raises right arm. Seed 2718: 384 raises right arm with unwanted foot movement; 320 and 256 raise both arms. Hand detail remains weak. No configuration meets reliable action following.",
+    "decision": "Do not promote resolution reduction. Next investigate pose-conditioned generation; official older LTX pose adapter is 13B, not the installed 2B.",
+    "sources": [
+      "https://github.com/Lightricks/LTX-Video",
+      "https://github.com/Lightricks/LTX-2"
+    ],
+    "api_spend_usd": 0,
+    "electricity_cost": "not measured"
   }
 }
