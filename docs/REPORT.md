@@ -10,13 +10,13 @@ Cloudflare Qwen plans replies, CPU Whisper/Kokoro handle recognition and speech,
 
 A same-latent decoder comparison removed the pronounced double-image defect by increasing the temporal window from 32 to 128 frames. The replacement sources were reviewed on the existing 16GB card. Close listening now uses one bilateral blink per 3.71-second loop with quieter background motion. This improves prepared footage; it does not solve arbitrary live video generation.
 
-An earlier Torch-based **30-minute call completed 120 interactions** across six repetitions of the 20-command suite, with zero functional failures or reported buffer stalls. Across 114 non-interrupted responses, median playback start was **1.89s**, p95 **2.82s**. Spoken-fixture p95 was **2.83s**, excluding physical capture and the approximately 0.65s endpoint wait. The two-second target is not met. Cycle medians did not show steadily accumulating delay.
-
-The suite covers movement, negation, memory updates, unsupported commands, interrupted movement and in-app messaging. Normal application retention removed 70 old clips before the long-call frame audit; its remaining 50 clips contain 2,469 inspected frames. Future benchmark runs archive synthetic media per turn, without increasing live-user retention. The long call therefore establishes session behavior, not complete frame-by-frame quality acceptance.
-
 The optional TensorRT decoder now runs in the preview. It reduced SD VAE batch time from **235ms to 120ms**, and four identical speech/motion renders finished **31–37% sooner**. All 259 paired frames were compared and the four worst pairs inspected. This is a measured renderer improvement on the existing GPU; the source appearance and supported actions are unchanged.
 
-Both TensorRT call trials passed **20/20 commands** without reported reply stalls. End-of-speech median/p95 was **2.50/3.44s** experimentally and **2.48/2.92s** through the normal runtime. Each includes nine uninterrupted spoken fixtures through browser capture/VAD; hosted variability makes these small samples unsuitable for a latency guarantee. The two-second target remains unmet. The latest trial recorded **25.11ms p95 / 32.55ms maximum** browser A/V clock skew across 614 samples. All **994** rendered frames were analyzed; 40 transition/close frames were manually inspected. Physical audio, perceptual lip sync and complete visual acceptance remain unqualified. Hand blur, close-view cropping and mouth artifacts remain. **137 Python and 17 Node tests pass.** The new decoder has not yet completed its own 30-minute trial.
+The selected decoder completed a **30-minute call / 120 commands**, covering movement, negation, memory, unsupported requests, interruption and in-app messaging. There were zero functional failures, browser errors or reported reply stalls. Across 54 uninterrupted spoken replies, end-of-speech median/p95 was **2.48/2.90s**, including synthetic browser capture and endpoint detection. The two-second target remains unmet. Cycle medians showed no steadily accumulating delay.
+
+All **120 clips / 5,966 frames** were retained and analyzed, with nonzero unclipped audio and zero limited heuristic flags. Six contact sheets covering 120 frames were inspected across the first and last cycles. Hand blur, soft mouth detail and close-view crown cropping remain. Browser A/V clock skew was **24.74ms p95 / 51.72ms maximum** across 3,685 samples; that does not establish perceptual lip sync.
+
+An offline review page now provides recorded playback, exact frame stepping and exportable notes. Its browser test detects decoded speech audio and passes desktop/mobile-width layout checks. Physical sound, real mobile use and full visual acceptance remain unqualified. **142 Python and 17 Node tests pass.**
 
 Exact revisions, benchmark commands, media hashes and continuing results are in [LOCAL_POC](LOCAL_POC.md) and its machine evidence. Keep all private conversation outside benchmark artifacts.
 
@@ -25,7 +25,7 @@ Exact revisions, benchmark commands, media hashes and continuing results are in 
 - Warm end-of-speech p95 <=2 seconds, including endpoint detection and actual capture.
 - Reliable fresh movement outside the small supported action set.
 - Natural appearance throughout every transition and stronger close-view lip quality.
-- Complete retained-media review across a sustained call, including natural movement and audible speech on a real device.
+- Complete perceptual review of the retained sustained-call media, including natural movement and audible speech on a real device.
 - Physical speaker/microphone echo testing, perceptual A/V alignment within 100ms and real mobile PWA evidence.
 - WebRTC output, Linux/GPU deployment, account isolation, public access controls and accepted billing.
 
@@ -49,4 +49,6 @@ CCBill is the first adult-business processor to request a quote from. Its publis
 
 An additional 24 synthetic Cloudflare calls compared Qwen, Llama 3.1 8B FP8 Fast and Llama 3.2 3B. Their median planner times were 0.603s / 0.596s / 0.421s. The 3B model missed one requested message; the 8B median improvement was negligible. Keep Qwen until a larger correct comparison establishes a better choice.
 
-Next: run the retained-media sustained trial with the selected decoder, reduce remaining endpoint/dialogue/speech delay, qualify actual audio/mobile behavior and compare the same workload on the capped rental if the founder elects to provision it. Keep the five core documents concise. Founder owns provider/processor/jurisdiction decisions; independent security/correctness review and staging remain pending before public release. Work on main as authorized and preserve secrets and local memory.
+CPU experiments found a possible 152ms ASR saving with a 15-second encoder input, but other lengths caused repetition or extra words. Smart Turn v3.2 classified 18/20 complete synthetic prompts correctly at the tested threshold. Neither experiment changes the live app; both need stronger accuracy and integrated-call evidence.
+
+Next: qualify the shorter ASR candidate, reduce endpoint/dialogue/speech delay, test actual audio/mobile behavior and compare the same workload on the capped rental if the founder elects to provision it. Keep five core documents. Founder owns provider/processor/jurisdiction decisions; independent security/correctness review and staging remain pending before public release. Work on main as authorized and preserve secrets and local memory.

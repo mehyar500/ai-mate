@@ -209,6 +209,13 @@ For the optional Moonshine comparison, create `.cache/moonshine-env`, install it
 
 Finally, 16 bounded synthetic Qwen planner calls compared fresh HTTPS with connection reuse: eight calls each, median **517ms / 458ms**, all four cases passed. The roughly 60ms difference does not resolve the call bottleneck; production transport is unchanged. `benchmark_dialogue_connection.py` records sanitized timing and token usage. Neural rendering, reply preparation and end-of-turn detection remain the main optimization work. ASR alternatives, connection reuse and model installation are separate from provider/content approval.
 
+Two further CPU experiments remain **unselected**:
+
+- Shorter Whisper encoder input, same Base English int8 weights/eight threads/83 fixtures: the 30s padded baseline had 0% word error at 269ms median; 15s had 0% at 116ms. However, 20s introduced 5.11% word error, 10s 3.41%, and 5s severe repetition plus one lost negation. These are minimum input durations, not truncation of voiced content. The [CTranslate2 encoder](https://github.com/OpenNMT/CTranslate2/blob/v4.8.2/src/layers/whisper.cc) accepts shorter inputs, but that does not establish equivalent recognition. The 15s candidate needs longer/real-speaker fixtures and a capture-inclusive call before selection.
+- [Smart Turn v3.2](https://huggingface.co/pipecat-ai/smart-turn-v3), pinned CPU ONNX, two threads: feature extraction plus inference was 20.25ms median / 21.28ms p95 across 57 warm samples. With 200ms trailing silence, 18/20 complete synthetic prompts exceeded the 0.5 completion threshold. Twenty-four of 40 cut prefixes also exceeded it, but these prefixes lack human completion labels. This cannot justify shortening the live 650ms boundary. The model card specifies BSD-2-Clause; retain its license and exact pin in `config/smart-turn-benchmark.json`.
+
+Run after call timing has finished, using new labels: `benchmark_asr_window.py --label new-asr --minimum-seconds 20 15` consumes the established `asr-calls-cpu-comparison` corpus. `benchmark_smart_turn.py --download-only`, then `benchmark_smart_turn.py --label new-turn --threads 2` uses the retained `qualification-temporal128` fixtures. Both run in the existing virtual environment, use synthetic data and preserve the active models, browser and packages. Full summaries, rejected outputs and hashes are retained in machine evidence/local audits.
+
 ### Full ASR-to-video check — September 9
 
 The real local recognizer, configured Cloudflare Qwen planner, Kokoro voice and MuseTalk renderer were exercised together through browser playback. Only physical microphone capture was replaced with fixed generated WAVs; an isolated database held the synthetic fact "My dog is named Maple." No private conversation was read or modified.
@@ -357,7 +364,7 @@ Four identical audio/body-source comparisons rendered in **1.52 / 1.58 / 0.615 /
 
 The experimental and integrated capture trials both passed **20/20 commands** with no reported reply stalls. End-of-speech median/p95 was **2.50/3.44s** and **2.48/2.92s** respectively (nine uninterrupted spoken inputs each); mixed Send-to-playback median/p95 was **1.49/2.77s** and **1.60/2.48s** (19 inputs each). Keep both runs: hosted variability changes the tail, and neither meets the two-second target. Integrated A/V clock skew was 25.11ms p95 / 32.55ms maximum over 614 samples. This measures browser clocks, not phoneme alignment or audible speakers.
 
-Every frame in both trials was analyzed: **1,005 experimental / 994 integrated**, with no heuristic flags, nonzero audio and no clipped samples. Forty transition/close frames per trial were manually inspected; remaining perceptual defects persist. All 20 integrated render records report `tensorrt`. The selected preview restarted successfully in **29.47s**, including five-source warm-up, with unchanged private memory. Its own 30-minute trial, physical audio and mobile checks remain pending.
+Every frame in both trials was analyzed: **1,005 experimental / 994 integrated**, with no heuristic flags, nonzero audio and no clipped samples. Forty transition/close frames per trial were manually inspected; remaining perceptual defects persist. All 20 integrated render records report `tensorrt`. The selected preview restarted successfully in **29.47s**, including five-source warm-up, with unchanged private memory. Physical audio and mobile checks remain pending; its sustained trial is recorded below.
 
 Reproduce on the configured local environment:
 
@@ -373,6 +380,28 @@ These commands use isolated synthetic audit folders and refuse overwriting compl
 After inspecting the comparisons and experimental call suite, copy only `decoder.engine` and `build.json` from `audit/visual-trt-fp16/` into `.cache/local-poc/musetalk-vae-trt/`, then mark that copied manifest `reviewed: true` with the review scope. Keep the original experiment record. Qualify the normal runtime using `serve_voice_video_benchmark.py --trial qualification --label trt-reviewed --performance-label temporal128 --decoder tensorrt-reviewed`, then `qualify_video_call.cjs qualification trt-reviewed --capture` and `review_call_frames.py --trial qualification --label trt-reviewed`. Set `AI_MATE_VISUAL_DECODER=tensorrt` only after that passes; restart between calls. Setting `torch` and restarting rolls back without touching memory.
 
 Only load engines built from the pinned local VAE. NVIDIA describes engines as executable, platform/GPU-dependent artifacts; hashes and a local review record are provenance checks, not a sandbox for third-party binaries. [NVIDIA runtime documentation](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/python-api-docs.html), [installation](https://docs.nvidia.com/deeplearning/tensorrt/latest/installing-tensorrt/install-pip.html). The optional runtime changes no model/content license, hosting eligibility or API credential.
+
+### Selected decoder: sustained capture and review — September 9
+
+`soak trt-capture --capture` completed **1,800.048s / 120 commands**, with all render records using TensorRT and zero functional failures, browser errors or reported reply stalls. Across 54 uninterrupted spoken replies, end-of-speech median/p95 was **2.478/2.896s**. Mixed Send-to-playback median/p95 was **1.55/2.22s** across 114 replies. Six deliberate interruptions are excluded from response percentiles. Cycle medians showed no steadily accumulating delay; the two-second target remains unmet.
+
+All **120 MP4/WAV pairs / 5,966 frames** were retained and analyzed: 20FPS median timestamp spacing per clip, zero heuristic flags, nonzero audio and no clipped samples. Six first/last-cycle contact sheets cover 120 visually sampled wave, resumed-approach and close-speech frames. Fingers blur during waving; mouth detail stays soft, and the close view crops the crown. Browser A/V clock skew was **24.744ms p95 / 51.724ms maximum**, 3,685 samples. The idle long-gap counter includes deliberate pauses/source changes and is not a stall count. No physical audio or full perceptual acceptance follows from these measurements.
+
+Five-source warm-up took 16.706s. Two whole-GPU point samples reported 9,691MiB, including the idle live preview and desktop; these are neither peak nor per-session usage. CPU model timing ran afterward. No rental or live model/credential/memory change was made.
+
+Reproduce with the existing server/driver/auditor, substituting a fresh label for `trt-capture`:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial soak --label trt-capture --performance-label temporal128 --decoder tensorrt-reviewed
+# Second terminal:
+node scripts/qualify_video_call.cjs soak trt-capture --capture
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial soak --label trt-capture
+.\.venv\Scripts\python.exe scripts/build_call_review.py --trial soak --label trt-capture
+# After timing, serve ONLY this synthetic folder for recorded review:
+.\.venv\Scripts\python.exe -m http.server 8767 --bind 127.0.0.1 --directory generated/local-app/audit/voice-video-soak-trt-capture
+```
+
+Open `http://127.0.0.1:8767/review.html`. The page checks coverage/hashes before construction, loads one clip at a time, steps decoded timestamps, plays embedded audio and exports browser-local review notes. Checkboxes start unreviewed; no approval is inferred. With that server running, `node scripts/verify_call_review.cjs soak trt-capture` passed frame stepping, export, 44px controls and desktop/390px layout checks. Decoded audio reached the headless browser's AudioContext destination (48 samples, maximum RMS 0.1532); this is not a physical speaker or listening test. The initial HTTP streaming seek failure was corrected by loading each complete clip into a Blob. Media and notes stay in the ignored synthetic audit folder; never serve the live memory directory.
 
 ## Playback, microphone and memory
 
@@ -436,7 +465,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 137 Python tests and 17 Node tests, Python compilation, JavaScript syntax and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Existing layout checks cover five viewports and 44px touch targets; actual iPhone keyboard behavior remains unqualified. Synthetic benchmark servers use disposable memory. No memory schema or provider credential changed. The optional non-secret decoder setting and decoder telemetry are documented above; new tests reject unreviewed, tampered, missing and runtime-mismatched engines.
+Checks for this revision: 142 Python tests and 17 Node tests, Python compilation, JavaScript syntax and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Five new review tests cover missing/duplicate media, hash/path boundaries and inert dialogue markup. Actual iPhone behavior remains unqualified. Synthetic benchmark servers use disposable memory. No runtime, memory schema, provider credential or deployment changed in the sustained-review cycle; rollback is a code revert without altering private memory or selected assets.
 
 ## Cost and next decision
 

@@ -13376,5 +13376,515 @@
       "https://docs.nvidia.com/deeplearning/tensorrt/latest/installing-tensorrt/install-pip.html",
       "https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/python-api-docs.html"
     ]
+  },
+  "sustained_trt_and_cpu_candidates_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "06ee0f697a8b8577dfce51a920ee644a5a2aa879",
+    "risk_class": "R1",
+    "scope": "Synthetic isolated benchmark/review tools, documentation and local artifacts; no production, private-memory, credential or active-model change.",
+    "decision": "Keep the reviewed TensorRT decoder and current live ASR/650ms endpoint. The selected renderer passed sustained capture testing; end-of-speech p95 and perceptual acceptance remain incomplete. Short ASR and Smart Turn remain experiments.",
+    "sustained_call": {
+      "command": "serve_voice_video_benchmark.py --trial soak --label trt-capture --performance-label temporal128 --decoder tensorrt-reviewed; qualify_video_call.cjs soak trt-capture --capture",
+      "summary": {
+        "elapsed_s": 1800.048,
+        "turns": 120,
+        "failures": [],
+        "response_sample_count": 114,
+        "p50_s": 1.55,
+        "p95_s": 2.22,
+        "playback": {
+          "frames": {
+            "video": {
+              "presented": 19,
+              "callbacks": 5694,
+              "longGaps": 0,
+              "last": 1788132.8,
+              "source": "blob:http://127.0.0.1:8766/7230da86-9889-4dcf-a680-97bae041ad20",
+              "wasVisible": true
+            },
+            "idle-video": {
+              "presented": 1108,
+              "callbacks": 32050,
+              "longGaps": 62,
+              "last": 1800732.346,
+              "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+              "wasVisible": true
+            }
+          },
+          "callActive": true,
+          "av_clock_skew_ms": {
+            "samples": 3685,
+            "p50": 9.236000000000022,
+            "p95": 24.74399999999988,
+            "max": 51.72399999999999
+          },
+          "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+        },
+        "errors": [],
+        "speech_end_to_playback_s": {
+          "samples": 54,
+          "p50": 2.4784666666637643,
+          "p95": 2.895533333336469
+        },
+        "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+      },
+      "all_render_records_tensorrt": true,
+      "warmup_s": 16.706,
+      "primed_sources": 5,
+      "warmup_torch_allocated_mib": 1833.892,
+      "frame_audit": {
+        "retained_clips": 120,
+        "retained_wavs": 120,
+        "decoded_frames": 5966,
+        "flagged_frames": 0,
+        "missing_media": 0,
+        "minimum_clip_timestamp_fps": 19.999999999999982,
+        "minimum_audio_rms": 0.07174231857061386,
+        "maximum_audio_clipped_fraction": 0.0,
+        "scope": "Every-frame face count/luma/adjacent-change diagnostics; no all-frame identity/anatomy guarantee. Audio statistics use retained WAVs; review UI additionally checks decoded MP4 audio."
+      },
+      "visual_review": {
+        "scope": "Six ordered contact sheets visually inspected, 120 sampled frames; not complete anatomy, normal-speed motion or perceptual speech acceptance.",
+        "sheets": [
+          {
+            "cycle": 1,
+            "case": "wave",
+            "frames": [
+              20,
+              39
+            ],
+            "sheet": "5cf36b7aca824959bef7d5dcbcf7a51d-0-frames-020.jpg",
+            "sha256": "85a9eb0a954f3435fafb5d2f9d29598c39a438c018dbc7f88b81db3a4aeb4808"
+          },
+          {
+            "cycle": 1,
+            "case": "description",
+            "frames": [
+              0,
+              19
+            ],
+            "sheet": "73580090363b4f6f99d8f83073232b9c-0-frames-000.jpg",
+            "sha256": "012b25fb42e2a53f90f1a60ce02b5f1fd661df33a9385f36ede18f5789203e61"
+          },
+          {
+            "cycle": 1,
+            "case": "resume_approach",
+            "frames": [
+              20,
+              39
+            ],
+            "sheet": "90b67243456244c2a4023970e06f5581-0-frames-020.jpg",
+            "sha256": "2bb45c242a26ea0852da0a7893be41c64fd8a37a0ba2465bc56b9d7e55970400"
+          },
+          {
+            "cycle": 6,
+            "case": "wave",
+            "frames": [
+              20,
+              39
+            ],
+            "sheet": "7ed2ee14c90d457fb607b6ac0456a716-0-frames-020.jpg",
+            "sha256": "23721c14d68af20017aeabcc53f98dc9e92e41658b15ac5206189635ee43e2b1"
+          },
+          {
+            "cycle": 6,
+            "case": "description",
+            "frames": [
+              0,
+              19
+            ],
+            "sheet": "0cf285bb87ac4992b01c5a1281b1add7-0-frames-000.jpg",
+            "sha256": "b5a5c2a0f00f2a89bbd70bc224066b5b51e77b4cabf4d0e6a0696f37d812b71e"
+          },
+          {
+            "cycle": 6,
+            "case": "resume_approach",
+            "frames": [
+              20,
+              39
+            ],
+            "sheet": "34f92e2f5be343d592b017b2221ab79b-0-frames-020.jpg",
+            "sha256": "8be4b280498264f835ddf3dfe87f9bdc201ef75bb821e88dedca58ad60959f9e"
+          }
+        ],
+        "findings": [
+          "One raised hand and full body retained in inspected wave frames; moving fingers blur.",
+          "Resumed approach continues toward close pose; mouth and skin detail remain soft.",
+          "Close speech crops the crown; eyelids close together in inspected blink sequence.",
+          "No pronounced source double image in inspected approach region; repetitive prepared motion remains."
+        ],
+        "physical_audio_qualified": false,
+        "perceptual_lip_sync_qualified": false,
+        "complete_visual_acceptance": false
+      },
+      "review_ui": {
+        "clips": 120,
+        "frameStepping": true,
+        "export": true,
+        "defaultUnreviewed": true,
+        "audio": {
+          "samples": 48,
+          "maxRms": 0.15320002940690697,
+          "maxPeak": 0.5686018466949463,
+          "scope": "Decoded MP4 audio reached an AudioContext destination in headless Chromium. No physical speaker, microphone, listening or perceptual lip-sync claim."
+        },
+        "layout": {
+          "width": 390,
+          "scroll": 390,
+          "buttons": [
+            {
+              "id": "export",
+              "height": 44
+            },
+            {
+              "id": "back-frame",
+              "height": 44
+            },
+            {
+              "id": "next-frame",
+              "height": 44
+            },
+            {
+              "id": "previous",
+              "height": 45.1875
+            },
+            {
+              "id": "next",
+              "height": 45.1875
+            },
+            {
+              "id": "flag",
+              "height": 45.1875
+            }
+          ]
+        },
+        "errors": [],
+        "consoleErrors": []
+      },
+      "gpu_point_samples": [
+        {
+          "utc_epoch": 1788928140.7107482,
+          "elapsed_s": 649.143,
+          "completed_turns": 44,
+          "gpu_memory_mib": 9691.0,
+          "gpu_util_pct": 0.0,
+          "gpu_temp_c": 50.0,
+          "gpu_power_w": 26.52,
+          "scope": "Whole GPU including idle live preview and desktop; point samples, not peak or per-session memory."
+        },
+        {
+          "utc_epoch": 1788928790.6855447,
+          "elapsed_s": 1296.317,
+          "completed_turns": 87,
+          "gpu_memory_mib": 9691.0,
+          "gpu_util_pct": 0.0,
+          "gpu_temp_c": 50.0,
+          "gpu_power_w": 19.3,
+          "scope": "Whole GPU including idle live preview and desktop; point samples, not peak or per-session memory."
+        }
+      ],
+      "gpu_scope": "Whole-GPU point samples include idle preview and desktop; not peak/per-session memory or demonstrated concurrent calling.",
+      "artifacts": {
+        "generated/local-app/audit/voice-video-soak-trt-capture/qualification.json": "563409a130c70f0d12552d5f14cbd1a3e032e8295752ec15c4a426c11932a8de",
+        "generated/local-app/audit/voice-video-soak-trt-capture/summary.json": "f1e7815ab64853595b960adad49be493fd14f4b644d1495b39d6f7d9b95aca1b",
+        "generated/local-app/audit/voice-video-soak-trt-capture/frame-review.json": "781f7443843f89a3f5f97406543b1f2f6ae664a23b0d56df6b318f84026882d8",
+        "generated/local-app/audit/voice-video-soak-trt-capture/manual-review.json": "aabf41be9821f1f37ff49c9e1e96d1dbf0b514c762fe28a7577a231c71031dbd",
+        "generated/local-app/audit/voice-video-soak-trt-capture/review.html": "80d847ebb673f7e0cb3899f350d640d50e482e47d0661b5e9058c3f25396a087",
+        "generated/local-app/audit/voice-video-soak-trt-capture/review-ui-results.json": "22aee1d94a33142f41dccac1d6f51fc899afe2de6da9f1d523ccac0851784747",
+        "generated/local-app/audit/voice-video-soak-trt-capture/review-desktop.png": "f92d6480817ccaa4c8735f46c49792e79c4a6bf46ff9c4c5060eeff944d60e2a",
+        "generated/local-app/audit/voice-video-soak-trt-capture/review-mobile.png": "3108bef567ef79f1101b41b5be4c27af924c73cb346504f668b7ae9f2293219c"
+      },
+      "cycles": [
+        {
+          "cycle": 1,
+          "mixed_samples": 19,
+          "speech_samples": 9,
+          "send_to_playback_median_s": 1.52,
+          "speech_end_to_playback_median_s": 2.4423333333333357
+        },
+        {
+          "cycle": 2,
+          "mixed_samples": 19,
+          "speech_samples": 9,
+          "send_to_playback_median_s": 1.51,
+          "speech_end_to_playback_median_s": 2.4889666666636474
+        },
+        {
+          "cycle": 3,
+          "mixed_samples": 19,
+          "speech_samples": 9,
+          "send_to_playback_median_s": 1.72,
+          "speech_end_to_playback_median_s": 2.61139999999851
+        },
+        {
+          "cycle": 4,
+          "mixed_samples": 19,
+          "speech_samples": 9,
+          "send_to_playback_median_s": 1.46,
+          "speech_end_to_playback_median_s": 2.4784666666637643
+        },
+        {
+          "cycle": 5,
+          "mixed_samples": 19,
+          "speech_samples": 9,
+          "send_to_playback_median_s": 1.52,
+          "speech_end_to_playback_median_s": 2.4465333333364687
+        },
+        {
+          "cycle": 6,
+          "mixed_samples": 19,
+          "speech_samples": 9,
+          "send_to_playback_median_s": 1.62,
+          "speech_end_to_playback_median_s": 2.5554333333349786
+        }
+      ],
+      "manual_review_scope": "Images inspected as ordered static sheets; six sheets/120 frames. Browser automated 1x playback checks decoded audio signal only; normal-speed visual and audible perceptual review remains pending."
+    },
+    "asr_encoder_window": {
+      "model": "faster-whisper Base English int8",
+      "threads": 8,
+      "ctranslate2": "4.8.2",
+      "faster_whisper": "1.2.1",
+      "corpus": "asr-calls-cpu-comparison",
+      "fixtures": 83,
+      "latency_samples_per_setting": 80,
+      "method": "Alternate settings per fixture; retain all nonzero mel columns plus 0.5s padding rounded up to seconds, with tested minimum. Process-local encode override; no installed package edit.",
+      "trials": [
+        {
+          "label": "cpu8",
+          "summaries": [
+            {
+              "minimum_seconds": 30,
+              "samples": 83,
+              "median_s": 0.26785355000174604,
+              "p95_s": 0.28871410000283504,
+              "word_error_rate": 0.0,
+              "negation_failures": 0,
+              "non_speech_hallucinations": 0
+            },
+            {
+              "minimum_seconds": 10,
+              "samples": 83,
+              "median_s": 0.08212105000347947,
+              "p95_s": 0.11189079999894602,
+              "word_error_rate": 0.03409090909090909,
+              "negation_failures": 0,
+              "non_speech_hallucinations": 0
+            },
+            {
+              "minimum_seconds": 5,
+              "samples": 83,
+              "median_s": 2.1120667999966827,
+              "p95_s": 5.061485899997933,
+              "word_error_rate": 11.494318181818182,
+              "negation_failures": 1,
+              "non_speech_hallucinations": 0
+            }
+          ],
+          "mismatching_fixtures_by_minimum": {
+            "30": [],
+            "10": [
+              "af_sarah-negated_wave",
+              "af_sarah-raise_hand",
+              "am_michael-negated_wave"
+            ],
+            "5": [
+              "af_sarah-greeting",
+              "af_sarah-wave",
+              "noise-wave",
+              "af_sarah-memory",
+              "noise-memory",
+              "af_sarah-approach",
+              "noise-approach",
+              "af_sarah-negated_return",
+              "af_sarah-description",
+              "af_sarah-return",
+              "af_sarah-remember",
+              "noise-remember",
+              "af_sarah-recall",
+              "noise-recall",
+              "af_sarah-unsupported",
+              "noise-unsupported",
+              "af_sarah-wave_again",
+              "af_sarah-negated_wave",
+              "noise-interrupted_approach",
+              "af_sarah-held_speech",
+              "noise-held_speech",
+              "af_sarah-message",
+              "af_sarah-return_again",
+              "af_sarah-raise_hand",
+              "af_sarah-conversation",
+              "noise-conversation",
+              "af_sarah-goodbye",
+              "noise-goodbye",
+              "am_michael-greeting",
+              "am_michael-wave",
+              "am_michael-memory",
+              "am_michael-approach",
+              "am_michael-description",
+              "am_michael-return",
+              "am_michael-remember",
+              "am_michael-recall",
+              "am_michael-unsupported",
+              "am_michael-wave_again",
+              "am_michael-negated_wave",
+              "am_michael-interrupted_approach",
+              "am_michael-held_speech",
+              "am_michael-resume_approach",
+              "am_michael-message",
+              "am_michael-return_again",
+              "am_michael-raise_hand",
+              "am_michael-goodbye",
+              "bf_emma-greeting",
+              "bf_emma-wave",
+              "bf_emma-memory",
+              "bf_emma-approach",
+              "bf_emma-description",
+              "bf_emma-return",
+              "bf_emma-remember",
+              "bf_emma-recall",
+              "bf_emma-unsupported",
+              "bf_emma-wave_again",
+              "bf_emma-negated_wave",
+              "bf_emma-held_speech",
+              "bf_emma-message",
+              "bf_emma-return_again",
+              "bf_emma-raise_hand",
+              "bf_emma-conversation",
+              "bf_emma-goodbye"
+            ]
+          },
+          "artifact": "generated/local-app/audit/asr-window-cpu8/results.json",
+          "sha256": "52079995b17cbbfafca036861ab8ba1a3f7a15f495a4f2effbe8d0f9536eb2af"
+        },
+        {
+          "label": "cpu8-long",
+          "summaries": [
+            {
+              "minimum_seconds": 30,
+              "samples": 83,
+              "median_s": 0.26867734999905224,
+              "p95_s": 0.291643299999123,
+              "word_error_rate": 0.0,
+              "negation_failures": 0,
+              "non_speech_hallucinations": 0
+            },
+            {
+              "minimum_seconds": 20,
+              "samples": 83,
+              "median_s": 0.15113579999888316,
+              "p95_s": 0.16802689999894938,
+              "word_error_rate": 0.05113636363636364,
+              "negation_failures": 0,
+              "non_speech_hallucinations": 0
+            },
+            {
+              "minimum_seconds": 15,
+              "samples": 83,
+              "median_s": 0.11623360000157845,
+              "p95_s": 0.13148999999975786,
+              "word_error_rate": 0.0,
+              "negation_failures": 0,
+              "non_speech_hallucinations": 0
+            }
+          ],
+          "mismatching_fixtures_by_minimum": {
+            "30": [],
+            "20": [
+              "af_sarah-recall"
+            ],
+            "15": []
+          },
+          "artifact": "generated/local-app/audit/asr-window-cpu8-long/results.json",
+          "sha256": "342e59652782a441830009ece54336354a9bfab16c4eddc5ef06e0247e4b6126"
+        }
+      ],
+      "decision": "5s rejected for severe repetition and one lost negation; 10s/20s rejected for additional words. 15s passed this corpus but is not selected: longer and real speech plus capture-inclusive qualification remain required.",
+      "source": "https://github.com/OpenNMT/CTranslate2/blob/v4.8.2/src/layers/whisper.cc"
+    },
+    "smart_turn": {
+      "model": {
+        "repository": "pipecat-ai/smart-turn-v3",
+        "revision": "f766f81d3cfdf7737ac64aad813d91bbfd56bf93",
+        "filename": "smart-turn-v3.2-cpu.onnx",
+        "sha256": "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f",
+        "bytes": 8679182,
+        "license": "BSD-2-Clause per the model card; retain the upstream license with the local artifact",
+        "source_revision": "4786657e242dfe77dd138699ac564ee074a2a543",
+        "source_repository": "https://github.com/pipecat-ai/smart-turn",
+        "selected_in_app": false,
+        "scope": "Isolated neutral end-of-turn classification benchmark. No hosted audio or private conversation."
+      },
+      "threads": 2,
+      "onnxruntime": "1.29.0",
+      "torch": "2.11.0+cu128",
+      "load_s": 0.04000300000188872,
+      "warm_timing_s": {
+        "samples": 57,
+        "median": 0.020245799998519942,
+        "p95": 0.021282399997289758
+      },
+      "complete_over_half": 18,
+      "prefix_over_half": 24,
+      "scope": "Twenty complete synthesized prompts and forty cut-prefix probes, each with 200ms trailing silence. Prefixes have no human completion labels. Includes feature extraction and inference, excludes browser upload and integration. No live model selection or real-speaker accuracy claim.",
+      "complete_samples": 20,
+      "prefix_samples": 40,
+      "complete_below_threshold": [
+        {
+          "case": "recall",
+          "kind": "complete",
+          "sample": 24,
+          "audio_sha256": "9a8e9de185bb562ad7ebe083004b2c9ce3a873256d99b2fdc9f378f01edd18df",
+          "probability_complete": 0.15019965171813965,
+          "feature_s": 0.001742499996908009,
+          "inference_s": 0.01889810000284342,
+          "total_s": 0.02064059999975143
+        },
+        {
+          "case": "wave_again",
+          "kind": "complete",
+          "sample": 30,
+          "audio_sha256": "b43108f008449c3d5982d0b39a7c8610aedfd5c2d86b5b5fb850f22eb6026f25",
+          "probability_complete": 0.06426429748535156,
+          "feature_s": 0.0016073000006144866,
+          "inference_s": 0.018030400002317037,
+          "total_s": 0.019637700002931524
+        }
+      ],
+      "selected_in_app": false,
+      "decision": "Keep isolated. Complete synthetic examples are missed, prefixes lack human completion labels, and actual user-turn accuracy/integration are unqualified.",
+      "artifact": "generated/local-app/audit/smart-turn-v32-cpu2/results.json",
+      "sha256": "35fbc141cd5da01422908c209a1feb32a72abc7d615481a3dd8f075371cde83b",
+      "sources": [
+        "https://huggingface.co/pipecat-ai/smart-turn-v3",
+        "https://github.com/pipecat-ai/smart-turn/blob/4786657e242dfe77dd138699ac564ee074a2a543/inference.py"
+      ]
+    },
+    "checks": {
+      "python_tests": 142,
+      "node_tests": 17,
+      "python_compile": true,
+      "node_syntax": true,
+      "review_ui": true,
+      "public_independent_review": "pending",
+      "staging": "not provisioned",
+      "commands": [
+        ".venv/Scripts/python.exe -m unittest discover -s tests -q",
+        ".venv/Scripts/python.exe -m compileall -q local_app scripts tests",
+        "node --check scripts/verify_call_review.cjs",
+        "node --check local_app/web/app.js",
+        "node --test tests/media-sync.test.mjs tests/microphone.test.mjs tests/call-input.test.mjs",
+        "git diff --check"
+      ],
+      "scope": "All listed checks passed locally. Expected negative-test error log lines are not suite failures. No independent agent or staging review performed."
+    },
+    "rollback": "Revert benchmark/review/docs commit if needed. No active inference, env, schema or asset rollback required; preserve private memory.",
+    "remaining": [
+      "End-of-speech p95 <=2s",
+      "Perceptual and physical-device audio/lip-sync acceptance",
+      "Natural arbitrary body movement and close-view quality",
+      "Actual mobile PWA/network qualification",
+      "Public model/host/payment acceptance and independent security/correctness review"
+    ]
   }
 }

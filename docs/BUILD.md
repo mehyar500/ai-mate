@@ -45,20 +45,22 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Selected decoder: end-of-speech median 2.48s / p95 2.92s, nine spoken replies; experimental TensorRT p95 3.44s. Synthetic MediaStream includes recorder/VAD but excludes physical acoustics |
+| Fast voice and visual response | Selected decoder sustained trial: end-of-speech median 2.48s / p95 2.90s, 54 spoken replies. Synthetic MediaStream includes recorder/VAD but excludes physical acoustics |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | Latest 614 browser clock samples: 25.11ms p95 / 32.55ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
-| Stable 30-minute call | Earlier Torch trial: 120 interactions, zero functional failures/reported stalls; full frame review incomplete. TensorRT sustained trial pending |
-| Realistic images and motion | Double-image defect reduced in reviewed sources and transition frames; latest 994 frames checked, 40 visually reviewed; previous source review retained. Hand blur, mouth artifacts, close framing and repetition remain |
+| Synchronization within 100ms | Latest 3,685 browser clock samples: 24.74ms p95 / 51.72ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
+| Stable 30-minute call | TensorRT: 120 interactions, zero functional failures/reported reply stalls, all 120 clips retained; no steadily accumulating response delay |
+| Realistic images and motion | Latest 5,966 frames analyzed, 120 visually sampled; previous source review retained. Hand blur, mouth artifacts, close framing and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 
 Targets remain warm end-of-speech p95 <=2s, at least 20 FPS with a 25 FPS target, bounded A/V skew and no accumulating session delay. Samples are not SLAs. Zero stalls do not establish correct anatomy or arbitrary movement capability.
 
-scripts/serve_voice_video_benchmark.py and scripts/qualify_video_call.cjs run isolated qualification/soak tests on port 8766 using synthetic profiles and WAV inputs. scripts/review_call_frames.py decodes every frame and creates ordered sheets. Frame heuristics flag anomalies; visual review remains necessary.
+scripts/serve_voice_video_benchmark.py and scripts/qualify_video_call.cjs run isolated qualification/soak tests on port 8766 using synthetic profiles and WAV inputs. scripts/review_call_frames.py decodes every frame and creates ordered sheets. scripts/build_call_review.py verifies complete media coverage and hashes before making an offline review page with frame stepping, audio and exportable notes. Review checkboxes remain unchecked until a reviewer records an observation. Frame heuristics and decoded-audio signal checks cannot certify perception.
 
 Pass `qualification run-label --capture` to the browser driver to exercise the actual AudioWorklet and end-of-turn logic. The ordinary mode starts at submission and understates conversational latency. CPU ASR tuning reduced recognition median from 448ms to 407ms in the capture comparison; dialogue variability and video generation still dominate the target miss. The 650ms speech boundary remains unchanged.
+
+Shortened Whisper encoder input and Smart Turn v3.2 are isolated experiments, not active runtime settings. LOCAL_POC records accuracy failures and the remaining candidate; do not replace the 30-second padded ASR or speech boundary solely from their compute timings.
 
 ## Next hosted experiment
 
