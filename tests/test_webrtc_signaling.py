@@ -103,6 +103,30 @@ class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
         session.idle_frame = lambda seconds, last: far
         self.assertTrue(((await picture.recv()).to_ndarray(format='bgr24') == near).all())
 
+    async def test_rtc_position_tracks_sent_frames_not_queued_generation(self):
+        from scripts.serve_webrtc_benchmark import PlaybackSession, Picture
+        import numpy as np
+        from scipy.io import wavfile
+        with tempfile.TemporaryDirectory() as folder:
+            audio = Path(folder)/'speech.wav'
+            wavfile.write(audio, 24000, np.zeros(2400, dtype=np.int16))
+            frame = np.zeros((32,32,3), dtype=np.uint8)
+            session = PlaybackSession(None, [frame], [], Path(folder))
+            session.receiver_ready = True
+            self.assertIsNone(session.playback_position())
+            with session.output('job', 3, audio, threading.Event()) as sink:
+                for index in range(4):
+                    sink(frame, index, 20)
+            picture = Picture(session)
+            await picture.recv()
+            self.assertEqual(session.playback_position(), {'id':'job','playback':{'index':3,'time_s':0}})
+            await picture.recv()
+            self.assertEqual(session.playback_position()['playback']['time_s'], .05)
+            self.assertEqual(session.clip['queue'].qsize(), 2)
+            session.cancel.set()
+            await picture.recv()
+            self.assertEqual(session.playback_position()['playback']['time_s'], .05)
+
     async def test_frame_underflow_pauses_audio_clock(self):
         try:
             from scripts.serve_webrtc_benchmark import Picture, Speech

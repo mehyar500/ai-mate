@@ -24,6 +24,7 @@ class PlaybackSession:
         self.renderer, self.idle, self.fixtures, self.folder = renderer, idle, fixtures, folder
         self.benchmark = benchmark
         self.sequence = 0
+        self.last_sent_position = None
         self.idle_frame = None
         self.clock_start = None
         self.clip = None
@@ -101,6 +102,8 @@ class PlaybackSession:
                 raise RuntimeError('RTC receiver unavailable or experiment limit reached.')
             row, sink = self.prepare_output(index, {'case': 'engine', 'wav': audio_path}, event)
             row['worker'] = threading.current_thread()
+            row['job_id'] = key
+            row['chunk_index'] = index
         try:
             yield sink
         except BaseException:
@@ -108,6 +111,11 @@ class PlaybackSession:
             raise
         finally:
             row['producer_done'] = True
+
+    def playback_position(self):
+        """Last frame handed to RTP, not a browser presentation acknowledgement."""
+        position = self.last_sent_position
+        return {'id': position[0], 'playback': {'index': position[1], 'time_s': position[2]/20}} if position else None
 
     def safe_rows(self):
         omit = {'queue', 'pcm', 'worker', 'started', 'event'}
@@ -132,6 +140,8 @@ class Picture(VideoStreamTrack):
                     clip['start_s'] = seconds
                     clip['first_frame_sent_s'] = time.perf_counter()-clip['started']
                 self.last = picture
+                if clip.get('job_id') is not None:
+                    self.session.last_sent_position = (clip['job_id'], clip['chunk_index'], index)
             except queue.Empty:
                 if clip['producer_done']:
                     clip['finished'] = True
