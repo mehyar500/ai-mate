@@ -19806,5 +19806,374 @@
       "Reliable arbitrary motion",
       "Public deployment and intended-content eligibility"
     ]
+  },
+  "six_source_soak_and_body_review_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "a8b90a15bbd783819edf57852cddaa4aec2d718d",
+    "change": "Qualify the current six-source near-wave renderer for 30 minutes; add pinned offline body diagnostics and consolidate the five core documents. No live inference or UI source change in this revision.",
+    "risk_class": "R1 offline diagnostics; R0 documentation. No public deployment, credentials, billing, account-boundary or private-memory changes.",
+    "commands": [
+      {
+        "command": ".venv/Scripts/python.exe scripts/serve_voice_video_benchmark.py --trial soak --label near-wave --performance-label near-wave --near-wave --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda",
+        "exit": 0
+      },
+      {
+        "command": "node scripts/qualify_video_call.cjs soak near-wave --capture",
+        "exit": 0
+      },
+      {
+        "command": ".venv/Scripts/python.exe scripts/review_call_frames.py --trial soak --label near-wave",
+        "exit": 0
+      },
+      {
+        "command": ".venv/Scripts/python.exe scripts/build_call_review.py --trial soak --label near-wave",
+        "exit": 0
+      },
+      {
+        "command": ".venv/Scripts/python.exe scripts/review_lip_sync.py --source voice-video-soak-near-wave --label near-wave-soak --device cuda",
+        "exit": 0
+      },
+      {
+        "command": ".venv/Scripts/python.exe scripts/download_body_evaluator.py",
+        "exit": 0
+      },
+      {
+        "command": ".venv/Scripts/python.exe scripts/review_body_motion.py --source voice-video-qualification-near-wave --label near-wave",
+        "exit": 0
+      },
+      {
+        "command": ".venv/Scripts/python.exe scripts/review_body_motion.py --source voice-video-soak-near-wave --label near-wave-soak",
+        "exit": 0
+      }
+    ],
+    "negative_admission": {
+      "command": "Body evaluator with --label guard-live while port 8766 was active",
+      "exit": 2,
+      "outcome": "Expected refusal; no output directory created."
+    },
+    "call_summary": {
+      "elapsed_s": 1800.031,
+      "turns": 132,
+      "startup_buffer_ms": 350,
+      "stopped_early_for_failures": false,
+      "soak_duration_met": true,
+      "runtime_app_sha256": "b3f376a7713b28d5e6a8c6f0b8ae22d0ae026ebe23f2f8101c724482c27e6896",
+      "buffer_override": false,
+      "frame_probe_sha256": "49603575ca87d61447c7e3200435e21537060f018564cd0f730776d1d63c7750",
+      "failures": [],
+      "response_sample_count": 126,
+      "p50_s": 1.37,
+      "p95_s": 1.86,
+      "playback": {
+        "frames": {
+          "video": {
+            "callbacks": 5446,
+            "intervalSamples": 5182,
+            "continuousIntervalMs": 260012.98199999792,
+            "continuousPresentedFrames": 5182,
+            "longGaps": 0,
+            "maxGapMs": 83.5,
+            "intervalHistogramMs": {
+              "15": 9,
+              "35": 1115,
+              "50": 2874,
+              "65": 1179,
+              "85": 5
+            },
+            "gapSamples": [],
+            "resets": {
+              "emptied": 138,
+              "loadstart": 132,
+              "element_visibility": 264,
+              "pause": 126
+            },
+            "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+          },
+          "idle-video": {
+            "callbacks": 32706,
+            "intervalSamples": 32308,
+            "continuousIntervalMs": 1342302.8740000003,
+            "continuousPresentedFrames": 32308,
+            "longGaps": 0,
+            "maxGapMs": 66.80000000004657,
+            "intervalHistogramMs": {
+              "15": 7255,
+              "35": 2424,
+              "50": 22078,
+              "65": 551
+            },
+            "gapSamples": [],
+            "resets": {
+              "element_visibility": 252,
+              "pause": 126,
+              "seeking": 247,
+              "emptied": 24,
+              "loadstart": 24
+            },
+            "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 4003,
+          "p50": 8.599999999999996,
+          "p95": 24.106000000000183,
+          "max": 34.61900000000018
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 60,
+        "p50": 1.5635333333363524,
+        "p95": 2.529633333345293
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+    },
+    "spoken_latency": {
+      "samples": 60,
+      "median_midpoint": 1.7732333333318624,
+      "p50_nearest_rank": 1.5635333333363524,
+      "p95_nearest_rank": 2.529633333345293
+    },
+    "spoken_latency_by_route": {
+      "direct_command": {
+        "samples": 30,
+        "median_midpoint": 1.516416666666686,
+        "p50_nearest_rank": 1.5132666666606673,
+        "p95_nearest_rank": 1.562633333345293
+      },
+      "model": {
+        "samples": 30,
+        "median_midpoint": 2.2155500000044706,
+        "p50_nearest_rank": 2.2109000000059607,
+        "p95_nearest_rank": 2.571433333342429
+      }
+    },
+    "cycle_speech_medians_midpoint_s": [
+      1.7666333333303434,
+      1.797783333336294,
+      1.8241166666696662,
+      1.7788666666697246,
+      1.7729166666592937,
+      1.8754666666712148
+    ],
+    "decision_counts": {
+      "model": 78,
+      "direct_command": 54
+    },
+    "observed_fps": {
+      "video": 19.92977412181689,
+      "idle-video": 24.069083532335483
+    },
+    "frame_review": {
+      "path": "generated/local-app/audit/voice-video-soak-near-wave/frame-review.json",
+      "sha256": "961550424991020c60a7b6702028efb0dbdc43d927e417971697f789ea55398d",
+      "clips": 132,
+      "frames": 5716,
+      "flagged_frames": 6,
+      "min_audio_rms": 0.07177421450614929,
+      "max_audio_peak": 0.710296630859375,
+      "max_clipped_fraction": 0.0
+    },
+    "lip_sync": {
+      "path": "generated/local-app/audit/lip-sync-near-wave-soak/results.json",
+      "sha256": "fd38bdbc99b428130a24e6a8fd470e858339e178d06cd53b458604edeb34232e",
+      "complete": true,
+      "clips": [
+        {
+          "case": "description",
+          "cycle": 1,
+          "audio_delay_ms": 0,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true
+        },
+        {
+          "case": "unsupported",
+          "cycle": 1,
+          "audio_delay_ms": -40,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true
+        },
+        {
+          "case": "conversation",
+          "cycle": 1,
+          "audio_delay_ms": -40,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true
+        },
+        {
+          "case": "description",
+          "cycle": 6,
+          "audio_delay_ms": 0,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true
+        },
+        {
+          "case": "unsupported",
+          "cycle": 6,
+          "audio_delay_ms": -40,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true
+        },
+        {
+          "case": "conversation",
+          "cycle": 6,
+          "audio_delay_ms": -40,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true
+        }
+      ],
+      "physical_or_perceptual_acceptance": false
+    },
+    "body_diagnostics": {
+      "near-wave": {
+        "result_path": "generated/local-app/audit/body-near-wave/results.json",
+        "result_sha256": "60659605ffb96668d83ef422cf12d174bcaf6c68b946215ce0605603dfab487a",
+        "complete": true,
+        "clips": 22,
+        "frames": 948,
+        "flagged_frames": 16,
+        "flags": {
+          "person_count": 15,
+          "projected_limb_length_jump": 1
+        },
+        "controls": {
+          "black_frame_flags": [
+            "person_count"
+          ],
+          "black_frame_detected": true,
+          "mirror_control": {
+            "observed": {
+              "left": true,
+              "right": false
+            },
+            "left_right_swap_detected": true,
+            "case": "near_wave",
+            "frame": 19,
+            "scope": "Geometric flip sensitivity; not anatomical ground truth."
+          }
+        },
+        "elapsed_s": 57.82918790000258,
+        "evaluator_manifest_sha256": "b3a2f67f5b6b960a6ff8efd6967f8d1d140d20da2907b3cfe2010d0b1b6e3f39",
+        "script_sha256": "1a9953e1236b3b0c28dfb012a3f838356ddc591b234203f85e6f370047eddc03",
+        "manual_review": {
+          "frames_inspected": 19,
+          "scope": "All 16 body flags plus three near-wave context frames inspected on flag-context-000.jpg. Single visible figure on person-count flags; blurred lowering hand. No physical audio or normal-speed acceptance.",
+          "sheet_sha256": "da08a76d8213f456330ee27d96bd0ddeff35a6d4dfc6f8ad6ea2516bd0476570"
+        }
+      },
+      "near-wave-soak": {
+        "result_path": "generated/local-app/audit/body-near-wave-soak/results.json",
+        "result_sha256": "924ed552c0d9de337e61ced583666a194c9abb2841f72dddf27a1b3592095c70",
+        "complete": true,
+        "clips": 132,
+        "frames": 5716,
+        "flagged_frames": 96,
+        "flags": {
+          "person_count": 90,
+          "projected_limb_length_jump": 6
+        },
+        "controls": {
+          "black_frame_flags": [
+            "person_count"
+          ],
+          "black_frame_detected": true,
+          "mirror_control": {
+            "observed": {
+              "left": true,
+              "right": false
+            },
+            "left_right_swap_detected": true,
+            "case": "near_wave",
+            "frame": 19,
+            "scope": "Geometric flip sensitivity; not anatomical ground truth."
+          }
+        },
+        "elapsed_s": 253.48840659999405,
+        "evaluator_manifest_sha256": "b3a2f67f5b6b960a6ff8efd6967f8d1d140d20da2907b3cfe2010d0b1b6e3f39",
+        "script_sha256": "1a9953e1236b3b0c28dfb012a3f838356ddc591b234203f85e6f370047eddc03",
+        "manual_review": {
+          "reviewer": "Codex visual inspection of decoded frame contact sheets",
+          "frames_inspected": 114,
+          "selection_file": "manual-selection.json",
+          "sheets_sha256": {
+            "flag-context-000.jpg": "f4ed96b878f860b0288dc2edb488d0a9b7d5a5dda1a94f0e8565f5f1133dd81c",
+            "flag-context-020.jpg": "bf2bf9c03b2da28c61ad1861953c278fbaa0385124a61ba308cf8b9f56c91d5f",
+            "flag-context-040.jpg": "4ffba7f2e6edfeb673ddfaddee983882615d4bba76ffcb26d377d5f2a43a3285",
+            "flag-context-060.jpg": "6f41e715fa3cc5c5010f61ca2f7c617549bd6004975f9555183680802135ff3d",
+            "flag-context-080.jpg": "50e6c6bdf7c0d365ff1f06451c554c3106467c8100dcb49be529316cb7320d32",
+            "flag-context-100.jpg": "deb7d5e900be4afc4f61717e273bd4d92778971660c5198bc5bdd0beebe151fa"
+          },
+          "observations": [
+            "All 96 body diagnostic flags and six face flags were inspected, plus 12 adjacent lowering-hand frames.",
+            "The 90 person-count flags show one visible character rather than a visibly duplicated person. Detector ambiguity is retained.",
+            "The six projected-limb changes occur while the right hand lowers; hand/finger blur remains.",
+            "Palm false-face detections recur in the same six near-wave frames.",
+            "Soft mouth detail and unnatural transition/gesture quality remain unresolved."
+          ],
+          "normal_speed_acceptance": false,
+          "physical_audio_test": false,
+          "anatomical_certification": false
+        }
+      }
+    },
+    "gpu_memory": {
+      "scope": "Whole-GPU used/free memory sampled every five seconds, including other processes; not an exact peak or per-worker allocation.",
+      "max_sampled_used_mib": 7306.5,
+      "min_sampled_free_mib": 9073.0,
+      "samples": 360
+    },
+    "preview": {
+      "url": "http://127.0.0.1:8765/",
+      "ready": true,
+      "busy": false,
+      "errors": false,
+      "unchanged_startup_s": 30.883,
+      "private_memory_unchanged_since_asset_promotion": true,
+      "restarted_this_revision": false
+    },
+    "review_ui": {
+      "url": "http://127.0.0.1:8772/review.html",
+      "retained_clips": 132,
+      "selected": "Cycle 6 near_wave",
+      "page_loaded_and_selection_checked": true,
+      "normal_speed_acceptance": false,
+      "physical_audio_test": false
+    },
+    "documentation": {
+      "core_documents": 5,
+      "local_runbook_lines_before": 774,
+      "local_runbook_lines_after": 207,
+      "historical_sections_preserved": 60
+    },
+    "checks": {
+      "python_unit_tests": 192,
+      "javascript_tests": 32,
+      "independent_review": "Pending before public release",
+      "staging": "Not provisioned",
+      "python_unit_command": ".venv/Scripts/python.exe -m unittest discover -s tests -v",
+      "javascript_command": "node --test tests/media-sync.test.mjs tests/microphone.test.mjs tests/call-input.test.mjs tests/playback-probe.test.cjs",
+      "syntax_commands": [
+        ".venv/Scripts/python.exe -m compileall -q local_app scripts tests",
+        "node --check local_app/web/app.js"
+      ],
+      "syntax_exit": 0,
+      "git_diff_check_exit": 0,
+      "core_document_local_links_missing": 0
+    },
+    "new_spending": {
+      "new_purchases_or_rentals_usd": 0,
+      "body_evaluator_download_bytes": 17732340,
+      "hosted_dialogue": "Existing bounded Cloudflare allowance. This experiment does not provide an itemized provider charge."
+    },
+    "rollback": "Revert the commit to remove offline diagnostics/docs changes. Runtime assets, private memory and selected backends are unchanged.",
+    "remaining": [
+      "Speech-end p95 2.53s exceeds 2s; spoken model replies are slower than prepared movement, with reply-length differences included.",
+      "Visible reply cadence approximately 19.93 FPS, not a demonstrated strict >=20/25 FPS guarantee.",
+      "Body detector ambiguity, blurred hands, soft mouths, seams, repeated footage and arbitrary fresh movement remain.",
+      "Physical audio, normal-speed perceptual acceptance, real mobile and public-network calling remain unqualified.",
+      "Commercial model/host/processor eligibility, public access controls and independent security/correctness review remain separate."
+    ]
   }
 }

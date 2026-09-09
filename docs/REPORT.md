@@ -2,27 +2,29 @@
 
 Build on the existing code and deliver a PWA. The immediate goal is a convincing video call with consistent appearance, natural speech, responsive movement and low latency. The intended commercial audience is verified adults, including nudity where lawful and permitted. The running demonstration is neutral; public eligibility is unresolved.
 
-## What works
+## Current measured demo
 
-The existing RTX 4060 Ti 16GB / 48GB RAM PC runs Text, Voice and Video through one engine. Calls accept speech or compact typed commands, preserve local memory, and can send an in-app message without ending the call. The character occupies the call view; prepared full-body and closer footage maintains position across conversation and interruption.
+The RTX 4060 Ti 16GB / 48GB RAM PC runs Text, Voice and Video through one engine. Calls accept speech or compact typed commands, preserve local memory and can send an in-app message without ending the call. Reviewed full-body and closer footage preserves position through conversation, approach/return and interruption. Both known poses now have a separate right-hand wave; arbitrary fresh movement remains unsolved.
 
-Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` plans replies. Whisper Base English and Kokoro `af_sarah` now use the local GPU; MuseTalk uses the selected TensorRT decoder. GPU speech releases unused allocator memory between replies. No new API key or GPU rental was needed.
+Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` plans conversation. Whisper Base English and Kokoro `af_sarah` use the local GPU; MuseTalk uses the reviewed TensorRT decoder. No new API key or GPU rental was needed.
 
-The revised GPU-speech configuration completed **30 minutes / 120 commands** without failed commands, page errors or reported reply-buffer stalls. Speech-end latency was **2.04s median / 2.50s p95** across 54 replies; the two-second p95 target remains unmet. This replaces an earlier failed GPU soak, whose three allocation errors remain documented.
+The current six-source configuration completed **30 minutes / 132 commands**. There were no failed commands, page errors or reported reply-buffer stalls. The call remained connected; cycle speech medians stayed between 1.77 and 1.88 seconds.
 
-All **120 clips / 5,945 frames** received limited diagnostics. Visual inspection sampled 120 frames from first/final-cycle clips; hand blur and soft close-up detail remain. Six lip-sync diagnostics passed their controls at estimated offsets of 0–80ms. Browser A/V clock skew was 26ms p95. These checks do not prove physical audibility, natural anatomy or human-perceived lip sync; the older idle callback counter cannot reliably classify pauses.
+| Current sustained test | Measured result |
+|---|---|
+| Speech end to synchronized playback | **1.77s median / 2.53s p95**, 60 noninterrupted spoken replies; target p95 <=2s remains unmet |
+| Spoken prepared movement | 1.52s median / 1.56s p95, 30 replies |
+| Spoken model-planned conversation | 2.22s median / 2.57s p95, 30 replies |
+| Visible playback | Approximately 19.93 FPS replies / 24.07 FPS listening; no continuous gap >250ms |
+| Browser A/V clock skew | 24.11ms p95 / 34.62ms maximum, 4,003 samples |
+| Offline lip-sync diagnostic | Six first/final-cycle clips estimated 0 or -40ms; injected-delay and reversed-audio controls passed |
+| GPU memory | 7,306.5MiB highest sampled whole-GPU usage, 360 samples; includes other processes and is not an exact peak |
 
-The preview now uses a **two-second wave**, removing about two seconds of nearly still footage after the gesture. Its separate 20-command qualification passed; all 829 frames received diagnostics and the complete 40-frame rendered wave was visually reviewed. The 30-minute result used the previous wave, so the revised asset has short-call evidence only. Restart completed in 29.48s with saved conversation unchanged.
+All **132 clips / 5,716 frames** received face, brightness, frame-change and decoded-audio diagnostics. Six palm/face-count flags remain. Every WAV was nonzero and unclipped. This is synthetic browser capture on localhost, excluding physical acoustics, public networks and real mobile devices. The table uses the midpoint median; raw browser JSON also retains its nearest-rank p50 of 1.56s.
 
-An isolated H.264/Opus WebRTC experiment did not establish a whole-call speed improvement over the existing fragmented-video player. Public-network transport remains unqualified.
+A new pinned, offline body diagnostic evaluated all 5,716 sustained-call frames and all 948 frames of the prior short qualification. It retained 96 and 16 uncertain frames respectively. All flags and nearby hand frames were visually inspected: 114 sustained-call frames and 19 short-call frames. One figure remains visible where the detector reports two people; the lowering hand remains blurred. Black-frame and left/right-mirror controls passed. Its fixed skeleton cannot certify anatomy or count extra limbs.
 
-The latest three short calls passed **60/60 commands**. Recognition warm-up reduced its component median from 136ms to 103–118ms, but whole-call p95 varied from 2.13 to 2.56s. It remains disabled: the apparent first-run gain did not hold reliably. The corrected playback probe observed approximately 19.97 FPS for replies and 24.16 FPS for listening, with no continuous gap over 250ms in the final short call.
-
-Six paused-speech cases also passed. All **2,877 new frames** received limited diagnostics; 80 were visually inspected, with blurred fingers and soft mouth detail still visible. The preview is ready after restart, with private memory unchanged.
-
-The preview also supports a separate **close-view wave** without fresh generation or losing the near pose. Its expanded call passed **22/22 commands**, with **1.56s median / 2.28s p95** from speech end. The wave itself responded in 1.42s. All 948 frames received diagnostics; the complete wave, following speech and return (137 frames) were visually inspected. A palm false detection is retained in the evidence and resolved by continuity tracking. Blurred fingers, a small transition seam and soft mouth detail remain. The six-source configuration still needs its own 30-minute qualification.
-
-**186 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) contains exact model settings, comparisons, retained review pages and reproduction commands. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
+**192 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) is the consolidated setup/test runbook; machine evidence preserves earlier successes and failures. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
 
 ## What is still missing
 
@@ -50,9 +52,5 @@ The optional technical pilot is approximately **$28.93 / $14.23 / $14.23** over 
 Under explicit cost/fee assumptions, test video packs at **$5.99/30 minutes** and **$9.99/60 minutes**, targeting roughly 52–53% contribution before fixed expenses. Validate willingness to pay and actual fulfillment costs; no guaranteed first-month profit.
 
 CCBill is the first adult-business processor to request a quote from. Its published US/Canada annual card registration alone totals **$1,950**; actual AI-service acceptance, processing fees, reserves and payout timing require underwriting. No verified zero-upfront paid launch exists in this plan. Segpay is an alternative with specific AI-site requirements. [ECONOMICS](ECONOMICS.md) provides sources, formulas, utilization sensitivity and limits.
-
-The latest bounded Cloudflare comparison found Gemini 3.5 Flash-Lite slower than Qwen: **0.93s versus 0.58s median**, with eight correct fixture responses each. Combined nominal usage cost was about **$0.00460**, before credit-purchase fees. Qwen remains selected. This tests neutral dialogue only; provider terms and intended-content eligibility remain separate.
-
-Shortened Whisper encoder input, early planning during pauses and a 150ms playback buffer remain unselected after accuracy, timing or playback regressions. Preserve the standard encoder window and 350ms startup-buffer threshold. LOCAL_POC retains the comparisons.
 
 Next: reduce endpoint/dialogue/speech delay, improve close-view quality, test actual audio/mobile behavior and compare the same workload on the capped rental if the founder elects to provision it. Keep five core documents. Founder owns provider/processor/jurisdiction decisions; independent security/correctness review and staging remain pending before public release. Work on main as authorized and preserve secrets and local memory.

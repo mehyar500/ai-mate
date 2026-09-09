@@ -1,7 +1,7 @@
 """Synthetic call suites through real ASR, hosted planning, speech and video.
 
 Uses only a new disposable directory and localhost:8766. Existing Cloudflare
-credentials are used for one warm-up and up to 120 bounded scripted turns;
+credentials are used for one warm-up and up to 132 bounded scripted turns;
 no private conversation is read. Drivers supply only the fixed fixtures.
 """
 import argparse

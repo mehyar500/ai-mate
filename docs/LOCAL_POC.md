@@ -1,725 +1,174 @@
-# Local companion demo
+# Local companion runbook
 
-Updated September 9, 2026. One private, non-explicit companion on the founder's RTX 4060 Ti **16GB VRAM / 48GB RAM**. Text, Voice call and Video call share memory. The current result combines reviewed photographic movement with newly generated speech and lip movement. It is not unrestricted live video generation or a released native app.
+Updated September 9, 2026. This is a private, neutral demonstration on the founder's RTX 4060 Ti **16GB VRAM / 48GB RAM / i9**. It combines prepared photographic movement with newly generated speech and lips. Arbitrary realistic live movement, public access and intended adult-service eligibility remain unqualified.
 
-## Run and try it
+[REPORT](REPORT.md) owns current results and decisions; [BUILD](BUILD.md) owns the processing flow and exact active models; [ECONOMICS](ECONOMICS.md) owns prices; [USA](USA.md) owns commercial eligibility. This runbook covers operation, reproduction and retained experiments. Historical detail remains in [machine evidence](research/local-poc-benchmarks.json), ignored local audit media and Git history through `a8b90a1`.
 
-On this configured PC:
+## Start and use the configured preview
 
 ```powershell
 .\scripts\start_local.ps1 -Background
-# Needed for fresh, experimental movements and offline preparation:
+```
+
+Open **http://127.0.0.1:8765** and wait for readiness. The process and PC must remain running. The launcher avoids duplicates and writes logs/process information under `.cache/local-poc/`; it is not a public URL or Windows startup service. A fresh checkout does not contain the private generated demonstration assets.
+
+Select Call Mira, Voice or Video to request microphone access. Video keeps the character prominent and has mute, interrupt and end controls. The keyboard icon opens optional compact text input: Enter sends, Shift+Enter adds a line, Escape closes it. Typing also works with microphone permission denied. Text retains its separate draft while an ongoing call stays connected; Return to call restores it. Ending the call releases microphone capture. Camera access is disabled.
+
+Try **“Come closer” → “Wave hello” → “What is my dog's name?” → “Step back.”** Supply the dog's name first. Both known poses have matching listening footage and right-hand waves. Unsupported movement must be acknowledged honestly. An interrupted movement holds the displayed pose; unknown positions cannot use a prepared wave. Repeating a gesture reuses footage rather than generating a unique body performance.
+
+Memory & settings contains editable notes/facts, optional call captions, Test sound and diagnostics. Mira knows only what was shared. Removing a fact does not remove it from recent exchanges; Clear all removes both. **Preserve `generated/local-app/memory.sqlite3` during updates.** Never use that database as benchmark input.
+
+The layout passed five Chromium sizes from 320x568 to 1280x720. Full-body footage keeps its head and feet in tall layouts; wide gestures may cross the phone crop. Buttons have 44px touch targets. Real iPhone/Android PWA, VoiceOver, physical speakers/microphone and acoustic echo remain unverified.
+
+## Runtime and recovery
+
+Exact weights, revisions and dependency versions are pinned in [local-models.json](../config/local-models.json), [local-assets.json](../config/local-assets.json) and [local-poc-requirements.txt](../config/local-poc-requirements.txt). BUILD lists every active pipeline model. The selected PC settings are:
+
+| Setting | This PC | Portable recovery |
+|---|---|---|
+| Dialogue | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Explicit alternative provider only |
+| `AI_MATE_ASR_DEVICE` | `cuda`: Whisper Base English FP16, eight threads | `cpu`: same weights, int8 |
+| `AI_MATE_TTS_DEVICE` | `cuda`: Kokoro-82M ONNX v1.0, `af_sarah`, eight host threads | `cpu` |
+| `AI_MATE_VISUAL_DECODER` | `tensorrt`: reviewed local FP16 engine | `torch` |
+| `AI_MATE_ASR_PAUSE_WARM` | `0` | Leave disabled |
+
+Use [.env.example](../.env.example) for implemented fields. Cloudflare accepts the existing global API key plus email; both take precedence over the alternative token. Only Cloudflare credential fields are read from `AI_MATE_ENV_FILE`; process overrides win. MiniMax requires its process environment key. Never print credentials or copy the founder's broad environment file to a remote worker.
+
+CUDA speech uses ONNX Runtime **1.26.0** in `.cache/ort-gpu-deps`, with existing Torch CUDA 12.8/cuDNN 9 libraries. Unused speech arena memory is released after inference. The 2GiB arena setting is not a total VRAM cap. Runtime version/location and actual GPU provider are checked; mismatches fail explicitly. Revert the corresponding setting and restart between calls. No automatic model/provider fallback masks a failed selection.
+
+The TensorRT decoder uses the same SD VAE predictions, batch eight. `.cache/local-poc/musetalk-vae-trt/{decoder.engine,build.json}` must match reviewed engine/source hashes, GPU, Torch and TensorRT versions. Rebuild/requalify on another GPU; do not assume Windows engine portability. A failed visual warm-up leaves text/voice available.
+
+Current render settings: **384x576, 20 FPS**, 256x256 face region, face shift **-0.05**, six Whisper context steps, face-appearance encode stride two. FFmpeg uses CPU libx264 because this PC's installed NVENC/driver combination is incompatible. The client consumes 200ms fMP4 fragments after at least 350ms is buffered. A separate WAV follows the video clock and pauses during stalls; the video's embedded audio is muted. Unsupported MSE waits for the finished file; autoplay rejection exposes Play reply. A/V clock checks do not prove physical audibility.
+
+Microphone capture keeps the **650ms endpoint pause**. Speech resumed before playback cancels/recombines an unfinished spoken turn, capped at 30 seconds. It never combines typed replacements, different devices/calls or already-playing replies. Playback interruption depends on reported echo cancellation and retains the observed video timestamp. End/mute clears temporary recording buffers.
+
+## Prepare graphics separately from calls
+
+Heavy image/video preparation must run while call inference is idle. ComfyUI is a separate installation, pinned to `00d34d92fe0afbfbab3893ebbab2d5d70f5e9882`, in `.cache/local-poc/ComfyUI` with `.cache/comfy-env`. Its launcher disables custom/API nodes, reserves 4GB VRAM and binds only to loopback 8188:
+
+```powershell
 .\scripts\start_motion.ps1 -Background -FastFP8
 ```
 
-Open **http://127.0.0.1:8765** and wait for model warm-up. Background launch avoids duplicate servers; logs and process information stay in ignored `.cache/local-poc/`. The PC and process must stay running. This is a loopback URL, not a public deployment or Windows startup service.
+LTX-2.3 22B distilled FP8 and its Gemma-3-12B mixed-FP4 encoder require about **39GB of weights**, beyond other caches/environments. [The downloader](../scripts/download_ltx23_benchmark.py) pins sizes/hashes and requires 45GB free workspace disk. Prompt encoding runs on CPU; diffusion offloads on 16GB. The smaller experimental LTX-Video 2B/T5 path has a [separate pinned downloader](../scripts/download_ltx_motion.py). Downloading a model does not select it or establish commercial permission.
 
-In Video call, try **“Come closer.” → “Wave hello.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns after intervening conversation. Each pose has a blinking listening loop and its own prepared right-hand wave. These prepared movements are disclosed in Memory & settings. A wave from unknown positions still uses experimental generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
+Prepared assets in `generated/local-app/`:
 
-Select Call Mira (phone icon on wider screens), or Voice/Video to start microphone input. Calls have mute/end icons and automatic sound. The keyboard icon opens an optional compact transparent input: Enter sends a command to the current voice/video call, Shift+Enter adds a line, and Escape hides it. Typed commands also work with the microphone muted or denied; sending during a reply stops it before submitting. Text has a separate draft and shows messages without ending an active call; Return to call restores the same media elements. “Send me a message saying hello from our call” delivers a separate in-app message with an unread badge. End call releases capture and stops playback. Memory & settings contains facts, notes, diagnostics, the prepared-footage disclosure and Test sound. Camera access is disabled.
-
-The video fills the height when controls fit in the side space. Tall phone views trim side background without cropping the top/bottom of full-body footage; very wide gestures may extend outside that phone crop. Compact tabs and controls replace the technical overlays. Buttons have at least 44px touch targets; optional call captions are in settings and last for the current page session. At 716x854, the stage increased from 544px to 854px tall (57%). Five Chromium layouts from 320x568 to 1280x720 passed overflow/control-overlap checks. Synthetic calls passed microphone-denial handling, caption visibility across Text/call navigation, unmuted audio completion and ending the call. These checks do not qualify physical audio, VoiceOver or Safari.
-
-## Models actually used
-
-| Component | Selection | Where and when |
-|---|---|---|
-| Conversation / bounded plan | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Hosted JSON response; exact simple body commands bypass the network |
-| Speech | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CUDA on this PC, eight host threads; new WAV per reply. CPU portable default |
-| Recognition | faster-whisper Base English FP16 on this PC | Optional local GPU; eight host threads. CPU int8 is the portable default |
-| Lip movement | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio encoder | Local GPU FP16; batch eight; 20 FPS output |
-| Face tracking | OpenCV YuNet 2023mar | CPU; tracks supplied body footage |
-| Reviewed movement / listening preparation | LTX-2.3-22B distilled FP8 with Gemma-3-12B mixed FP4 text encoder | Offline native ComfyUI graph; prompt encoder on CPU, diffusion offload on 16GB |
-| Experimental new movement | LTX-Video 2B 0.9.8 distilled FP8 + T5-XXL FP8 | Local ComfyUI, eight steps; not reliable arbitrary motion |
-| Reference image preparation | FLUX.2 Klein 4B | Separate GPU process; review still images before generating video |
-| Delivery | FFmpeg libx264/AAC, fragmented MP4 plus synchronized WAV | CPU encoder; installed FFmpeg/NVENC driver pair is incompatible |
-| Offline lip-sync evaluation | SyncNet v2 + python_speech_features 0.6 | Isolated diagnostic cache; never loaded by the call server |
-
-Pins: [models](../config/local-models.json), [assets](../config/local-assets.json), [Python dependencies](../config/local-poc-requirements.txt), [LTX-2B downloader](../scripts/download_ltx_motion.py), [LTX-2.3 downloader and SHA-256](../scripts/download_ltx23_benchmark.py). ComfyUI is pinned to `00d34d92fe0afbfbab3893ebbab2d5d70f5e9882`, with custom/API nodes disabled and 4GB VRAM reserved. The isolated environment is `.cache/comfy-env`; motion API is loopback port 8188. Do not expose this unauthenticated development service.
-
-Open weights do not automatically establish commercial rights. MuseTalk's model grant, dependency licenses, LTX's community license/use policy, voice and reference-image provenance each matter. [BUILD](BUILD.md) defines the current architecture; comparisons are recorded below and [USA](USA.md) contains source-based release conditions. No public or adult deployment is approved.
-
-## Central flow and visual continuity
-
-`local_app/engine.py` owns all modalities, job cancellation, pose state and memory:
-
-```text
-typed input / opt-in mic -> local ASR if needed
-    -> direct supported command OR Cloudflare conversation plan
-    -> calls: short speech phrases; prepare one TTS phrase ahead
-    -> Text: text only; Voice call: new Kokoro speech
-    -> Video call:
-         base + closer -> reviewed approach -> near
-         near + farther -> reviewed reverse -> base
-         base + wave -> reviewed right-hand gesture -> base
-         near + wave -> matching reviewed right-hand gesture -> near
-         conversation at base/near -> corresponding listening footage
-         other supported action -> experimental LTX-2B generation
-       -> requested action once, then continue the destination pose/loop phase
-       -> track face -> new MuseTalk lips -> one fMP4/WAV stream per phrase
-    -> successful server completion: conversation, facts, message and generated pose
-    -> completed browser playback: switch to the matching listening loop
-```
-
-Scene changes require a current visual request. Talking about a garden does not reset a close view to the garden portrait. The planner receives the trusted current pose; it cannot execute code, paths, URLs or shell commands.
-
-Prepared assets must have an explicit local review flag and matching reference/video hashes. Fixed files: `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png`, optional `performance-wave.json/.mp4` and `performance-near-wave.json/.mp4`, plus `idle-fullbody.json/.mp4` and `idle-near.json/.mp4`. Near waves also require `pose: near`. They are private generated artifacts, not in Git. Preparation scripts default to unreviewed. Missing/changed/unreviewed assets fall back to the experimental renderer or held portrait; a fresh checkout does not contain the demonstration clips.
-
-Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Ambient reply video now ends with speech instead of forcing a whole idle-loop duration; deliberate approach/return clips still finish their movement. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for six short reviewed clips. User speech and generated mouth frames are not cached there.
-
-Successful fresh video captures its final decoded frame as the next reference. Unknown positions disable known-pose loops. The older one-shot reverse cache remains only for an unprepared approach followed immediately by a return. Cancelled generation cannot commit its endpoint. Interrupt reports the displayed frame timestamp; the engine separately preserves that observed pose. Restart clears transient pose/return files and starts at the base pose while preserving conversation. Voice now triggers this interruption flow when echo cancellation is reported; actual acoustic behavior and playback recovery after browser closure remain open.
-
-## Measured results and failures
-
-### Close-view wave — September 9
-
-The preview now has a separate **2.125s close-view wave**, so waving after an approach preserves the near position through the following reply and return. Preparation used the same LTX-2.3 model, near reference, 73 frames at 384x576/24 FPS, seed 85 and return-to-reference guidance. Three local generations took 146.3/24.4/136.9s; the latter two used the wrong hand. The selected clip trims stationary tail footage without speeding up motion. All 73 source and 51 prepared frames were visually inspected. Fingers blur; the endpoint seam remains visible. This is limited neutral demo acceptance.
-
-YuNet mistook a palm for a second face. Sequential tracking now resolves only an unambiguous overlapping face in reviewed clips; all **493 frames across six sources** produced valid face crops. Raw flags remain visible: prepared frame 33 and rendered wave frame 28. Fresh-generation checks are unchanged. BUILD describes tracking and telemetry; a failed optional near manifest leaves other prepared movements available.
-
-The expanded suite passed **22/22 commands** in 106.3s, including the close wave, memory reply and return. Ten spoken replies measured **1.556s median / 2.277s p95** from speech end; 21 mixed submissions measured **1.20/1.60s** from Send. The close wave itself took **1.422s from speech end / 0.76s from Send**, with no fresh diffusion. No page errors, buffer stalls or continuous frame gaps over 250ms occurred. Presented replies/listening were approximately **19.96/24.13 FPS**; maximum gaps were 66.8/66.8ms. Browser A/V clock skew was **21.59ms p95 / 33.65ms maximum**, 664 samples. Six-source appearance warm-up took 16.984s, excluding other startup work.
-
-All **22 clips / 948 frames** received limited diagnostics; all waveforms were nonzero and unclipped. Complete close-wave, subsequent speech and return clips (**137 frames**) were visually reviewed. Three separate eligible speech clips estimated **0/-40/-40ms** lip-sync offsets with delay/reversal controls passing. Normal-speed playback was exercised in the in-app browser, but physical audibility and perceptual approval remain unverified. The preview restarted ready in **30.883s** with six sources and private memory byte-identical. No 30-minute test yet covers this sixth source and tracker together; the two-second p95 target remains unmet.
-
-Evidence: `audit/performance-near-wave`, `audit/voice-video-qualification-near-wave/{summary,frame-review,manual-review}.json`, `review.html`, and `audit/lip-sync-near-wave/results.json`. Reproduce with fresh labels:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/prepare_performance.py SOURCE.mp4 --action wave --pose near --duration 2.125 --candidate-label new-near-wave
-# Review every frame and hashes before enabling the candidate manifest.
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-near-wave --performance-label new-near-wave --near-wave --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda
-node scripts/qualify_video_call.cjs qualification new-near-wave --capture
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-near-wave
-```
-
-### Recognition during the speaking pause — September 9
-
-An optional fixed-audio warm-up starts 200ms into the existing 650ms endpoint pause. It never plans from unfinished user speech, uploads early audio or changes the captured WAV. A small offline test after five seconds idle reduced median recognition from **348ms to 43ms** (four samples per policy, identical recognized words). An encoder-only warm-up was inconsistent. The complete call did not reproduce that large improvement:
-
-| Same 20-command call | Recognition median, 10 inputs | Speech-end median / p95, 9 replies |
-|---|---|---|
-| Warm-up disabled | 136ms | 2.153 / 2.421s |
-| Warm-up enabled | 103ms | 1.949 / 2.132s |
-| Enabled repeat | 118ms | 1.972 / 2.563s |
-
-All **60 commands** passed with no page errors or reported reply-buffer stalls. Both enabled runs completed every warm-up before actual submission (maximum warm work 143ms, measured drain wait below 0.01ms). Hosted greeting-plan time varied from 600ms to 1,093ms between enabled runs. **Leave `AI_MATE_ASR_PAUSE_WARM=0`: a reliable whole-call latency improvement is not established, and the two-second p95 target remains unmet.** No configuration, model, prepared asset or private memory was changed in the preview by this experiment. Warm-up uses additional local recognition work; it makes no additional hosted requests.
-
-The frame probe now resets across actual pauses, seeks, source changes and visibility changes, while retaining gaps during continuous playback. Redundant `hidden=false` assignments no longer reset it. The final repeat used this corrected probe: **787 reply intervals, approximately 19.97 presented FPS, maximum gap 83.3ms; 1,128 listening intervals, approximately 24.16 FPS, maximum gap 66.7ms**. Neither had a gap over 250ms. A/V clock skew was **20.55ms p95 / 33.19ms maximum**, 615 samples. The first two trials used an intermediate probe that also reset on redundant visibility assignments; use the repeat for the final probe evidence. These callback measurements exclude physical display and acoustic delay and do not retroactively qualify older long-call counters.
-
-Evidence is in `audit/asr-idle-{encoder,recognizer}-pause` and `audit/voice-video-qualification-pause-{control,warm,repeat}`. Reproduce with the existing qualification commands, a fresh label and `--performance-label wave-trim --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda`; add `--asr-pause-warm` for the candidate. The capture driver records the app and frame-probe hashes. `benchmark_asr_idle.py --label NEW --wake-policy recognizer` reproduces the small offline comparison. BUILD describes admission, serialization, authentication and recovery. This optional path has no 30-minute qualification.
-
-All six paused-speech cases also passed with warm-up enabled, preserving negations/corrections and cancelling three partial jobs (`audit/voice-video-qualification-pause-corrections`). Across the three calls and paused suite, **66 clips / 2,877 frames** received the limited checks with no flags, missing media or clipped/silent waveforms. Visual inspection covered **80 repeat-run frames**: the complete wave and the first 20 approach/close-description frames. Fingers blur and mouth detail stays soft; no normal-speed or physical-audio approval follows. The repeat's `review.html` supports playback/frame stepping; `manual-review.json` records the actual sampled scope. The preview restarted ready in **29.071s**, with warm-up disabled and private memory byte-identical. All test drivers, servers and frame reviewers exited successfully. Existing 30-minute results predate this code/shortened-wave combination.
-
-### Optional GPU speech — September 9
-
-The same Kokoro-82M float32 weights and `af_sarah` voice have an explicit CUDA option. **This PC now selects CUDA after the revised memory policy passed the completed soak below.** CPU remains the default elsewhere and the recovery setting. No new model, API key, driver or main-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.
-
-The initial soak stopped after **64 turns / 945.16s of recorded call activity**, with three speech allocation failures, including "Hello." CUDA's 2GiB speech arena could not satisfy a 65.5MiB allocation. Five-second samples reached 13,034.5MiB used with at least 3,345MiB free; they include other processes and are not an exact peak. This does not establish that the card needs replacement. One successful reply also took 6.73s from Send. Failed responses are excluded from latency samples but remain failures. Evidence: `audit/voice-video-soak-gpu-speech-ready/terminated-summary.json`.
-
-The revision applies ONNX Runtime's [GPU arena shrinkage](https://onnxruntime.ai/docs/get-started/with-c.html) after each synthesis, returning unused regions while retaining active allocations. In two speech-only replays of the same 64 neutral replies, both policies completed **128/128** phrases. Retained/cleaned memory sampled **2,144.5/1,648.5MiB**, with median synthesis **109/117ms** and p95 **147/162ms**. All waveforms were finite, nonzero and unclipped. The speech-only control did **not** reproduce the integrated failure; this comparison demonstrates memory savings, not a proven sustained-call fix.
-
-The revised integrated candidate passed **20/20 commands** in 101.0s. Nine spoken replies reached synchronized playback in **1.905s median / 2.291s p95**; 19 mixed Send measurements were **1.24/1.65s**. No functional/page errors or reported reply stalls occurred. All **971 frames** received limited diagnostics with no flags; **40 wave/near frames** were inspected visually. A/V clock skew was **24.56ms p95 / 31.22ms maximum** across 589 samples. Three SyncNet clips measured **0/40/80ms**, with injected-delay and reversed-audio controls passing. Hand blur, soft facial detail, normal-speed perception and physical audio remain unresolved. The live preview's Test sound button was exercised; user confirmation of speaker output is pending.
-
-Revised evidence: `audit/speech-memory-retained-arena`, `audit/speech-memory-shrinking-arena`, `audit/voice-video-qualification-speech-arena` and `audit/lip-sync-speech-arena`. The completed sustained run is `audit/voice-video-soak-speech-arena`, summarized below. Soaks end normally after three failed turns, preserving playback statistics and explicitly marking incomplete duration. Replay the memory comparison with `.\.venv\Scripts\python.exe scripts/benchmark_speech_memory.py --source gpu-speech-ready --label new-memory --memory-policy shrink`; use `retain` for the control and a fresh lowercase output label.
-
-Twenty fixed-text samples per configuration compared installed CPU ONNX Runtime 1.29.0, isolated CPU 1.26.0 and isolated CUDA 1.26.0. Each used five phrases repeated four times, eight CPU threads, identical speed and the same model/voice hashes. Warm median synthesis times:
-
-| Phrase | CPU 1.29 | CPU 1.26 | CUDA 1.26 |
-|---|---|---|---|
-| Short acknowledgement | 0.223s | 0.232s | 0.109s |
-| Greeting | 0.383s | 0.390s | 0.153s |
-| Ordinary sentence | 0.471s | 0.481s | 0.162s |
-| Two-sentence memory reply | 0.800s | 0.815s | 0.346s |
-| Count from one through 25 | 1.536s | 1.553s | 0.903s |
-
-All three configurations had zero ordinary-text ASR readback errors, complete 1–25 count readbacks in four repeats, finite nonzero audio and no clipping. Numeric-format differences in the raw word-error metric are retained separately. Ordinary phrase durations matched; small count-duration differences remain. Readback and matching duration do not establish identical sound or physical audibility.
-
-The GPU candidate passed **20/20 call commands** with no functional/page errors or reported reply stalls. Across nine spoken replies, end-of-speech median/p95 was **2.040/2.235s**, versus **2.028/2.631s** in the preceding CPU-speech call. The median is essentially unchanged, the sample is small and hosted dialogue varies. Across 19 mixed submissions, median/p95 was **1.29/1.63s**. Median first-phrase synthesis inside the call fell from **0.238s to 0.171s**. The two-second p95 target is still unmet.
-
-All **970 generated frames** were analyzed; **40 wave/near frames** were visually inspected. A/V clock skew was **23.33ms p95 / 33.54ms maximum** across 588 samples. SyncNet's near description and full-body unsupported-action reply scored **0/40ms**, with injected-delay and reversed-audio controls passing. The third eligible clip scored 40ms but failed the reversed-audio confidence check; treat it as inconclusive. All six paused-speech cases preserved corrections/negations and cancelled three unfinished replies; their **210 frames** passed limited diagnostics. Hand blur, soft facial detail, physical audio and normal-speed perceptual acceptance remain unresolved.
-
-Use the [pinned Windows/Python 3.12 wheel](../config/speech-gpu-benchmark-requirements.txt), with the installed CUDA 12.8/cuDNN 9 libraries. The [ONNX Runtime compatibility table](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html) distinguishes CUDA-13 default packages from the compatible 1.26 release. GPU options use heuristic convolution selection, TF32 off and a 2GiB allocator arena; the arena is not a total GPU-memory cap. CPU nodes and transfers still exist. The runtime checks package location/version and actual provider selection; missing installation, a previously loaded incompatible runtime or CPU fallback fails explicitly. Recovery is `AI_MATE_TTS_DEVICE=cpu` plus restart.
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install --target .cache/ort-gpu-deps --no-deps --only-binary=:all: --require-hashes -r config/speech-gpu-benchmark-requirements.txt
-.\.venv\Scripts\python.exe scripts/benchmark_speech_device.py --label new-cpu --device cpu
-.\.venv\Scripts\python.exe scripts/benchmark_speech_device.py --label new-gpu --device cuda --runtime isolated
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-gpu-call --performance-label headroom --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda
-# In another terminal; the driver now waits up to 90 seconds for actual readiness:
-node scripts/qualify_video_call.cjs qualification new-gpu-call --capture
-```
-
-Earlier short-call/media evidence: `audit/voice-video-qualification-gpu-speech`, `audit/voice-video-qualification-gpu-speech-paused` and `audit/lip-sync-gpu-speech`. Its review page verified frame stepping, notes/export, decoded audio and a 390px layout; human-review checkboxes stay unchecked. A separate earlier soak setup started before server readiness and ended with zero commands; it is retained as a setup failure. Neither earlier run establishes sustained GPU-speech acceptance.
-
-### Completed GPU-speech soak and hosted comparison — September 9
-
-The arena-cleanup revision completed **1,800.048s / 120 commands**, with no failed commands, page errors or reported reply-buffer stalls. Across 54 spoken replies, end-of-speech median/p95 was **2.043/2.500s**. Across 114 mixed submissions, Send-to-playback median/p95 was **1.29/1.75s**. Six cycle speech medians were 2.116/2.048/1.977/2.198/1.959/2.086s: no steadily accumulating delay, but the two-second p95 target remains unmet. The previous CPU baseline was 2.114/2.609s; these sequential runs are not a controlled estimate of the speech change alone.
-
-CUDA `mem_get_info` sampled 7,080.5MiB used initially, 7,138.5MiB finally and 7,306.5MiB maximum over 360 samples. Separate `nvidia-smi` snapshots during the run reported 10,529MiB used. Windows accounting differs; neither is an exact peak, per-worker allocation or proof of room for another call. The revised run did not repeat the three allocation failures from the earlier retained-arena soak.
-
-All **120 clips / 5,945 frames** have face-count, luminance and adjacent-change diagnostics with no flags or missing media; all speech waveforms were nonzero and unclipped. Visual inspection covered 120 frames from six first/final-cycle wave, approach and near-view clips. Identity and framing were consistent in those samples; hand blur and soft facial detail persist. A separate expanded review of the short call covered 252 frames across four complete clips. Neither review certifies every frame anatomically or proves normal-speed naturalness.
-
-Browser A/V clock skew was **25.91ms p95 / 55.59ms maximum** across 3,666 samples. Six SyncNet clips, description/unsupported/conversation from cycles one and six, estimated 0/-40/-80ms respectively; shift and reversed-audio controls passed. These are diagnostic estimates at 40ms resolution, not physical speaker or human-perceived alignment. The frame callback counter recorded zero reply long gaps and 72 idle long gaps; it does not reset on every intervening pause/visibility change, so idle gaps cannot be classified as stalls from this aggregate. Sustained perceptual playback and real mobile/audio evidence remain open.
-
-Evidence: `audit/voice-video-soak-speech-arena/{summary,gpu-memory,frame-review,manual-review}.json`, its `review.html`, and `audit/lip-sync-speech-arena-soak/results.json`. Reproduce with the earlier server/driver commands using `--trial soak`, `soak` and a fresh label, followed by `review_call_frames.py --trial soak` and `review_lip_sync.py --source voice-video-soak-LABEL --label NEW --device cuda`.
-
-A bounded, synthetic-only comparison used the existing funded Cloudflare key/email route for [Gemini 3.5 Flash-Lite](https://developers.cloudflare.com/ai/models/google/gemini-3.5-flash-lite/) and Qwen. Eight requests each passed the four fixture checks. Gemini/Qwen median was **0.933/0.577s**, observed maximum **2.624/0.747s**, and nominal usage cost **$0.003970/$0.000630**. Keep Qwen: this small sequential comparison provides no latency advantage for Gemini. It measures complete planner responses, not an entire call or broad conversation quality.
-
-The harness requests [cache bypass](https://developers.cloudflare.com/ai-gateway/features/caching/) and rejects reported cache hits; responses omitted the status header, so the evidence records UNKNOWN. Google lists **$0.30 input / $2.50 output per million tokens**, including thinking output ([pricing](https://ai.google.dev/gemini-api/docs/pricing), checked September 9). The combined nominal test cost was about $0.00460 before credit-purchase fees; this is not an invoice. No private conversation, new key, purchase or runtime switch was involved. Provider terms still apply; this neutral technical comparison establishes no intended-content eligibility.
-
-```powershell
-.\.venv\Scripts\python.exe scripts/benchmark_cloud_comparison.py dialogue --model google/gemini-3.5-flash-lite --repeats 2 --label new-gemini
-.\.venv\Scripts\python.exe scripts/benchmark_cloud_comparison.py dialogue --model '@cf/qwen/qwen3-30b-a3b-fp8' --repeats 2 --label new-qwen-control
-```
-
-Run between call benchmarks. The harness checks positive Unified Billing credit for Google, limits the selected run to eight requests and a $0.10 nominal reservation, refuses an active benchmark, and never retries a failed model. This is a local request bound, not an account-wide billing cap.
-
-### Shorter prepared wave selected — September 9
-
-The previous wave continued for about two seconds after its hand movement finished. An isolated copy of the reviewed `performance-headroom` bundle now retains the first **48 source frames at 24 FPS**, without changing speed. Its entire source and rendered wave were visually reviewed. The gesture still raises the hand, waves and lowers it; head/feet remain visible and moving fingers remain blurred. Background/pose differences at the listening seam persist; this does not certify an invisible transition.
-
-The revised asset passed **20/20 commands** with no functional/page errors or reported reply-buffer stalls. All **20 clips / 829 frames** received limited diagnostics with no flags; all 40 rendered wave frames were viewed. The wave now lasts **2.043s / 40 output frames**, versus 4.093s / 81 frames previously. Spoken median/p95 across nine replies was **2.007/2.555s**, with A/V clock skew **22.21ms p95 / 31.38ms maximum**. This is a shorter gesture, not evidence of faster general dialogue. The long soak above used the previous wave; no 30-minute result is claimed for this final asset set.
-
-Exact source hashes, encode settings and review notes are in `audit/performance-wave-trim/performance-wave.json`; frame evidence is in `audit/frames-performance-wave-wave-trim` and `audit/voice-video-qualification-wave-trim`. The encode command was `ffmpeg -v error -i SOURCE -frames:v 48 -an -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -movflags +faststart TARGET`, inside the isolated candidate. Updated review hashes were checked before the call test. Reproduce with `serve_voice_video_benchmark.py --trial qualification --label NEW --performance-label wave-trim --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda`, then the normal capture driver and frame reviewer.
-
-The idle preview restarted in **29.476s**, selecting CUDA speech and the two-second wave. The five visual sources warmed in 17.169s; saved SQLite conversation remained byte-identical. This PC's private project `.env` now sets `AI_MATE_TTS_DEVICE=cuda`; provider credentials were untouched. Roll back between calls by restoring the two wave files and prior local runtime settings from ignored `.cache/local-poc/rollback-speech-wave-20260909`, then restart. Do not restore, delete or replace the conversation database. CPU remains the portable default in `.env.example`.
-
-### Isolated WebRTC transport comparison — September 9
-
-**Keep the existing player.** A separate benchmark now sends actual GPU-generated mouth frames directly through WebRTC, with continuous H.264 video and Opus audio. The selected preview still uses fragmented MP4/WAV. No new API credential, hosted inference or rental was used.
-
-The final comparison reused three retained synthetic WAVs and matching reviewed body sources, four repetitions each, in separate warm processes on the same PC. Times start at the browser's render request; recognition, dialogue, speech synthesis and public networking are excluded. Twelve samples per transport give only a small diagnostic comparison; nearest-rank p95 is the maximum observation.
-
-| Transport | First picture median / p95 | Advancing picture median / p95 | Decoded audio onset median / p95 |
-|---|---|---|---|
-| Existing MSE, 350ms media threshold | 0.476 / 0.660s | 0.593 / 0.776s | 0.550 / 0.709s |
-| WebRTC H.264, requested 20ms jitter target | 0.517 / 0.615s | 0.580 / 0.649s | 0.603 / 0.677s |
-
-MSE showed one 116–139ms callback gap immediately after each initial picture. WebRTC had no reply callback gaps above 100ms, no renderer underflows, packet loss, video drops or reported freezes; decoded audio required no concealment in the final H.264 run. Its measured mean video/audio jitter buffers were 38.7/46.4ms. A requested [jitter target](https://developer.mozilla.org/en-US/docs/Web/API/RTCRtpReceiver/jitterBufferTarget) is not an achieved delay. First advancing picture means the next distinct media timestamp; audio onset uses decoded RMS, not a physical speaker or phoneme-sync measurement.
-
-The first generated frame took approximately 0.42s in both final runs. WebRTC slightly improved motion onset but delayed median audio onset by about 53ms. These sequential, small-sample runs do not establish a whole-call speed improvement. MSE's 350ms threshold is buffered *media duration*, not a mandatory 350ms wall-clock wait. The latest actual spoken-call p95 remains 2.63s.
-
-Two preliminary RTC runs negotiated VP8: codec preferences had been applied after the remote offer. Moving preference selection before negotiation fixed that; the driver now asserts the received codec. Their first-picture medians were 0.562s and 0.512s. All six runs are retained, including an MSE run excluded from the final timing comparison because frame analysis began near its last two replies. The replacement `mse-clean` run finished before analysis started.
-
-Every archival frame across **72 completed replies / 4,488 frames** was analyzed for face count, luminance, adjacent-pixel changes and timing-marker isolation, with no flags. These repeat three phrases; they are not 72 distinct command tests. Archives precede RTC encoding, so they do not qualify every received frame. Three H.264 receiver screenshots were visually inspected: full-body/near framing and clothing were consistent, with soft facial detail and mouth edges still visible. Normal-speed receiver review, perceptual A/V timing and physical audio remain unqualified.
-
-The prototype binds signaling to 127.0.0.1:8766, requires the same origin and per-process token, restricts SDP to receiving audio/video with this PC's candidate addresses, and uses no external STUN/TURN. Five HTTP rejection/preconnection checks passed in the H.264 run. A thirteenth reply was cancelled during generation; the worker stopped and removed the partial archive. This is a bounded local **R2 transport experiment**, with independent security/correctness review and staging still pending before any public exposure. It does not yet implement voice capture, app session continuity, Cloudflare SFU, NAT traversal or multi-user isolation.
-
-Reproduce on this configured Windows/Python 3.12 rig, using fresh labels and keeping other inference/frame analysis idle:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install --target .cache/webrtc-deps --no-deps --only-binary=:all: --require-hashes -r config/webrtc-benchmark-requirements.txt
-.\.venv\Scripts\python.exe scripts/serve_webrtc_benchmark.py --label rtc-check --jitter-ms 20
-# In a second terminal after the server reports ready:
-node scripts/qualify_webrtc.cjs rtc-check
-# After both processes finish, repeat with a fresh server label and --transport mse.
-# Analyze only after timing runs have finished:
-.\.venv\Scripts\python.exe scripts/review_webrtc_benchmark.py --labels rtc-check
-```
-
-The driver uses the configured Playwright runtime described below. [Pinned wheels](../config/webrtc-benchmark-requirements.txt) install aiortc 1.15.0 and PyAV 17.1.0 under `.cache/webrtc-deps`; the live environment remains unchanged. Top-level package licenses do not establish codec/bundled-library or intended-service eligibility. The renderer's optional copied-frame callback defaults off; rolling back this experiment requires no memory migration or production configuration change. Evidence lives under `generated/local-app/audit/webrtc-*`, with hashes and scope in `docs/research/local-poc-benchmarks.json`.
-
-### Mouth timing and selected face crop — September 9
-
-The selected MuseTalk face shift is now **-0.05**, previously -0.10. This adjusts the face region supplied to synthesis; it does not delay speech, alter timestamps or change the body footage. Appearance caches already include the crop setting in their key.
-
-[SyncNet](https://github.com/joonson/syncnet_python) provides a separate audio/visual timing diagnostic. The [pinned evaluator manifest](../config/syncnet-evaluator.json) records the source commit, hashes, 54.6MB weights and research scope. The [Oxford model page](https://www.robots.ox.ac.uk/~vgg/software/lipsync/) describes research use with a CC BY link; this evaluator is not a production-service eligibility claim. No app dependency or new API credential is required.
-
-Five eligible clips from the preceding soak were evaluated; one selected clip was too short. Close-view estimates were 0ms, while full-body estimates showed 160–200ms of mouth lag. All 20 injected shifts (±200/400ms) were recovered and reversed speech had lower confidence. A controlled comparison then rendered **12 clips / 828 frames**, using the same two WAVs in both poses across three crops:
-
-| Face shift | Full-body estimates, two phrases | Near-view estimates, two phrases | Interpretation |
-|---|---|---|---|
-| -0.10, previous | 0ms unreliable / 200ms mouth lag | 0 / 0ms | One phrase failed controls; the other had lag |
-| **-0.05, selected** | **40 / 40ms mouth lag** | **0 / 40ms mouth lag** | All four clips passed shift controls and reverse-audio comparison |
-| 0, rejected | 80 / 80ms mouth lag | 40 / 40ms mouth lag | Less consistent timing and weaker near-view scores |
-
-Every frame passed the limited face/luma/pixel-change checks. **120 face crops** were visually inspected across all variants. The selected crop showed stronger articulation without an obvious displaced outline in those samples; mouth edges and skin remain soft. These checks do not prove natural phonemes, anatomy or subjective preference.
-
-The selected crop then passed **20/20 commands**, including approach, return, wave, negation, interruption and unsupported-action handling. All **978 frames** were retained and analyzed. End-of-speech latency across nine uninterrupted spoken replies was **2.028s median / 2.631s p95**; mixed Send-to-playback was **1.33/1.96s** across 19 responses. There were no reported reply stalls or page errors. Clock skew across 598 samples was **24.24ms p95 / 28.71ms maximum**. Three eligible speech clips scored **0, 40 and 80ms mouth lag**, with all twelve injected-shift controls passing. This improves estimated lip timing, not end-to-end latency. The earlier 30-minute soak used the previous crop.
-
-Method limits: the evaluator uses reviewed YuNet boxes with the upstream asymmetric crop, decoded timestamps resampled to 25 FPS without speeding up the footage, mono 16kHz PCM, and common interior feature windows. It excludes zero-padded search edges, unlike upstream's aggregate scoring; its confidence values are not directly comparable with published SyncNet scores. Estimates have 40ms resolution, and known-shift controls establish sensitivity rather than absolute perceptual accuracy. MP4 video is compared with the separate WAV used by the live app. Normal-speed listening, physical audio and real mobile validation remain open.
-
-Recorded commands below require retained synthetic artifacts. Use new labels to repeat without overwriting evidence:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/download_syncnet_evaluator.py
-.\.venv\Scripts\python.exe scripts/review_lip_sync.py --label gpu-pcm-calibrated --device cuda
-.\.venv\Scripts\python.exe scripts/benchmark_lip_crops.py --label lip-crops
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label lip-crops
-.\.venv\Scripts\python.exe scripts/review_lip_sync.py --source voice-video-qualification-lip-crops --label crop-comparison --device cuda
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label lip-crop-selected --performance-label headroom --decoder tensorrt-reviewed --asr-device cuda
-# After the isolated server reports ready, in a second terminal:
-node scripts/qualify_video_call.cjs qualification lip-crop-selected --capture
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label lip-crop-selected
-.\.venv\Scripts\python.exe scripts/review_lip_sync.py --source voice-video-qualification-lip-crop-selected --label selected-call --device cuda
-```
-
-The initial calibration stopped on a short fixture and reached a search boundary; its partial results are retained as `lip-sync-gpu-pcm-calibration`. The final evaluator reports short-fixture exclusions and uses a bounded wider search where enough common windows remain. No production timing correction was inferred from that initial run. [Machine evidence](research/local-poc-benchmarks.json), entry `lip_crop_syncnet_20260909`, contains the result hashes and remaining limitations.
-
-The tables distinguish individual samples from repeated suites. Different configurations and capture boundaries are not directly comparable; none is a performance guarantee. [Machine-readable history](research/local-poc-benchmarks.json) preserves settings and rejected trials. Raw synthetic traces and reviewed contact sheets stay in ignored `generated/local-app/audit/`.
-
-### Current recognition and call selection — September 9
-
-The preview selects `AI_MATE_ASR_DEVICE=cuda`: faster-whisper 1.2.1 / CTranslate2 4.8.2, Base English FP16, pinned model revision `3d3d5dee26484f91867d81cb899cfcf72b96be6c`. The same cached model supports the default `cpu` int8 setting. Windows CUDA/cuDNN libraries come from the installed Torch 2.11.0+cu128 package. Explicit GPU initialization failure stops startup; set `cpu` and restart to recover. No new package, weight or credential was installed.
-
-The WAV boundary still checks mono PCM16, 8–96kHz, complete frames and 0.15–30 seconds. Normalize validated PCM and use SciPy polyphase resampling when needed, then pass a 16kHz float32 array directly to Whisper. This bypasses the [upstream audio loader and its explicit full garbage collection](https://github.com/SYSTRAN/faster-whisper/blob/v1.2.1/faster_whisper/audio.py). The 650ms endpoint, VAD, beam size and full encoder window remain unchanged.
-
-| Fixed corpus / recognition path | Ordinary speech median / p95 | Harder speech median / p95 | Recognition differences |
-|---|---:|---:|---|
-| CPU int8, previous decoding | 292 / 319ms | 311 / 405ms | Baseline: 0 / 4 word errors |
-| GPU FP16, previous decoding | 63 / 75ms | 88 / 161ms | Same normalized words as CPU |
-| CPU int8, validated PCM | 258 / 277ms | 283 / 367ms | Same words as its baseline |
-| GPU FP16, validated PCM — selected | 31 / 42ms | 52 / 132ms | Same words as its baseline |
-
-There are 80 ordinary utterances plus three non-speech probes and 36 harder utterances, across three synthetic voices; the ordinary set includes noise. All 119 normalized transcripts matched between each previous and new decoding path. Selected CPU/FP16 outputs had no negation losses, non-speech hallucinations or repeated-punctuation flags. Four known errors remain across 564 harder-corpus reference words. These are fixed synthetic fixtures, not real-speaker accuracy evidence. The earlier GPU INT8/FP16 trial emitted repeated punctuation once; it did not repeat with PCM input, but FP16 is the configuration taken through full call qualification.
-
-Loading the actual renderer increased previous GPU recognition to roughly 133–143ms, including 93–98ms in audio decoding. Direct PCM measured 35–37ms with that renderer loaded. After five seconds idle, its first recognition still took 224ms versus subsequent 36–39ms: GPU wake-up remains. Device-wide point samples rose from 4,262 to 4,555MiB during the sequential comparison, including the idle preview and CUDA context. Those are not model-only or peak allocation measurements.
-
-| Full browser capture suite | Commands / spoken samples | Speech-end median / p95 | Outcome |
-|---|---:|---:|---|
-| Previous CPU speech-continuity | 20 / 9 | 2.471 / 2.755s | Passed |
-| GPU FP16, previous decoding | 20 / 9 | 2.121 / 2.658s | Passed |
-| GPU FP16, validated PCM | 20 / 9 | **1.994 / 2.525s** | Passed |
-
-The selected run took 108.311 seconds. Mixed Send-to-playback median/p95 was 1.52/1.86s across 19 replies. There were no functional failures, page errors or reported reply stalls. A/V clock skew: 25.357ms p95 / 36.970ms maximum over 623 samples. All 20 clips / 1,003 frames passed limited diagnostics with nonzero unclipped speech; forty approach/near frames were inspected. Natural mouth detail and hands remain imperfect. The whole-call measurements include variable hosted planning and response lengths, so they are not a controlled universal speed ratio.
-
-All six paused-speech cases also passed with GPU/PCM: final transcripts preserved negation/correction, actions stayed `none`, and three pending replies were cancelled before playback. All 276 frames passed diagnostics and twenty were inspected. Faster preparation did not break the tested recovery flow. AEC remains simulated; physical echo and mobile use are unqualified.
-
-Two isolated buffering changes remain unselected. A 150ms starting threshold produced one brief waiting event and one end-of-playback timeout in 20 commands; the timeout's cause was not captured. The driver now retains events and media state on failures. 100ms FFmpeg fragments passed 20 commands but did not establish an improvement (spoken p95 2.693s). Keep the **350ms threshold and 200ms fragments**; these are separate from inference batch size.
-
-Reproduce after other GPU work finishes, using fresh labels and the retained synthetic fixtures:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/benchmark_asr_device.py --label new-pcm --compare-with gpu-comparison
-.\.venv\Scripts\python.exe scripts/benchmark_asr_runtime.py --label new-runtime
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-gpu-pcm --performance-label headroom --decoder tensorrt-reviewed --asr-device cuda
-# Second terminal with the existing Playwright NODE_PATH:
-node scripts/qualify_video_call.cjs qualification new-gpu-pcm --capture
-# After call timing finishes:
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-gpu-pcm
-```
-
-For paused speech, start a separate qualification server with a new label and run `review_paused_voice.cjs <label>`, then the same frame reviewer. For 30 minutes / 120 commands, use `soak` in both server and browser commands. These processes use disposable memory on port 8766. Corpus comparison requires the retained baseline audit; a fresh checkout lacks private generated fixtures/media and must prepare a new baseline. The GPU/PCM preview restarted in 31.026s with five-source preparation in 19.158s and memory unchanged. The same configuration then completed **1,800.049 seconds / 120 commands**, with no functional failures, page errors or reported reply stalls. Across 54 spoken replies, speech-end median/p95 was **2.114/2.609s**; mixed Send-to-playback across 114 was **1.44/1.92s**. Six cycle speech medians were 2.131/1.988/2.152/2.239/2.114/2.101s, showing no steadily accumulating delay. Actual ASR median was 267ms across the spaced call inputs, illustrating the idle-recovery difference from the 31ms isolated benchmark. The p95 target remains unmet.
-
-All **120 clips / 5,952 frames** were retained and decoded with zero limited flags, 20FPS median timestamp spacing, and nonzero unclipped speech. Six sheets covering 120 frames were inspected across first/last-cycle wave, approach and near speech. Soft hands/mouth and repeated prepared motion remain. Browser A/V clock skew was **26.191ms p95 / 45.688ms maximum** across 3,667 samples. No long reply-video callback gaps were reported; raw idle-gap counters include intentional hidden/paused intervals and are not stall counts. One synthetic sequential session cannot establish physical acoustics, normal-speed perceptual acceptance, mobile behavior or public concurrency.
-
-Build the retained review page with `build_call_review.py --trial soak --label gpu-pcm`. The current page is served only on loopback **http://127.0.0.1:8768/review.html**; the earlier review on 8767 remains available. Reproduce its browser checks using `node scripts/verify_call_review.cjs soak gpu-pcm 8768` after call timing. This checks decoded audio, frame stepping, note export and layout, not physical speaker output. Review boxes stay unchecked until a person records an observation. Previous soaks remain historical evidence.
-
-The next lip-sync measurement candidate is [SyncNet](https://github.com/joonson/syncnet_python), which estimates audio/video offset from mouth imagery and speech. Its code is MIT; Oxford's [model page](https://www.robots.ox.ac.uk/~vgg/software/lipsync/) links CC BY 4.0 and describes research use. This is an uninstalled offline-evaluation candidate, not production eligibility or a measured result. Calibrate any evaluator with deliberately shifted positive/negative controls and consistent face crops. Neither a score nor a clock-skew pass alone can qualify perceptual lip sync.
-
-### Earlier input and latency evidence
-
-The paused-speech regression uses six fixed recordings through the real AudioWorklet, turn detector, ASR, Cloudflare, Kokoro and MuseTalk. Initially, one negated wave was performed after ASR inserted a period inside "do not wave"; other paused corrections lost their beginning while the microphone was gated during preparation. Listening during preparation restored the correction, but one split negation still lost "do not". The final change combines the recorder audio when speech resumes before any reply playback. All six final transcripts retain the negation/correction, all final actions are none, and four unfinished replies were cancelled before a displayed video frame. The complete 276 output frames passed limited diagnostics; twenty were visually inspected. Synthetic AEC capability was simulated; physical echo remains untested.
-
-```powershell
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-paused --performance-label headroom --decoder tensorrt-reviewed
-# Second terminal, with the existing Playwright NODE_PATH:
-node scripts/review_paused_voice.cjs new-paused
-# After the server exits:
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-paused
-```
-
-Early ASR/planning/speech preparation remains **unselected**. A 26-case ideal-pause experiment improved median speech-file readiness, but that assumption overstated applicability. Replaying the actual detector produced 29 turns from 26 sources; three paused sources split. Across twenty ordinary prompts, median readiness improved **1.635s → 1.351s**, while p95 worsened **1.942s → 1.975s**. Sixteen drafts were reused only after exact final-transcript validation. Each comparison made forty bounded Cloudflare requests. These are speech-file timings, not playback; the fixed context does not model continuity across split turns. This follows the cancellation principle in [LiveKit's preemptive-generation documentation](https://docs.livekit.io/agents/logic/turns/tuning/), without adding a LiveKit dependency.
-
-```powershell
-node scripts/prepare_preemptive_replay.mjs new-replay
-.\.venv\Scripts\python.exe scripts/benchmark_preemptive_planning.py --label new-timing --replay-label new-replay
-```
-
-The timing experiments preceded the negation/capture fixes. Reproduction against a changed planner is a new comparison. Neither the endpoint nor selected models changed. Raw evidence: `audit/preemptive-initial`, `preemptive-replay-detector`, `preemptive-detector`, and the `voice-video-qualification-paused-*` directories. The `paused-revised` server was stopped before browser testing to correct veto ordering; it is not a qualification result. Only `paused-continuity` contains the complete capture fix.
-
-The subsequent `qualification speech-continuity --capture` run passed **20/20 commands** in 108.698 seconds. Spoken end-of-speech median/p95: **2.471/2.755s** (nine); mixed Send-to-playback: **1.38/2.08s** (nineteen). Zero functional failures, page errors or reported reply stalls. A/V clock skew: **24.512ms p95 / 30.141ms maximum**, 596 samples. All 976 frames were analyzed with zero limited flags and nonzero unclipped audio; forty approach/near-speech frames were inspected. Hand/skin softness and imperfect lips remain. The changed input flow still needs physical echo, mobile and its own sustained-call qualification. Roll back this code revision and restart/reload to restore the previous input behavior; no database migration or asset rollback is required.
-
-| Test | Observed result | Limit |
-|---|---|---|
-| Prepared approach → greeting → return | Browser starts 1.72s / 2.16s / 1.83s, zero stalls; unmuted audio ended; matching idle resumed | Prepared movement, newly synthesized speech/lips; not fresh diffusion |
-| Synthetic spoken “Come closer” through real audio API | ASR 0.445s; server complete 3.085s | No physical mic/speaker or browser round trip in this sample |
-| LTX-2.3 approach, 97 frames, seed 70, silent | 146.429s cold wall time; reviewed approach succeeded | Offline preparation; slight camera drift, soft face remain |
-| LTX-2.3 close idle | Generic prompts were static or zoomed/pulled back; rejected. Blink-only guided 97 frames took 28.482s with cached prompt | Selected 3.792s loop visibly repeats over long sessions |
-| LTX-2.3 joint audio/video wave | 144.974s cold / 21.445s with cached text conditioning | Coherent wave but unwanted subtitle-like marks; too slow for live replacement |
-| Direct LTX-2B body-only generation | Warm 4.50s at 384x576; 3.19s at 320x480; 2.00s at 256x384 | Excludes speech/lips/browser. Fastest raised both hands; backward test moved forward |
-| OmniAvatar-1.3B, Wan2.1 / UMT5 / Wav2Vec2 dependencies | Two short clips took 60.5–67.5s and did not wave | Rejected configurations |
-
-The paired-motion demonstration is a real improvement, but the requested quality is not accepted: loops repeat, scene identity differs across older portraits, fingers and mouth detail remain soft, and new movements can ignore instructions. A 13.092s spoken count before appearance caching took **9.97s to playback**, **23.489s server completion**, and stalled twice; short greetings alone do not qualify long calls. Later cache measurements are recorded in the machine evidence and REPORT.
-
-Output files contain speech, local ASR recovered synthetic test sentences, and the browser completed unmuted playback without media errors. Physical speaker output and subjective phoneme/voice quality still need device testing. Jobs record first text, per-chunk speech generation time, rendering stages, cache hits and completion; the browser separately measures first playback and stalls.
-
-### Reviewed wave and repeatable command coverage - September 9
-
-The new right-hand wave is a prepared LTX-2.3 clip from the verified full-body reference: 97 frames, seed 83, 384x576 at 24FPS, generated in **154.781s**. A separate review manifest binds the footage to the reference SHA-256. It is selected only from the base pose; an interrupted gesture retains the displayed frame without incorrectly treating it as approach progress. Startup now primes five appearance sources in **16.735s**, using 1,831MiB of Torch allocation before speech rendering.
-
-Five real ASR/Cloudflare/Kokoro/MuseTalk browser interactions started in **2.09-2.66s**, with no buffer stalls. Every one of their **278 decoded frames** passed the limited face-count/luma/pixel-change diagnostics. All **81 rendered wave frames** were visually inspected in sequence: one raised right hand, body and feet retained, with hand blur, face softness and background deformation still visible. This is a neutral demo asset, not approved adult-generation infrastructure.
-
-`config/video-call-qualification.json` defines 20 commands covering motion, negation, memory update/recall, unsupported motion, interrupted approach/resumption and in-app messaging while switching views. The initial run produced 20 media clips / **984 decoded frames**, with zero heuristic flags. Two harness assertions incorrectly rejected completed-render/partial-playback interruption and the Text-view active-call banner; corrected assertions are used in the extended run. Initial response p95 was approximately **2.83s**, excluding physical capture and endpoint detection.
-
-Reproduce in two terminals, using a fresh trial directory (existing evidence is deliberately not overwritten):
-
-```powershell
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification
-# In a second terminal with Playwright available on NODE_PATH:
-node scripts/qualify_video_call.cjs qualification
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification
-```
-
-Use `soak` in all three commands for six cycles / 120 interactions across 30 minutes. For a repeat, append `--label new-run` to the Python commands and `new-run` after the Node trial argument; labels preserve prior evidence. Drivers alternate fixed synthetic WAV and typed input; recognition, hosted planning, speech synthesis, GPU rendering and browser playback are real. Default injection excludes physical capture and endpoint wait. The `--capture` mode below includes the actual browser recorder and detector. Neither tests physical acoustics or mobile/internet transport. Frame diagnostics create ordered sheets covering every decoded frame, but cannot certify anatomy, identity or perceptual lip synchronization. The live user's database is never copied into these trials.
-
-Prepare new footage in an isolated bundle using `prepare_performance.py <local-output-path> --action wave --duration 4.05 --candidate-label new-wave`. Preparation writes an unreviewed manifest; inspect source and rendered output before accepting it. The seed-83 result above used the original 32-frame decoder window. The revised decoder and replacement footage are described below.
-
-### Removing double images from prepared motion — September 9
-
-A paired experiment decoded the **same sampled latent** with temporal windows of 32 and 128 frames, holding all other decoder inputs fixed. The larger window removed the pronounced double images at the inspected approach frames. It is now the preparation-script default for the measured 97-frame clips. This changes offline source quality; it does not accelerate dialogue or establish arbitrary live movement. ComfyUI documents the [temporal window and compression handling](https://docs.comfy.org/built-in-nodes/VAEDecodeTiled); [issue 11767](https://github.com/Comfy-Org/ComfyUI/issues/11767) reports similar artifacts, but the local paired experiment is the evidence for this change.
-
-| Replacement | Preparation and review |
+| Files | Purpose |
 |---|---|
-| Approach and return | Seed 70, 97 source frames; select 72 frames / 3 seconds and reverse for return. Paired generation plus both decoders: 83.09s. |
-| Close listening | Seed 94, matching new close reference; 77.87s preparation. Select source seconds 1.75–4.00 and retime to an 89-frame / 3.708s loop with one bilateral blink. |
-| Right-hand wave | Seed 84, 97 frames / 4.042s; 28.65s with warm generation caches. Seed 83 at the new window was rejected because the face tracker missed frame 28. |
+| `fullbody.png` | Original full-body identity/reference |
+| `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png` | Matched approach, reverse return and near reference |
+| `performance-wave.json/.mp4` | Base-pose gesture |
+| `performance-near-wave.json/.mp4` | Separate near gesture; requires `pose: near` |
+| `idle-fullbody.json/.mp4`, `idle-near.json/.mp4` | Matching silent listening loops |
 
-All 291 selected source frames and all 89 final listening frames were visually inspected in ordered sheets. Every approach/return/wave transcode frame was compared with its reviewed source. The largest transcode mean absolute pixel difference was 3.11/255; this is a correspondence check, not an anatomy score. Close-loop background flow measured 0.15 pixels/s mean versus 0.46 in the previous loop, with different generated content. Hand blur, soft skin, close-view crown cropping, subtle loop seams and imperfect mouth shapes remain. Normal-speed motion and perceptual lip-sync acceptance remain separate from frame diagnostics.
+Manifests must explicitly record local review and match every required reference/video hash. A broken optional gesture disables only that gesture. Appearance warm-up covers at most **six sources, 144 frames each, 384x576**. Only source appearance is cached; generated mouths and user speech are not. Sequential face correspondence resolves the palm false positive in reviewed near-wave footage. Raw detector flags remain in frame reviews; fresh generation keeps strict single-face detection.
 
-The paired job fit this 16GB card. Partial device sampling peaked at 15,376MiB used, including the preview and desktop; it is not model-only VRAM or a complete peak trace. Preparation timings have different cache states and must not be ranked as live response speeds. Release idle ComfyUI model caches before measuring calls.
+Use isolated candidate bundles; inspect each reference before generating from it. The current approach is three seconds from seed 96 with a reviewed end reference; the final corrective guide frame was excluded. The return reverses that approach. Base wave is two seconds. Near wave is 2.125 seconds from seed 85, without speeding up motion. A 128-frame temporal VAE window removed the earlier double-image defect. Fingers, mouth detail and transition seams still need improvement.
 
-Reproduce the paired comparison and keep new candidates separate from the running app:
+Example: create another near-wave candidate using the currently reviewed near reference. These commands perform local generation and preserve existing assets:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action closer --silent --frames 97 --seed 70 --temporal-size 128 --compare-decode --timeout 600
-.\.venv\Scripts\python.exe scripts/review_motion_frames.py <local-source.mp4> --label source-review
-.\.venv\Scripts\python.exe scripts/prepare_performance.py <reviewed-source.mp4> --candidate-label new-bundle
-# Review approach/return and the new performance-near.png before preparing matching idle.
-# prepare_idle_loop.py accepts --performance-label new-bundle; its manifest remains unreviewed.
-# Once all matching manifests are reviewed, qualify the bundle without using private memory:
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-call --performance-label new-bundle
+.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --reference-path generated/local-app/performance-near.png --action wave --framing close --return-to-reference --silent --frames 73 --seed 85 --temporal-size 128 --timeout 600
+```
+
+Use the returned local MP4 path as `SOURCE.mp4` below, and a fresh lowercase label:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/review_motion_frames.py SOURCE.mp4 --label new-source
+.\.venv\Scripts\python.exe scripts/prepare_performance.py SOURCE.mp4 --action wave --pose near --duration 2.125 --candidate-label new-near-wave
+```
+
+Preparation intentionally writes an unreviewed manifest. Review the source and prepared clip frame by frame, normal-speed motion, direction and seams before recording a truthful review. Qualify that candidate with the call suite below. Promote only the matching assets between calls, keep a rollback copy, and restart to rebuild the appearance cache. Never change the memory database. New reference images use `prepare_local_scene.py --scene fullbody --candidate`; they also require review before promotion.
+
+For new listening footage, `prepare_idle_loop.py SOURCE.mp4 --pose near --performance-label new-bundle` uses the matching candidate near reference. `retime_idle_motion.py` can slow background motion while preserving a separately selected bilateral blink interval; it does not choose or validate the blink. Keep retimed footage within 144 frames, inspect interpolation/seam artifacts, and record the output review. Exact selected generation/retiming settings and hashes remain in machine evidence.
+
+## Repeatable call qualification
+
+Use `.venv\Scripts\python.exe`, FFmpeg on PATH, and Node with Playwright available. On this PC:
+
+```powershell
+$env:NODE_PATH='C:\Users\mehya\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules'
+```
+
+The isolated server uses **127.0.0.1:8766**, synthetic notes/audio and the existing hosted dialogue credentials. It never copies live conversation. The unchanged core suite has 20 commands; `--near-wave` adds a near gesture and following memory reply. The 30-minute soak runs six cycles: **120 core or 132 expanded interactions**. Use a fresh label to preserve earlier evidence.
+
+Terminal one, using the reviewed `near-wave` bundle already retained on this PC:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-call --performance-label near-wave --near-wave --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda
+```
+
+Terminal two:
+
+```powershell
 node scripts/qualify_video_call.cjs qualification new-call --capture
+```
+
+For a new candidate, replace `--performance-label near-wave` with its reviewed bundle label. For the sustained test, use `--trial soak` and Node's `soak` argument with the same fresh label. The driver waits up to 90 seconds for startup, alternates synthetic speech and text, exercises real AudioWorklet/VAD/ASR/planning/TTS/render/playback, and closes the server through its completion marker. Three failed soak turns stop it early while preserving failures. An observation timeout does not mean the job stopped: inspect the actual process before restarting.
+
+`--capture` measures from the last synthetic speech block above the detector's energy floor to both audio/video playback. Default WAV injection excludes capture/endpoint waiting. Deliberate interruptions are excluded from response percentiles. Neither mode measures physical acoustics or public/mobile networks. Frame callbacks measure continuous visible playback, resetting on actual pause/seek/source/visibility changes.
+
+After timing and both processes finish:
+
+```powershell
 .\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-call
+.\.venv\Scripts\python.exe scripts/build_call_review.py --trial qualification --label new-call
+.\.venv\Scripts\python.exe scripts/review_lip_sync.py --source voice-video-qualification-new-call --label new-sync --device cuda
 ```
 
-Use `--temporal-size 32` to reproduce historical preparation. Longer clips or other resolutions need their own memory and visual qualification. Candidate labels never select assets in the live server automatically; promote the matching set only between calls, retain a rollback copy and restart to rebuild appearance caches.
-
-The `qualification temporal128 --capture` run passed all 20 commands without reported reply stalls. Across nine uninterrupted spoken replies, end-of-speech playback was **2.706s median / 3.421s p95**. Across 19 mixed typed/spoken replies, Send-to-playback was 1.81s median / 2.75s p95. Browser A/V clocks differed by 27.355ms p95 / 38.780ms maximum (635 samples). Every one of the 20 clips / **1,014 frames** was retained and decoded, with zero limited heuristic flags and nonzero unclipped audio. Visual review covered all 81 frames of one rendered wave and 60 transition/close-speech frames, confirming removal of the earlier double image in the inspected region. It did not qualify physical audio, perceptual lip sync or all-frame anatomy.
-
-After the test, the idle preview call was ended and eight matching asset files replaced with a rollback copy in ignored `audit/live-before-temporal128/`. The memory database was unchanged during promotion. The restarted server loaded five appearance sources in **18.071s**; the page was refreshed to the full-body Call Mira screen. No public deployment, credential, provider or memory-schema change was made. Roll back by stopping the preview between calls, restoring those eight files, reverting the code if needed and restarting. Never restore or overwrite private memory as part of an asset rollback.
-
-### Thirty-minute call and smaller planners - September 9
-
-A 1,800.056-second call completed **120 interactions** (six fixed 20-command cycles), with zero functional assertion failures, browser errors or reported buffer stalls. The call remained active through the final turn. Six deliberate interruptions were excluded from first-response percentiles.
-
-| Input boundary | Samples | Median | p95 | Maximum |
-|---|---:|---:|---:|---:|
-| Mixed typed / injected WAV | 114 | 1.89s | 2.82s | 5.64s |
-| Typed submission | 60 | 1.855s | 2.58s | 4.55s |
-| Injected WAV, including ASR | 54 | 2.215s | 2.83s | 5.64s |
-
-Cycle medians were 2.13 / 2.28 / 1.89 / 1.85 / 1.99 / 1.89 seconds. This run shows no steady growth in response delay; it is one sequential user on this PC, not a concurrency or mobile qualification. Spoken end-of-speech latency still adds physical capture and the approximately 0.65s endpoint wait. Raw callback-gap counters include intentional source changes and idle pauses, so they are not presented as playback stalls.
-
-Normal 50-turn retention deleted 70 older clips before the post-run review. The **50 retained clips / 2,469 decoded frames** had zero limited heuristic flags, 20FPS decoded timestamp spacing, nonzero speech RMS and no clipped audio samples. The other 70 clips cannot be retrospectively inspected; this is not a complete every-frame pass. The harness now archives only its synthetic media per turn. Windows browser closure also produced one ConnectionAbortedError while returning the final cancellation response; disconnect handling is corrected and regression tested.
-
-The subsequent `qualification --label sync` run completed all 20 commands with zero failures/stalls and retained every clip: **997 decoded frames**, zero heuristic flags. Its response p50/p95 was **1.83s/3.05s** across 19 non-interrupted replies. **619 audio/video clock samples** measured 11.19ms median, 27.94ms p95 and 31.86ms maximum absolute skew while speech was playing. This passes the browser-clock target, not perceptual phoneme alignment or physical speaker latency. The server closed cleanly. Validation: 130 Python tests, 17 Node tests, compileall and Node syntax checks passed; independent public-release review remains pending.
-
-After the soak, 24 sequential synthetic calls compared three Cloudflare models using the same real planner prompt/schema and memory, negation, message and unsupported-action cases. Rates are from the [Cloudflare table](https://developers.cloudflare.com/workers-ai/platform/pricing/), checked September 9 UTC. These are complete planner times, not first tokens or whole-call times:
-
-| Exact model | Samples | Median / maximum | Failed cases | Listed total cost |
-|---|---:|---:|---:|---:|
-| @cf/qwen/qwen3-30b-a3b-fp8 | 8 | 0.603s / 1.268s | 0 | $0.000608 |
-| @cf/meta/llama-3.1-8b-instruct-fp8-fast | 8 | 0.596s / 0.828s | 0 | $0.000638 |
-| @cf/meta/llama-3.2-3b-instruct | 8 | 0.421s / 0.692s | 1 message delivery | $0.000623 |
-
-Keep Qwen: 8B did not show a meaningful median gain; 3B sacrificed a requested behavior. These small samples do not establish tail reliability or adult-service permission. Reproduce with `benchmark_cloud_comparison.py dialogue --model <exact-model> --repeats 2 --label <new-label>` in the virtual environment. Runtime selection and credentials were unchanged.
-
-### End-of-speech measurement and ASR comparison — September 9
-
-`qualify_video_call.cjs --capture` supplies synthetic speech to a virtual MediaStream while retaining the actual AudioWorklet, energy detector, turn submission, ASR, planner and playback. The measurement begins at the last 128-sample input block above the detector's minimum energy floor and ends when both audio and video have started. This includes the 650ms endpoint wait; it still excludes physical microphone/speaker latency and acoustic echo. Deliberate interruption is excluded from response percentiles.
-
-| Capture-inclusive run | Commands | Spoken samples | End-of-speech p50 / p95 | Browser A/V p95 / maximum |
-|---|---:|---:|---:|---:|
-| Base English, four CPU threads | 20 | 9 | 2.85s / 3.39s | 24.43ms / 30.72ms |
-| Base English, eight CPU threads | 20 | 9 | 3.09s / 3.83s | 24.36ms / 32.01ms |
-
-Both runs passed all commands without reported stalls. Actual recognition median fell from 447.5ms to 406.5ms across ten audio submissions; normalized words matched. Hosted planner timing and reply lengths varied, so the second run establishes no overall call improvement. Retain eight threads for the measured ASR benefit; do not shorten the speech boundary without pause/cutoff testing. The two-second target remains unmet.
-
-All 40 clips were retained: 986 + 1,003 decoded frames, zero face-count/dark-frame/abrupt-change flags, and nonzero unclipped audio. Manual spot review found blurred hands, close-view mouth artifacts and pronounced double images during approach. A source/render comparison confirms that approach source frames 48 and 50 already contain the double image before MuseTalk. The heuristics missed this defect. Replace/review the prepared source; faster transport cannot repair it. These runs are not full visual, perceptual lip-sync or physical-audio acceptance.
-
-The separate ASR corpus contains 80 utterances across US female, US male and UK female synthetic voices, including 20 with seeded 15dB white noise, plus three non-speech probes. Whole-utterance results on this CPU:
-
-| Recognizer | Threads | Median / p95 | Word error rate |
-|---|---:|---:|---:|
-| Whisper Base English int8 | 4 | 313ms / 330ms | 0% |
-| Whisper Base English int8 | 8 | 268ms / 286ms | 0% |
-| Whisper Tiny English int8 | 4 | 172ms / 180ms | 1.42% |
-| Whisper Tiny English int8 | 8 | 138ms / 144ms | 1.42% |
-| Moonshine Tiny Streaming | Native default | 283ms / 531ms | 3.13% |
-| Moonshine Small Streaming | Native default | 1,089ms / 1,727ms | 1.42% |
-
-No tested recognizer lost a critical negation. Tiny substitutes “T” for “tea”; the scorer also counts UK “favourite” as an error, although that spelling is harmless. Both Moonshine models emitted a word for digital silence when called directly; the application's existing energy guard rejects that silence before inference. Moonshine was tested through its whole-utterance API, without incremental overlap; these results do not reject every possible streaming configuration. The corpus is synthetic English, not a human/accent/noisy-room qualification.
-
-Tiny's official converted checkpoint is pinned in config/local-models.json. Optional Moonshine SDK **0.1.5** and its isolated dependencies are pinned in config/moonshine-benchmark-requirements.txt; downloaded English models use CDN revision **quantized_26_08_21**, with exact URLs and SHA-256 manifests retained locally. The [upstream license](https://github.com/moonshine-ai/moonshine/blob/main/LICENSE) grants the English/streaming models under MIT; other assets and dependencies need their own review. Neither candidate changes the active app model.
-
-Reproduce using fresh labels/directories:
+Use the corresponding `soak` names for a sustained run. Each review page checks retained media coverage/hashes and supports playback, exact frame stepping, flags and browser-local notes/export. Serve **only the synthetic audit directory**, never the live database folder:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label capture-new
-# In another terminal; set NODE_PATH as in the existing qualification instructions:
-node scripts/qualify_video_call.cjs qualification capture-new --capture
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label capture-new
-.\.venv\Scripts\python.exe scripts/download_local_models.py --models asr-tiny-en
-.\.venv\Scripts\python.exe scripts/benchmark_call_asr.py --label cpu-comparison
+.\.venv\Scripts\python.exe -m http.server 8771 --bind 127.0.0.1 --directory generated/local-app/audit/voice-video-qualification-new-call
 ```
 
-For the optional Moonshine comparison, create `.cache/moonshine-env`, install its pinned requirements there, and run `benchmark_moonshine_asr.py --model tiny-streaming --download-only` with that environment's Python, followed by the same command without `--download-only`; repeat for `small-streaming`. It consumes the fixed `asr-calls-cpu-comparison` corpus. Existing results cause an error rather than overwrite evidence. Model discovery/download and benchmarking are separate; no microphone or cloud inference is used.
+Choose a free port. Review checkboxes stay unchecked until someone actually records the observation. Generated audio can be nonzero, unclipped and unmuted yet remain inaudible at the physical speakers.
 
-Finally, 16 bounded synthetic Qwen planner calls compared fresh HTTPS with connection reuse: eight calls each, median **517ms / 458ms**, all four cases passed. The roughly 60ms difference does not resolve the call bottleneck; production transport is unchanged. `benchmark_dialogue_connection.py` records sanitized timing and token usage. Neural rendering, reply preparation and end-of-turn detection remain the main optimization work. ASR alternatives, connection reuse and model installation are separate from provider/content approval.
+SyncNet v2 is installed as an offline evaluator under `.cache/local-poc/syncnet-evaluator`; [its manifest](../config/syncnet-evaluator.json) records model, dependency, code hashes and research scope. `download_syncnet_evaluator.py` restores the pinned assets without changing app packages. It compares actual decoded timestamps and the app's separate WAV, uses 40ms offset resolution and calibrated injected-delay/reversed-audio controls. It is not a human-perception or commercial-license certificate.
 
-Two further CPU experiments remain **unselected**:
-
-- Shorter Whisper encoder input is rejected. The initial 83-fixture comparison suggested a 15s minimum could reduce median ASR from 269ms to 116ms without changing normalized words. A subsequent 36-fixture challenge found repeated punctuation in **17/36 candidate outputs versus 0/36 baseline**, and p95 worsened from **371ms to 657ms**. Both had the same 0.71% word-error score: normalization hid the punctuation defect. The challenge includes three synthetic voices, corrections, 400ms pauses and utterances up to 15.83s. No negation was lost; real-speaker accuracy remains untested. The earlier 5/10/20s trials also failed. The [CTranslate2 encoder](https://github.com/OpenNMT/CTranslate2/blob/v4.8.2/src/layers/whisper.cc) accepting shorter input does not establish equivalent recognition. Preserve the standard 30s padding.
-- [Smart Turn v3.2](https://huggingface.co/pipecat-ai/smart-turn-v3), pinned CPU ONNX, two threads: feature extraction plus inference was 20.25ms median / 21.28ms p95 across 57 warm samples. With 200ms trailing silence, 18/20 complete synthetic prompts exceeded the 0.5 completion threshold. Twenty-four of 40 cut prefixes also exceeded it, but these prefixes lack human completion labels. This cannot justify shortening the live 650ms boundary. The model card specifies BSD-2-Clause; retain its license and exact pin in `config/smart-turn-benchmark.json`.
-
-Run after call timing has finished, using new labels: `benchmark_asr_window.py --label new-asr --minimum-seconds 20 15` consumes the established `asr-calls-cpu-comparison` corpus. `benchmark_smart_turn.py --download-only`, then `benchmark_smart_turn.py --label new-turn --threads 2` uses the retained `qualification-temporal128` fixtures. Both run in the existing virtual environment, use synthetic data and preserve the active models, browser and packages. Full summaries, rejected outputs and hashes are retained in machine evidence/local audits.
-
-Reproduce the harder ASR comparison with `prepare_asr_challenge.py --label new-challenge`, then `benchmark_asr_window.py --label new-review --corpus-label new-challenge --minimum-seconds 15`. The scorer now reports repeated punctuation separately; no recognition output is silently cleaned to make the test pass.
-
-### Full ASR-to-video check — September 9
-
-The real local recognizer, configured Cloudflare Qwen planner, Kokoro voice and MuseTalk renderer were exercised together through browser playback. Only physical microphone capture was replaced with fixed generated WAVs; an isolated database held the synthetic fact "My dog is named Maple." No private conversation was read or modified.
-
-| Selected build, one warm call | ASR | ASR + complete plan | First browser playback | Stalls |
-|---|---:|---:|---:|---:|
-| Greeting | 0.396s | 1.065s | 2.52s | 0 |
-| Recall dog's name | 0.393s | 0.975s | 2.20s | 0 |
-| Contextual approach request | 0.411s | 0.935s | 2.19s | 0 |
-
-All transcripts matched the fixed prompts, memory recall returned Maple, and the approach reached the near pose with unmuted audio completion. Peak Torch allocation was 2,739MiB, not total device memory. The existing 16GB card fits this path. These three samples are not p95; physical microphone, endpoint detection, mobile Safari, internet transport, long calls and concurrent users remain unmeasured. The current microphone waits about 0.65s of silence before submission, so end-of-speech latency is longer than the table.
-
-A 0.15s starting-buffer experiment caused a 0.05–0.09s stall in each of three trials. Keep 0.35s. Baseline timing was 2.60/2.35/2.01s; varying hosted replies mean the selected run is not a claimed speed percentage. The selected change fixes repeated audio-end seeks during a longer silent body gesture: seven ended events became one. iPhone ManagedMediaSource selection is implemented and unit checked with remote playback disabled; no real iPhone performance claim follows from those checks.
-
-Reproduce in a fresh audit directory with `serve_voice_video_benchmark.py --trial selected`, then `review_voice_video_playback.cjs selected`. Existing trial directories cause an error to preserve evidence. Each trial uses four hosted plans including warm-up; all prompts/history are synthetic. Three completed trials made twelve such requests; billing usage was not captured, so these are not declared free. Files remain under `generated/local-app/audit/voice-video-{baseline,revised,selected}`; machine-readable summary is in research/local-poc-benchmarks.json.
-
-### Preparing appearances before calls — September 9
-
-Same synthetic approach/count/browser workflow, current mouth crop:
-
-| Configuration | First browser playback from Send | Total phrase gaps | Within-phrase stalls | Server completion |
-|---|---:|---:|---:|---:|
-| Batch 8, previous preparation | 2.56s | 1.03s | 0 | 15.63s |
-| Batch 4 | 2.53s | 1.00s | 0 | 15.87s |
-| Batch 8, two views prerendered | 1.67s | 0.03s | 0 | 12.16s |
-| Batch 8, four source appearances primed | **1.61s** | **0.03s** | **0** | **11.10s** |
-
-Batch 4 was rejected as noise. The selected implementation tracks/encodes verified source appearances during startup, caches four bounded clips instead of two, and generates speech-conditioned mouths anew. It does not precompute user replies. Priming four sources took **13.514s** before admission; subsequent face tracking took about 4ms per phrase. Loaded Torch allocation was 1,829MiB; peak rendering allocation was 2,742MiB, excluding other processes/display/driver usage. This is not a 16GB capacity bottleneck. Prepared movement and facial/arbitrary-command limitations remain.
-
-The browser completed three unmuted phrases without errors. Engine startup now primes sources; `visual_warmup` reports source count, time and allocation. Reproduce with `serve_phrase_benchmark.py --action closer --prime-reviewed`, then `review_phrase_playback.cjs phrases-approach-primed`. `--prewarm-reviewed` retains the two-clip experiment; `--batch-size 4` retains the rejected comparison. These exclude physical capture, real ASR/dialogue, internet transport and concurrency. Startup is longer; warm replies are faster.
-
-New primary research: [OmniMate](https://arxiv.org/html/2607.23023v1) reports 27.64FPS and 3.49s time to first frame with H100 hardware/pipeline parallelism; downloadable inference weights were not located in the checked paper. [InteractiveAvatar](https://arxiv.org/html/2606.22905v1) describes state/history switching and separates DiT/VAE across GPUs; it is an architectural lead, not an installed package. [Omni-LiveAvatar](https://github.com/Aoko955/Omni-LiveAvatar) reports H200 streaming but explicitly has not released code/checkpoints. [MotionStream](https://joonghyuk.com/motionstream-web/index.html) reports 29FPS/0.4s on H100 with motion controls, not a complete speech-driven companion. None proves a drop-in 16GB solution. The tested FlashHead Lite remains a practical next streaming comparison, with body-command and dependency-license gaps.
-
-### Speech pipeline — September 8 measured revision
-
-The engine now preserves the full planned reply across short phrases (first target 72 characters, later 120), prepares one CPU TTS phrase ahead while rendering, performs a body command once, and advances the prepared loop's source time. Punctuation/word boundaries are preserved. Cancellation joins in-flight TTS before clearing media; incomplete replies do not commit memory. Each completed phrase closes its own fMP4 response. Previously the response stayed open until the whole job finished, causing an 8.34s stall in the first segmented experiment; that regression is fixed and covered by an HTTP test.
-
-| Same 215-character count | First browser playback | Server complete | Stalls within clips | Largest gap between clips |
-|---|---:|---:|---:|---:|
-| Whole reply, batch 8 | 4.10s | 14.89s | 0 | N/A |
-| Three phrases, batch 8 — selected | 2.33s | 14.71s | 0 | 0.576s |
-| Three phrases, batch 16 — rejected | 2.36s | 14.58s | 3 / 0.94s | 0.018s |
-| Three phrases plus approach, batch 8 | 2.66s | 15.63s | 0 | 0.987s |
-
-These are single local samples with **synthetic ASR and planner**, real Kokoro/MuseTalk/HTTP/MSE, and unmuted Chromium audio. Add real recognition and dialogue time for a real call. They are not p50/p95 or directly comparable with earlier differently loaded runs. Local Whisper recovered 1–25 in every concatenated speech output. Contact sheets retained full-body framing and the close destination, but the prepared approach visibly blurs/ghosts, the close source crops the crown, and mouth artifacts remain. Gap time is now reported separately from buffer stalls; faster start does not establish seamless playback.
-
-Reproduce in two terminals: `.\.venv\Scripts\python.exe scripts/serve_phrase_benchmark.py [--whole | --batch-size 16 | --action closer]`, then `node scripts/review_phrase_playback.cjs <whole|phrases|phrases-b16|phrases-approach>` with Playwright on `NODE_PATH`. This dedicated loopback server uses port 8766, a separate synthetic database and reviewed media copies; it never reads the live conversation, makes a cloud call or opens a physical microphone. It shuts down after browser completion or a 150s observation window. `review_phrase_outputs.py` produces transcripts and contact sheets. Audit media stay local; sanitized results/hashes are in the machine evidence.
-
-### Interruption continuity — September 8 measured revision
-
-The browser freezes the current picture immediately and sends only the registered job/part and presented timestamp to authenticated `/api/cancel`. The engine copies a bounded, app-owned fMP4 prefix before cancellation deletes media, then selects the last decoded frame at that timestamp on CPU. Container-average frame rate was inaccurate for fragmented clips; decoded timestamps select the frame, while the renderer's 20fps source clock selects the motion offset. No client image, path or URL is accepted. Stale jobs cannot roll back newer state; reset wins over an in-flight capture, and new replies wait until capture finishes. Transient snapshots are removed; the retained PNG is deleted on replacement, reset or restart.
-
-For the reviewed approach/return pair, the engine preserves progress between base and near. An ordinary reply speaks from that captured pose; a later approach or return uses the corresponding remaining source segment. Other generated actions preserve their displayed image but have no guaranteed reversible body trajectory. Failed capture stops the reply and reports that its position was not saved. Stopping a server-completed reply does not retroactively erase its already-saved text; delivery-aware memory remains future work. No new API key, environment variable or database migration is needed.
-
-| Actual browser trial | Saved movement position | CPU capture | Following behavior |
-|---|---:|---:|---|
-| Interrupt approach → speak → return | 0.8s into source | 0.136s | Speech retained the pose; return began at 2.2s of the reverse clip and reached base |
-| Interrupt approach → speak → continue | 1.6s into source | 0.094s | Speech retained the pose; approach resumed at 1.6s and reached near |
-
-Both in-flight approaches cancelled successfully. Browser-held versus engine-saved images differed by 1.33 / 1.41 channel levels on a 0–255 scale, consistent with small decoder/color differences; this is a position check, not a realism score. In the second trial, following speech started in 1.46s and the resumed long approach reply in 1.84s, with zero within-clip buffer waits and a 0.68s total inter-phrase gap. These two samples use synthetic ASR/plans with real Kokoro, MuseTalk, HTTP and Chromium. Physical audio, natural barge-in, every interruption position and sustained p95 remain unqualified. Visual review still shows soft mouths, body morphing and close framing that crops the crown. Two initial harness attempts accidentally awaited the complete submit promise and stopped in phrase 2; they did not qualify mid-motion interruption.
-
-Reproduce with `serve_phrase_benchmark.py --interruption`, then `node scripts/review_interruption_playback.cjs`; repeat using `--interruption --trial middle` and `node scripts/review_interruption_playback.cjs middle`. `review_interruption_outputs.py` computes the saved-frame differences and artifact hashes. The same synthetic-only port 8766 isolation applies.
-
-Latest listening review: two raw calm LTX-2.3 candidates held both eyes shut for roughly one second and were rejected unchanged. `retime_idle_motion.py` slows the full frame to half speed while compressing the manually selected blink interval separately to about 0.25s. The reviewed 5.208s prepared result is now active: side-background mean optical flow fell from 1.153 to 0.473px/s (59%), with a brief bilateral blink. This is a measured improvement, not a natural-motion certificate: minor scene morphing, seam movement and repetition remain. The source, settings, reviewed hash and rollback backup are recorded in machine evidence; `prepare_idle_loop.py --candidate` never replaces active footage automatically.
-
-`benchmark_listening_timing.py` used the same synthetic 1.035s greeting. Old-padding-equivalent playback lasted 5.25s; the corrected ambient path lasts 1.05s, removing 4.2s of unnecessary silent reply playback. Warm rendering took 0.83s with first 4KB at 0.345s. The old-equivalent render had a cold appearance cache, so its 1.655s render is not a controlled attribution of all speed gains to this change. Speech creation was 0.279s; LLM, ASR and browser delay are excluded.
-
-`benchmark_cloud_speech.py` makes at most six synthetic requests using the existing Cloudflare authentication, without reading conversation. [Aura-2 English](https://developers.cloudflare.com/workers-ai/models/aura-2-en/) (`@cf/deepgram/aura-2-en`, `luna`) lists $0.03/1,000 input characters. First 4KB arrived in 0.278–0.395s; complete WAVs took 0.750–0.818s for 16 characters, 1.851–1.873s for 62, and 6.014–7.264s for 215. Six listed costs total $0.01758; an earlier 16-character request with an unknown-length WAV header failed local parsing, adding a nominal $0.00048. These are computed list prices, not an invoice. The parser now measures actual PCM length. Cloud speech is **not selected**: first bytes are not usable synchronized video, and long complete-file latency is still poor. Streaming audio would require incremental speech features/rendering, not just changing the provider.
-
-### Cloudflare comparison — September 8 follow-up
-
-The founder authorized API quality/latency comparisons. `benchmark_cloud_comparison.py` uses synthetic notes and the actual dialogue adapter, with bounded requests/tokens and no runtime switch. Eight samples per successful model covered recall, negated movement, in-call message delivery and an unsupported cartwheel. These are whole-response times, not token-stream latency:
-
-| Model | Completion samples | Quality finding |
-|---|---:|---|
-| `@cf/qwen/qwen3-30b-a3b-fp8` | 0.455–0.771s | Correct recall, no negated movement, message delivered; remains selected |
-| `@cf/ibm-granite/granite-4.0-h-micro` | 1.289–2.108s | Same basic decisions, cheaper tokens but slower in this sample |
-| `@cf/zai-org/glm-4.7-flash` | 6.854s truncated; second sample timed out at 30s | Not compatible with the current 512-token/no-think adapter settings; not a general model-quality verdict |
-
-Qwen and Granite both incorrectly said “Let me try that” for a cartwheel while choosing no action. A capability prompt correction makes the selected Qwen explain the limit; two follow-up samples returned the correct explanation. This fixes the observed case, not every possible unsupported request. The harness now stops testing a failed model for the entire run; its initial version repeated GLM once in the second round.
-
-Three identical texts (16/62/215 characters), with one new sample per voice:
-
-| Speech model / voice | Short / normal / long complete audio | Long output duration | Long sample list cost |
-|---|---|---:|---:|
-| Local Kokoro `af_sarah`, four CPU threads, warm | 0.307 / 0.683 / 2.153s | 13.092s | Local electricity |
-| `@cf/deepgram/aura-1`, `luna` | 0.747 / 0.538 / 2.435s | 13.363s | $0.003225 |
-| `@cf/deepgram/aura-2-en`, `luna` | 0.736 / 1.886 / 7.269s | 18.000s | $0.006450 |
-| `@cf/myshell-ai/melotts`, default English voice | 0.974 / 1.473 / 2.005s | 10.545s | $0.000035 |
-
-All twelve WAVs contained non-silent, unclipped signal. Local Whisper recovered the count through 25 for Kokoro/Aura; Aura-1's “birdsong” became “birds on,” and Melo's count transcription repeated 20. These are ASR flags, not proof of which model introduced an error or a subjective listening score. Kokoro stays selected: the cloud alternatives do not consistently beat it, and voice preference is untested. `review_cloud_speech.py` reproduces the local comparison. [Cloudflare list pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) determines nominal costs; the failed GLM timeout has unknown billed usage.
-
-The 86-entry [Workers AI catalog](https://developers.cloudflare.com/workers-ai/models/) is only the Cloudflare-hosted subset. The broader [AI catalog](https://developers.cloudflare.com/ai/models/) lists 235 entries on September 8, including third-party video. Our earlier Workers AI inventory therefore did not cover every model reachable through Cloudflare.
-
-### Remote inference with fewer credentials — September 8
-
-Prefer **one Cloudflare credential, at most one additional GPU credential** if continuous rendering requires it. Cloudflare's [unified REST endpoint](https://developers.cloudflare.com/ai-gateway/usage/rest-api/) accepts `{model, input}` at `/accounts/{account}/ai/run`; its documented third-party examples use Unified Billing without individual provider keys. This is a proposed benchmark route, not a new app renderer.
-
-| Role | Exact Cloudflare model ID | Decision |
-|---|---|---|
-| Dialogue | `@cf/qwen/qwen3-30b-a3b-fp8` | Keep the measured active route |
-| Remote speech | `@cf/deepgram/aura-1` | Already compared; Kokoro remains selected |
-| Cheap motion candidate | `pruna/p-video` | Compare 720p draft and standard, same fictional reference and command |
-| Spoken avatar clip | `pruna/p-video-avatar` | Compare against local FlashHead; completed clips are not proof of streaming calls |
-| Alternative motion | `lightricks/ltx-2-5-fast`, `bytedance/seedance-2.0-fast` | Secondary candidates after price/terms checks |
-| Additional speech candidate | `inworld/tts-1.5-mini` | Defer: its AUP restricts suggestive/mature applications; advertised latency is not measured here |
-
-Sources: [P-Video](https://developers.cloudflare.com/ai/models/pruna/p-video/), [avatar](https://developers.cloudflare.com/ai/models/pruna/p-video-avatar/), [LTX](https://developers.cloudflare.com/ai/models/lightricks/ltx-2-5-fast/), [Seedance](https://developers.cloudflare.com/ai/models/bytedance/seedance-2.0-fast/), [Inworld AUP](https://inworld.ai/aup/). Cloudflare routing preserves underlying model terms; no NSFW approval is established. See USA for content exclusions and ECONOMICS for per-clip versus continuous-video costs.
-
-The founder funded $10 in prepaid credits for Gateway **`default`**. Existing **API key + email** works for both the [credit-balance GET](https://developers.cloudflare.com/api/resources/ai_gateway/subresources/billing/) and LTX third-party inference. Reproduce with `.\.venv\Scripts\python.exe scripts/check_cloud_gateway.py`; it writes only sanitized status to the local audit folder. It reads no conversation and never purchases credits, changes billing or follows redirects. The read-only checker tests billing only; the separate video benchmark proves third-party key/email compatibility. No extra provider key or runtime environment variable was added.
-
-[Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) adds 5% to credit purchases; rare negative balances can still be collected later. The founder purchased credits; no GPU was rented. The benchmark makes one bounded synthetic request per case, keeps provider safety filtering, refuses existing cases and disables automatic retry. Measure request-to-playable time, identity, command execution and audio sync. Do not upload private history or mistake provider inference time for call latency. Continuous calls retain local rendering while remote candidates are unqualified.
-
-### Funded Gateway video test — September 8 evening (September 9 UTC)
-
-| Trial | Result | Request time | Recorded generation cost |
-|---|---|---:|---:|
-| `pruna/p-video`, 5s, 720p draft | HTTP 400 input-mapping errors; no clip | 1.04–2.77s | No observed deduction |
-| `lightricks/ltx-2-5-fast`, 5s, 720x1280/24fps, audio | Two completed text-to-video requests | 31.107 / 31.204s | $0.45 each |
-
-The three Pruna diagnostics tested documented flat parameters, provider nesting and both. Errors alternated between missing `input` and missing `prompt`; the live dashboard schema matches the published flat request. Stop this route pending adapter correction. No safety rejection was reported. LTX's first completed result was missed by the initial response parser; its Gateway log confirmed completion/cost but logging-off prevented payload recovery. The corrected parser preserves the nested v4 response; a separate review trial supplies the usable clip. Both charges are counted.
-
-The reviewed LTX clip is 720x1280 H.264/AAC, 5.042s, 3.18MB; download took 0.635s after generation. Sampled frames show a full-body right-hand raise, wave and lowering, with stable clothing/framing. CPU Whisper recovered “Hi, good to see you.” This text-only test created a different fictional woman: Mira identity conditioning, fine lip-sync, physical speakers and repeatability remain unqualified. At about 31.8s to local availability it fits a prepared message, not a two-second call. Provider inference cost reconciled to **$0.90 used / $9.10 credits remaining**; immediate balance reads lagged. Credit-balance values are cents, while log costs are dollars. Account pricing also shows LTX 1080p at $0.15/s, so the $0.09/s comparison applies to 720p.
-
-Reproduce once per case with `scripts/benchmark_cloud_video.py motion-draft`, `ltx-smoke` or `ltx-review`; these are paid tests with existing-output guards, not runtime routing. `scripts/review_cloud_video.py ltx-review` downloads the returned clip for decoding from the observed HTTPS Google Storage host, without Cloudflare headers or redirects. Local evidence lives under `generated/local-app/audit/cloud-video/`; URLs, account details and credentials are not committed. Model sources are linked above. No new API key, automatic top-up, payment setting or live provider switch was made.
-
-### Local mouth tuning — September 8 evening
-
-`benchmark_visual_quality.py` compared four face/audio settings on near and full-body idle footage; `--motion` adds legacy/new approach and return comparisons. The selected crop moves its face midpoint from −0.04 to −0.10 of detected face height, reducing exaggerated mouth openings in sampled frames. MuseTalk's two-frame left context is now six Whisper steps at 20fps, matching [upstream preprocessing](https://github.com/TMElyralab/MuseTalk/blob/main/musetalk/utils/audio_processor.py), instead of the previous four. Crop-sensitive source caches prevent reuse of old face latents. Teeth, motion blur and the crude mouth blend remain visible; this is a modest correction, not photorealistic lip-sync qualification.
-
-The isolated browser approach/count trial (`serve_phrase_benchmark.py --action closer --quality-review`, then `review_phrase_playback.cjs phrases-approach-quality`) began at **2.56s from Send**, finished server work in 15.63s, completed all three unmuted audio phrases and had zero within-phrase stalls / 1.03s total phrase gaps. ASR/planning were synthetic. `benchmark_visual_graph.py` produced identical pixels but changed batch-eight neural time only from 0.2902s to 0.2877s median (0.85%); CUDA graphs were rejected. Source/quality contact sheets and raw timings remain in the local audit folder.
-
-### FlashHead Lite local trial
-
-`Soul-AILab/SoulX-FlashHead-1_3B/Model_Lite` now runs locally in an isolated benchmark using PyTorch SDPA, four denoising steps, 384x576, 24 generated frames per 0.96s chunk. The full-body greeting used 5,014MiB peak tensor allocation; its first chunk took 1.424s and later chunks 0.790–0.856s. The close reference with a 3.262s synthetic Aura-1 sentence took 0.937s for the first chunk and 0.790–0.878s thereafter, producing 5.76s in 4.993s including encoding. Model/reference setup was 4.0–4.5s, excluded from chunk times. This establishes short-run local throughput, not end-to-end call latency or sustained p95.
-
-Reviewed output: the full-body mouth barely reacts; the close reference has visible mouth/head motion and smoother whole-face changes, but mouth shapes remain imperfect and the framing clips the crown as the source does. Neither test follows arbitrary body commands. **Not selected in the app.** Next compare longer speech, silence, identity drift and action transitions before adding a persistent renderer. The [authors' 4090 results](https://github.com/Soul-AILab/SoulX-FlashHead) are separate from these measurements. Apache top-level licensing does not settle the bundled LTX VAE/dependency rights for public use.
-
-A follow-up 32-chunk run used the complete 13.092s Kokoro count and then silence: 30.72s of video generated/encoded in 25.592s, 0.929s first chunk, 0.793s median / 0.863s maximum later chunks, about 5GB peak tensor allocation. Sampled frames retained identity through the end and returned to a quiet expression; mouth shapes still look imperfect. This is a 31-second throughput check, not a 30-minute call or a lip-sync acceptance test. Reproduce after the speech review with `benchmark_flashhead.py --reference performance-near --audio kokoro-long --chunks 32`; insufficient output duration now fails instead of truncating the input sentence.
-
-### Faster speech-video decoder — September 9
-
-A batch-eight profile isolated SD VAE decoding at **234ms**, versus **56ms** for MuseTalk UNet and **4ms** for pixel transfer. A locally built TensorRT FP16 decoder reduced the isolated decode median from **235ms to 120ms** across 12 synthetic conditions. Raw decoded pixel differences averaged about 0.068/255, with a maximum of 2/255.
-
-Four identical audio/body-source comparisons rendered in **1.52 / 1.58 / 0.615 / 0.621s**, versus Torch **2.41 / 2.28 / 0.957 / 0.963s**: a 31–37% render-time reduction. All **259 encoded frames** were compared; the largest whole-frame mean difference was 0.126/255. All four worst-pair images were inspected, and partial batches 1–8 remained finite and close to Torch. This preserves existing appearance, including its mouth/hand defects; it does not certify natural lip sync. Torch allocation counters exclude TensorRT's external memory allocations.
-
-The experimental and integrated capture trials both passed **20/20 commands** with no reported reply stalls. End-of-speech median/p95 was **2.50/3.44s** and **2.48/2.92s** respectively (nine uninterrupted spoken inputs each); mixed Send-to-playback median/p95 was **1.49/2.77s** and **1.60/2.48s** (19 inputs each). Keep both runs: hosted variability changes the tail, and neither meets the two-second target. Integrated A/V clock skew was 25.11ms p95 / 32.55ms maximum over 614 samples. This measures browser clocks, not phoneme alignment or audible speakers.
-
-Every frame in both trials was analyzed: **1,005 experimental / 994 integrated**, with no heuristic flags, nonzero audio and no clipped samples. Forty transition/close frames per trial were manually inspected; remaining perceptual defects persist. All 20 integrated render records report `tensorrt`. The selected preview restarted successfully in **29.47s**, including five-source warm-up, with unchanged private memory. Physical audio and mobile checks remain pending; its sustained trial is recorded below.
-
-Reproduce on the configured local environment:
+The new OpenCV Zoo MediaPipe [person](https://github.com/opencv/opencv_zoo/tree/47534e27c9851bb1128ccc0102f1145e27f23f98/models/person_detection_mediapipe) and [pose](https://github.com/opencv/opencv_zoo/tree/47534e27c9851bb1128ccc0102f1145e27f23f98/models/pose_estimation_mediapipe) diagnostic is CPU-only and offline. Both directories state Apache-2.0; code, licenses and weights are hash-pinned in [body-evaluator.json](../config/body-evaluator.json). It estimates person presence, joint confidence, raised wrists and abrupt projected limb changes. Its fixed skeleton cannot count extra limbs or certify identity/anatomy. Run after timing; inspect flags visually:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install --target .cache/tensorrt-deps --no-deps -r config/tensorrt-benchmark-requirements.txt
-.\.venv\Scripts\python.exe scripts/benchmark_visual_kernels.py --label baseline
-.\.venv\Scripts\python.exe scripts/benchmark_trt_vae.py --label fp16
-.\.venv\Scripts\python.exe scripts/benchmark_trt_media.py
+.\.venv\Scripts\python.exe scripts/download_body_evaluator.py
+.\.venv\Scripts\python.exe scripts/review_body_motion.py --source voice-video-qualification-new-call --label new-body
 ```
 
-These commands use isolated synthetic audit folders and refuse overwriting completed runs. The media comparison uses retained speech from the documented `qualification temporal128 --capture` trial. Install dependencies only into the optional target directory; the existing Torch environment is unchanged. The NVIDIA Windows libraries require approximately 2.25GB to download. The fixed engine is approximately 101MB and built in 38.2s on this rig; installation and cold preparation are additional.
+Additional focused checks: `review_paused_voice.cjs` exercises corrected/negated resumed utterances; `review_voice_interruption.cjs` checks interruption continuity with synthetic capture. Their scope excludes physical echo. Existing exact commands and prerequisites remain in the scripts and historical evidence.
 
-After inspecting the comparisons and experimental call suite, copy only `decoder.engine` and `build.json` from `audit/visual-trt-fp16/` into `.cache/local-poc/musetalk-vae-trt/`, then mark that copied manifest `reviewed: true` with the review scope. Keep the original experiment record. Qualify the normal runtime using `serve_voice_video_benchmark.py --trial qualification --label trt-reviewed --performance-label temporal128 --decoder tensorrt-reviewed`, then `qualify_video_call.cjs qualification trt-reviewed --capture` and `review_call_frames.py --trial qualification --label trt-reviewed`. Set `AI_MATE_VISUAL_DECODER=tensorrt` only after that passes; restart between calls. Setting `torch` and restarting rolls back without touching memory.
+## Current evidence and decisions
 
-Only load engines built from the pinned local VAE. NVIDIA describes engines as executable, platform/GPU-dependent artifacts; hashes and a local review record are provenance checks, not a sandbox for third-party binaries. [NVIDIA runtime documentation](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/python-api-docs.html), [installation](https://docs.nvidia.com/deeplearning/tensorrt/latest/installing-tensorrt/install-pip.html). The optional runtime changes no model/content license, hosting eligibility or API credential.
+| Evidence | Result and limitation |
+|---|---|
+| `voice-video-qualification-near-wave` | 22/22 commands; speech-end median/p95 1.556/2.277s, ten samples. 948 frames analyzed, 137 visually inspected. One palm detection flag; no functional/page errors or reported reply stalls |
+| Same short call playback | Approximately 19.96 FPS replies / 24.13 FPS listening. No continuous gap over 250ms; A/V clock skew 21.59ms p95, 664 samples. Three SyncNet clips estimated 0/-40/-40ms with controls passing |
+| Preview after near-wave promotion | Ready in 30.883s, six sources; private memory byte-identical |
+| Earlier `voice-video-soak-speech-arena` | 30 minutes / 120 commands without failures. Speech-end 2.043/2.500s, 54 samples. 5,945 frames analyzed. Predates shortened base wave, near wave and new tracking |
+| `voice-video-soak-near-wave` | 30 minutes / 132 commands, no failures. Speech-end midpoint median/p95 1.773/2.530s, 60 samples. Approximately 19.93/24.07 FPS reply/listening; no continuous gap >250ms. A/V skew 24.11ms p95, 4,003 samples. Six SyncNet estimates 0/-40ms with controls passing; all 5,716 frames analyzed |
 
-### Selected decoder: sustained capture and review — September 9
+The body evaluator completed 948 short-call and 5,716 sustained-call frames. It retained 16/96 flags respectively: repeated person-count ambiguity and a projected-limb change during hand lowering. All flags plus hand context were visually inspected (19/114 frames); one figure is visible on the two-person flags, and hand blur persists. Black-frame and mirrored-raise controls passed. Detailed joint outputs and review selections remain in `body-near-wave` and `body-near-wave-soak`; these diagnostics are not anatomy or perceptual acceptance.
 
-`soak trt-capture --capture` completed **1,800.048s / 120 commands**, with all render records using TensorRT and zero functional failures, browser errors or reported reply stalls. Across 54 uninterrupted spoken replies, end-of-speech median/p95 was **2.478/2.896s**. Mixed Send-to-playback median/p95 was **1.55/2.22s** across 114 replies. Six deliberate interruptions are excluded from response percentiles. Cycle medians showed no steadily accumulating delay; the two-second target remains unmet.
+All paths above are under `generated/local-app/audit/`. Metrics are measured samples, not SLAs. Browser summary JSON uses nearest-rank percentiles; this sustained run's nearest-rank p50 is 1.564s, while the midpoint median is 1.773s. Targets remain p95 <=2s from speech end, >=20 FPS with a 25 FPS target, <=100ms perceptual sync and stable 30-minute state. Physical audio, real mobile, natural motion, arbitrary movement and public eligibility are still open. REPORT is the current acceptance summary.
 
-All **120 MP4/WAV pairs / 5,966 frames** were retained and analyzed: 20FPS median timestamp spacing per clip, zero heuristic flags, nonzero audio and no clipped samples. Six first/last-cycle contact sheets cover 120 visually sampled wave, resumed-approach and close-speech frames. Fingers blur during waving; mouth detail stays soft, and the close view crops the crown. Browser A/V clock skew was **24.744ms p95 / 51.724ms maximum**, 3,685 samples. The idle long-gap counter includes deliberate pauses/source changes and is not a stall count. No physical audio or full perceptual acceptance follows from these measurements.
+Keep these selected improvements: local GPU recognition; validated PCM decoding; same-voice CUDA speech with allocator cleanup; reviewed TensorRT VAE; phrase output with one speech phrase ahead; six-source appearance priming; reviewed body footage and constrained pose continuity.
 
-Five-source warm-up took 16.706s. Two whole-GPU point samples reported 9,691MiB, including the idle live preview and desktop; these are neither peak nor per-session usage. CPU model timing ran afterward. No rental or live model/credential/memory change was made.
+| Rejected or deferred experiment | Why it is not selected |
+|---|---|
+| Recognition warm-up during pauses | Component median improved, but complete-call p95 varied 2.13–2.56s; disabled |
+| Short Whisper encoder windows / earlier turn decisions | Harder tests exposed punctuation/latency or unfinished-utterance risks; preserve normal padding and endpoint |
+| 150ms video buffer / batch-16 rendering | Playback regressions; keep 350ms threshold and batch eight |
+| CUDA graphs | About 0.85% isolated gain; insufficient demonstrated benefit |
+| Supertonic-3, Tiny/Moonshine ASR | Accuracy/quality or integrated-benefit gaps; no replacement selected |
+| FlashHead Lite 1.3B | Local 31-second throughput demonstrated around 5GB tensor allocation, but imperfect mouth/framing and no arbitrary body commands |
+| Cloudflare Aura speech / Gemini 3.5 Flash-Lite planner | No demonstrated whole-call advantage over selected Kokoro/Qwen |
+| Gateway LTX-2.5 Fast | About 31.8s to local availability for a five-second clip; two tests cost $0.90 total. Different text-generated identity; unsuitable for immediate calls |
+| Local aiortc WebRTC prototype | H.264/Opus transport works in isolation, but no full-call speed advantage or public-network qualification demonstrated |
 
-Reproduce with the existing server/driver/auditor, substituting a fresh label for `trt-capture`:
+Experiment settings, sample counts, failures, official source links and hashes remain in machine evidence. Detailed older narrative is retrievable from Git; no audit media is removed by this consolidation. Independent public-release review and staging remain pending.
 
-```powershell
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial soak --label trt-capture --performance-label temporal128 --decoder tensorrt-reviewed
-# Second terminal:
-node scripts/qualify_video_call.cjs soak trt-capture --capture
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial soak --label trt-capture
-.\.venv\Scripts\python.exe scripts/build_call_review.py --trial soak --label trt-capture
-# After timing, serve ONLY this synthetic folder for recorded review:
-.\.venv\Scripts\python.exe -m http.server 8767 --bind 127.0.0.1 --directory generated/local-app/audit/voice-video-soak-trt-capture
-```
+## Rebuild dependencies on a new machine
 
-Open `http://127.0.0.1:8767/review.html`. The page checks coverage/hashes before construction, loads one clip at a time, steps decoded timestamps, plays embedded audio and exports browser-local review notes. Checkboxes start unreviewed; no approval is inferred. With that server running, `node scripts/verify_call_review.cjs soak trt-capture` passed frame stepping, export, 44px controls and desktop/390px layout checks. Decoded audio reached the headless browser's AudioContext destination (48 samples, maximum RMS 0.1532); this is not a physical speaker or listening test. The initial HTTP streaming seek failure was corrected by loading each complete clip into a Blob. Media and notes stay in the ignored synthetic audit folder; never serve the live memory directory.
-
-### CPU speech tuning and rejected replacement — September 9
-
-Retain Kokoro and use **eight CPU threads** on this rig. Two isolated runs each generated five identical texts three times per setting. Eight-thread Kokoro reduced median synthesis time across the 15 samples from **687ms to 547ms**; the greeting improved from **561ms to 460ms**, and the full count from **2.200s to 1.609s**. All ordinary sentences and all six count readbacks were correct. Durations matched across thread settings, but generated waveforms vary even between repeats at the same setting; this is not bitwise equivalence or physical listening evidence.
-
-[Supertonic 3](https://huggingface.co/Supertone/supertonic-3), F1 preset, five steps/four threads produced the greeting in 387ms, but it spoke for 3.894s versus Kokoro's 2.983s. More output duration means more visual rendering. Whole-count readback failed to recover 1–25 in every tested Supertonic sample (12 trials across 5/8 steps and 4/8 threads); ordinary sentences were recovered correctly. ASR can itself make mistakes, so these are unresolved quality failures, not verified TTS omissions. The literal word-error score hid numeric sequence differences; count completeness is now reported separately. Supertonic is **not selected**. No evidence establishes that segmentation repairs these failures.
-
-Exact model/code/voice/config hashes are in `config/supertonic-benchmark.json`: model revision `3cadd1ee6394adea1bd021217a0e650ede09a323`, code revision `7e2804f96016a7028cb1ed627353c61c1e9dd281`, 398.7MB across ten retained files, ONNX Runtime 1.29.0 on CPU. No package or API key was added. The model uses [OpenRAIL-M restrictions](https://huggingface.co/Supertone/supertonic-3/blob/3cadd1ee6394adea1bd021217a0e650ede09a323/LICENSE), including disclosure and impersonation consent requirements; code is MIT. Upstream announced an end to official open-source development/support in its [July 23 notice](https://github.com/supertone-inc/supertonic). This benchmark establishes no adult/public-service clearance.
-
-Reproduce with the configured virtual environment: `download_supertonic_benchmark.py`, then `benchmark_supertonic.py --label new-cpu4 --threads 4`, followed by a fresh label with `--threads 8`. The downloader verifies fixed sizes/hashes and retains licenses. The benchmark checks only synthetic speech and performs ASR readback after timing. Do not run it during call timing.
-
-The full `qualification kokoro8 --capture` call passed **20/20 commands**, with zero reported reply stalls. End-of-speech median/p95 was **2.471/3.218s** across nine spoken replies; mixed Send-to-playback was 1.46/2.55s across 19. The slowest greeting spent 1.098s in hosted planning. These small, variable calls establish functional compatibility, not an end-to-end speed gain or a two-second guarantee. Browser A/V skew was **25.915ms p95 / 37.113ms maximum**, 624 samples. All **20 clips / 1,005 frames** were analyzed with zero heuristic flags and nonzero unclipped WAV audio; 60 wave/close/transition frames were visually sampled. Existing hand blur, soft mouth detail and crown cropping remain. A sustained call with the changed TTS thread setting remains to be qualified.
-
-Use `serve_voice_video_benchmark.py --trial qualification --label new-kokoro8 --performance-label temporal128 --decoder tensorrt-reviewed`, then `qualify_video_call.cjs qualification new-kokoro8 --capture` and `review_call_frames.py --trial qualification --label new-kokoro8`. `benchmark-settings.json` records the actual CPU thread count and decoder. The idle preview restarted with startup 28.989s and five-source warm-up 17.676s; private memory was unchanged and the page refreshed. Roll back by reverting the CPU-thread change and restarting between calls. No model weight, voice preset, credential, schema or prepared asset changed.
-
-### Wider near framing — September 9
-
-The preview now uses the `headroom` prepared bundle. A reviewed frame from the previous approach constrains a new LTX-2.3 final pose. The selected clip preserves the whole head, giving a medium near view instead of the previous crown-cropped close-up. Seed 95 / 97 frames was rejected for delayed motion and endpoint correction; seed 96 / 73 frames starts earlier. Keep its first 72 frames, excluding the visibly corrective final guide frame, and reverse them for the return. The two preparations took 147.695s and 25.009s respectively; different cache state and lengths prevent a direct speed comparison.
-
-Matching near listening uses seed 97 / 97 frames, calm style and return-to-reference guidance (79.823s preparation). Select source 0.5–3.5s, slow ambient motion to half speed and retime the observed bilateral blink to 0.25s. The prepared loop has **125 frames / 5.208s**. Side-strip background flow fell from 0.527 to 0.280px/s relative to its own source; the previous active loop was quieter at 0.152px/s. Its seam MAE is **3.036/255 versus previous 2.195**, so this is a framing improvement with remaining loop/skin/hand softness, not universal visual acceptance.
-
-`qualification headroom --capture` passed **20/20 commands** with zero functional failures, browser errors or reported reply stalls. Spoken end-of-speech median/p95 was **2.456/2.898s** (nine replies); mixed Send-to-playback was **1.41/2.23s** (19). Browser clock skew was **22.643ms p95 / 30.437ms maximum** (610 samples). All **20 clips / 991 frames** were analyzed with zero limited heuristic flags and nonzero unclipped audio. All 73 selected-candidate source frames and 80 rendered approach/near-speech frames were visually inspected. Every prepared forward/reverse frame was compared with its source. Physical sound, normal-speed perceptual quality, full anatomy/lip-sync acceptance, mobile use and a sustained run with the latest combination remain unqualified.
-
-Reproduction uses existing local weights and the reviewed PNG, with fresh candidate/run labels:
-
-```powershell
-# Endpoint was extracted by prepare_performance.py from the previous seed-70
-# temporal-128 source at duration 1.375 (last decoded frame 32), then inspected.
-.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action closer --frames 73 --seed 96 --silent --end-reference-path generated/local-app/audit/performance-framed-endpoint/performance-near.png --temporal-size 128
-# Review source, then prepare_performance.py <source> --duration 3 --candidate-label <new>
-# Review the new performance-near.png before generating its matching listening source:
-.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action idle --frames 97 --seed 97 --silent --framing close --idle-style calm --reference-path generated/local-app/audit/performance-headroom/performance-near.png --return-to-reference --temporal-size 128
-# Trim to source 0.5–3.5s; retime_idle_motion.py uses blink-start 1.666667,
-# blink-end 2, blink-seconds 0.25, speed 0.5; prepare_idle_loop.py makes the loop.
-.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-headroom --performance-label headroom --decoder tensorrt-reviewed
-node scripts/qualify_video_call.cjs qualification new-headroom --capture
-.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-headroom
-```
-
-The complete six-file approach/near/return/listening set was replaced between calls. The previous set is retained in ignored `audit/rollback-headroom-20260909`; restore those exact six files and restart to roll back. Base listening, wave, model weights, runtime code, memory schema, credentials and public deployment remain unchanged. Detailed generation records, rejection reasons and checksums are retained in machine evidence and ignored local audits.
-
-## Playback, microphone and memory
-
-The browser consumes 200ms MP4 fragments and starts after at least 350ms is buffered (typically about 427ms with current fragment batches). Its embedded audio stays muted; a separate WAV follows the video clock, pauses during stalls and corrects drift above 120ms. If MediaSource is unsupported, playback waits for the finished file. Autoplay rejection exposes Play reply. Interrupt aborts both tracks. These paths have Node tests, but mobile Safari and lengthy calls remain unqualified.
-
-Microphone capture uses AudioWorklet, mono PCM16 WAV, 200ms pre-roll, a 650ms silence boundary and a 25s turn cap. During playback, a browser reporting echo cancellation permits voice interruption after 240ms of above-threshold audio. The energy detector is not a speech/noise classifier. `call-input.mjs` holds one utterance while the authenticated stop preserves the displayed pose and releases the previous render. Cleanup has a 10s bound after the stop response; stale call/microphone generations, rejected cancellation and timeout discard pending audio. Valid short words below the early-onset threshold also stop before submission. Browsers without reported echo cancellation retain manual Interrupt and resume listening 450ms after playback. Raw capture stays in memory; the transcript enters local history and hosted dialogue context.
-
-The isolated voice-interruption trial fed generated PCM through the actual browser recorder, energy detector and local ASR, then real Kokoro/MuseTalk media. Cancellation arrived **445ms after fixture playback started**, including **75ms pose capture**; fixture leading silence is included, so this is not pure detector latency. The next transcript was exactly “Actually, tell me the name of my dog.” It continued from the held pose and then returned to full body. Three inputs produced exactly three submissions; ending the call produced no extra submission. The held browser image versus engine-saved pose differed by **1.34/255 mean channel levels**, a continuity check rather than a quality score. Echo cancellation was simulated and planning was deterministic; no physical microphone, acoustic echo test, iPhone, cloud request or new body generation was involved. Existing source blur remains.
-
-Reproduce with `.\.venv\Scripts\python.exe scripts/serve_phrase_benchmark.py --interruption --voice-interruption --prime-reviewed`, then `node scripts/review_voice_interruption.cjs`. Both use synthetic-only port 8766 and ignored `generated/local-app/audit/speech-interruption-voice-primed/`; the live conversation is untouched. See machine history for exact results.
-
-SQLite keeps editable notes, up to 50 exchanges (12 shown, four sent as recent context) and up to 12 bounded verbatim fact excerpts. Users can inspect, correct and delete saved information. It knows only what was shared; automatic check-ins, calendar integrations and push notifications are unimplemented. Preserve `generated/local-app/memory.sqlite3` during normal updates.
-
-Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL`, `AI_MATE_ENV_FILE`, `AI_MATE_VISUAL_DECODER`, `AI_MATE_ASR_DEVICE` and `AI_MATE_TTS_DEVICE`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
-
-## Reproduce or extend
-
-Current environment: Python 3.12, PyTorch 2.11.0+cu128, FFmpeg. Core setup commands for a fresh Python environment:
+Installed baseline: Python **3.12**, Torch **2.11.0+cu128**, FFmpeg. Use an actual Python 3.12 executable to create the environment; Windows' bare `python` may be an unavailable Store alias.
 
 ```powershell
 python -m venv .venv
@@ -729,46 +178,30 @@ python -m venv .venv
 .\.venv\Scripts\python.exe scripts/download_local_models.py --models asr-base-en musetalk sd-vae whisper-tiny klein
 ```
 
-Ollama is optional and unloaded on this PC; the active dialogue route is Cloudflare. ComfyUI and its isolated environment are separately installed; the app launcher does not install them. Large downloads require adequate disk space: LTX-2.3 and its prompt encoder add about 39GB, excluding other models/environments. Downloads do not select a runtime automatically.
-
-Prepare/review references while other GPU inference is idle. Never replace active assets during a call. The approach and close-idle sequence uses the installed benchmark:
+This sets up core inference, not the separate ComfyUI installation or reviewed private footage. Optional GPU speech uses the [pinned Windows/Python wheel](../config/speech-gpu-benchmark-requirements.txt):
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/prepare_local_scene.py --scene fullbody --candidate
-# Review the candidate before promoting it to the active fullbody.png.
-.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action closer --frames 97 --seed 70 --silent --timeout 300
-.\.venv\Scripts\python.exe scripts/review_local_video.py <local-source.mp4>
-.\.venv\Scripts\python.exe scripts/prepare_performance.py <reviewed-approach.mp4>
-# Review the forward/reverse clips and performance-near.png before marking the manifest reviewed.
-.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action idle --frames 97 --seed 75 --silent --framing close --reference-path generated/local-app/performance-near.png --return-to-reference
-.\.venv\Scripts\python.exe scripts/prepare_idle_loop.py <reviewed-close-idle.mp4> --pose near
-# Review the prepared loop and seam, then mark its manifest reviewed and restart.
+.\.venv\Scripts\python.exe -m pip install --target .cache/ort-gpu-deps --no-deps --only-binary=:all: --require-hashes -r config/speech-gpu-benchmark-requirements.txt
 ```
 
-Base idle uses `--action idle --frames 97 --seed 61 --return-to-reference` with the full-body reference and default `prepare_idle_loop.py` pose. Source images must be reviewed before inference; scripts never certify their own outputs. Exact generation settings and SHA-256 values are in machine evidence.
-
-For independent fresh-motion comparisons use `benchmark_direct_ltx.py`, `benchmark_ltx_motion.py`, `benchmark_video_assembly.py` and `benchmark_omniavatar.py`. [Hallo-Live](https://github.com/fudan-generative-vision/Hallo-Live) reports 20.38 FPS / 0.94s on **two H200s**; [LightX2V](https://github.com/ModelTC/LightX2V) provides quantization/offload paths. Neither establishes those speeds or command quality on this 4060 Ti.
-
-FlashHead reproduction uses source revision `9bc03de06bb0de82cd6bc477804512ae06144bf2` in `.cache/local-poc/SoulX-FlashHead`, with [Windows patch](../config/flashhead-windows.patch) applied using `git apply --unidiff-zero` in that source checkout. Install [isolated dependencies](../config/flashhead-benchmark-requirements.txt) with pip `--target .cache/flashhead-deps --no-deps`, reusing the configured Torch/scientific runtime. `download_flashhead_benchmark.py` downloads about 8.2GB of pinned, SHA-verified Lite/VAE/Wav2Vec2 weights. Run `benchmark_listening_timing.py` to create the synthetic greeting, then `benchmark_flashhead.py`. The close trial additionally needs `benchmark_cloud_comparison.py speech`, then `benchmark_flashhead.py --reference performance-near --audio cloud-aura1-normal --chunks 6`. Downloads and scripts do not select the model automatically. No private conversation is benchmark input.
-
-Checks:
+TensorRT installation/build comparison is separate and hardware-specific:
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.venv\Scripts\python.exe -m pip install --target .cache/tensorrt-deps --no-deps -r config/tensorrt-benchmark-requirements.txt
+.\.venv\Scripts\python.exe scripts/benchmark_trt_vae.py --label fp16
+.\.venv\Scripts\python.exe scripts/benchmark_trt_media.py
+```
+
+These particular build scripts retain fixed experiment paths; inspect existing outputs and their resume behavior first. Only after numerical/media review, copy `decoder.engine` and `build.json` from `audit/visual-trt-fp16` into the reviewed runtime directory, record the actual review and qualify `--decoder tensorrt-reviewed`. No script self-approves its engine. Portable Torch/CPU settings remain available.
+
+Routine checks:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
 .\.venv\Scripts\python.exe -m compileall -q local_app scripts tests
 node --check local_app/web/app.js
-node --test tests/media-sync.test.mjs tests/microphone.test.mjs tests/call-input.test.mjs
+node --test tests/media-sync.test.mjs tests/microphone.test.mjs tests/call-input.test.mjs tests/playback-probe.test.cjs
 git diff --check
-# Idle ready server, synthetic cancellation check preserving existing conversation:
-.\.venv\Scripts\python.exe scripts/verify_streaming.py
 ```
 
-R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
-
-The earlier PCM recognition revision passed **158 Python and 23 Node tests**, Python compilation and whitespace checks. Current totals are in REPORT. New recording checks cover float scaling, duration/pitch at seven sample rates, malformed/truncated/stereo audio, silence and duration boundaries; device tests cover explicit selection and CPU recovery. Existing authentication, cancellation, pose, speech and microphone checks remain green. Real devices, independent review and public staging remain separate requirements. No database migration or new data recipient. Roll back recognition to `cpu` and restart; reverting the code also restores the previous decoding path. Preserve memory and reviewed assets.
-
-## Cost and next decision
-
-TensorRT changes no rented-GPU charges or proven concurrency. Do not convert its render-time saving into a billing or profit claim. The optional three-month technical-pilot forecast is **$57.38 under a $100 planning cap**, including local power, the existing Gateway funding and ten optional 5090 test hours per month with a disk allowance. Power and stopped-storage assumptions are unmeasured; no GPU has been rented. The electricity-only baseline remains available in the calculator's historical output.
-
-Use the bounded demo to test whether people value the conversation and continuity before buying capacity. [ECONOMICS](ECONOMICS.md) contains the PWA rental, session-cost and pricing assumptions. Device testing and intended-content model/hosting/payment qualification remain required. No profit, legal immunity or universal two-second latency is promised.
+Changing hardware, precision, audio backend, source footage or transport needs the relevant complete-call qualification. Keep services private, retain memory and secrets, and use the capped rental proposal in ECONOMICS only after the founder elects to provision it. A working local demonstration does not authorize a public adult service.
