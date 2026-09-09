@@ -1,6 +1,9 @@
 import unittest
 import io
 import tempfile
+import threading
+import queue
+from types import SimpleNamespace
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
@@ -59,6 +62,27 @@ def offer(address='127.0.0.1', direction='recvonly'):
     candidate=f'a=candidate:1 1 udp 100 {address} 50000 typ host\r\n'
     return {'type':'offer','sdp':'v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 96\r\na='+direction+'\r\n'+candidate+
             'm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na='+direction+'\r\n'+candidate}
+
+
+class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_cancel_silences_buffered_audio_and_holds_last_frame(self):
+        try:
+            from scripts.serve_webrtc_benchmark import Picture, Speech, np
+        except ImportError as error:
+            self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
+        async def pace(seconds):
+            pass
+        clip = {'start_s': 0, 'pcm': np.full(48000, 8000, dtype=np.int16),
+                'finished': False, 'queue': queue.Queue()}
+        clip['queue'].put((1, np.full((32, 32, 3), 200, dtype=np.uint8)))
+        session = SimpleNamespace(clip=clip, pace=pace, cancel=threading.Event(),
+                                  idle=[np.zeros((32, 32, 3), dtype=np.uint8)])
+        speech, picture = Speech(session), Picture(session)
+        picture.last = np.full((32, 32, 3), 77, dtype=np.uint8)
+        session.cancel.set()
+        self.assertFalse((await speech.recv()).to_ndarray().any())
+        self.assertTrue(((await picture.recv()).to_ndarray(format='bgr24') == 77).all())
+        self.assertEqual(clip['queue'].qsize(), 1)
 
 
 class LocalRTCSignalingTests(unittest.TestCase):

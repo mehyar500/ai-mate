@@ -97,7 +97,7 @@ def live_session():
     return Session(renderer, idle, fixtures, folder)
 
 
-async def measure(auth, result, media='both', clip=None, session=None):
+async def measure(auth, result, media='both', clip=None, session=None, interrupt=False):
     import av
     import numpy as np
     from aiortc import (RTCPeerConnection, RTCConfiguration, RTCIceServer, RTCBundlePolicy, RTCRtpSender,
@@ -266,8 +266,17 @@ async def measure(auth, result, media='both', clip=None, session=None):
                 await asyncio.to_thread(session.begin, index)
                 deadline = time.monotonic()+30
                 while not session.clip['finished'] and time.monotonic() < deadline:
+                    if interrupt and index == 2 and session.clip.get('first_decoded_frame_s') is not None:
+                        session.cancel.set()
+                        queued = session.clip['queue'].qsize()
+                        await asyncio.sleep(.5)
+                        result['live_cancellation'] = {'queued_at_stop': queued,
+                            'queued_after_stop': session.clip['queue'].qsize(),
+                            'last_five_audio_peak': max(peaks[-5:], default=32767),
+                            'renegotiated': False}
+                        break
                     await asyncio.sleep(.02)
-                if not session.clip['finished']:
+                if not session.clip['finished'] and not session.cancel.is_set():
                     raise TimeoutError('GPU stream did not finish')
                 await asyncio.sleep(.3)
             result['live_rows'] = session.safe_rows()
@@ -304,7 +313,10 @@ async def measure(auth, result, media='both', clip=None, session=None):
         if session:
             result['passed'] = result['passed'] and all(
                 row.get('first_decoded_frame_s') is not None and not row.get('error')
-                for row in result['live_rows'])
+                for row in result['live_rows'] if not (interrupt and row['index'] == 3))
+            if interrupt:
+                stopped = result.get('live_cancellation', {})
+                result['passed'] = result['passed'] and stopped.get('last_five_audio_peak', 32767) < 100
         result['stage'] = 'finished'
     finally:
         if session:
@@ -329,11 +341,14 @@ def main():
     parser.add_argument('--media', choices=['audio', 'video', 'both'], default='both')
     parser.add_argument('--clip', type=fixture_path, help='Reviewed generated audit MP4 plus matching synthetic WAV; sends both through Cloudflare')
     parser.add_argument('--live-render', action='store_true', help='Stream new GPU lip frames for three retained synthetic speech fixtures')
+    parser.add_argument('--interrupt', action='store_true', help='Cancel the third live-render reply during playback')
     args = parser.parse_args()
     if args.clip and args.media != 'both':
         parser.error('--clip requires --media both')
     if args.live_render and (args.clip or args.media != 'both'):
         parser.error('--live-render requires both media and no --clip')
+    if args.interrupt and not args.live_render:
+        parser.error('--interrupt requires --live-render')
     configure_runtime()
     result = {'time': datetime.now(timezone.utc).isoformat(), 'passed': False, 'media': args.media,
               'scope': 'CPU peers through Cloudflare SFU; synthetic media or prerecorded generated fixture. No live inference, browser, microphone or end-to-end call latency test.'}
@@ -342,13 +357,13 @@ def main():
                            'No ASR, dialogue, TTS, browser display, private conversation or arbitrary-motion test.')
     try:
         session = live_session() if args.live_render else None
-        asyncio.run(measure(Conversation(''), result, args.media, args.clip, session))
+        asyncio.run(measure(Conversation(''), result, args.media, args.clip, session, args.interrupt))
     except Exception as error:
         result['error_type'] = type(error).__name__
         if isinstance(error, urllib.error.HTTPError):
             result['http_status'] = error.code
             result['diagnostic'] = getattr(error, 'transport_diagnostic', 'unknown')
-    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"live" if args.live_render else "fixture" if args.clip else args.media}.json'
+    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"live-cancel" if args.interrupt else "live" if args.live_render else "fixture" if args.clip else args.media}.json'
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(result))

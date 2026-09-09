@@ -128,8 +128,9 @@ class Picture(VideoStreamTrack):
         seconds = self.tick/20
         await self.session.pace(seconds)
         clip = self.session.clip
-        picture = None
-        if clip and not clip['finished']:
+        stopped = self.session.cancel.is_set()
+        picture = (self.last if self.last is not None else self.session.idle[0]) if stopped else None
+        if not stopped and clip and not clip['finished']:
             try:
                 index, picture = clip['queue'].get_nowait()
                 if clip['start_s'] is None:
@@ -161,7 +162,7 @@ class Speech(AudioStreamTrack):
         await self.session.pace(seconds)
         pcm = np.zeros((1, 960), dtype=np.int16)
         clip = self.session.clip
-        if clip and clip['start_s'] is not None:
+        if not self.session.cancel.is_set() and clip and clip['start_s'] is not None:
             offset = round((seconds-clip['start_s'])*48000)
             begin, end = max(0, offset), min(len(clip['pcm']), offset+960)
             if begin < end:
