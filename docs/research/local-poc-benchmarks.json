@@ -24712,5 +24712,13 @@
       "gpu_usd_per_30_min": 2.25,
       "excluded": "Startup, idle capacity, other services, taxes; compatible interconnect/availability unverified"
     }
+  },
+  "longlive_turn_return_20260909": {
+    "artifact": "generated/local-app/audit/longlive2-turn-return-seed914/benchmark.json",
+    "inference_s": 16.4129,
+    "first_chunk_s": 7.9148,
+    "frames": 125,
+    "review": "12 sampled frames: turns sideways but does not return to face camera; scene shifts, ghosting and body-position drift. Not all-frame or audio review.",
+    "decision": "Not promoted; prompt correction responsiveness remains failed. No remote spend."
   }
 }
