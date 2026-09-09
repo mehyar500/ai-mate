@@ -67,6 +67,7 @@ class CompanionEngine:
         from .media import load_reviewed_performance
         self.performance = load_reviewed_performance(self.directory)
         self.performance_state = 'base'
+        self.hold_still = False
         self.visual_cursor = None  # Partial progress along the reviewed base -> near footage.
         self.return_motion = None  # One approach, valid until the next successful video turn.
         for path in self.directory.glob('*-pose.png'):
@@ -111,8 +112,8 @@ class CompanionEngine:
         if paths:
             self.visual_warmup = renderer.prime_motion(paths, event)
 
-    def listening_asset(self, scene, pose):
-        if scene != 'fullbody':
+    def listening_asset(self, scene, pose, *, held=None):
+        if scene != 'fullbody' or (self.hold_still if held is None else held):
             return None
         return self.idle_video if pose == 'base' else self.near_idle_video if pose == 'near' else None
 
@@ -258,6 +259,7 @@ class CompanionEngine:
             self.store.reset()
             self.scene = "mira"
             self.performance_state = 'base'
+            self.hold_still = False
             self.visual_cursor = None
             if self.pose:
                 self.pose[1].unlink(missing_ok=True)
@@ -288,6 +290,7 @@ class CompanionEngine:
         return_candidate = None
         performance_candidate = None
         cursor_candidate = None
+        hold_candidate = False
         speech_prefetch = None
         candidate_poses = set()
         try:
@@ -341,7 +344,14 @@ class CompanionEngine:
                     pose_reference = self.pose[1] if self.pose and self.pose[0] == scene else None
                     performance_candidate = self.performance_state if scene == self.scene else 'base'
                     cursor_candidate = self.visual_cursor if scene == self.scene else None
-                    listening_video = self.listening_asset(scene, performance_candidate)
+                    hold_candidate = self.hold_still if scene == self.scene else False
+                    if plan and plan.get('motion_veto') == 'stop_command':
+                        hold_candidate = True
+                    elif plan and plan.get('action', 'none') != 'none':
+                        hold_candidate = False
+                    if hold_candidate and pose_reference is None and performance_candidate == 'near':
+                        pose_reference = self.directory / 'performance-near.png'
+                    listening_video = self.listening_asset(scene, performance_candidate, held=hold_candidate)
                     prepared_transition = self.performance.get((performance_candidate, plan.get('action'))) if scene == 'fullbody' and plan else None
                     if scene == 'fullbody' and cursor_candidate is not None and plan and plan.get('action') in {'closer', 'farther'}:
                         origin = 'base' if plan.get('action') == 'closer' else 'near'
@@ -383,7 +393,7 @@ class CompanionEngine:
                         action = plan.get('action', 'none') if plan and index == 0 else 'none'
                         if index:
                             prepared_transition = None
-                            listening_video = self.listening_asset(scene, performance_candidate)
+                            listening_video = self.listening_asset(scene, performance_candidate, held=hold_candidate)
                             if not listening_video:
                                 renderer.prepare(scene, **({'reference_path': pose_reference} if pose_reference else {}))
                         chunk['prepared_motion'] = bool(prepared_transition or (listening_video and action == 'none'))
@@ -439,12 +449,13 @@ class CompanionEngine:
                                                           "motion_start_s":listening_offset if prepared_idle else motion_start,
                                                           "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
                             metrics.update(motion_metrics)
+                            metrics['held_body_pose'] = hold_candidate
                             metrics['looped_prepared_body'] = prepared_idle
                             if prepared_idle:
                                 listening_offset += metrics.get('duration_s', audio_duration)
                             else:
                                 listening_offset = 0.0
-                            if not prepared_idle and (motion_path or pose_reference) and hasattr(renderer,"capture_last_frame"):
+                            if not prepared_idle and (motion_path or pose_reference or hold_candidate) and hasattr(renderer,"capture_last_frame"):
                                 previous_candidate = pose_candidate
                                 pose_candidate = self.directory / (filename+"-pose.png")
                                 candidate_poses.add(pose_candidate)
@@ -480,9 +491,11 @@ class CompanionEngine:
                 if mode == 'video':
                     self.performance_state = performance_candidate
                     self.visual_cursor = cursor_candidate
+                    self.hold_still = hold_candidate
                 elif self.scene != scene:
                     self.performance_state = 'base'
                     self.visual_cursor = None
+                    self.hold_still = False
                 self.scene = scene
                 self.store.set_scene(scene)
                 if mode == 'video' or (self.return_motion and self.return_motion[0] != scene):

@@ -296,6 +296,10 @@ Benchmark programs now live in `experiments/` (42 moved files). `scripts/` retai
 
 Additional moved-entry-point comparisons: Llama-3.1-8B-Instruct-FP8-Fast passed four checks at 0.662–0.974s; Llama-3.2-3B-Instruct ran at 0.379–0.591s but omitted message delivery in one of four cases. Qwen remains selected. These small synthetic trials do not establish call latency or p95. Evidence key: `mvp_experiment_layout_20260909`.
 
+### Stop-command correction — September 9
+
+“Stop moving” now suppresses the prepared body loop across subsequent replies; a new movement releases the hold. Close-view reference and reset behavior are covered. An isolated local GPU test kept every raw lower-body frame identical while generating speech/lips (24 rendered frames, non-silent audio). First media took 8.512s including preparation; rendering alone took 0.715s. This is not a live-call latency or perceptual-sync pass. Private memory was unchanged. All 220 Python tests pass. Evidence: `generated/local-app/audit/stop-pose-smoke-raw/result.json`. Remaining priority: reduce first-response preparation and test renderer output through WebRTC with interruption.
+
 ### Cloudflare WebRTC transport qualification — September 9
 
 `experiments/benchmark_cloud_realtime.py --media both` creates a temporary SFU app with the existing Cloudflare key/email, sends synthetic CPU video and a tone between two peers through Cloudflare, then closes peers and deletes that app. No new credential file, private conversation, camera, local GPU or GPU rental is used. The default Python client header hit HTTP 403 / 1010; an explicit project User-Agent fixed API access. VP8 delivered audio but no video; MAX_BUNDLE repeatedly timed out publishing. H.264 with balanced bundling delivered 151 video frames and 323 audio frames, with both peers connected and nonzero audio amplitude. Both media types first arrived 1.593s after renegotiation, followed by a five-second sample. This is setup-to-media timing, not one-way latency, perceptual sync or an inference call benchmark. GPU/inference cost was zero; SFU billing was not measured. The temporary app deletion succeeded.

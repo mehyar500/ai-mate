@@ -97,6 +97,48 @@ class PoseTests(unittest.TestCase):
         self.assertEqual(self.app.pose,previous)
         self.assertTrue(previous[1].exists())
 
+    def test_stop_holds_pose_across_replies_until_new_movement(self):
+        idle = Path(self.temp.name)/'idle.mp4'
+        idle.write_bytes(b'loop')
+        self.app.idle_video = idle
+        original = self.app.models.plan
+        def plan(snapshot, text, mode, scene, available, event):
+            result = original(snapshot, text, mode, scene, available, event)
+            if text == 'stop':
+                result['motion_veto'] = 'stop_command'
+            return result
+        self.app.models.plan = plan
+        stopped = self.reply('stop')
+        self.assertEqual(stopped['state'], 'done')
+        self.assertNotIn('motion_path', self.visual.render_options[-1])
+        self.assertIsNone(stopped['idle_video'])
+        self.assertIsNotNone(self.app.pose)
+        self.reply('hello')
+        self.assertNotIn('motion_path', self.visual.render_options[-1])
+        self.assertIsNone(self.app.listening_url())
+        self.reply('wave')
+        self.assertFalse(self.app.hold_still)
+
+    def test_failed_stop_does_not_commit_hold(self):
+        self.app.models.plan = lambda *args: {'reply': 'Still', 'presentation': 'video',
+            'scene': 'fullbody', 'action': 'none', 'facts': [], 'motion_veto': 'stop_command'}
+        self.visual.fail = True
+        self.assertEqual(self.reply('stop')['state'], 'failed')
+        self.assertFalse(getattr(self.app, 'hold_still', False))
+
+    def test_stop_in_close_view_uses_close_reference_and_reset_releases_hold(self):
+        near = Path(self.temp.name)/'performance-near.png'
+        near.write_bytes(b'close-reference')
+        self.app.scene = 'fullbody'
+        self.app.performance_state = 'near'
+        self.app.models.plan = lambda *args: {'reply': 'Still', 'presentation': 'video',
+            'scene': 'fullbody', 'action': 'none', 'facts': [], 'motion_veto': 'stop_command'}
+        self.assertEqual(self.reply('stop')['state'], 'done')
+        self.assertEqual(self.visual.prepared[-1], b'close-reference')
+        self.assertTrue(self.app.hold_still)
+        self.app.reset()
+        self.assertFalse(self.app.hold_still)
+
     def test_reset_during_capture_cannot_restore_pose_or_history(self):
         self.reply('wave')
         self.visual.after_capture=self.app.reset
