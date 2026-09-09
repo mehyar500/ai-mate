@@ -8,6 +8,7 @@ import argparse
 import gc
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -304,6 +305,11 @@ def run(args, record, output):
                'first_decoded_chunk_s': decoded_events[0]['ready_s'] if decoded_events else None,
                'decoded_chunks': list(decoded_events), 'peak_allocated_bytes': torch.cuda.max_memory_allocated(),
                'peak_reserved_bytes': torch.cuda.max_memory_reserved(), 'file': path.name, 'sha256': checksum(path)}
+        duration = len(frames) / 24
+        row.update(output_duration_s=duration, real_time_factor=elapsed/duration,
+                   estimated_inference_usd=elapsed*args.hourly_cost/3600 if args.hourly_cost else None,
+                   estimated_usd_per_generated_minute=elapsed/duration*args.hourly_cost/60 if args.hourly_cost else None,
+                   cost_scope='Inference only; excludes initialization, prompt encoding, idle time, storage and transfer. Zero rate means unspecified, not free.')
         record['runs'].append(row)
         (output / 'benchmark.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
         print(json.dumps(row), flush=True)
@@ -314,6 +320,7 @@ def run(args, record, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
+    parser.add_argument('--hourly-cost', type=float, default=0, help='Actual GPU-instance hourly rate; inference-only cost estimate, excluding startup and idle time.')
     parser.add_argument('--case', choices=['raise-lower', 'unilateral-raise-lower', 'turn-return'], default='raise-lower')
     parser.add_argument('--sampling-steps', type=int, choices=[2, 4], default=4)
     parser.add_argument('--checkpoint', choices=['bf16', 's2-dequantized'], default='bf16')
@@ -327,6 +334,8 @@ def main():
     parser.add_argument('--text-device', choices=['cpu', 'cuda'], default='cpu')
     parser.add_argument('--vae', choices=['wan', 'light-v2'], default='wan')
     args = parser.parse_args()
+    if not math.isfinite(args.hourly_cost) or args.hourly_cost < 0:
+        parser.error('Hourly cost must be finite and non-negative.')
     if not re.fullmatch('[a-z0-9][a-z0-9-]{0,47}', args.label):
         parser.error('Use a new lowercase experiment label.')
     if args.checkpoint == 's2-dequantized' and (args.sampling_steps != 2 or args.precision != 'bf16'):
