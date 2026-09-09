@@ -177,6 +177,7 @@ class Picture(VideoStreamTrack):
                     clip['completed_s'] = time.perf_counter()-clip['started']
                 elif clip['start_s'] is not None:
                     clip['underflows'] += 1
+                    clip['audio_pause_until'] = seconds + 1/20
                     picture = self.last
         if picture is None:
             picture = self.session.idle[int(seconds*24) % len(self.session.idle)]
@@ -197,8 +198,9 @@ class Speech(AudioStreamTrack):
         pcm = np.zeros((1, 960), dtype=np.int16)
         clip = self.session.clip
         if not self.session.cancel.is_set() and clip and not (clip.get('event') and clip['event'].is_set()) and clip['start_s'] is not None:
-            offset = round((seconds-clip['start_s'])*48000)
-            begin, end = max(0, offset), min(len(clip['pcm']), offset+960)
+            offset = round((seconds-clip['start_s']-clip.get('underflows', 0)/20)*48000)
+            pause_samples = max(0, min(960, round((clip.get('audio_pause_until', 0)-seconds)*48000)))
+            begin, end = max(0, offset+pause_samples), min(len(clip['pcm']), offset+960)
             if begin < end:
                 pcm[0, begin-offset:end-offset] = clip['pcm'][begin:end]
         frame = av.AudioFrame.from_ndarray(pcm, format='s16', layout='mono')

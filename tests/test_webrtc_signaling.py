@@ -65,6 +65,29 @@ def offer(address='127.0.0.1', direction='recvonly'):
 
 
 class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_frame_underflow_pauses_audio_clock(self):
+        try:
+            from scripts.serve_webrtc_benchmark import Picture, Speech, np
+        except ImportError as error:
+            self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
+        async def pace(seconds):
+            pass
+        clip = {'start_s': 0, 'pcm': np.arange(24000, dtype=np.int16),
+                'finished': False, 'producer_done': False, 'underflows': 0, 'queue': queue.Queue()}
+        session = SimpleNamespace(clip=clip, pace=pace, cancel=threading.Event(),
+                                  idle=[np.zeros((32,32,3), dtype=np.uint8)])
+        picture, speech = Picture(session), Speech(session)
+        picture.last = session.idle[0]
+        picture.tick, speech.tick = 2, 5
+        await picture.recv()  # no frame at 100ms: hold picture for 50ms
+        self.assertFalse((await speech.recv()).to_ndarray().any())
+        speech.tick = 7  # audio packet crosses the 150ms pause boundary
+        crossing = (await speech.recv()).to_ndarray()[0]
+        self.assertFalse(crossing[:480].any())
+        self.assertEqual(int(crossing[480]), 4800)
+        speech.tick = 8  # 160ms media clock minus the 50ms pause
+        self.assertEqual(int((await speech.recv()).to_ndarray()[0,0]), 5280)
+
     async def test_engine_output_uses_turn_cancellation_without_closing_session(self):
         try:
             from scripts.serve_webrtc_benchmark import Session, Picture, Speech, np, wavfile
