@@ -306,6 +306,8 @@ class CompanionEngine:
                     job["text"] = plan["reply"]
                     job["metrics"]["first_text_s"] = round(time.perf_counter()-started, 3)
                     job["metrics"]["decision_source"] = plan.get("decision_source", "model")
+                    if plan.get('motion_veto'):
+                        job['metrics']['motion_veto'] = plan['motion_veto']
                     if mode == "portrait":
                         job["portrait"] = "/portrait/" + scene + ".png"
                 if mode == "portrait":

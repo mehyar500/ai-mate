@@ -20,7 +20,11 @@ Kokoro now uses eight CPU threads: median synthesis improved **687ms → 547ms**
 
 The new framing passed **20/20 commands**, including interruption and return, with no reported reply stalls. Spoken end-of-speech median/p95 was **2.46/2.90s**, across nine replies; this does not establish a speed gain. All **991 frames / 20 clips** were analyzed, and 80 approach/near-speech frames inspected visually. Whole-head framing improves; hand/skin softness, imperfect lips and a slightly worse loop boundary remain. A sustained call with the latest speech setting and footage is still required.
 
-An offline review page provides recorded playback, exact frame stepping and exportable notes. Its browser test detects decoded speech audio and passes desktop/mobile-width layout checks. Physical sound, real mobile use and full visual acceptance remain unqualified. **148 Python and 17 Node tests pass.**
+Paused speech now stays intact when the user continues before a reply starts. The browser cancels preparation and combines the two audio segments; explicit negations also veto incorrect movement plans, including ASR punctuation errors. Six paused-command cases passed after the baseline incorrectly waved once and clipped corrections. The standard suite passed **20/20 commands**, with spoken median/p95 **2.47/2.75s** across nine replies, no reported reply stalls, and A/V clock skew **24.51ms p95 / 30.14ms maximum**. All **976 frames / 20 clips** passed limited diagnostics; forty approach/near-speech frames were visually inspected. This small run does not establish a sustained speed improvement.
+
+Early planning during a pause remains unselected: twenty ordinary prompts reached a speech file 283ms sooner at the median, but p95 worsened by 33ms. This excludes rendering/playback and cannot establish the two-second call target.
+
+An offline review page provides recorded playback, exact frame stepping and exportable notes. Its browser test detects decoded speech audio and passes desktop/mobile-width layout checks. Physical sound, real mobile use and full visual acceptance remain unqualified. **150 Python and 23 Node tests pass.**
 
 Exact revisions, benchmark commands, media hashes and continuing results are in [LOCAL_POC](LOCAL_POC.md) and its machine evidence. Keep all private conversation outside benchmark artifacts.
 

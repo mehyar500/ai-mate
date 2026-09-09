@@ -72,6 +72,34 @@ def scene_change_requested(user, target):
     return target == 'fullbody' and bool(re.search(start + r'(?:stand up|move around)\b', user, re.I))
 
 
+def motion_is_negated(user, action):
+    """Conservative veto for explicit negation, including ASR-added punctuation.
+
+    This only blocks a proposed action; it never invents or selects one. Other
+    actions remain possible in 'wave, but do not come closer'. Ambiguous reversals
+    such as 'do not wave, actually wave' require another unambiguous command.
+    """
+    text = re.sub(r"[^\w'\s]", ' ', user.lower().replace('\u2019', "'"))
+    text = ' '.join(text.split())
+    movement = {
+        'wave': r"(?:wave|waving|raise (?:your |a |the )?hands?|lift (?:your |a |the )?hands?)",
+        'closer': r"(?:(?:(?:come|move|step|get|walk|go) )?(?:closer|nearer)|come here|approach|(?:move |walk )?towards? (?:me|the camera))",
+        'farther': r"(?:(?:(?:move|step|go|walk|get) )?(?:back|farther|further|away)|retreat)",
+    }
+    if action not in movement:
+        return False
+    prefix = r"\b(?:do not|don't|never) (?:please |ever )?"
+    if re.search(prefix + movement[action] + r'\b', text):
+        return True
+    # Generic stop instructions apply to any proposed body movement, but
+    # 'do not move closer' must not veto a separately requested wave.
+    original = ' '.join(user.lower().replace('\u2019', "'").split())
+    if re.search(prefix + r"(?:move|do (?:that|it)|repeat (?:that|it))\s*(?:[.!?,;]|$)", original):
+        return True
+    return action in {'closer', 'farther'} and bool(re.search(
+        r'\b(?:stay|remain) (?:right )?(?:there|here|still|where you are)\b', text))
+
+
 def validate_plan(data, user, mode, scene, available):
     if not isinstance(data, dict):
         raise ValueError("The conversation model returned an invalid response. Please retry.")
@@ -94,6 +122,7 @@ def validate_plan(data, user, mode, scene, available):
     action = data.get("action", "none")
     if action not in {"none", "closer", "farther", "wave"}:
         action = "none"
+    motion_veto = action != 'none' and motion_is_negated(user, action)
     # A stale movement label from history must not spend a fresh GPU job.
     # These are the three implemented actions, not an arbitrary-motion parser.
     action_cues = {
@@ -109,6 +138,8 @@ def validate_plan(data, user, mode, scene, available):
     direct = direct_motion_plan(user, available)
     if direct:
         action = direct['action']
+    if motion_veto:
+        action, reply = 'none', "I'll keep still."
     if action != "none" and "fullbody" in available:
         presentation, chosen = "video", "fullbody"
     # The model may propose only a bounded label and a verbatim excerpt of THIS
@@ -127,6 +158,8 @@ def validate_plan(data, user, mode, scene, available):
         if mode != "video":
             action, chosen = "none", scene
     result = {"reply": reply, "presentation": presentation, "scene": chosen, "action": action, "facts": facts}
+    if motion_veto:
+        result['motion_veto'] = 'explicit_negation'
     message = data.get("message")
     if mode in {"voice", "video"} and isinstance(message, str) and 0 < len(message.strip()) <= 600:
         result["message"] = clean_reply(message)
@@ -195,6 +228,8 @@ class Conversation:
             "Choose fullbody when the user asks to see your full body, stand up, move around or show an action. "
             "action: closer for come closer/come here, farther for step back/go back, wave for raise your hand/wave. "
             "Default action is none. Never repeat an earlier action just because it is in history. "
+            "Honor negations and corrections in the whole current utterance. Speech recognition can insert punctuation: "
+            "'Please do not. Wave' means do not wave; choose action none. If intent conflicts, stay still and clarify. "
             "Talking ABOUT a walk or describing a scene is conversation, not a body-action command. "
             "For closer, farther and wave choose presentation video and scene fullbody. "
             "The app generates these body movements locally; success is not known until the video renders. "

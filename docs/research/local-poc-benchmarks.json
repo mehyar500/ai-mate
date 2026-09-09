@@ -15210,5 +15210,443 @@
       "path": "generated/local-app/audit/framing-20260909/prepared-review.json",
       "sha256": "8ab61fe74997da90d0e53960b29f097a2774ff1b2a7fb1f4603f2ec0e970c4f2"
     }
+  },
+  "preemptive_planning_20260909": {
+    "source_commit": "015bcdc09ef6abcac2804bf5647d52d104e4b0f6",
+    "selected": false,
+    "date": "2026-09-09",
+    "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+    "asr": "Whisper Base EN int8 CPU8 original padding",
+    "speech": "Kokoro-82M af_sarah CPU8",
+    "scope": "Isolated ASR/planner/TTS timing. Early work at 200ms pause, exact independent final-ASR verification at unchanged 650ms endpoint; cancelled/mismatched drafts discarded. No engine, memory, rendering or browser playback.",
+    "ideal_ending": {
+      "cases": 26,
+      "requests": 40,
+      "active_app_unchanged": true,
+      "serial": {
+        "samples": 20,
+        "speech_file_ready_median_s": 1.6701560000001336,
+        "speech_file_ready_p95_s": 2.057023900000786,
+        "reused": 0,
+        "word_errors": 0
+      },
+      "early": {
+        "samples": 20,
+        "speech_file_ready_median_s": 1.298300950002158,
+        "speech_file_ready_p95_s": 2.055667100001301,
+        "reused": 18,
+        "word_errors": 0
+      },
+      "challenge": {
+        "samples": 6,
+        "reused": 0,
+        "discarded": 6
+      }
+    },
+    "actual_detector_replay": {
+      "cases": 29,
+      "requests": 40,
+      "active_app_unchanged": true,
+      "serial": {
+        "samples": 20,
+        "speech_file_ready_median_s": 1.634610850000172,
+        "speech_file_ready_p95_s": 1.941925099999935,
+        "reused": 0,
+        "word_errors": 0,
+        "unscored_split_turns": 0
+      },
+      "early": {
+        "samples": 20,
+        "speech_file_ready_median_s": 1.3512748500033922,
+        "speech_file_ready_p95_s": 1.9746664999984205,
+        "reused": 16,
+        "word_errors": 0,
+        "unscored_split_turns": 0
+      },
+      "challenge": {
+        "samples": 9,
+        "reused": 5,
+        "discarded": 4
+      }
+    },
+    "split_sources": [
+      {
+        "case": "am_michael-paused_negation",
+        "source_sha256": "fd4d56328bae1459805f5b7360467c6c8214153d5f550cb52807d55806ffd4dc",
+        "detected_turns": 2,
+        "cancelled_drafts": 1
+      },
+      {
+        "case": "am_michael-paused_correction",
+        "source_sha256": "454c9c30444219aaf54fe0fdb4cba748aebb84de9b5468b489976ffa4c826b90",
+        "detected_turns": 2,
+        "cancelled_drafts": 0
+      },
+      {
+        "case": "bf_emma-paused_correction",
+        "source_sha256": "bed4898639faf979fa180ae004d3cf74c97403a2a6090c1f5a9f86b688f4f356",
+        "detected_turns": 2,
+        "cancelled_drafts": 0
+      }
+    ],
+    "source_count": 26,
+    "detected_turns": 29,
+    "cancelled_drafts": 7,
+    "evidence": [
+      {
+        "path": "generated/local-app/audit/preemptive-initial/results.json",
+        "sha256": "61f934f16e8ad21ad880a52aaf2b4ff351334de11a2f77ef46c2d19c072ba24a"
+      },
+      {
+        "path": "generated/local-app/audit/preemptive-initial/summary.json",
+        "sha256": "4f77f7fa4bfa7f86b7b4d6e84655d55283d21ff6c4d839b2cada1193c8d39475"
+      },
+      {
+        "path": "generated/local-app/audit/preemptive-replay-detector/fixtures.json",
+        "sha256": "65bec1409b68066eff3a062323faf1395032ff86f9e01dd7913de8a925f9cb6e"
+      },
+      {
+        "path": "generated/local-app/audit/preemptive-detector/results.json",
+        "sha256": "3b45318efcaf7ab6f3e1f05a67a91f8f46959735c5fbf3bc51932efaee443fe6"
+      },
+      {
+        "path": "generated/local-app/audit/preemptive-detector/summary.json",
+        "sha256": "e659183e85b6d778988e556f9c39ceecc60e839343bc1c3bf3f076d9efed4b94"
+      }
+    ],
+    "decision": "Reject live selection: actual-replay median readiness improved 283ms, but p95 worsened 33ms. Fixed synthetic context does not establish correct continuity across split turns. Six split stress turns have no whole-source WER score. Planner response variation and CPU contention affect timings.",
+    "sources": [
+      "https://docs.livekit.io/reference/agents/turn-handling-options/",
+      "https://docs.livekit.io/agents/logic/turns/tuning/"
+    ]
+  },
+  "paused_speech_continuity_20260909": {
+    "source_commit": "015bcdc09ef6abcac2804bf5647d52d104e4b0f6",
+    "date": "2026-09-09",
+    "risk_class": "R1 local call input and fixed movement validation; public R2/R3 gates remain pending",
+    "requirement_links": [
+      "Spoken input and interruptions",
+      "Correct movement and negation",
+      "Warm end-of-speech latency",
+      "Preserve private memory"
+    ],
+    "runtime_files": [
+      {
+        "path": "local_app/web/app.js",
+        "sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a"
+      },
+      {
+        "path": "local_app/web/call-input.mjs",
+        "sha256": "564c0099986a2334b570058d632f39db676975d471adff7e525bbbf84c0198cc"
+      },
+      {
+        "path": "local_app/conversation.py",
+        "sha256": "95ea8c8cb85ad012d9ef1172cd1c70c42abef6c0a91167c69edab035ff907adb"
+      },
+      {
+        "path": "local_app/engine.py",
+        "sha256": "6d97114bc03380d9e7e04b09632c41ca7c6b0d0872afbc689f06881f93d383b4"
+      }
+    ],
+    "changes": [
+      "Listen and interrupt during silent reply preparation, retaining playback/AEC and acoustic-tail restrictions.",
+      "If speech resumes before a speech reply starts, cancel the reply and combine canonical recorder PCM before resubmission; preserve negation and correction prefixes.",
+      "Cap combined PCM at 30 seconds, reject changed rate/invalid WAVs, never prepend audio to typed replacements, different calls or interruptions after playback starts.",
+      "Conservatively veto explicitly negated movement despite ASR punctuation; record motion_veto and use stillness acknowledgement."
+    ],
+    "trials": {
+      "paused-baseline": {
+        "cases": 6,
+        "page_errors": [],
+        "evidence": {
+          "path": "generated/local-app/audit/voice-video-qualification-paused-baseline/paused-results.json",
+          "sha256": "e2507e539d025c223d87af7624dcaaeb1be52382a393c0f8b9023bbfbedaa273"
+        },
+        "cases_observed": [
+          {
+            "case": "af_sarah-paused_negation",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Please do not. Wave, just tell me what you can see.",
+            "final_action": "wave",
+            "final_state": "done"
+          },
+          {
+            "case": "af_sarah-paused_correction",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Come closer. Actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "am_michael-paused_negation",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "am_michael-paused_correction",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "bf_emma-paused_negation",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "bf_emma-paused_correction",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          }
+        ]
+      },
+      "paused-selected": {
+        "cases": 6,
+        "page_errors": [],
+        "evidence": {
+          "path": "generated/local-app/audit/voice-video-qualification-paused-selected/paused-results.json",
+          "sha256": "375a24afc65cb20dccbfa304179dd48aa3343f1b4d00db11fbb043d4b46c82fb"
+        },
+        "cases_observed": [
+          {
+            "case": "af_sarah-paused_negation",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Please do not. Wave, just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "af_sarah-paused_correction",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Come closer. Actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "am_michael-paused_negation",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Wave, just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "am_michael-paused_correction",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "bf_emma-paused_negation",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Please do not. Waived, just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "bf_emma-paused_correction",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          }
+        ]
+      },
+      "paused-continuity": {
+        "cases": 6,
+        "page_errors": [],
+        "evidence": {
+          "path": "generated/local-app/audit/voice-video-qualification-paused-continuity/paused-results.json",
+          "sha256": "ef4626d026727c73ec6cd05f5b3decb622e939d4f57cb0ccc686f2abbee83d54"
+        },
+        "cases_observed": [
+          {
+            "case": "af_sarah-paused_negation",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Please do not. Wave, just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "af_sarah-paused_correction",
+            "settled": true,
+            "jobs": 1,
+            "cancelled": 0,
+            "final_transcript": "Come closer. Actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "am_michael-paused_negation",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Please do not. Wave, just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "am_michael-paused_correction",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Come closer. Actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "bf_emma-paused_negation",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Please do not. Waved, just tell me what you can see.",
+            "final_action": "none",
+            "final_state": "done"
+          },
+          {
+            "case": "bf_emma-paused_correction",
+            "settled": true,
+            "jobs": 2,
+            "cancelled": 1,
+            "final_transcript": "Come closer. Actually stay there and do not move.",
+            "final_action": "none",
+            "final_state": "done"
+          }
+        ]
+      }
+    },
+    "aborted_trial": "paused-revised: stopped before browser use to fix veto ordering; no results claimed",
+    "qualification": {
+      "elapsed_s": 108.698,
+      "turns": 20,
+      "failures": [],
+      "response_sample_count": 19,
+      "p50_s": 1.38,
+      "p95_s": 2.08,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 931,
+            "longGaps": 0,
+            "last": 108787.4,
+            "source": "blob:http://127.0.0.1:8766/4afde6ae-7475-4007-bc07-814790a55a8b",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 219,
+            "callbacks": 1306,
+            "longGaps": 10,
+            "last": 109354.056,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 596,
+          "p50": 9.001000000000008,
+          "p95": 24.51200000000009,
+          "max": 30.141000000000002
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 9,
+        "p50": 2.4713666666696517,
+        "p95": 2.7546333333378032
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+    },
+    "frame_review": {
+      "clips": 20,
+      "frames": 976,
+      "flagged": 0,
+      "missing": 0,
+      "nonzero_unclipped_audio": true,
+      "manually_viewed_standard_frames": 40,
+      "manually_viewed_paused_frames": 20,
+      "paused_frames": 276,
+      "observations": "Whole head retained through the sampled approach and near speech. Hands, skin and mouth remain soft. Diagnostic flags cannot qualify anatomy, natural motion or perceptual sync."
+    },
+    "evidence": [
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-speech-continuity/summary.json",
+        "sha256": "c1a47f34f2676e37647b407a6d79193e735fd169c9b989e82798cb972e0a1cd2"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-speech-continuity/qualification.json",
+        "sha256": "18a0be987d5ef93d33bee4e6c8d96901c60d59c27e44f2baa949b501e84c6bf5"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-speech-continuity/frame-review.json",
+        "sha256": "57743e35ba30ee4fec7860cf908d55ff6c0656e70d90494bd01b0a2ed655a6fd"
+      }
+    ],
+    "restart": {
+      "ready": true,
+      "busy": false,
+      "visual_loaded": true,
+      "startup_s": 30.432,
+      "visual_warmup": {
+        "sources": 5,
+        "decoder": "tensorrt",
+        "seconds": 19.171,
+        "torch_allocated_mib": 1834.454
+      },
+      "visual_error": null,
+      "memory_unchanged": true
+    },
+    "checks": {
+      "python_tests": 150,
+      "node_tests": 23,
+      "compileall": "passed",
+      "whitespace": "passed",
+      "paused_semantic_assertions": "six retained cases passed final action/negation/correction checks"
+    },
+    "data_handling": "Only synthetic benchmark inputs. Live memory unchanged across restart. Bounded previous-input buffer stays in browser memory and clears on mute/end. No new credentials, provider, model, database schema or assets.",
+    "rollback": "Revert the code commit, restart the local service and reload the page. No database migration or asset rollback.",
+    "limits": [
+      "Warm two-second p95 still unmet. Nine uninterrupted spoken samples cannot establish sustained speed gain.",
+      "650ms energy endpoint still splits some pauses; recombination applies only before reply playback.",
+      "Negation checks are conservative, not a full language parser. Conflicting movement requests may require clarification.",
+      "AEC capability is simulated in paused-speech browser tests; physical echo/audio and real mobile remain unqualified.",
+      "Latest input flow needs a new 30-minute qualification; older soak is preserved but not relabelled.",
+      "Independent review/staging and model/host/payment eligibility remain pending before public release."
+    ]
   }
 }

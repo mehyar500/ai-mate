@@ -18,6 +18,10 @@ local_app/engine.py owns planning, speech, media, memory, cancellation and pose 
 
 Known actions are closer, farther and wave. Unsupported actions must be explained honestly. A prepared base wave cannot be applied to an unknown or near pose. Interrupted gestures retain a held frame without inventing an approach cursor. Prepared footage is disclosed; arbitrary low-latency body generation remains unsolved.
 
+Calls keep listening during silent reply preparation. If speech resumes before playback, cancel the unfinished reply and combine the original and resumed recorder audio for recognition. Keep the 650ms endpoint; combined audio is capped at the recognizer's 30 seconds. Never combine typed replacements, different calls/devices, or speech interrupting an already playing reply. Oversized/invalid combinations ask for a shorter repeated sentence. These temporary browser buffers clear on mute/end; no new storage or provider receives them. Playback interruption still requires reported echo cancellation, and the acoustic-tail cooldown remains.
+
+The planner prompt and action validator account for ASR punctuation inside explicit negation. A proposed movement contradicted by "Please do not. Wave" is suppressed, with a stillness acknowledgement and `motion_veto` metric. The check is deliberately conservative for conflicting instructions and is not a general language parser. Negating a different movement does not block a separately requested wave.
+
 ## Exact active models
 
 | Stage | Model / configuration | Where it runs |
@@ -47,12 +51,12 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Latest eight-thread TTS trial: end-of-speech median 2.47s / p95 3.22s, nine spoken replies. Earlier four-thread sustained p95 2.90s across 54. Synthetic MediaStream includes recorder/VAD; no physical-acoustic or overall speed-gain claim |
+| Fast voice and visual response | Latest speech-continuity trial: end-of-speech median 2.47s / p95 2.75s, nine spoken replies. Earlier four-thread sustained p95 2.90s across 54. Synthetic MediaStream includes recorder/VAD; no physical-acoustic or sustained speed-gain claim |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | Latest 624 clock samples: 25.92ms p95 / 37.11ms maximum; sustained four-thread TTS maximum 51.72ms. Perceptual alignment and physical audio remain unqualified |
+| Synchronization within 100ms | Latest 596 clock samples: 24.51ms p95 / 30.14ms maximum; sustained four-thread TTS maximum 51.72ms. Perceptual alignment and physical audio remain unqualified |
 | Stable 30-minute call | TensorRT/four-thread TTS: 120 interactions without functional failures/reported reply stalls; eight-thread TTS passed 20 commands but sustained qualification remains pending |
-| Realistic images and motion | Latest 1,005 frames analyzed, 60 visually sampled; sustained/source reviews retained. Hand blur, mouth artifacts, close framing and repetition remain |
+| Realistic images and motion | Latest 976 frames analyzed, 40 visually sampled; six additional paused-speech clips / 276 frames analyzed, 20 sampled. Sustained/source reviews retained. Hand blur, mouth artifacts and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 

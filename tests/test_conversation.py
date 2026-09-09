@@ -14,6 +14,29 @@ from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
 class PlanTests(unittest.TestCase):
+    def test_negation_veto_overrides_incorrect_model_action_even_with_asr_punctuation(self):
+        for action, prompts in {
+            'wave': ["Please do not. Wave, just tell me what you can see.", "Don't wave.", "Don\u2019t raise your hand.", "Never wave.", "Do not move."],
+            'closer': ["Come closer. Actually stay there and do not move.", "Do not. Come closer.", "Don't approach me."],
+            'farther': ["Please don't step back.", "Never move away.", "Stay where you are."],
+        }.items():
+            for user in prompts:
+                with self.subTest(user=user):
+                    data={'reply':'Let me try that.','action':action,'scene':'fullbody','facts':[]}
+                    result=validate_plan(data,user,'video','fullbody',['fullbody'])
+                    self.assertEqual(result['action'],'none')
+                    self.assertEqual(result['reply'],"I'll keep still.")
+                    self.assertEqual(result['motion_veto'],'explicit_negation')
+
+    def test_negating_another_action_or_an_unrelated_fact_does_not_block_wave(self):
+        data={'reply':'Hello.','action':'wave','scene':'fullbody','facts':[]}
+        for user in ["Wave, but do not come closer or step back.", "Don't forget to wave.",
+                     "My dog's name is not Pepper. Please wave.", "Wave and stay where you are.", "Don't stop waving."]:
+            with self.subTest(user=user):
+                result=validate_plan(data,user,'video','fullbody',['fullbody'])
+                self.assertEqual(result['action'],'wave')
+                self.assertNotIn('motion_veto',result)
+
     def test_scene_mentions_preserve_current_view_but_visual_requests_can_change_it(self):
         available=['mira','garden','cafe','fullbody']
         data={'reply':'The garden is peaceful.','presentation':'video','scene':'garden','action':'none','facts':[]}

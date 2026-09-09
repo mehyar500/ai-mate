@@ -1,9 +1,9 @@
 import {synchronizeSpeech, streamingSource} from './media-sync.mjs';
 import {Microphone} from './microphone.mjs';
-import {CallInput} from './call-input.mjs';
+import {CallInput,speechAccess} from './call-input.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false;
+let token="",ready=false,busy=false,active=null,submitting=false,pendingStop=false,connected=false,submittedSpeech=false;
 let replyMode="text",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia=null,queue=[],abortMedia=null,objectURL=null;
 let idleURL=null,idleFailed=false,idleSuppressed=false;
 let nextIdleURL=undefined,pictureStarted=false,motionRequested=false;
@@ -34,15 +34,19 @@ function updateCaptions(){
 $('show-captions').addEventListener('change',updateCaptions);
 const callInput=new CallInput({
   state:()=>({stamp:callRequest+':'+microphone.generation+':'+replyMode,
-    canInterrupt:ready&&microphone.enabled&&microphone.echoCancellation&&playing&&!stopping,
+    canInterrupt:speechAccess(callSpeechState()).canInterrupt,
+    canContinue:busy&&submittedSpeech&&firstPlayed===null,
     busy:busy||stopping||submitting}),
   stop:()=>interrupt(),submit:input=>submit(input.text||'',input.raw||null,input.mode,input.draftId),
   onError:error=>notice(error.message,true)
 });
 const microphone=new Microphone({onTurn:raw=>callInput.turn({raw,mode:replyMode}),onSpeech:()=>callInput.speech(),
-  canListen:()=>ready&&replyMode!=='text'&&(callInput.capturing()||
-    (!stopping&&!submitting&&((playing&&microphone.echoCancellation)||(!busy&&!playing&&performance.now()>listenAfter)))),
+  canListen:()=>speechAccess({...callSpeechState(),capturing:callInput.capturing()}).canListen,
   onState:state=>{if(state==='off')callInput.reset();if(micState!==state){micState=state;controls();}}});
+function callSpeechState(){
+  return {ready,enabled:microphone.enabled,mode:replyMode,busy,playing,stopping,submitting,
+    echoCancellation:microphone.echoCancellation,settled:performance.now()>listenAfter};
+}
 let lastStart=0,firstPlayed=null,stalls=0,firstBoot=true,provider="ollama",lastServerSeconds=null,waitingSince=null,waitingSeconds=0;
 let partEndedAt=null,phraseGapSeconds=0;
 const sceneNames={mira:"Living room",garden:"Garden",cafe:"Café",fullbody:"Full-body garden"};
@@ -280,7 +284,7 @@ async function follow(key,node){
 async function submit(text,raw=null,inputMode=null,draftId='message'){
   if(busy||stopping||!ready||(!raw&&!text.trim()))return;
   resetPlayback(true);lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
-  pendingStop=false;submitting=true;busy=true;controls();
+  pendingStop=false;submitting=true;busy=true;submittedSpeech=Boolean(raw);controls();
   const node=bubble(raw?"Listening…":text,"user");
   if(!raw)$(draftId).value="";
   notice(raw?"Listening to your message…":"Mira is thinking…");

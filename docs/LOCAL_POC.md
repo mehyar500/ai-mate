@@ -71,6 +71,27 @@ Successful fresh video captures its final decoded frame as the next reference. U
 
 The tables distinguish individual samples from repeated suites. Different configurations and capture boundaries are not directly comparable; none is a performance guarantee. [Machine-readable history](research/local-poc-benchmarks.json) preserves settings and rejected trials. Raw synthetic traces and reviewed contact sheets stay in ignored `generated/local-app/audit/`.
 
+The paused-speech regression uses six fixed recordings through the real AudioWorklet, turn detector, ASR, Cloudflare, Kokoro and MuseTalk. Initially, one negated wave was performed after ASR inserted a period inside "do not wave"; other paused corrections lost their beginning while the microphone was gated during preparation. Listening during preparation restored the correction, but one split negation still lost "do not". The final change combines the recorder audio when speech resumes before any reply playback. All six final transcripts retain the negation/correction, all final actions are none, and four unfinished replies were cancelled before a displayed video frame. The complete 276 output frames passed limited diagnostics; twenty were visually inspected. Synthetic AEC capability was simulated; physical echo remains untested.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-paused --performance-label headroom --decoder tensorrt-reviewed
+# Second terminal, with the existing Playwright NODE_PATH:
+node scripts/review_paused_voice.cjs new-paused
+# After the server exits:
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-paused
+```
+
+Early ASR/planning/speech preparation remains **unselected**. A 26-case ideal-pause experiment improved median speech-file readiness, but that assumption overstated applicability. Replaying the actual detector produced 29 turns from 26 sources; three paused sources split. Across twenty ordinary prompts, median readiness improved **1.635s → 1.351s**, while p95 worsened **1.942s → 1.975s**. Sixteen drafts were reused only after exact final-transcript validation. Each comparison made forty bounded Cloudflare requests. These are speech-file timings, not playback; the fixed context does not model continuity across split turns. This follows the cancellation principle in [LiveKit's preemptive-generation documentation](https://docs.livekit.io/agents/logic/turns/tuning/), without adding a LiveKit dependency.
+
+```powershell
+node scripts/prepare_preemptive_replay.mjs new-replay
+.\.venv\Scripts\python.exe scripts/benchmark_preemptive_planning.py --label new-timing --replay-label new-replay
+```
+
+The timing experiments preceded the negation/capture fixes. Reproduction against a changed planner is a new comparison. Neither the endpoint nor selected models changed. Raw evidence: `audit/preemptive-initial`, `preemptive-replay-detector`, `preemptive-detector`, and the `voice-video-qualification-paused-*` directories. The `paused-revised` server was stopped before browser testing to correct veto ordering; it is not a qualification result. Only `paused-continuity` contains the complete capture fix.
+
+The subsequent `qualification speech-continuity --capture` run passed **20/20 commands** in 108.698 seconds. Spoken end-of-speech median/p95: **2.471/2.755s** (nine); mixed Send-to-playback: **1.38/2.08s** (nineteen). Zero functional failures, page errors or reported reply stalls. A/V clock skew: **24.512ms p95 / 30.141ms maximum**, 596 samples. All 976 frames were analyzed with zero limited flags and nonzero unclipped audio; forty approach/near-speech frames were inspected. Hand/skin softness and imperfect lips remain. The changed input flow still needs physical echo, mobile and its own sustained-call qualification. Roll back this code revision and restart/reload to restore the previous input behavior; no database migration or asset rollback is required.
+
 | Test | Observed result | Limit |
 |---|---|---|
 | Prepared approach → greeting → return | Browser starts 1.72s / 2.16s / 1.83s, zero stalls; unmuted audio ended; matching idle resumed | Prepared movement, newly synthesized speech/lips; not fresh diffusion |
@@ -507,7 +528,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 148 Python tests and 17 Node tests, Python compilation and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Three added endpoint tests cover distinct final-pose conditioning, removal of guide latents before both decoders, and conflicting endpoints. Actual iPhone behavior remains unqualified. Synthetic benchmark servers use disposable memory. This cycle changes the offline benchmark and the reviewed approach/near footage; private memory and credentials are preserved.
+Checks for this revision: 150 Python tests and 23 Node tests, Python compilation and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Added checks cover incorrect negated movement plans, listening during preparation, preserving resumed PCM, stale/typed/playback input, changed devices, malformed WAVs and the 30-second limit. Actual iPhone behavior remains unqualified. Synthetic benchmark servers use disposable memory. This cycle changes call input recovery and movement validation; private memory, credentials, model selection and prepared assets are preserved.
 
 ## Cost and next decision
 
