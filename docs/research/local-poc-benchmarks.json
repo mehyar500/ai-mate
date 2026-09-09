@@ -16563,5 +16563,729 @@
       "Prepared body actions remain limited; no new arbitrary movement or visual-quality improvement is claimed.",
       "No rental, public deployment, independent public-release review or staging approval. Model/host/payment eligibility remains separate."
     ]
+  },
+  "lip_crop_syncnet_20260909": {
+    "source_commit": "2cdcdb64da29fa513d20f1c3c74adaad3f1cb641",
+    "date": "2026-09-09",
+    "risk_class": "R1",
+    "scope": "Neutral local video quality and evaluation only; main edits authorized. No public rollout or private-memory use in benchmarks.",
+    "requirement_links": [
+      "goal: photorealistic video call with synchronized speech",
+      "goal: frame inspection and measured failures",
+      "goal: local 16GB-first iteration",
+      "goal: preserve private memory and credentials"
+    ],
+    "files": [
+      "local_app/visual.py",
+      "config/syncnet-evaluator.json",
+      "scripts/download_syncnet_evaluator.py",
+      "scripts/review_lip_sync.py",
+      "scripts/benchmark_lip_crops.py",
+      "tests/test_lip_sync_review.py",
+      "scripts/economics.py",
+      "scripts/verify_call_review.cjs",
+      "docs/REPORT.md",
+      "docs/LOCAL_POC.md",
+      "docs/research/local-poc-benchmarks.json"
+    ],
+    "change": {
+      "face_shift_before": -0.1,
+      "face_shift_selected": -0.05,
+      "audio_or_clock_shift_applied": false,
+      "app_package_changes": false,
+      "new_runtime_api_keys": 0,
+      "new_gpu_rental": false,
+      "evaluator_download_bytes": 54573114
+    },
+    "evaluator": {
+      "manifest": "config/syncnet-evaluator.json",
+      "model_sha256": "961e8696f888fce4f3f3a6c3d5b3267cf5b343100b238e79b2659bff2c605442",
+      "device": "cuda",
+      "resolution_ms": 40,
+      "method": "Reviewed YuNet boxes; upstream asymmetric BGR crop; original decoded timestamps held on 25FPS grid; original separate WAV resampled to mono PCM16 16kHz. Equal interior visual windows across lag candidates. Signed delay <0 means sound precedes the corresponding mouth. No human perceptual claim.",
+      "control_delays_ms": [
+        -400,
+        -200,
+        200,
+        400
+      ]
+    },
+    "baseline": {
+      "clips": [
+        {
+          "id": "4647086b1f994d8090e53ceebe1d6848",
+          "case": "description",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 5.9459075927734375,
+          "distance": 8.632684707641602,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "28db07d2c364f2ec7a74d3d3cdf85c4fcdfb4e084197994d39539fe5af13a7b2",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7"
+        },
+        {
+          "id": "f8ab43d21446449981948c3271adbea8",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -200,
+          "confidence": 3.8256778717041016,
+          "distance": 10.629962921142578,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "a543163b28926c7852e022bd2bf16fc0cacd5e11efd79a4dd002a3379e3c33a8",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983"
+        },
+        {
+          "id": "0e2408c0ac204d9d9c73fd23aca58486",
+          "case": "conversation",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -160,
+          "confidence": 6.388792037963867,
+          "distance": 8.90150260925293,
+          "evaluated_windows": 21,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "395747462fbf2cba09864538665ed5f777283fb23d87d3580a3a61253785defd",
+          "audio_sha256": "cd6732b429a42e3f07684fb807ed0fb565ecd3195a00e9336f8c9de3aa2f7969"
+        },
+        {
+          "id": "f75edebeadb7418394c87120aafb4551",
+          "case": "description",
+          "cycle": 6,
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 6.379393577575684,
+          "distance": 8.236015319824219,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "f5cd96897b13fda367f3d94afd8e667a421e87d43b518f0250f34c88cef883b5",
+          "audio_sha256": "03c3e3b58e9f8ae6be8846e8471fe666ad3fdd81fc283cfcfd64714bfda67039"
+        },
+        {
+          "id": "7785c04c82904b6bbde47078beeb7c5e",
+          "case": "unsupported",
+          "cycle": 6,
+          "pose": "base",
+          "audio_delay_ms": -200,
+          "confidence": 3.7328062057495117,
+          "distance": 10.741930961608887,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "b8b7f8667120bff8bf432fdac6bfa3c71ca3126b93fd07ff60cf6aa114220c06",
+          "audio_sha256": "8221d46ec98c266d405493d47e95e31ee666f4478b0a822e9c4a66e8db6174c9"
+        }
+      ],
+      "skipped": [
+        {
+          "id": "3d6b35415b334f34aca8e40af1ffd933",
+          "case": "conversation",
+          "cycle": 6,
+          "reason": "Too short for 20 common interior windows over the full lag search."
+        }
+      ],
+      "scope": "Five clips, three synthetic phrases across first/last cycles; one short clip excluded. Initial partial run retained separately."
+    },
+    "crop_comparison": {
+      "clips": [
+        {
+          "id": "ecccc1ada13748a6b40fa94480818fad",
+          "case": "description",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": 0,
+          "confidence": 1.5787811279296875,
+          "distance": 12.294356346130371,
+          "evaluated_windows": 26,
+          "shift_controls_pass": false,
+          "reverse_confidence_lower": false,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            -920,
+            -920
+          ],
+          "video_sha256": "e9135ba0193cb72d1d01ee3a490b7583b439f856bff55421900ffeb4c6e3008c",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7",
+          "face_shift": -0.1
+        },
+        {
+          "id": "db1eb5114b924327b00f758fdad9c849",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -200,
+          "confidence": 3.813516616821289,
+          "distance": 10.642694473266602,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "9f13d3bd7cc8fac7ef80aa3bf963c6696d3690c6a76c4826c71db696547d5ac4",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983",
+          "face_shift": -0.1
+        },
+        {
+          "id": "d979206e1dd64c03a059d7d68c73e34f",
+          "case": "description",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 5.9459075927734375,
+          "distance": 8.632684707641602,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "28db07d2c364f2ec7a74d3d3cdf85c4fcdfb4e084197994d39539fe5af13a7b2",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7",
+          "face_shift": -0.1
+        },
+        {
+          "id": "8261dbf3b9bb41449f1b4bd1801bd6b5",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 8.27569580078125,
+          "distance": 6.738430500030518,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "988e78280e86881c2492a4a297ca6504877799b5574998b984f7204f44891216",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983",
+          "face_shift": -0.1
+        },
+        {
+          "id": "d1189be1bff240cbb66c5ab4b2a2419d",
+          "case": "description",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 4.614006996154785,
+          "distance": 9.827069282531738,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "d34aaea8ac51db9d9728bc42c6683a5a06b4b0a4bd4b8a21b7d67a2cded22934",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7",
+          "face_shift": -0.05
+        },
+        {
+          "id": "5b86a34dc4a94e339e076f370a8f529a",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 5.934388160705566,
+          "distance": 8.473063468933105,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "2a03d822f7411c212d381ea1ed39e2fa6ec830eede19a0bf543f9d5038072286",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983",
+          "face_shift": -0.05
+        },
+        {
+          "id": "f876f26f18af4595acf8b8713fe1e447",
+          "case": "description",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 7.510952472686768,
+          "distance": 7.464457035064697,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "fbef7efd2c1657a5f85a606eae45421e3eef3ba93ec85f31e36b42d10b1ef438",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7",
+          "face_shift": -0.05
+        },
+        {
+          "id": "ed95ada9abc64ce3bfd2f471006497c8",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": -40,
+          "confidence": 7.567845344543457,
+          "distance": 7.254682540893555,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "930ee9547a80c889a6f89bc32392223872de54445708262e9c0392ec77afabf7",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983",
+          "face_shift": -0.05
+        },
+        {
+          "id": "d3ca368893a0445ca26a208ab6fadffb",
+          "case": "description",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -80,
+          "confidence": 7.013885498046875,
+          "distance": 7.952210426330566,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "d6d538e3a95920e5deea373e8721204dd43124d976c1322cbbb082181a690289",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7",
+          "face_shift": 0
+        },
+        {
+          "id": "5cfb78037540440f887cae22c8a0b14c",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -80,
+          "confidence": 4.647347450256348,
+          "distance": 10.173370361328125,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "249aa0610005751277ae2482c2af8219147e1c64cb61f72d1ec72d799211264e",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983",
+          "face_shift": 0
+        },
+        {
+          "id": "ad6dbfdedb5547b2acbdfef196348099",
+          "case": "description",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": -40,
+          "confidence": 3.4393606185913086,
+          "distance": 10.696184158325195,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "a7b72f1a1b6208f44987588b0959f6b08371216fbd54d861658da52f1b57cf77",
+          "audio_sha256": "b1aa1ce191973dcb041a068af2fc1f80634a76bedf2eac7cc3e6c990edd63bf7",
+          "face_shift": 0
+        },
+        {
+          "id": "0c9f41c004514e0c930a629cd007158c",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": -40,
+          "confidence": 4.109732627868652,
+          "distance": 10.476447105407715,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "fd9244c4dc30666e357088736f3ea8b69b50248c633212d3639bac2d49c01bac",
+          "audio_sha256": "bd96434d89371345e00d4478927ab5fa9cea5463c7b04b7acc04479cc9dfc983",
+          "face_shift": 0
+        }
+      ],
+      "frames_analyzed": 828,
+      "heuristic_flags": 0,
+      "visual_review": {
+        "reviewer": "Codex visual inspection",
+        "source_images": [
+          "fullbody.png",
+          "performance-near.png"
+        ],
+        "source_images_inspected_before_generation": true,
+        "reviewed_frame_indices_per_clip": [
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24,
+          26,
+          28
+        ],
+        "clips": 12,
+        "inspected_frames": 120,
+        "normal_speed_review": false,
+        "physical_audio_heard": false,
+        "observations": "The -0.05 crop increases visible mouth articulation while preserving the inspected face outline, hair and eyes. Near-view mouth edges and skin remain soft. No newly obvious duplicate mouth or displaced facial outline in the sampled frames. Timing scores do not establish natural phonemes or perceptual acceptance.",
+        "grids": {
+          "mouth-comparison-description.jpg": "dfb36b74ad0cfe405c97e26c0f437684e2d66d4a3ae982e6595be18c3ea4c3d0",
+          "mouth-comparison-unsupported.jpg": "265a8274397d8929a552022168088f667679ac2fef0a59b1e7518fc2da29e318"
+        }
+      },
+      "selection": "-0.05 keeps the four matched estimates within 40ms and improves base-view articulation. Two phrases on two views do not establish universal quality."
+    },
+    "selected_call": {
+      "commands": 20,
+      "functional_failures": [],
+      "page_errors": [],
+      "elapsed_s": 105.777,
+      "speech_end_to_playback_s": {
+        "samples": 9,
+        "p50": 2.0275333333363124,
+        "p95": 2.6309333333348333
+      },
+      "send_to_playback": {
+        "samples": 19,
+        "p50_s": 1.33,
+        "p95_s": 1.96
+      },
+      "av_clock_skew_ms": {
+        "samples": 598,
+        "p50": 8.143000000000011,
+        "p95": 24.237999999999982,
+        "max": 28.71199999999996
+      },
+      "reply_video_long_gaps": 0,
+      "call_active_at_end": true,
+      "clips_analyzed": 20,
+      "frames_analyzed": 978,
+      "heuristic_flagged_frames": 0,
+      "all_audio_nonzero_unclipped": true,
+      "lip_estimates": [
+        {
+          "id": "bd99aa631c004c7d9c937fdea2aabe62",
+          "case": "description",
+          "cycle": 1,
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 7.711656093597412,
+          "distance": 7.324596881866455,
+          "evaluated_windows": 26,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "48040770db9308a6164a78b447ad16a4b50449da3e3db600f9bbac30ec31c107",
+          "audio_sha256": "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983"
+        },
+        {
+          "id": "ad566a6a88604b79a2026fa1e7cc1b8d",
+          "case": "unsupported",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 6.035460472106934,
+          "distance": 8.422069549560547,
+          "evaluated_windows": 54,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "b546fa7e09b8cc94ab27efbc0becfe70f27486c0f38f5cf0839adddfa44bf6b8",
+          "audio_sha256": "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce"
+        },
+        {
+          "id": "4c8209aeb69b4e6f9497531e25f31bae",
+          "case": "conversation",
+          "cycle": 1,
+          "pose": "base",
+          "audio_delay_ms": -80,
+          "confidence": 5.364992141723633,
+          "distance": 9.751709938049316,
+          "evaluated_windows": 21,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "shift_control_relative_errors_ms": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "video_sha256": "4177020d2dc914b462308f9c91bf8a154f12862f0441a0852410b844529d5717",
+          "audio_sha256": "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        }
+      ],
+      "visual_review": {
+        "reviewer": "Codex visual inspection",
+        "frames": 40,
+        "selections": [
+          {
+            "id": "12fa90b0418748d9a72e083774a92d5b",
+            "frame_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19
+            ]
+          },
+          {
+            "id": "bd99aa631c004c7d9c937fdea2aabe62",
+            "frame_indices": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19
+            ]
+          }
+        ],
+        "observations": "Whole-head framing and the inspected body silhouette are retained. The wave still has hand blur; near-view face/skin remain soft. No additional face outline displacement is obvious in these samples.",
+        "normal_speed_review": false,
+        "physical_audio_heard": false
+      }
+    },
+    "review_ui": {
+      "clips": 20,
+      "frameStepping": true,
+      "export": true,
+      "defaultUnreviewed": true,
+      "audio": {
+        "samples": 48,
+        "maxRms": 0.15602576571887505,
+        "maxPeak": 0.579997181892395,
+        "scope": "Decoded MP4 audio reached an AudioContext destination in headless Chromium. No physical speaker, microphone, listening or perceptual lip-sync claim."
+      },
+      "layout": {
+        "width": 390,
+        "scroll": 390,
+        "buttons": [
+          {
+            "id": "export",
+            "height": 44
+          },
+          {
+            "id": "back-frame",
+            "height": 44
+          },
+          {
+            "id": "next-frame",
+            "height": 44
+          },
+          {
+            "id": "previous",
+            "height": 45.1875
+          },
+          {
+            "id": "next",
+            "height": 45.1875
+          },
+          {
+            "id": "flag",
+            "height": 45.1875
+          }
+        ]
+      },
+      "errors": [],
+      "consoleErrors": []
+    },
+    "restart": {
+      "ready": true,
+      "busy": false,
+      "visual_loaded": true,
+      "asr_device": "cuda",
+      "visual_warmup": {
+        "sources": 5,
+        "decoder": "tensorrt",
+        "seconds": 19.14,
+        "torch_allocated_mib": 1834.454
+      },
+      "memory_unchanged": true
+    },
+    "evidence": [
+      {
+        "path": "generated/local-app/audit/lip-sync-gpu-pcm-calibration/results.json",
+        "sha256": "ed2367a0c61c1c12722cd49556230707b36fb16f069781db8d46ace490a84ebf"
+      },
+      {
+        "path": "generated/local-app/audit/lip-sync-gpu-pcm-calibrated/results.json",
+        "sha256": "cfb6ae2740efc18fc3ee68b591e3586d02d137912b8e4dfe25b19ef18d247549"
+      },
+      {
+        "path": "generated/local-app/audit/lip-sync-crop-comparison/results.json",
+        "sha256": "e70dfc8259c84dffb3f18ac8a43281fe2dfe69bcc9a82fd2b2a50d33c893b435"
+      },
+      {
+        "path": "generated/local-app/audit/lip-sync-selected-call/results.json",
+        "sha256": "09ef2dda7fbbf735b6c61e4c240f58afcb76d73843838322b683d17d8add54f7"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crops/qualification.json",
+        "sha256": "851220cb35e42a07ca8a78baa46756ab1b2169a6d36ca2982b96e565c0c3b35e"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crops/frame-review.json",
+        "sha256": "6fae88fe0504b6fcd1f7459306f4d4599ad8cee86d4fcf85479b2f17e370ebb4"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crops/manual-review.json",
+        "sha256": "f53068cbd2e34433f722fee8c18bba1d20db16b823c4c18910394995ebce9436"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crop-selected/qualification.json",
+        "sha256": "fe8fba3f8bcf3c0962de52bd1ea27ef2e6195316d5b6d65294c631ac8ef748ab"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crop-selected/summary.json",
+        "sha256": "7abae68f7fd4d5fbba9094b20cdfa0b0e7d7ee73034d9c52b390a037a62080fa"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crop-selected/frame-review.json",
+        "sha256": "7d704655cecde0aee63c881f96780ab024997b7b3f50bc78fabd624b1e3141ec"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crop-selected/manual-review.json",
+        "sha256": "f38b1c4bd0d53acffa851e1f696a7fdacde4bee0a88f15e901e0f1d61c77976d"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crop-selected/review-ui-results.json",
+        "sha256": "b9d75989a8131438e54297cfb9fa09af36f3f91339fc66fb7162fbb180b0b929"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-lip-crop-selected/restart-check.json",
+        "sha256": "f0e8ccbfc4fb481cf422067e3338fd4470ef03c2a7d5bf477387fb398b829358"
+      }
+    ],
+    "checks": {
+      "python_tests": 162,
+      "node_tests": 23,
+      "python_compileall": "passed",
+      "review_ui": "passed",
+      "economics_drift": "Initial full suite failed on two stale generator strings from the preceding recognition change. Updated generator to match the existing document; formulas and prices unchanged. Full 162-test rerun passed."
+    },
+    "data_handling": "Only fixed synthetic audit recordings and permitted fictional-character sources. Evaluator/code/weights remain in ignored cache. Restricted torch weights loading and runtime hash verification. Private memory fingerprint remains outside the synthetic review server; public record contains only unchanged=true.",
+    "rollback": "Revert the reviewed commit or restore DEFAULT_FACE_SHIFT=-0.10 and restart only the idle local preview. No migration; existing memory schema and assets remain.",
+    "limits": [
+      "The 2-second p95 target is still unmet (2.631s in nine spoken replies).",
+      "The previous 30-minute soak used -0.10; -0.05 has the 20-command call test.",
+      "40ms model offset estimates are not human phoneme or physical-acoustic verification.",
+      "Small faces, soft mouths/skin, hand blur and prepared body movements remain.",
+      "No real mobile or physical-speaker test; public security/correctness review and staging remain pending."
+    ]
   }
 }

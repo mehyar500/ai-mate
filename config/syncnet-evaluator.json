@@ -1,0 +1,27 @@
+{
+  "name": "SyncNet v2 offline timing evaluator",
+  "source_commit": "907c0b579c2e2d83f0eae1b2ac9e720cde4e5623",
+  "repository": "https://github.com/joonson/syncnet_python",
+  "model_page": "https://www.robots.ox.ac.uk/~vgg/software/lipsync/",
+  "paper": "Chung and Zisserman, Out of time: automated lip sync in the wild, ACCV workshop 2016",
+  "license_scope": "Source MIT; Oxford model page describes research use with a CC BY 4.0 link. Used only as an offline research evaluator; production eligibility is not established.",
+  "downloads": {
+    "SyncNetModel.py": "https://raw.githubusercontent.com/joonson/syncnet_python/907c0b579c2e2d83f0eae1b2ac9e720cde4e5623/SyncNetModel.py",
+    "LICENSE.md": "https://raw.githubusercontent.com/joonson/syncnet_python/907c0b579c2e2d83f0eae1b2ac9e720cde4e5623/LICENSE.md",
+    "syncnet_v2.model": "https://www.robots.ox.ac.uk/~vgg/software/lipsync/data/syncnet_v2.model",
+    "python_speech_features-0.6.tar.gz": "https://files.pythonhosted.org/packages/ff/d1/94c59e20a2631985fbd2124c45177abaa9e0a4eee8ba8a305aa26fc02a8e/python_speech_features-0.6.tar.gz"
+  },
+  "download_sha256": {
+    "SyncNetModel.py": "41b85aed0006546cb2d6dc9180c5bc3dac737ab80eff643022e397a349c30c22",
+    "LICENSE.md": "70155ceb20fb7aae10fc1e9d5c9753de6a10a50a8937e0f5ab3afcdf96c8754d",
+    "syncnet_v2.model": "961e8696f888fce4f3f3a6c3d5b3267cf5b343100b238e79b2659bff2c605442",
+    "python_speech_features-0.6.tar.gz": "a0aebf746464bc929dc3162cb369d7ff967c398c5120ddf5fb40a65f01b92b11"
+  },
+  "runtime_sha256": {
+    "SyncNetModel.py": "41b85aed0006546cb2d6dc9180c5bc3dac737ab80eff643022e397a349c30c22",
+    "syncnet_v2.model": "961e8696f888fce4f3f3a6c3d5b3267cf5b343100b238e79b2659bff2c605442",
+    "python_speech_features/__init__.py": "1119a63b1cfff6652422e71c35bcd46b963a8152cb543772738702c5b08251b6",
+    "python_speech_features/base.py": "5da9dd3a98ebf697d5ac0dec1cc79e605f6df4874d1aa327096acf3002aaabd1",
+    "python_speech_features/sigproc.py": "f4769a1c7b01c1d42d11549e2c5db4a84159e755d61a2f72c59afdbaad0b1352"
+  }
+}

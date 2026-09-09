@@ -14,6 +14,8 @@ import time
 
 from .models import CACHE, ROOT, check_cancel
 
+DEFAULT_FACE_SHIFT = -.05
+
 
 def audio_left_padding(fps):
     """MuseTalk v1.5 uses two video frames of Whisper context, rounded up."""
@@ -37,7 +39,7 @@ def motion_duration(speech_seconds, source_frames, source_fps, *, loop=False, st
 
 
 class PortraitRenderer:
-    def __init__(self, face_shift=-.10, decoder_backend='torch'):
+    def __init__(self, face_shift=DEFAULT_FACE_SHIFT, decoder_backend='torch'):
         if not math.isfinite(face_shift) or not -.2 <= face_shift <= .05:
             raise ValueError('Face crop adjustment is out of range.')
         if decoder_backend not in {'torch','tensorrt'}:
@@ -156,7 +158,7 @@ class PortraitRenderer:
         check_cancel(cancel)
         if not hasattr(self, '_motion_cache'):
             self._motion_cache = OrderedDict()
-        key = (hashlib.sha256(path.read_bytes()).digest(), getattr(self, 'face_shift', -.10)) if reuse and path.stat().st_size <= 40_000_000 else None
+        key = (hashlib.sha256(path.read_bytes()).digest(), getattr(self, 'face_shift', DEFAULT_FACE_SHIFT)) if reuse and path.stat().st_size <= 40_000_000 else None
         cached = self._motion_cache.get(key) if key else None
         self.motion_cache_hit = cached is not None
         if cached:
@@ -203,7 +205,7 @@ class PortraitRenderer:
                     raise RuntimeError("The generated movement lost its clear face. Please retry the movement.")
                 face = faces[0]
                 x, y, w, h = map(float, face[:4])
-                mid = float(face[9]) + getattr(self, 'face_shift', -.10)*h
+                mid = float(face[9]) + getattr(self, 'face_shift', DEFAULT_FACE_SHIFT)*h
                 x1, y1 = max(0, int(x)), max(0, int(2*mid-(y+h)))
                 x2, y2 = min(width, int(x+w)), min(height, int(y+h+.12*h))
                 if x2 <= x1 or y2 <= y1:

@@ -33,6 +33,7 @@ The video fills the height when controls fit in the side space. Tall phone views
 | Experimental new movement | LTX-Video 2B 0.9.8 distilled FP8 + T5-XXL FP8 | Local ComfyUI, eight steps; not reliable arbitrary motion |
 | Reference image preparation | FLUX.2 Klein 4B | Separate GPU process; review still images before generating video |
 | Delivery | FFmpeg libx264/AAC, fragmented MP4 plus synchronized WAV | CPU encoder; installed FFmpeg/NVENC driver pair is incompatible |
+| Offline lip-sync evaluation | SyncNet v2 + python_speech_features 0.6 | Isolated diagnostic cache; never loaded by the call server |
 
 Pins: [models](../config/local-models.json), [assets](../config/local-assets.json), [Python dependencies](../config/local-poc-requirements.txt), [LTX-2B downloader](../scripts/download_ltx_motion.py), [LTX-2.3 downloader and SHA-256](../scripts/download_ltx23_benchmark.py). ComfyUI is pinned to `00d34d92fe0afbfbab3893ebbab2d5d70f5e9882`, with custom/API nodes disabled and 4GB VRAM reserved. The isolated environment is `.cache/comfy-env`; motion API is loopback port 8188. Do not expose this unauthenticated development service.
 
@@ -68,6 +69,43 @@ Listening footage continues while a reply buffers, pauses when the reply actuall
 Successful fresh video captures its final decoded frame as the next reference. Unknown positions disable known-pose loops. The older one-shot reverse cache remains only for an unprepared approach followed immediately by a return. Cancelled generation cannot commit its endpoint. Interrupt reports the displayed frame timestamp; the engine separately preserves that observed pose. Restart clears transient pose/return files and starts at the base pose while preserving conversation. Voice now triggers this interruption flow when echo cancellation is reported; actual acoustic behavior and playback recovery after browser closure remain open.
 
 ## Measured results and failures
+
+### Mouth timing and selected face crop — September 9
+
+The selected MuseTalk face shift is now **-0.05**, previously -0.10. This adjusts the face region supplied to synthesis; it does not delay speech, alter timestamps or change the body footage. Appearance caches already include the crop setting in their key.
+
+[SyncNet](https://github.com/joonson/syncnet_python) provides a separate audio/visual timing diagnostic. The [pinned evaluator manifest](../config/syncnet-evaluator.json) records the source commit, hashes, 54.6MB weights and research scope. The [Oxford model page](https://www.robots.ox.ac.uk/~vgg/software/lipsync/) describes research use with a CC BY link; this evaluator is not a production-service eligibility claim. No app dependency or new API credential is required.
+
+Five eligible clips from the preceding soak were evaluated; one selected clip was too short. Close-view estimates were 0ms, while full-body estimates showed 160–200ms of mouth lag. All 20 injected shifts (±200/400ms) were recovered and reversed speech had lower confidence. A controlled comparison then rendered **12 clips / 828 frames**, using the same two WAVs in both poses across three crops:
+
+| Face shift | Full-body estimates, two phrases | Near-view estimates, two phrases | Interpretation |
+|---|---|---|---|
+| -0.10, previous | 0ms unreliable / 200ms mouth lag | 0 / 0ms | One phrase failed controls; the other had lag |
+| **-0.05, selected** | **40 / 40ms mouth lag** | **0 / 40ms mouth lag** | All four clips passed shift controls and reverse-audio comparison |
+| 0, rejected | 80 / 80ms mouth lag | 40 / 40ms mouth lag | Less consistent timing and weaker near-view scores |
+
+Every frame passed the limited face/luma/pixel-change checks. **120 face crops** were visually inspected across all variants. The selected crop showed stronger articulation without an obvious displaced outline in those samples; mouth edges and skin remain soft. These checks do not prove natural phonemes, anatomy or subjective preference.
+
+The selected crop then passed **20/20 commands**, including approach, return, wave, negation, interruption and unsupported-action handling. All **978 frames** were retained and analyzed. End-of-speech latency across nine uninterrupted spoken replies was **2.028s median / 2.631s p95**; mixed Send-to-playback was **1.33/1.96s** across 19 responses. There were no reported reply stalls or page errors. Clock skew across 598 samples was **24.24ms p95 / 28.71ms maximum**. Three eligible speech clips scored **0, 40 and 80ms mouth lag**, with all twelve injected-shift controls passing. This improves estimated lip timing, not end-to-end latency. The earlier 30-minute soak used the previous crop.
+
+Method limits: the evaluator uses reviewed YuNet boxes with the upstream asymmetric crop, decoded timestamps resampled to 25 FPS without speeding up the footage, mono 16kHz PCM, and common interior feature windows. It excludes zero-padded search edges, unlike upstream's aggregate scoring; its confidence values are not directly comparable with published SyncNet scores. Estimates have 40ms resolution, and known-shift controls establish sensitivity rather than absolute perceptual accuracy. MP4 video is compared with the separate WAV used by the live app. Normal-speed listening, physical audio and real mobile validation remain open.
+
+Recorded commands below require retained synthetic artifacts. Use new labels to repeat without overwriting evidence:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/download_syncnet_evaluator.py
+.\.venv\Scripts\python.exe scripts/review_lip_sync.py --label gpu-pcm-calibrated --device cuda
+.\.venv\Scripts\python.exe scripts/benchmark_lip_crops.py --label lip-crops
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label lip-crops
+.\.venv\Scripts\python.exe scripts/review_lip_sync.py --source voice-video-qualification-lip-crops --label crop-comparison --device cuda
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label lip-crop-selected --performance-label headroom --decoder tensorrt-reviewed --asr-device cuda
+# After the isolated server reports ready, in a second terminal:
+node scripts/qualify_video_call.cjs qualification lip-crop-selected --capture
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label lip-crop-selected
+.\.venv\Scripts\python.exe scripts/review_lip_sync.py --source voice-video-qualification-lip-crop-selected --label selected-call --device cuda
+```
+
+The initial calibration stopped on a short fixture and reached a search boundary; its partial results are retained as `lip-sync-gpu-pcm-calibration`. The final evaluator reports short-fixture exclusions and uses a bounded wider search where enough common windows remain. No production timing correction was inferred from that initial run. [Machine evidence](research/local-poc-benchmarks.json), entry `lip_crop_syncnet_20260909`, contains the result hashes and remaining limitations.
 
 The tables distinguish individual samples from repeated suites. Different configurations and capture boundaries are not directly comparable; none is a performance guarantee. [Machine-readable history](research/local-poc-benchmarks.json) preserves settings and rejected trials. Raw synthetic traces and reviewed contact sheets stay in ignored `generated/local-app/audit/`.
 
