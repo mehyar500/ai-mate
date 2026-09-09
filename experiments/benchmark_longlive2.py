@@ -324,7 +324,7 @@ def main():
     parser.add_argument('--case', choices=['raise-lower', 'unilateral-raise-lower', 'turn-return'], default='raise-lower')
     parser.add_argument('--sampling-steps', type=int, choices=[2, 4], default=4)
     parser.add_argument('--checkpoint', choices=['bf16', 's2-dequantized'], default='bf16')
-    parser.add_argument('--blocks', type=int, choices=[2, 4], default=2)
+    parser.add_argument('--blocks', type=int, choices=[2, 4, 8], default=2)
     parser.add_argument('--attention-frames', type=int, choices=[16, 32], default=16)
     parser.add_argument('--precision', choices=['bf16', 'fp8-selective'], default='bf16')
     parser.add_argument('--width', type=int, choices=[256, 320, 384], default=320)

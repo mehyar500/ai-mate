@@ -24720,5 +24720,16 @@
     "frames": 125,
     "review": "12 sampled frames: turns sideways but does not return to face camera; scene shifts, ghosting and body-position drift. Not all-frame or audio review.",
     "decision": "Not promoted; prompt correction responsiveness remains failed. No remote spend."
+  },
+  "longlive_turn_return_extended_20260909": {
+    "artifact": "generated/local-app/audit/longlive2-turn-return-eight-seed914/benchmark.json",
+    "inference_s": 28.525,
+    "output_duration_s": 10.541666666666666,
+    "real_time_factor": 2.70593,
+    "first_chunk_s": 7.5628,
+    "frames": 253,
+    "review_scope": "12 sampled frames, no normal-speed/audio review",
+    "observed": "Turns sideways then faces camera again around sampled frame192 after prompt switch near125. About 2.8 generated seconds delay; not wall-clock response measurement. Ghosting, camera/background and body position drift remain.",
+    "decision": "Longer allowance produces return in this seed. Revise earlier inference: delayed correction is possible, but quality and live speed still fail. No promotion."
   }
 }
