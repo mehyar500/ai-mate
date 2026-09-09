@@ -40,6 +40,7 @@ class RuntimeSettingsTests(unittest.TestCase):
             path.write_text('AI_MATE_LLM_PROVIDER=cloudflare\n'
                             'AI_MATE_LLM_MODEL="example-model"\n'
                             'AI_MATE_ENV_FILE=credentials.env\n'
+                            'AI_MATE_VISUAL_DECODER=tensorrt\n'
                             'CLOUDFLARE_API_KEY=synthetic-secret\n'
                             'PATH=untrusted\n', encoding='utf-8')
             env = {'AI_MATE_LLM_PROVIDER': 'ollama'}
@@ -48,6 +49,7 @@ class RuntimeSettingsTests(unittest.TestCase):
                 'AI_MATE_LLM_PROVIDER': 'ollama',
                 'AI_MATE_LLM_MODEL': 'example-model',
                 'AI_MATE_ENV_FILE': str(Path(folder) / 'credentials.env'),
+                'AI_MATE_VISUAL_DECODER': 'tensorrt',
             })
 
     def test_missing_empty_and_comments_do_not_override_defaults(self):

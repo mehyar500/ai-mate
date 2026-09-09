@@ -6,6 +6,7 @@ no private conversation is read. Drivers supply only the fixed fixtures.
 """
 import argparse
 import json
+import os
 import re
 from pathlib import Path
 import shutil
@@ -31,6 +32,7 @@ def main():
     parser.add_argument('--trial', choices=['baseline', 'revised', 'selected', 'wave', 'qualification', 'soak'], required=True)
     parser.add_argument('--label', default='')
     parser.add_argument('--performance-label', default='', help='Use a reviewed isolated candidate asset bundle.')
+    parser.add_argument('--decoder', choices=['torch','tensorrt','tensorrt-reviewed'], default='torch', help='Torch, experimental engine, or the reviewed runtime path.')
     args = parser.parse_args()
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
@@ -56,6 +58,7 @@ def main():
         for name in ['performance-wave.mp4','performance-wave.json']:
             shutil.copyfile((assets if args.performance_label else ROOT/'generated/local-app/audit')/name, folder/name)
     configure_runtime()
+    os.environ['AI_MATE_VISUAL_DECODER']='tensorrt' if args.decoder=='tensorrt-reviewed' else 'torch'
     app = CompanionEngine(folder)
     app.scene = 'fullbody'
     app.store.remember('My dog is named Maple.')
@@ -75,6 +78,11 @@ def main():
         duration = app.models.speech(prompt, target)
         fixtures.append(dict(spec, duration_s=duration))
     renderer = app.models.load_visual()
+    if args.decoder=='tensorrt':
+        sys.path.insert(0,str(ROOT/'.cache/tensorrt-deps'))
+        from scripts.trt_vae_runtime import ExperimentalDecoder
+        renderer.decode_prediction=ExperimentalDecoder(renderer.torch,ROOT/'generated/local-app/audit/visual-trt-fp16')
+        renderer.decoder_backend='tensorrt-experiment'
     renderer.prepare('fullbody')
     renderer.render(folder/'greeting.wav', folder/'warm.mp4', event, 'fullbody',
                     streaming=True, motion_path=app.idle_video, loop_motion=True,

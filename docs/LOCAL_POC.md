@@ -349,6 +349,31 @@ Reviewed output: the full-body mouth barely reacts; the close reference has visi
 
 A follow-up 32-chunk run used the complete 13.092s Kokoro count and then silence: 30.72s of video generated/encoded in 25.592s, 0.929s first chunk, 0.793s median / 0.863s maximum later chunks, about 5GB peak tensor allocation. Sampled frames retained identity through the end and returned to a quiet expression; mouth shapes still look imperfect. This is a 31-second throughput check, not a 30-minute call or a lip-sync acceptance test. Reproduce after the speech review with `benchmark_flashhead.py --reference performance-near --audio kokoro-long --chunks 32`; insufficient output duration now fails instead of truncating the input sentence.
 
+### Faster speech-video decoder — September 9
+
+A batch-eight profile isolated SD VAE decoding at **234ms**, versus **56ms** for MuseTalk UNet and **4ms** for pixel transfer. A locally built TensorRT FP16 decoder reduced the isolated decode median from **235ms to 120ms** across 12 synthetic conditions. Raw decoded pixel differences averaged about 0.068/255, with a maximum of 2/255.
+
+Four identical audio/body-source comparisons rendered in **1.52 / 1.58 / 0.615 / 0.621s**, versus Torch **2.41 / 2.28 / 0.957 / 0.963s**: a 31–37% render-time reduction. All **259 encoded frames** were compared; the largest whole-frame mean difference was 0.126/255. All four worst-pair images were inspected, and partial batches 1–8 remained finite and close to Torch. This preserves existing appearance, including its mouth/hand defects; it does not certify natural lip sync. Torch allocation counters exclude TensorRT's external memory allocations.
+
+The experimental and integrated capture trials both passed **20/20 commands** with no reported reply stalls. End-of-speech median/p95 was **2.50/3.44s** and **2.48/2.92s** respectively (nine uninterrupted spoken inputs each); mixed Send-to-playback median/p95 was **1.49/2.77s** and **1.60/2.48s** (19 inputs each). Keep both runs: hosted variability changes the tail, and neither meets the two-second target. Integrated A/V clock skew was 25.11ms p95 / 32.55ms maximum over 614 samples. This measures browser clocks, not phoneme alignment or audible speakers.
+
+Every frame in both trials was analyzed: **1,005 experimental / 994 integrated**, with no heuristic flags, nonzero audio and no clipped samples. Forty transition/close frames per trial were manually inspected; remaining perceptual defects persist. All 20 integrated render records report `tensorrt`. The selected preview restarted successfully in **29.47s**, including five-source warm-up, with unchanged private memory. Its own 30-minute trial, physical audio and mobile checks remain pending.
+
+Reproduce on the configured local environment:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install --target .cache/tensorrt-deps --no-deps -r config/tensorrt-benchmark-requirements.txt
+.\.venv\Scripts\python.exe scripts/benchmark_visual_kernels.py --label baseline
+.\.venv\Scripts\python.exe scripts/benchmark_trt_vae.py --label fp16
+.\.venv\Scripts\python.exe scripts/benchmark_trt_media.py
+```
+
+These commands use isolated synthetic audit folders and refuse overwriting completed runs. The media comparison uses retained speech from the documented `qualification temporal128 --capture` trial. Install dependencies only into the optional target directory; the existing Torch environment is unchanged. The NVIDIA Windows libraries require approximately 2.25GB to download. The fixed engine is approximately 101MB and built in 38.2s on this rig; installation and cold preparation are additional.
+
+After inspecting the comparisons and experimental call suite, copy only `decoder.engine` and `build.json` from `audit/visual-trt-fp16/` into `.cache/local-poc/musetalk-vae-trt/`, then mark that copied manifest `reviewed: true` with the review scope. Keep the original experiment record. Qualify the normal runtime using `serve_voice_video_benchmark.py --trial qualification --label trt-reviewed --performance-label temporal128 --decoder tensorrt-reviewed`, then `qualify_video_call.cjs qualification trt-reviewed --capture` and `review_call_frames.py --trial qualification --label trt-reviewed`. Set `AI_MATE_VISUAL_DECODER=tensorrt` only after that passes; restart between calls. Setting `torch` and restarting rolls back without touching memory.
+
+Only load engines built from the pinned local VAE. NVIDIA describes engines as executable, platform/GPU-dependent artifacts; hashes and a local review record are provenance checks, not a sandbox for third-party binaries. [NVIDIA runtime documentation](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/python-api-docs.html), [installation](https://docs.nvidia.com/deeplearning/tensorrt/latest/installing-tensorrt/install-pip.html). The optional runtime changes no model/content license, hosting eligibility or API credential.
+
 ## Playback, microphone and memory
 
 The browser consumes about 200ms MP4 fragments with about 400ms initial media buffered. Its embedded audio stays muted; a separate WAV follows the video clock, pauses during stalls and corrects drift above 120ms. If MediaSource is unsupported, playback waits for the finished file. Autoplay rejection exposes Play reply. Interrupt aborts both tracks. These paths have Node tests, but mobile Safari and lengthy calls remain unqualified.
@@ -361,7 +386,7 @@ Reproduce with `.\.venv\Scripts\python.exe scripts/serve_phrase_benchmark.py --i
 
 SQLite keeps editable notes, up to 50 exchanges (12 shown, four sent as recent context) and up to 12 bounded verbatim fact excerpts. Users can inspect, correct and delete saved information. It knows only what was shared; automatic check-ins, calendar integrations and push notifications are unimplemented. Preserve `generated/local-app/memory.sqlite3` during normal updates.
 
-Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL` and `AI_MATE_ENV_FILE`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
+Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL`, `AI_MATE_ENV_FILE` and `AI_MATE_VISUAL_DECODER`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
 
 ## Reproduce or extend
 
@@ -411,10 +436,10 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 130 Python tests and 17 Node tests, Python compilation, JavaScript syntax and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Existing layout checks cover five viewports and 44px touch targets; actual iPhone keyboard behavior remains unqualified. Synthetic benchmark servers use disposable memory. No memory schema, environment variable or provider configuration changed.
+Checks for this revision: 137 Python tests and 17 Node tests, Python compilation, JavaScript syntax and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Existing layout checks cover five viewports and 44px touch targets; actual iPhone keyboard behavior remains unqualified. Synthetic benchmark servers use disposable memory. No memory schema or provider credential changed. The optional non-secret decoder setting and decoder telemetry are documented above; new tests reject unreviewed, tampered, missing and runtime-mismatched engines.
 
 ## Cost and next decision
 
-The optional three-month technical-pilot forecast is **$57.38 under a $100 planning cap**, including local power, the existing Gateway funding and ten optional 5090 test hours per month with a disk allowance. Power and stopped-storage assumptions are unmeasured; no GPU has been rented. The electricity-only baseline remains available in the calculator's historical output.
+TensorRT changes no rented-GPU charges or proven concurrency. Do not convert its render-time saving into a billing or profit claim. The optional three-month technical-pilot forecast is **$57.38 under a $100 planning cap**, including local power, the existing Gateway funding and ten optional 5090 test hours per month with a disk allowance. Power and stopped-storage assumptions are unmeasured; no GPU has been rented. The electricity-only baseline remains available in the calculator's historical output.
 
 Use the bounded demo to test whether people value the conversation and continuity before buying capacity. [ECONOMICS](ECONOMICS.md) contains the PWA rental, session-cost and pricing assumptions. Device testing and intended-content model/hosting/payment qualification remain required. No profit, legal immunity or universal two-second latency is promised.

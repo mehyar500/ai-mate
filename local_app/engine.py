@@ -30,7 +30,7 @@ def configure_runtime(path=ROOT / ".env", environ=None):
     path = Path(path)
     if not path.is_file():
         return
-    allowed = {"AI_MATE_LLM_PROVIDER", "AI_MATE_LLM_MODEL", "AI_MATE_ENV_FILE"}
+    allowed = {"AI_MATE_LLM_PROVIDER", "AI_MATE_LLM_MODEL", "AI_MATE_ENV_FILE", "AI_MATE_VISUAL_DECODER"}
     for line in path.read_text(encoding="utf-8-sig").splitlines():
         key, sep, value = line.strip().removeprefix("export ").partition("=")
         key, value = key.strip(), value.strip().strip('"').strip("'")

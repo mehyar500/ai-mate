@@ -37,9 +37,12 @@ def motion_duration(speech_seconds, source_frames, source_fps, *, loop=False, st
 
 
 class PortraitRenderer:
-    def __init__(self, face_shift=-.10):
+    def __init__(self, face_shift=-.10, decoder_backend='torch'):
         if not math.isfinite(face_shift) or not -.2 <= face_shift <= .05:
             raise ValueError('Face crop adjustment is out of range.')
+        if decoder_backend not in {'torch','tensorrt'}:
+            raise ValueError('Select torch or tensorrt for the visual decoder.')
+        self.decoder_backend=decoder_backend
         self.face_shift = face_shift
         import cv2
         import numpy as np
@@ -67,6 +70,10 @@ class PortraitRenderer:
         pe = torch.zeros(50, 384)
         pe[:, 0::2], pe[:, 1::2] = torch.sin(pos * div), torch.cos(pos * div)
         self.pe = pe.unsqueeze(0).to("cuda", self.dtype)
+        self.prediction_decoder=None
+        if decoder_backend=='tensorrt':
+            from .trt_decoder import TensorRTDecoder
+            self.prediction_decoder=TensorRTDecoder(torch)
         self.portrait = None
         probe = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i",
                                 "color=c=gray:s=64x64:r=25:d=0.04", "-c:v", "h264_nvenc", "-f", "null", "-"],
@@ -252,8 +259,14 @@ class PortraitRenderer:
                     check_cancel(cancel)
                     self.encode_appearance([row[3] for row in rows[offset:offset+8]])
             self.torch.cuda.synchronize()
-        return {'sources':len(paths),'seconds':round(time.perf_counter()-started,3),
+        return {'sources':len(paths),'decoder':self.decoder_backend,'seconds':round(time.perf_counter()-started,3),
                 'torch_allocated_mib':round(self.torch.cuda.memory_allocated()/1048576,3)}
+
+    def decode_prediction(self, prediction):
+        """The optional local runtime decodes the same model's predictions."""
+        if self.prediction_decoder is not None:
+            return self.prediction_decoder(prediction)
+        return self.vae.decode(prediction / self.vae.config.scaling_factor).sample
 
     def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0):
         if streaming:
@@ -341,7 +354,7 @@ class PortraitRenderer:
                     else:
                         latent = self.latent.expand(count, -1, -1, -1)
                     pred = self.unet(latent, torch.tensor(0, device="cuda"), encoder_hidden_states=conditioning).sample
-                    images = self.vae.decode(pred / self.vae.config.scaling_factor).sample
+                    images = self.decode_prediction(pred)
                     images = ((images / 2 + .5).clamp(0, 1).permute(0, 2, 3, 1).float().cpu().numpy() * 255).round().astype("uint8")
                     neural_seconds += time.perf_counter()-neural_start
                     composite_start = time.perf_counter()
@@ -382,7 +395,8 @@ class PortraitRenderer:
                 "torch_peak_reserved_mib": torch.cuda.max_memory_reserved()/1048576,
                 "audio_features_s": features_seconds, "neural_s": neural_seconds,
                 "composite_pipe_s": composite_seconds,
-                "encoder": self.encoder, "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
+                "encoder": self.encoder, "decoder": self.decoder_backend,
+                "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
                 "face_encode_stride": face_encode_stride if movement else None,
                 "prepared_appearance_cache_hit": self.motion_cache_hit if movement else False,
                 "motion_start_s": motion_start_s}

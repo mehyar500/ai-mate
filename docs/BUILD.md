@@ -25,7 +25,7 @@ Known actions are closer, farther and wave. Unsupported actions must be explaine
 | Dialogue / plan | @cf/qwen/qwen3-30b-a3b-fp8 | Cloudflare, existing API key + email |
 | Recognition | faster-whisper Base English, int8, eight threads | Local CPU |
 | Speech | Kokoro-82M ONNX v1.0, af_sarah | Local CPU |
-| Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features | Local GPU |
+| Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features; optional TensorRT 11.2.1.2 FP16 decoder | Local GPU |
 | Face tracking | YuNet ONNX | Local CPU |
 | Reviewed body preparation | LTX-2.3 22B distilled FP8, Gemma 3 12B FP4 encoder | Offline local preparation |
 | Experimental fresh actions | LTX-Video 2B 0.9.8 | Local GPU / ComfyUI |
@@ -35,6 +35,8 @@ Pinned requirements and revisions are in config/local-poc-requirements.txt, conf
 
 Five prepared body sources are bounded by frame count/resolution, verified against reviewed manifests and primed before calls. Only source appearance is cached. Image generation and heavy video preparation run separately from calls. Unknown positions retain their captured frame instead of resetting the character.
 
+`AI_MATE_VISUAL_DECODER=torch` is the portable default. The optional `tensorrt` selection requires a reviewed, locally built engine in `.cache/local-poc/musetalk-vae-trt/`. It verifies the engine and source-weight hashes, GPU name and exact Torch/TensorRT versions before deserialization. Missing or mismatched artifacts fail video warm-up while text/voice remain available. Revert the setting and restart to use Torch. Neither engine nor weights belong in Git; rebuild and requalify on a different GPU. LOCAL_POC records equivalence and call measurements.
+
 Preparation now uses a 128-frame temporal VAE window for the measured 97-frame LTX clips. A same-latent comparison isolated the earlier double-image defect to temporal decoding. Isolated candidate bundles require matching review manifests before the call harness will load them. Promote the complete matching set between calls and rebuild appearance caches on restart; preserve memory and a rollback copy. LOCAL_POC records generation commands and remaining visual defects.
 
 These are **neutral-demo selections**. LTX terms exclude the intended explicit service, and FlashHead's incorporated VAE rights remain unresolved. Hosted routes retain provider/model conditions. Commercial scope needs a separately qualified model/asset pipeline. Self-hosting does not remove license restrictions; USA records the evidence.
@@ -43,12 +45,12 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Replacement assets: end-of-speech median 2.71s / p95 3.42s, nine spoken replies; prior runs 3.39s / 3.83s p95. Synthetic MediaStream includes recorder/VAD but excludes physical acoustics |
+| Fast voice and visual response | Selected decoder: end-of-speech median 2.48s / p95 2.92s, nine spoken replies; experimental TensorRT p95 3.44s. Synthetic MediaStream includes recorder/VAD but excludes physical acoustics |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | Latest 635 browser clock samples: 27.36ms p95 / 38.78ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
-| Stable 30-minute call | 120 interactions, zero functional failures/reported stalls; complete frame-quality review remains incomplete |
-| Realistic images and motion | Double-image defect reduced in reviewed sources and transition frames; latest 1,014 frames checked, 141 visually reviewed. Hand blur, mouth artifacts, close framing and repetition remain |
+| Synchronization within 100ms | Latest 614 browser clock samples: 25.11ms p95 / 32.55ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
+| Stable 30-minute call | Earlier Torch trial: 120 interactions, zero functional failures/reported stalls; full frame review incomplete. TensorRT sustained trial pending |
+| Realistic images and motion | Double-image defect reduced in reviewed sources and transition frames; latest 994 frames checked, 40 visually reviewed; previous source review retained. Hand blur, mouth artifacts, close framing and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 
@@ -86,7 +88,7 @@ Production memory needs per-account authorization and source/time metadata. Opt-
 
 ## Configuration and release gates
 
-.env.example documents implemented fields: AI_MATE_LLM_PROVIDER, AI_MATE_LLM_MODEL and AI_MATE_ENV_FILE, plus Cloudflare account ID/key/email or alternative scoped token. MiniMax uses its explicit process credential. No GPU, WebRTC or payment environment variable is wired yet.
+.env.example documents implemented fields: AI_MATE_LLM_PROVIDER, AI_MATE_LLM_MODEL, AI_MATE_ENV_FILE and AI_MATE_VISUAL_DECODER, plus Cloudflare account ID/key/email or alternative scoped token. MiniMax uses its explicit process credential. No GPU-provider, WebRTC or payment environment variable is wired yet.
 
 The initial remote benchmark can use SSH without another inference API key. Public deployment will need scoped application/Realtime credentials, accepted GPU lifecycle access and processor-specific merchant/webhook secrets. Add exact fields with the implemented adapters; placeholders must not imply a functioning service.
 

@@ -1,0 +1,8 @@
+# Optional isolated VAE experiment; reuse the configured .venv Torch runtime.
+# Install with --target .cache/tensorrt-deps --no-deps. Installation does not select it.
+# NVIDIA's libs source package retrieves its matching wheel from pypi.nvidia.com.
+tensorrt-cu12==11.2.1.2
+tensorrt-cu12-bindings==11.2.1.2
+tensorrt-cu12-libs==11.2.1.2
+onnx==1.22.0
+ml_dtypes==0.5.4

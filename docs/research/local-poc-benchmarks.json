@@ -12035,5 +12035,1346 @@
       "https://docs.comfy.org/built-in-nodes/VAEDecodeTiled",
       "https://github.com/Comfy-Org/ComfyUI/issues/11767"
     ]
+  },
+  "tensorrt_vae_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "b46481d8c65215ff74600dedf1d648c8f7e29e35",
+    "decision": "Select the reviewed self-built TensorRT VAE on this rig; keep Torch as the default elsewhere. Continue toward end-of-speech p95 <=2s; no public or sustained TensorRT qualification.",
+    "runtime": {
+      "packages": [
+        "tensorrt-cu12==11.2.1.2",
+        "tensorrt-cu12-bindings==11.2.1.2",
+        "tensorrt-cu12-libs==11.2.1.2",
+        "onnx==1.22.0",
+        "ml_dtypes==0.5.4"
+      ],
+      "isolated_dependencies": ".cache/tensorrt-deps",
+      "build": {
+        "tensorrt": "11.2.1.2",
+        "gpu": "NVIDIA GeForce RTX 4060 Ti",
+        "torch": "2.11.0+cu128",
+        "model_sha256": "ff4d1133e9710b6f809424dc5811f7156bd383e417b50bb87eb23a9ad680a98e",
+        "engine_sha256": "66579ffab8db80d84fa5a12c20dab4b8d138f38a19114e62e69439c4b5ed7cda",
+        "build_s": 38.224323900001764,
+        "scope": "Locally exported FP16 decoder, fixed batch8, no change to selected app models.",
+        "source_vae_sha256": {
+          "config.json": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e",
+          "diffusion_pytorch_model.safetensors": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815"
+        },
+        "reviewed": false
+      },
+      "engine_bytes": 100944852,
+      "engine_input": "8x4x32x32 FP16",
+      "engine_output": "8x3x256x256 FP16",
+      "source_semantics": "Export includes division by SD VAE scaling_factor; optional runtime executes the same decoder.",
+      "runtime_memory_scope": "Torch counters exclude external TensorRT allocations. No claim of total GPU memory reduction.",
+      "artifact_scope": "Self-built engine, GPU/runtime/source hash checks and explicit local review. Never load arbitrary third-party engines."
+    },
+    "kernel_profile": {
+      "torch": "2.11.0+cu128",
+      "cuda": "12.8",
+      "batch": 8,
+      "rows": [
+        {
+          "index": 0,
+          "unet_s": 0.05617399999755435,
+          "vae_s": 0.23403440000402043,
+          "transfer_s": 0.004092499999387655
+        },
+        {
+          "index": 1,
+          "unet_s": 0.05608080000092741,
+          "vae_s": 0.23400240000046324,
+          "transfer_s": 0.0038322999971569516
+        },
+        {
+          "index": 2,
+          "unet_s": 0.05611200000566896,
+          "vae_s": 0.23401300000114134,
+          "transfer_s": 0.0037386999974842183
+        },
+        {
+          "index": 3,
+          "unet_s": 0.05610280000109924,
+          "vae_s": 0.234048399994208,
+          "transfer_s": 0.0039407000003848225
+        },
+        {
+          "index": 4,
+          "unet_s": 0.056375599997409154,
+          "vae_s": 0.2341006999995443,
+          "transfer_s": 0.003802999999606982
+        },
+        {
+          "index": 5,
+          "unet_s": 0.05626240000128746,
+          "vae_s": 0.23412780000217026,
+          "transfer_s": 0.003704500006278977
+        },
+        {
+          "index": 6,
+          "unet_s": 0.0560715000028722,
+          "vae_s": 0.23404149999987567,
+          "transfer_s": 0.003900999996403698
+        },
+        {
+          "index": 7,
+          "unet_s": 0.05622150000272086,
+          "vae_s": 0.23410389999480685,
+          "transfer_s": 0.003751099997316487
+        },
+        {
+          "index": 8,
+          "unet_s": 0.05609499999991385,
+          "vae_s": 0.23406960000284016,
+          "transfer_s": 0.003831900001387112
+        },
+        {
+          "index": 9,
+          "unet_s": 0.05628620000061346,
+          "vae_s": 0.2340420999971684,
+          "transfer_s": 0.004037999999127351
+        },
+        {
+          "index": 10,
+          "unet_s": 0.056140200002118945,
+          "vae_s": 0.23406229999818606,
+          "transfer_s": 0.0037969999975757673
+        },
+        {
+          "index": 11,
+          "unet_s": 0.05610430000524502,
+          "vae_s": 0.23403809999581426,
+          "transfer_s": 0.0038330999959725887
+        }
+      ],
+      "median_s": {
+        "unet_s": 0.05612610000389395,
+        "vae_s": 0.2340452499956882,
+        "transfer_s": 0.0038320999992720317
+      },
+      "scope": "Warm fixed batch8 synthetic conditioning, reviewed close-reference appearance. Excludes ASR, dialogue, speech, tracking, encoding, browser and perceptual quality."
+    },
+    "raw_decoder_comparison": {
+      "build": {
+        "tensorrt": "11.2.1.2",
+        "gpu": "NVIDIA GeForce RTX 4060 Ti",
+        "torch": "2.11.0+cu128",
+        "model_sha256": "ff4d1133e9710b6f809424dc5811f7156bd383e417b50bb87eb23a9ad680a98e",
+        "engine_sha256": "66579ffab8db80d84fa5a12c20dab4b8d138f38a19114e62e69439c4b5ed7cda",
+        "build_s": 38.224323900001764,
+        "scope": "Locally exported FP16 decoder, fixed batch8, no change to selected app models."
+      },
+      "rows": [
+        {
+          "index": 0,
+          "eager_s": 0.2368075999984285,
+          "trt_s": 0.1196842999997898,
+          "finite": true,
+          "pixel_mae_255": 0.06877708435058594,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 1,
+          "trt_s": 0.11959160000697011,
+          "eager_s": 0.2355881999974372,
+          "finite": true,
+          "pixel_mae_255": 0.06802495568990707,
+          "pixel_max_255": 1.0
+        },
+        {
+          "index": 2,
+          "eager_s": 0.2346975000036764,
+          "trt_s": 0.1196879999988596,
+          "finite": true,
+          "pixel_mae_255": 0.06799507141113281,
+          "pixel_max_255": 1.0
+        },
+        {
+          "index": 3,
+          "trt_s": 0.11967600000207312,
+          "eager_s": 0.2354466999968281,
+          "finite": true,
+          "pixel_mae_255": 0.06814830005168915,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 4,
+          "eager_s": 0.2346722000002046,
+          "trt_s": 0.11965269999927841,
+          "finite": true,
+          "pixel_mae_255": 0.06819470971822739,
+          "pixel_max_255": 1.0
+        },
+        {
+          "index": 5,
+          "trt_s": 0.11977950000436977,
+          "eager_s": 0.23592379999900004,
+          "finite": true,
+          "pixel_mae_255": 0.06843503564596176,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 6,
+          "eager_s": 0.23474020000139717,
+          "trt_s": 0.11971319999429397,
+          "finite": true,
+          "pixel_mae_255": 0.06791051477193832,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 7,
+          "trt_s": 0.11992810000083409,
+          "eager_s": 0.2373890000017127,
+          "finite": true,
+          "pixel_mae_255": 0.06834157556295395,
+          "pixel_max_255": 1.0
+        },
+        {
+          "index": 8,
+          "eager_s": 0.23461669999960577,
+          "trt_s": 0.1196395000006305,
+          "finite": true,
+          "pixel_mae_255": 0.06796137988567352,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 9,
+          "trt_s": 0.11984420000226237,
+          "eager_s": 0.2369985999976052,
+          "finite": true,
+          "pixel_mae_255": 0.06831169128417969,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 10,
+          "eager_s": 0.23471380000410136,
+          "trt_s": 0.11972570000216365,
+          "finite": true,
+          "pixel_mae_255": 0.06825892627239227,
+          "pixel_max_255": 2.0
+        },
+        {
+          "index": 11,
+          "trt_s": 0.119753099999798,
+          "eager_s": 0.2354330000016489,
+          "finite": true,
+          "pixel_mae_255": 0.0685984343290329,
+          "pixel_max_255": 2.0
+        }
+      ],
+      "median_s": {
+        "eager": 0.2354398499992385,
+        "trt": 0.11970059999657678
+      },
+      "scope": "Synthetic conditioning, fixed batch8 VAE decoder only. Runtime tensor timing excludes the call and does not certify perceptual speech/video quality."
+    },
+    "real_media_comparison": {
+      "cases": [
+        {
+          "case": "greeting",
+          "source": "idle-fullbody.mp4",
+          "audio_sha256": "1241e4144bad967466cce314d89ccb80dde39fccf8fd9c7ea264cbe5e9556332",
+          "torch": {
+            "render_s": 2.406048100005137,
+            "frames": 60,
+            "fps": 24.937157324440815,
+            "duration_s": 3.0,
+            "speech_duration_s": 2.9826875,
+            "lip_sync_frames": 60,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2734.0361328125,
+            "torch_peak_reserved_mib": 3582.0,
+            "audio_features_s": 0.046764500002609566,
+            "neural_s": 2.306896800007962,
+            "composite_pipe_s": 0.04575650000333553,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.004255699997884221,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "trt": {
+            "render_s": 1.5201845999981742,
+            "frames": 60,
+            "fps": 39.468890817649424,
+            "duration_s": 3.0,
+            "speech_duration_s": 2.9826875,
+            "lip_sync_frames": 60,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 1969.93603515625,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.02894899999955669,
+            "neural_s": 1.4472570000070846,
+            "composite_pipe_s": 0.03702049999265,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.004247200005920604,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "frame_comparison": {
+            "frames": 60,
+            "whole_frame_mean_mae_255": 0.019813795085065068,
+            "worst_frame_mae_255": 0.06140739470720291,
+            "max_channel_difference_255": 10.0,
+            "worst_frame": 10
+          },
+          "render_time_reduction_pct": 36.81819577942234
+        },
+        {
+          "case": "description",
+          "source": "idle-near.mp4",
+          "audio_sha256": "ac4265d15436aeb06a2d41f642d7f8ce39b6e0a4b9ce0f4a5acdb9e254cd5f46",
+          "trt": {
+            "render_s": 1.5810007999971276,
+            "frames": 58,
+            "fps": 36.685623435551314,
+            "duration_s": 2.9,
+            "speech_duration_s": 2.868,
+            "lip_sync_frames": 58,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 1969.91796875,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.027952999997069128,
+            "neural_s": 1.4515820999877178,
+            "composite_pipe_s": 0.09394630000315374,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.0036147999999229796,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "torch": {
+            "render_s": 2.279531300002418,
+            "frames": 58,
+            "fps": 25.443826983177846,
+            "duration_s": 2.9,
+            "speech_duration_s": 2.868,
+            "lip_sync_frames": 58,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2734.01806640625,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.02976910000143107,
+            "neural_s": 2.1490842000057455,
+            "composite_pipe_s": 0.09319619999587303,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.003654100000858307,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "frame_comparison": {
+            "frames": 58,
+            "whole_frame_mean_mae_255": 0.09681043619739599,
+            "worst_frame_mae_255": 0.1255289763212204,
+            "max_channel_difference_255": 20.0,
+            "worst_frame": 15
+          },
+          "render_time_reduction_pct": 30.64360204242641
+        },
+        {
+          "case": "approach",
+          "source": "performance-closer.mp4",
+          "audio_sha256": "264b4d19851499f91c0b862dddf93c697c4878b04519f85686d38e17a529689d",
+          "torch": {
+            "render_s": 0.9573711999983061,
+            "frames": 60,
+            "fps": 62.67161577464014,
+            "duration_s": 3.0,
+            "speech_duration_s": 0.885375,
+            "lip_sync_frames": 24,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2734.0361328125,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.026579699995636474,
+            "neural_s": 0.8855743000021903,
+            "composite_pipe_s": 0.032558099999732804,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.00398739999945974,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "trt": {
+            "render_s": 0.6146844999966561,
+            "frames": 60,
+            "fps": 97.61105087297045,
+            "duration_s": 3.0,
+            "speech_duration_s": 0.885375,
+            "lip_sync_frames": 24,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 1969.93603515625,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.027260800001386087,
+            "neural_s": 0.5426042999970377,
+            "composite_pipe_s": 0.03260500000033062,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.003928199999791104,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "frame_comparison": {
+            "frames": 60,
+            "whole_frame_mean_mae_255": 0.011257695918902754,
+            "worst_frame_mae_255": 0.08400547504425049,
+            "max_channel_difference_255": 17.0,
+            "worst_frame": 15
+          },
+          "render_time_reduction_pct": 35.794548655971305
+        },
+        {
+          "case": "wave",
+          "source": "performance-wave.mp4",
+          "audio_sha256": "a48017311f88d5cfe0e4ee2c4446ba1daeb62922e276c64abfdf9716d6e04d81",
+          "trt": {
+            "render_s": 0.6208774999977322,
+            "frames": 81,
+            "fps": 130.46051757439406,
+            "duration_s": 4.05,
+            "speech_duration_s": 0.9606875,
+            "lip_sync_frames": 24,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 1971.22021484375,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.027102399995783344,
+            "neural_s": 0.542512899999565,
+            "composite_pipe_s": 0.04031339999346528,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.0038531000027433038,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "torch": {
+            "render_s": 0.9633453999995254,
+            "frames": 81,
+            "fps": 84.08199177578457,
+            "duration_s": 4.05,
+            "speech_duration_s": 0.9606875,
+            "lip_sync_frames": 24,
+            "resolution": "384x576",
+            "face_region": "256x256",
+            "torch_peak_allocated_mib": 2735.3203125,
+            "torch_peak_reserved_mib": 3584.0,
+            "audio_features_s": 0.02739609999844106,
+            "neural_s": 0.8861495999954059,
+            "composite_pipe_s": 0.03912950000812998,
+            "encoder": "libx264",
+            "body_motion": true,
+            "face_tracking_s": 0.004017299994302448,
+            "face_encode_stride": 2,
+            "prepared_appearance_cache_hit": true,
+            "motion_start_s": 0
+          },
+          "frame_comparison": {
+            "frames": 81,
+            "whole_frame_mean_mae_255": 0.009523549605804829,
+            "worst_frame_mae_255": 0.06756516546010971,
+            "max_channel_difference_255": 16.0,
+            "worst_frame": 19
+          },
+          "render_time_reduction_pct": 35.549855742495055
+        }
+      ],
+      "partial_batches": [
+        {
+          "batch": 1,
+          "finite": true,
+          "pixel_mae_255": 0.0667622908949852,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 2,
+          "finite": true,
+          "pixel_mae_255": 0.0677235946059227,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 3,
+          "finite": true,
+          "pixel_mae_255": 0.066986083984375,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 4,
+          "finite": true,
+          "pixel_mae_255": 0.0670267790555954,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 5,
+          "finite": true,
+          "pixel_mae_255": 0.0670267790555954,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 6,
+          "finite": true,
+          "pixel_mae_255": 0.0670267716050148,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 7,
+          "finite": true,
+          "pixel_mae_255": 0.066497802734375,
+          "pixel_max_255": 1.0
+        },
+        {
+          "batch": 8,
+          "finite": true,
+          "pixel_mae_255": 0.066497802734375,
+          "pixel_max_255": 1.0
+        }
+      ],
+      "scope": "Four actual speech-driven renders with identical prepared source/audio, plus all partial batch sizes. Every output frame compared. Pixel closeness is not independent perceptual or physical-audio acceptance."
+    },
+    "manual_pixel_comparison": "All four worst-difference paired images inspected; no new visible decoder defect. This is equivalence to the imperfect baseline, not perceptual acceptance.",
+    "call_suites": [
+      {
+        "label": "trt-vae",
+        "turns": 20,
+        "failures": [],
+        "browser_errors": [],
+        "send_to_playback_s": {
+          "samples": 19,
+          "p50": 1.49,
+          "p95": 2.77
+        },
+        "speech_end_to_playback_s": {
+          "samples": 9,
+          "p50": 2.4970666666651815,
+          "p95": 3.44160000000149
+        },
+        "av_clock_skew_ms": {
+          "samples": 624,
+          "p50": 8.548,
+          "p95": 21.65499999999998,
+          "max": 34.47700000000009
+        },
+        "reply_long_gap_count": 0,
+        "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+        "decoded_clips": 20,
+        "decoded_frames": 1005,
+        "heuristic_flags": 0,
+        "audio_nonzero_unclipped": true,
+        "manual_frames": 40,
+        "manual_scope": "Twenty consecutive frames of resumed approach and twenty of close speech. Existing soft mouth, hand motion blur and crown crop remain; no new visible decoder defect identified.",
+        "cases": [
+          {
+            "case": "greeting",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.3,
+            "speech_end_to_playback_s": 2.977333333333333,
+            "engine_metrics": {
+              "asr_s": 0.383,
+              "first_text_s": 1.17,
+              "decision_source": "model",
+              "first_media_ready_s": 3.051,
+              "total_s": 3.059
+            },
+            "speech_s": 0.461,
+            "render_s": 1.4158613000035984,
+            "decoders": []
+          },
+          {
+            "case": "wave",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 0.92,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.001,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.168,
+              "total_s": 1.175
+            },
+            "speech_s": 0.259,
+            "render_s": 0.8551732000050833,
+            "decoders": []
+          },
+          {
+            "case": "memory",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.77,
+            "speech_end_to_playback_s": 3.44160000000149,
+            "engine_metrics": {
+              "asr_s": 0.381,
+              "first_text_s": 1.594,
+              "decision_source": "model",
+              "first_media_ready_s": 3.314,
+              "total_s": 3.322
+            },
+            "speech_s": 0.387,
+            "render_s": 1.3308025000005728,
+            "decoders": []
+          },
+          {
+            "case": "approach",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 0.92,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.001,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.156,
+              "total_s": 1.161
+            },
+            "speech_s": 0.257,
+            "render_s": 0.8523458999989089,
+            "decoders": []
+          },
+          {
+            "case": "negated_return",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.01,
+            "speech_end_to_playback_s": 2.687133333330352,
+            "engine_metrics": {
+              "asr_s": 0.37,
+              "first_text_s": 0.937,
+              "decision_source": "model",
+              "first_media_ready_s": 2.202,
+              "total_s": 2.21
+            },
+            "speech_s": 0.293,
+            "render_s": 0.970315099999425,
+            "decoders": []
+          },
+          {
+            "case": "description",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.73,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.489,
+              "decision_source": "model",
+              "first_media_ready_s": 2.885,
+              "total_s": 2.893
+            },
+            "speech_s": 0.555,
+            "render_s": 1.8392058000026736,
+            "decoders": []
+          },
+          {
+            "case": "return",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.43,
+            "speech_end_to_playback_s": 2.0920666666651813,
+            "engine_metrics": {
+              "asr_s": 0.357,
+              "first_text_s": 0.358,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.856,
+              "total_s": 1.864
+            },
+            "speech_s": 0.348,
+            "render_s": 1.1029034000021056,
+            "decoders": []
+          },
+          {
+            "case": "remember",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.52,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.397,
+              "decision_source": "model",
+              "first_media_ready_s": 2.25,
+              "total_s": 2.258
+            },
+            "speech_s": 0.449,
+            "render_s": 1.4008010999968974,
+            "decoders": []
+          },
+          {
+            "case": "recall",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.83,
+            "speech_end_to_playback_s": 2.4970666666651815,
+            "engine_metrics": {
+              "asr_s": 0.36,
+              "first_text_s": 0.819,
+              "decision_source": "model",
+              "first_media_ready_s": 2.208,
+              "total_s": 2.223
+            },
+            "speech_s": 0.358,
+            "render_s": 1.0292336999991676,
+            "decoders": []
+          },
+          {
+            "case": "unsupported",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 2.01,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.639,
+              "decision_source": "model",
+              "first_media_ready_s": 3.476,
+              "total_s": 3.481
+            },
+            "speech_s": 0.728,
+            "render_s": 2.1069960999957402,
+            "decoders": []
+          },
+          {
+            "case": "wave_again",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.35,
+            "speech_end_to_playback_s": 2.0181999999955296,
+            "engine_metrics": {
+              "asr_s": 0.361,
+              "first_text_s": 0.362,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.794,
+              "total_s": 1.802
+            },
+            "speech_s": 0.3,
+            "render_s": 1.0797732999999425,
+            "decoders": []
+          },
+          {
+            "case": "negated_wave",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.49,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.468,
+              "decision_source": "model",
+              "first_media_ready_s": 1.873,
+              "total_s": 1.88
+            },
+            "speech_s": 0.313,
+            "render_s": 1.0896685999978217,
+            "decoders": []
+          },
+          {
+            "case": "interrupted_approach",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.31,
+            "speech_end_to_playback_s": 1.965333333333343,
+            "engine_metrics": {
+              "asr_s": 0.357,
+              "first_text_s": 0.358,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.72,
+              "total_s": 1.73,
+              "playback_stop": {
+                "pose_preserved": true,
+                "time_s": 0.74267578125,
+                "source_time_s": 0.7,
+                "idle_video": null,
+                "prepared_pose": null,
+                "capture_s": 0.062
+              }
+            },
+            "speech_s": 0.326,
+            "render_s": 0.9892728999984683,
+            "decoders": []
+          },
+          {
+            "case": "held_speech",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.49,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.544,
+              "decision_source": "model",
+              "first_media_ready_s": 2.088,
+              "total_s": 2.096
+            },
+            "speech_s": 0.391,
+            "render_s": 1.056675300002098,
+            "decoders": []
+          },
+          {
+            "case": "resume_approach",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.38,
+            "speech_end_to_playback_s": 2.0475333333288726,
+            "engine_metrics": {
+              "asr_s": 0.335,
+              "first_text_s": 0.336,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.795,
+              "total_s": 1.826
+            },
+            "speech_s": 0.331,
+            "render_s": 1.0695263000015984,
+            "decoders": []
+          },
+          {
+            "case": "message",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.63,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.514,
+              "decision_source": "model",
+              "first_media_ready_s": 2.206,
+              "total_s": 2.213
+            },
+            "speech_s": 0.403,
+            "render_s": 1.2863813000003574,
+            "decoders": []
+          },
+          {
+            "case": "return_again",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.4,
+            "speech_end_to_playback_s": 2.0632333333393036,
+            "engine_metrics": {
+              "asr_s": 0.35,
+              "first_text_s": 0.351,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.823,
+              "total_s": 1.837
+            },
+            "speech_s": 0.335,
+            "render_s": 1.0889769999994314,
+            "decoders": []
+          },
+          {
+            "case": "raise_hand",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 0.9,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.001,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.339,
+              "total_s": 1.345
+            },
+            "speech_s": 0.312,
+            "render_s": 0.9744155000007595,
+            "decoders": []
+          },
+          {
+            "case": "conversation",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.25,
+            "speech_end_to_playback_s": 2.9150333333288727,
+            "engine_metrics": {
+              "asr_s": 0.389,
+              "first_text_s": 1.011,
+              "decision_source": "model",
+              "first_media_ready_s": 3.186,
+              "total_s": 3.19
+            },
+            "speech_s": 0.492,
+            "render_s": 1.6800386999966577,
+            "decoders": []
+          },
+          {
+            "case": "goodbye",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.44,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.471,
+              "decision_source": "model",
+              "first_media_ready_s": 1.617,
+              "total_s": 1.626
+            },
+            "speech_s": 0.261,
+            "render_s": 0.8830439999946975,
+            "decoders": []
+          }
+        ],
+        "artifact_sha256": {
+          "summary.json": "b7308745e1d5dae761a3e9b9c6714add41bfc4342b7347f622503c84cb271e4d",
+          "qualification.json": "cf371c4c18ba4ac779f27ddaf3797527f93e774115b63ed6aaefc7a9299b8c23",
+          "frame-review.json": "b64188ef9b59f0b0b091be8ffb4c94e0cfa45f2fd3a7e3f1fad87b8cc9f3ee5e",
+          "engine-results.json": "f871fba8f6b6391d1b08dbd11f55d2e90f91575104769e20c530d0a1ffcfe978"
+        }
+      },
+      {
+        "label": "trt-reviewed",
+        "turns": 20,
+        "failures": [],
+        "browser_errors": [],
+        "send_to_playback_s": {
+          "samples": 19,
+          "p50": 1.6,
+          "p95": 2.48
+        },
+        "speech_end_to_playback_s": {
+          "samples": 9,
+          "p50": 2.4825,
+          "p95": 2.9184333333348333
+        },
+        "av_clock_skew_ms": {
+          "samples": 614,
+          "p50": 9.840999999999989,
+          "p95": 25.105999999999852,
+          "max": 32.54699999999999
+        },
+        "reply_long_gap_count": 0,
+        "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+        "decoded_clips": 20,
+        "decoded_frames": 994,
+        "heuristic_flags": 0,
+        "audio_nonzero_unclipped": true,
+        "manual_frames": 40,
+        "manual_scope": "Twenty consecutive frames of resumed approach and twenty of close speech. Existing soft mouth, hand motion blur and crown crop remain; no new visible decoder defect identified.",
+        "cases": [
+          {
+            "case": "greeting",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.14,
+            "speech_end_to_playback_s": 2.826833333333333,
+            "engine_metrics": {
+              "asr_s": 0.388,
+              "first_text_s": 0.981,
+              "decision_source": "model",
+              "first_media_ready_s": 2.864,
+              "total_s": 2.871
+            },
+            "speech_s": 0.462,
+            "render_s": 1.41895569999906,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "wave",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 0.9,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.001,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.158,
+              "total_s": 1.163
+            },
+            "speech_s": 0.266,
+            "render_s": 0.8388563999978942,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "memory",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.13,
+            "speech_end_to_playback_s": 2.80960000000149,
+            "engine_metrics": {
+              "asr_s": 0.376,
+              "first_text_s": 0.982,
+              "decision_source": "model",
+              "first_media_ready_s": 2.698,
+              "total_s": 2.707
+            },
+            "speech_s": 0.392,
+            "render_s": 1.321962000001804,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "approach",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 0.94,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.001,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.184,
+              "total_s": 1.188
+            },
+            "speech_s": 0.264,
+            "render_s": 0.8696484999964014,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "negated_return",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.83,
+            "speech_end_to_playback_s": 2.5081333333303517,
+            "engine_metrics": {
+              "asr_s": 0.41,
+              "first_text_s": 0.841,
+              "decision_source": "model",
+              "first_media_ready_s": 2.026,
+              "total_s": 2.034
+            },
+            "speech_s": 0.293,
+            "render_s": 0.8904169000015827,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "description",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 2.19,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.925,
+              "decision_source": "model",
+              "first_media_ready_s": 3.332,
+              "total_s": 3.341
+            },
+            "speech_s": 0.554,
+            "render_s": 1.8511463000031654,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "return",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.38,
+            "speech_end_to_playback_s": 2.0585,
+            "engine_metrics": {
+              "asr_s": 0.393,
+              "first_text_s": 0.394,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.823,
+              "total_s": 1.831
+            },
+            "speech_s": 0.332,
+            "render_s": 1.0466320000050473,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "remember",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 2.48,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 1.367,
+              "decision_source": "model",
+              "first_media_ready_s": 3.037,
+              "total_s": 3.044
+            },
+            "speech_s": 0.386,
+            "render_s": 1.2814741000038339,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "recall",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.8,
+            "speech_end_to_playback_s": 2.4825,
+            "engine_metrics": {
+              "asr_s": 0.392,
+              "first_text_s": 0.812,
+              "decision_source": "model",
+              "first_media_ready_s": 2.183,
+              "total_s": 2.191
+            },
+            "speech_s": 0.356,
+            "render_s": 1.0128215000004275,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "unsupported",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.8,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.465,
+              "decision_source": "model",
+              "first_media_ready_s": 3.293,
+              "total_s": 3.301
+            },
+            "speech_s": 0.724,
+            "render_s": 2.1020748000009917,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "wave_again",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.39,
+            "speech_end_to_playback_s": 2.0619000000059606,
+            "engine_metrics": {
+              "asr_s": 0.381,
+              "first_text_s": 0.382,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.815,
+              "total_s": 1.823
+            },
+            "speech_s": 0.315,
+            "render_s": 1.0626906999968924,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "negated_wave",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.68,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.62,
+              "decision_source": "model",
+              "first_media_ready_s": 2.032,
+              "total_s": 2.036
+            },
+            "speech_s": 0.31,
+            "render_s": 1.0997404000008828,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "interrupted_approach",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.46,
+            "speech_end_to_playback_s": 2.1098666666696517,
+            "engine_metrics": {
+              "asr_s": 0.393,
+              "first_text_s": 0.394,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.891,
+              "total_s": 1.9,
+              "playback_stop": {
+                "pose_preserved": true,
+                "time_s": 0.74267578125,
+                "source_time_s": 0.7,
+                "idle_video": null,
+                "prepared_pose": null,
+                "capture_s": 0.07
+              }
+            },
+            "speech_s": 0.332,
+            "render_s": 1.1139690999989398,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "held_speech",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.51,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.499,
+              "decision_source": "model",
+              "first_media_ready_s": 2.097,
+              "total_s": 2.102
+            },
+            "speech_s": 0.387,
+            "render_s": 1.1081491000004462,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "resume_approach",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.44,
+            "speech_end_to_playback_s": 2.1026666666666713,
+            "engine_metrics": {
+              "asr_s": 0.374,
+              "first_text_s": 0.375,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.849,
+              "total_s": 1.854
+            },
+            "speech_s": 0.34,
+            "render_s": 1.0719958999980008,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "message",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.6,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.456,
+              "decision_source": "model",
+              "first_media_ready_s": 2.171,
+              "total_s": 2.175
+            },
+            "speech_s": 0.396,
+            "render_s": 1.3179292999993777,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "return_again",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 1.43,
+            "speech_end_to_playback_s": 2.086733333331853,
+            "engine_metrics": {
+              "asr_s": 0.374,
+              "first_text_s": 0.375,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.859,
+              "total_s": 1.864
+            },
+            "speech_s": 0.327,
+            "render_s": 1.1076036999947974,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "raise_hand",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.07,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.001,
+              "decision_source": "direct_command",
+              "first_media_ready_s": 1.508,
+              "total_s": 1.513
+            },
+            "speech_s": 0.328,
+            "render_s": 1.126840800003265,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "conversation",
+            "input": "audio",
+            "failures": [],
+            "send_to_playback_s": 2.25,
+            "speech_end_to_playback_s": 2.9184333333348333,
+            "engine_metrics": {
+              "asr_s": 0.378,
+              "first_text_s": 1.071,
+              "decision_source": "model",
+              "first_media_ready_s": 3.188,
+              "total_s": 3.196
+            },
+            "speech_s": 0.489,
+            "render_s": 1.626656100001128,
+            "decoders": [
+              "tensorrt"
+            ]
+          },
+          {
+            "case": "goodbye",
+            "input": "text",
+            "failures": [],
+            "send_to_playback_s": 1.38,
+            "speech_end_to_playback_s": null,
+            "engine_metrics": {
+              "first_text_s": 0.435,
+              "decision_source": "model",
+              "first_media_ready_s": 1.577,
+              "total_s": 1.585
+            },
+            "speech_s": 0.259,
+            "render_s": 0.8814896999974735,
+            "decoders": [
+              "tensorrt"
+            ]
+          }
+        ],
+        "artifact_sha256": {
+          "summary.json": "bce55f7ef02ac75aa729bcac6565228832ea2933ab02c4372e687e326a01e714",
+          "qualification.json": "d3ca5d0a46a5a27f668e2b341fb0776a7e85a299045d2ee1f29708bde565dd82",
+          "frame-review.json": "a5015ae2066fe9b07213e0d92c384b59a10efb9a2a265619c956d0a2479c392a",
+          "engine-results.json": "fe51ac0daf1545c4928cf48b410282bae4255fffd2d0c9671b03f14b095d755f"
+        }
+      }
+    ],
+    "validation": {
+      "python_tests": 137,
+      "node_tests": 17,
+      "compileall": "passed",
+      "javascript_syntax": "passed",
+      "diff_check": "passed",
+      "live_promotion": {
+        "decoder": "tensorrt",
+        "previous_decoder_setting": "default:torch",
+        "engine_sha256": "66579ffab8db80d84fa5a12c20dab4b8d138f38a19114e62e69439c4b5ed7cda",
+        "call_suite": "voice-video-qualification-trt-reviewed",
+        "status": "running_verified",
+        "memory_unchanged": true,
+        "startup": {
+          "ready": true,
+          "busy": false,
+          "visual_loaded": true,
+          "visual_error": null,
+          "startup_s": 29.47,
+          "visual_warmup": {
+            "sources": 5,
+            "decoder": "tensorrt",
+            "seconds": 17.866,
+            "torch_allocated_mib": 1833.892
+          }
+        },
+        "preview": "http://127.0.0.1:8765/",
+        "ui": "In-app preview refreshed; full-body Call Mira screen verified. Call left ended."
+      },
+      "privacy": "All benchmarks use disposable synthetic profiles. No private conversation or credential enters evidence.",
+      "rollback": "Set AI_MATE_VISUAL_DECODER=torch and restart between calls. No SQLite migration or restoration.",
+      "public_release": "Independent security/correctness review and staging pending."
+    },
+    "sources": [
+      "https://docs.nvidia.com/deeplearning/tensorrt/latest/installing-tensorrt/install-pip.html",
+      "https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/python-api-docs.html"
+    ]
   }
 }

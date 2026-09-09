@@ -108,5 +108,5 @@ class Models:
     def load_visual(self):
         if self.visual is None:
             from .visual import PortraitRenderer
-            self.visual = PortraitRenderer()
+            self.visual = PortraitRenderer(decoder_backend=os.environ.get('AI_MATE_VISUAL_DECODER','torch'))
         return self.visual
