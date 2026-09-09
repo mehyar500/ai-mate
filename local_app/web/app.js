@@ -501,3 +501,22 @@ setInterval(async()=>{
   }catch(error){notice(error.message,true);}
   finally{rtcPolling=false;}
 },250);
+
+// Only aggregate reception counters; never retain speech, SDP or network addresses.
+let audioStatsBusy=false;
+setInterval(async()=>{
+  const peer=rtcPeer;
+  if(!peer||audioStatsBusy)return;
+  audioStatsBusy=true;
+  try{
+    const stats=await peer.getStats();
+    if(rtcPeer!==peer)return;
+    const audio=[...stats.values()].find(s=>s.type==='inbound-rtp'&&s.kind==='audio');
+    const video=$('video');
+    $('rtc-audio-status').textContent=audio
+      ? `Call audio: ${audio.packetsReceived??0} packets received; ${audio.totalAudioEnergy==null?'signal measurement unavailable':audio.totalAudioEnergy>0?'audio signal detected':'no signal detected yet'}; playback ${video.muted||video.volume===0?'muted':video.paused?'paused':'enabled'}.`
+      : 'Call audio: waiting for incoming audio.';
+  }catch{
+    if(rtcPeer===peer)$('rtc-audio-status').textContent='Call audio diagnostics unavailable.';
+  }finally{audioStatsBusy=false;}
+},1000);
