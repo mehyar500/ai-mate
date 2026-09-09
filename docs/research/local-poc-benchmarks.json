@@ -23479,5 +23479,38 @@
       "https://github.com/cloudflare/realtime-examples/tree/main/echo"
     ],
     "decision": "Use explicit project User-Agent, H264, balanced bundling for next engine-to-SFU integration test. This standalone synthetic transport test is not an AI video call."
+  },
+  "cloud_realtime_transit_20260909": {
+    "time": "2026-09-09T19:05:54.373927+00:00",
+    "passed": true,
+    "media": "both",
+    "scope": "Synthetic CPU peers through Cloudflare SFU; no remote GPU, browser, model, microphone or end-to-end call latency test.",
+    "stage": "finished",
+    "first_both_media_after_renegotiation_s": 2.313,
+    "received_frames": {
+      "audio": 352,
+      "video": 152
+    },
+    "audio_peak": 2133,
+    "sender_connected": true,
+    "receiver_connected": true,
+    "sent_packets": {
+      "audio": 667,
+      "video": 401
+    },
+    "received_packets": {
+      "audio": 356,
+      "video": 212
+    },
+    "video_codec": "H264",
+    "video_encode_transport_decode_ms": {
+      "samples": 152,
+      "median": 62.0,
+      "p95": 78.5,
+      "max": 94.0,
+      "scope": "Same-process monotonic frame creation to received decoded frame; includes codec, SFU and jitter buffering, excludes inference, browser and physical display."
+    },
+    "bundle_policy": "balanced",
+    "temporary_app_deleted": true
   }
 }

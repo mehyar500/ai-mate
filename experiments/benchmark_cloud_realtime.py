@@ -56,11 +56,21 @@ async def measure(auth, result, media='both'):
     from aiortc import (RTCPeerConnection, RTCConfiguration, RTCIceServer, RTCBundlePolicy, RTCRtpSender,
                         RTCSessionDescription, VideoStreamTrack, AudioStreamTrack)
 
+    sent_frames = {}
+    transit_ms = []
+
     class Video(VideoStreamTrack):
         async def recv(self):
             pts, base = await self.next_timestamp()
             pixels = np.zeros((180, 320, 3), dtype=np.uint8)
             pixels[:, (pts // 3000 * 5) % 300:][:, :20] = (40, 180, 80)
+            # Codec-tolerant frame counter: 16 grayscale cells, sampled centrally.
+            counter = (pts // 3000) % 65536
+            for bit in range(16):
+                pixels[:20, bit*20:(bit+1)*20] = 240 if counter & (1 << bit) else 16
+            sent_frames[counter] = time.monotonic()
+            if len(sent_frames) > 1800:
+                del sent_frames[next(iter(sent_frames))]
             frame = av.VideoFrame.from_ndarray(pixels, format='rgb24')
             frame.pts, frame.time_base = pts, base
             return frame
@@ -102,6 +112,13 @@ async def measure(auth, result, media='both'):
                 counts[track.kind] += 1
                 if track.kind == 'audio':
                     peaks.append(int(np.abs(frame.to_ndarray().astype(np.int32)).max()))
+                elif track.kind == 'video':
+                    pixels = frame.to_ndarray(format='rgb24')
+                    counter = sum(1 << bit for bit in range(16)
+                                  if pixels[5:15, bit*20+5:bit*20+15].mean() > 128)
+                    sent = sent_frames.get(counter)
+                    if sent is not None:
+                        transit_ms.append((time.monotonic()-sent)*1000)
 
         @receiver.on('track')
         def on_track(track):
@@ -144,6 +161,13 @@ async def measure(auth, result, media='both'):
         result['received_packets'] = {s.kind: s.packetsReceived for s in (await receiver.getStats()).values()
                                       if s.type == 'inbound-rtp'}
         result['video_codec'] = 'H264'
+        if transit_ms:
+            result['video_encode_transport_decode_ms'] = {
+                'samples': len(transit_ms),
+                'median': round(float(np.median(transit_ms)), 1),
+                'p95': round(float(np.percentile(transit_ms, 95)), 1),
+                'max': round(max(transit_ms), 1),
+                'scope': 'Same-process monotonic frame creation to received decoded frame; includes codec, SFU and jitter buffering, excludes inference, browser and physical display.'}
         result['bundle_policy'] = 'balanced'
         result['passed'] = (counts.get('video', 60) >= 60 and counts.get('audio', 100) >= 100
                             and ('audio' not in counts or max(peaks, default=0) > 100))
