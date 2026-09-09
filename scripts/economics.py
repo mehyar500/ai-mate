@@ -190,6 +190,40 @@ def remote_clip_comparison():
     return '\n'.join(rows)
 
 
+def gpu_session_cost(hourly_rate, call_minutes, startup_seconds=60, idle_seconds=90):
+    """Single admitted call per GPU; overhead is charged once per cold session."""
+    values = [hourly_rate, call_minutes, startup_seconds, idle_seconds]
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0 for v in values):
+        raise ValueError('GPU session assumptions must be finite nonnegative numbers.')
+    if hourly_rate == 0 or call_minutes == 0:
+        raise ValueError('GPU rate and call duration must be positive.')
+    return hourly_rate * (call_minutes*60 + startup_seconds + idle_seconds)/3600
+
+
+def autoscaling_comparison():
+    # Documentation gives $0.00031/s while the price table rounds to $1.10/h.
+    # Use the higher number for this planning comparison, pending a real quote.
+    flex, pod = .00031*3600, .74
+    rows = ['### Autoscaling decision — September 9', '',
+        'PWA first is now the selected distribution plan. Web payments avoid App Store commission but need an accepted processor quote, reserves, refunds, verification and support in the margin model. Adult-service prices cannot inherit the neutral demo\'s model/hosting assumptions. Higher prices do not by themselves prove willingness to pay or fund idle capacity.', '',
+        'Calls reserve one measured GPU slot for the entire session; do not cold-start a worker per sentence. Short generated clips use a separate queue and can scale to zero. Begin with scheduled local demos. For a later non-explicit online pilot, compare capped Flex workers against scheduled Pods; do not keep a worker on 24/7 before traffic justifies it. Runpod is not selected for the intended explicit service under its published terms.', '',
+        'Runpod endpoint documentation lists 4090 at $0.00031/s ($1.116/hour), versus the rounded $1.10/hour price table. This conservative comparison uses $1.116/hour and $0.74/hour Pods. Assumptions: one call per GPU, 60 seconds startup and 90 seconds idle charged once per call. Those overheads are scenarios, not measured cloud startup. [Endpoint settings](https://docs.runpod.io/serverless/endpoints/endpoint-configurations).', '',
+        '| Delivered call | Flex including startup/idle | Pod running only that window |',
+        '|---|---:|---:|']
+    for minutes in [30, 60]:
+        rows.append(f'| {minutes} minutes | ${gpu_session_cost(flex, minutes):.3f} | ${gpu_session_cost(pod, minutes):.3f} |')
+    rows += ['', 'Pod windows require lifecycle automation and available capacity; their lower compute price is not a managed-autoscaling implementation. Neither option guarantees immediate cold admission. Storage, transport, dialogue, speech, monitoring and fees remain additional.', '',
+        '| Monthly 30-minute calls | Flex compute + 80GB storage | One always-on Pod + same storage |',
+        '|---|---:|---:|']
+    for calls in [20, 100, 500]:
+        rows.append(f'| {calls} | ${calls*gpu_session_cost(flex,30)+5.60:.2f} | ${pod*720+5.60:.2f} |')
+    crossover = pod / flex * 1800 / 1950
+    rows += ['', f'This one-worker, non-overlapping-call scenario crosses an always-on Pod at about **{crossover:.1%} call occupancy**, before extra warm spares, failures or other costs. Scheduled Pods may be cheaper below that point too. Real concurrency, peak demand and worker availability must be measured; a user count alone is not a capacity forecast.', '',
+        'Planning controls: min workers 0 outside demo windows, max workers 1 for the first pilot, no automatic expensive GPU fallback, 90-second post-call idle timeout, at most 60 minutes per admitted call, disconnect grace 30 seconds, and a separately approved daily/monthly spend ceiling. Reserve the worst-case session spend before admission; count startup, idle, already admitted calls and pending workers. Reject new calls before the cap and drain existing calls. A max-worker setting limits burn rate, not total spend. All these cloud controls are proposed, not deployed.', '',
+        'Scale from admitted sessions divided by benchmarked slots per worker, not individual speech requests. Keep call state on the assigned worker, durable memory outside it, and stop idle retention when the call lease expires. Runpod [worker affinity](https://docs.runpod.io/serverless/load-balancing/worker-affinity) supports strict routing but does not preserve lost memory. Its [load-balancing endpoint](https://docs.runpod.io/serverless/load-balancing/overview) has a documented 5.5-minute request limit: send short control/inference requests and transport media separately; qualify worker retention and networking before a 60-minute call. Never treat one hour-long HTTP job as already supported.', '']
+    return '\n'.join(rows)
+
+
 def report(c):
     p=c["poc"];d=demo_forecast(c);future=calculate(c)
     rows=["# Local proof-of-concept economics","",
@@ -233,6 +267,7 @@ def report(c):
              "",
              "Cloudflare [Realtime SFU pricing](https://developers.cloudflare.com/realtime/sfu/pricing/) is $0.05/GB egress after its shared SFU/TURN allowance. A single 2Mbps downstream for 30 minutes is 0.45GB, or $0.0225 at that rate before protocol overhead and other billable traffic. GPU-provider egress is separate. This is transport only; WebRTC does not perform model inference.",
              "",
+             autoscaling_comparison(), "",
              "The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.",
              "","| Future monthly offer | Price to test | Earlier direct contribution hypothesis |","|---|---:|---:|"]
     for plan in future['plans']:

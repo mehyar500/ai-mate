@@ -62,7 +62,7 @@
         "input_tokens": 51,
         "tokens_per_second": 94.98357215945151,
         "model_load_s": 0.0026355,
-        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615"
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕"
       },
       {
         "first_token_s": 0.06251069996505976,
@@ -112,7 +112,7 @@
         "input_tokens": 51,
         "tokens_per_second": 95.22325525026403,
         "model_load_s": 0.0022774,
-        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615"
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕"
       },
       {
         "first_token_s": 0.05107929999940097,
@@ -388,7 +388,7 @@
         "audio_s": 1.918
       },
       {
-        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615",
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕",
         "llm_s": 0.26285250001819804,
         "tts_s": 1.2375127000268549,
         "ready_s": 1.500365200045053,
@@ -435,7 +435,7 @@
         "audio_s": 1.918
       },
       {
-        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \ud83c\udf3f\u2615",
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕",
         "llm_s": 0.26429610000923276,
         "tts_s": 1.4020240999525413,
         "ready_s": 1.666320199961774,
@@ -924,7 +924,7 @@
         },
         {
           "prompt": "What should I name a new houseplant?",
-          "reply": "How about \"Maple\"? It's a great name for a plant\u2014like your dog.",
+          "reply": "How about \"Maple\"? It's a great name for a plant—like your dog.",
           "seconds": 0.3051776999491267
         }
       ]
@@ -1034,7 +1034,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Try planting a few herbs like mint or basil\u2014they grow easily and smell great.",
+          "text": "Try planting a few herbs like mint or basil—they grow easily and smell great.",
           "metrics": {
             "first_text_s": 0.472,
             "first_media_ready_s": 2.524,
@@ -1056,7 +1056,7 @@
         {
           "state": "done",
           "user": "What name should you call me?",
-          "text": "You can call me Alex\u2014your name, of course.",
+          "text": "You can call me Alex—your name, of course.",
           "metrics": {
             "first_text_s": 0.446,
             "first_media_ready_s": 1.642,
@@ -1067,7 +1067,7 @@
         {
           "state": "done",
           "user": "Let's have a short, quiet conversation.",
-          "text": "I love gardening and cooking, just like you. Maple\u2019s bark is soft, and I\u2019ve seen your dog enjoy the garden too.",
+          "text": "I love gardening and cooking, just like you. Maple’s bark is soft, and I’ve seen your dog enjoy the garden too.",
           "metrics": {
             "first_text_s": 0.414,
             "first_media_ready_s": 1.622,
@@ -1089,7 +1089,7 @@
         {
           "state": "done",
           "user": "What is my dog's name?",
-          "text": "Maple. Your dog\u2019s name is Maple.",
+          "text": "Maple. Your dog’s name is Maple.",
           "metrics": {
             "first_text_s": 0.393,
             "first_media_ready_s": 1.485,
@@ -1122,7 +1122,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to the soil\u2014easy and great for planting.",
+          "text": "Add a few composted leaves to the soil—easy and great for planting.",
           "metrics": {
             "first_text_s": 0.448,
             "first_media_ready_s": 2.308,
@@ -1133,7 +1133,7 @@
         {
           "state": "done",
           "user": "I have ten minutes free. What could I practice?",
-          "text": "Try playing one simple piece from your piano lesson\u2014start slow and focus on smooth finger movement.",
+          "text": "Try playing one simple piece from your piano lesson—start slow and focus on smooth finger movement.",
           "metrics": {
             "first_text_s": 0.47,
             "first_media_ready_s": 3.029,
@@ -1144,7 +1144,7 @@
         {
           "state": "done",
           "user": "What name should you call me?",
-          "text": "You can call me Alex. It\u2019s a nice name to know.",
+          "text": "You can call me Alex. It’s a nice name to know.",
           "metrics": {
             "first_text_s": 0.326,
             "first_media_ready_s": 1.16,
@@ -1155,7 +1155,7 @@
         {
           "state": "done",
           "user": "Let's have a short, quiet conversation.",
-          "text": "I love how you care for Maple and cook\u2014what\u2019s one recipe you\u2019ve tried lately?",
+          "text": "I love how you care for Maple and cook—what’s one recipe you’ve tried lately?",
           "metrics": {
             "first_text_s": 0.461,
             "first_media_ready_s": 2.456,
@@ -1177,7 +1177,7 @@
         {
           "state": "done",
           "user": "What is my dog's name?",
-          "text": "Maple. Your dog\u2019s name is Maple.",
+          "text": "Maple. Your dog’s name is Maple.",
           "metrics": {
             "first_text_s": 0.349,
             "first_media_ready_s": 1.458,
@@ -1210,7 +1210,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to your soil\u2014easy and great for plant growth.",
+          "text": "Add a few composted leaves to your soil—easy and great for plant growth.",
           "metrics": {
             "first_text_s": 0.582,
             "first_media_ready_s": 2.568,
@@ -1221,7 +1221,7 @@
         {
           "state": "done",
           "user": "I have ten minutes free. What could I practice?",
-          "text": "Try playing one simple piece slowly\u2014focus on steady rhythm and clean notes.",
+          "text": "Try playing one simple piece slowly—focus on steady rhythm and clean notes.",
           "metrics": {
             "first_text_s": 0.323,
             "first_media_ready_s": 2.314,
@@ -1298,7 +1298,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to the soil\u2014easy and helps plants grow.",
+          "text": "Add a few composted leaves to the soil—easy and helps plants grow.",
           "metrics": {
             "first_text_s": 0.505,
             "first_media_ready_s": 2.341,
@@ -4015,7 +4015,7 @@
       },
       "run2": {
         "metrics": "First playback: 2.56s from Send. Buffer waits: 0 (0.00s). Server completed: 4.07s.",
-        "scene": "Garden \u00b7 Generated video",
+        "scene": "Garden · Generated video",
         "videoError": null,
         "videoTime": 2.782666,
         "videoVisible": true
@@ -8956,6 +8956,1213 @@
       "compile": "passed",
       "browser": "passed",
       "independent_public_review": "pending"
+    }
+  },
+  "full_voice_video_2026_09_09": {
+    "measured_at": "2026-09-09T00:53:36.700413+00:00",
+    "source_commit": "62f831a",
+    "changes": "Keep 0.35s starting buffer; fix repeated speech-end seeks during gesture tail; add ManagedMediaSource capability selection.",
+    "scope": "Fixed synthetic WAV upload through real local Whisper ASR, Cloudflare Qwen plan, CPU Kokoro, GPU MuseTalk and desktop Chromium playback. Synthetic private database. No live user conversation access.",
+    "trials": {
+      "baseline": {
+        "browser": [
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.60660000000149,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.60760000000149,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 5.663400000002235,
+                "currentTime": 2.982667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 5.728800000000745,
+                "currentTime": 3.042675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.60s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 4.27s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "greeting",
+            "expected": "Hi Mira, how are you today?",
+            "transcribed": "Hi Mira, how are you today?",
+            "reply": "I'm doing well, thanks for asking! How about you?",
+            "engine": {
+              "asr_s": 0.409,
+              "first_text_s": 1.029,
+              "decision_source": "model",
+              "first_media_ready_s": 4.258,
+              "total_s": 4.27
+            },
+            "action": "none",
+            "prepared_pose": "base",
+            "pageErrors": []
+          },
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.358,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.358699999999255,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.080199999999255,
+                "currentTime": 1.684625,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 4.1596000000014905,
+                "currentTime": 1.742675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.35s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 3.04s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "memory",
+            "expected": "What is my dog's name?",
+            "transcribed": "What is my dog's name?",
+            "reply": "Your dog's name is Maple.",
+            "engine": {
+              "asr_s": 0.383,
+              "first_text_s": 1.083,
+              "decision_source": "model",
+              "first_media_ready_s": 3.036,
+              "total_s": 3.044
+            },
+            "action": "none",
+            "prepared_pose": "base",
+            "pageErrors": []
+          },
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.018300000000745,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.01860000000149,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 3.339900000002235,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 3.874300000000745,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.139,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.4008000000007454,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.666300000000745,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.932,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 5.14010000000149,
+                "currentTime": 3.042675,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 5.141699999999255,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.01s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 2.66s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "approach",
+            "expected": "Could you come closer and say hello?",
+            "transcribed": "Could you come closer and say hello?",
+            "reply": "Let me try that.",
+            "engine": {
+              "asr_s": 0.393,
+              "first_text_s": 0.82,
+              "decision_source": "model",
+              "first_media_ready_s": 2.651,
+              "total_s": 2.659
+            },
+            "action": "closer",
+            "prepared_pose": "near",
+            "pageErrors": []
+          }
+        ],
+        "engine": [
+          {
+            "id": "a3a93055d57c470c811d46b93658bbd3",
+            "state": "done",
+            "text": "I'm doing well, thanks for asking! How about you?",
+            "user": "Hi Mira, how are you today?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "I'm doing well, thanks for asking! How about you?",
+                "audio": "/media/a3a93055d57c470c811d46b93658bbd3-0.wav",
+                "duration_s": 2.982666666666667,
+                "speech_s": 0.535,
+                "prepared_motion": true,
+                "video": "/media/a3a93055d57c470c811d46b93658bbd3-0.mp4",
+                "stream": "/api/streams/a3a93055d57c470c811d46b93658bbd3-0.mp4",
+                "render": {
+                  "render_s": 2.69064409999919,
+                  "frames": 60,
+                  "fps": 22.299493270038226,
+                  "duration_s": 3.0,
+                  "speech_duration_s": 2.9826875,
+                  "lip_sync_frames": 60,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2738.5517578125,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.06521150000116904,
+                  "neural_s": 2.5768405999951938,
+                  "composite_pipe_s": 0.042075600002135616,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.004063500000484055,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "motion_source": "prepared_listening_loop",
+                  "fresh_body_generation": false,
+                  "looped_prepared_body": true
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.409,
+              "first_text_s": 1.029,
+              "decision_source": "model",
+              "first_media_ready_s": 4.258,
+              "total_s": 4.27
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "remembered": [],
+            "prepared_pose": "base",
+            "idle_video": "/idle/fullbody.mp4"
+          },
+          {
+            "id": "7dfba2197a1e4c0aa2c8d8ad42428f28",
+            "state": "done",
+            "text": "Your dog's name is Maple.",
+            "user": "What is my dog's name?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "Your dog's name is Maple.",
+                "audio": "/media/7dfba2197a1e4c0aa2c8d8ad42428f28-0.wav",
+                "duration_s": 1.684625,
+                "speech_s": 0.381,
+                "prepared_motion": true,
+                "video": "/media/7dfba2197a1e4c0aa2c8d8ad42428f28-0.mp4",
+                "stream": "/api/streams/7dfba2197a1e4c0aa2c8d8ad42428f28-0.mp4",
+                "render": {
+                  "render_s": 1.5690800000011222,
+                  "frames": 34,
+                  "fps": 21.6687485660232,
+                  "duration_s": 1.7,
+                  "speech_duration_s": 1.684625,
+                  "lip_sync_frames": 34,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2737.14208984375,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.05479589999958989,
+                  "neural_s": 1.4838636000022234,
+                  "composite_pipe_s": 0.0236021000018809,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.003966799999034265,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "motion_source": "prepared_listening_loop",
+                  "fresh_body_generation": false,
+                  "looped_prepared_body": true
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.383,
+              "first_text_s": 1.083,
+              "decision_source": "model",
+              "first_media_ready_s": 3.036,
+              "total_s": 3.044
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "remembered": [],
+            "prepared_pose": "base",
+            "idle_video": "/idle/fullbody.mp4"
+          },
+          {
+            "id": "c5b046e9b9be4be9af53ebe94ce11a89",
+            "state": "done",
+            "text": "Let me try that.",
+            "user": "Could you come closer and say hello?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "Let me try that.",
+                "audio": "/media/c5b046e9b9be4be9af53ebe94ce11a89-0.wav",
+                "duration_s": 1.2806666666666666,
+                "speech_s": 0.314,
+                "prepared_motion": true,
+                "video": "/media/c5b046e9b9be4be9af53ebe94ce11a89-0.mp4",
+                "stream": "/api/streams/c5b046e9b9be4be9af53ebe94ce11a89-0.mp4",
+                "render": {
+                  "render_s": 1.4712024000000383,
+                  "frames": 60,
+                  "fps": 40.782967727620914,
+                  "duration_s": 3.0,
+                  "speech_duration_s": 1.2806875,
+                  "lip_sync_frames": 32,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2738.5517578125,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.04401530000177445,
+                  "neural_s": 1.3796548999998777,
+                  "composite_pipe_s": 0.03506649999690126,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.003990699999121716,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "action": "closer",
+                  "motion_source": "reviewed_prepared_transition",
+                  "fresh_body_generation": false,
+                  "target_pose": "near",
+                  "transition_start_s": 0.0,
+                  "looped_prepared_body": false,
+                  "continues_previous_pose": false
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.393,
+              "first_text_s": 0.82,
+              "decision_source": "model",
+              "first_media_ready_s": 2.651,
+              "total_s": 2.659
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "closer",
+            "remembered": [],
+            "prepared_pose": "near",
+            "idle_video": "/idle/near.mp4"
+          }
+        ]
+      },
+      "revised": {
+        "browser": [
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "waiting",
+                "at": 2.343900000002235,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.3745,
+                "currentTime": 0.00011,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.37510000000149,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "waiting",
+                "at": 2.5754000000022352,
+                "currentTime": 0.160072,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.6281000000014902,
+                "currentTime": 0.180083,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.628300000000745,
+                "currentTime": 0.21962,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.59,
+                "currentTime": 2.132625,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 4.68920000000298,
+                "currentTime": 2.192675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.37s from Send. Buffer waits: 1 (0.05s). Between phrases: 0.00s. Server completed: 3.68s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "greeting",
+            "expected": "Hi Mira, how are you today?",
+            "transcribed": "Hi Mira, how are you today?",
+            "reply": "I'm doing well, thanks for asking!",
+            "engine": {
+              "asr_s": 0.407,
+              "first_text_s": 1.303,
+              "decision_source": "model",
+              "first_media_ready_s": 3.67,
+              "total_s": 3.677
+            },
+            "action": "none",
+            "prepared_pose": "base",
+            "pageErrors": []
+          },
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "waiting",
+                "at": 2.073900000002235,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.077300000000745,
+                "currentTime": 6.1e-05,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.0775,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "waiting",
+                "at": 2.2775,
+                "currentTime": 0.160032,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.3656999999992547,
+                "currentTime": 0.210748,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.366,
+                "currentTime": 0.256,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 3.8574000000022353,
+                "currentTime": 1.684625,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 3.94660000000149,
+                "currentTime": 1.742675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.07s from Send. Buffer waits: 1 (0.09s). Between phrases: 0.00s. Server completed: 3.09s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "memory",
+            "expected": "What is my dog's name?",
+            "transcribed": "What is my dog's name?",
+            "reply": "Your dog's name is Maple.",
+            "engine": {
+              "asr_s": 0.431,
+              "first_text_s": 1.071,
+              "decision_source": "model",
+              "first_media_ready_s": 3.08,
+              "total_s": 3.088
+            },
+            "action": "none",
+            "prepared_pose": "base",
+            "pageErrors": []
+          },
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "waiting",
+                "at": 2.07239999999851,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.0738999999985097,
+                "currentTime": 7.2e-05,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.074699999999255,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "waiting",
+                "at": 2.2740999999977647,
+                "currentTime": 0.160033,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.358599999997765,
+                "currentTime": 0.210882,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.3590999999977647,
+                "currentTime": 0.256,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 3.4545,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 5.280599999997765,
+                "currentTime": 3.042675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.07s from Send. Buffer waits: 1 (0.08s). Between phrases: 0.00s. Server completed: 2.99s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "approach",
+            "expected": "Could you come closer and say hello?",
+            "transcribed": "Could you come closer and say hello?",
+            "reply": "Let me try that.",
+            "engine": {
+              "asr_s": 0.426,
+              "first_text_s": 1.176,
+              "decision_source": "model",
+              "first_media_ready_s": 2.978,
+              "total_s": 2.987
+            },
+            "action": "closer",
+            "prepared_pose": "near",
+            "pageErrors": []
+          }
+        ],
+        "engine": [
+          {
+            "id": "855317be03854583921883700bd683c5",
+            "state": "done",
+            "text": "I'm doing well, thanks for asking!",
+            "user": "Hi Mira, how are you today?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "I'm doing well, thanks for asking!",
+                "audio": "/media/855317be03854583921883700bd683c5-0.wav",
+                "duration_s": 2.132625,
+                "speech_s": 0.446,
+                "prepared_motion": true,
+                "video": "/media/855317be03854583921883700bd683c5-0.mp4",
+                "stream": "/api/streams/855317be03854583921883700bd683c5-0.mp4",
+                "render": {
+                  "render_s": 1.9173930999968434,
+                  "frames": 43,
+                  "fps": 22.426282852520327,
+                  "duration_s": 2.15,
+                  "speech_duration_s": 2.132625,
+                  "lip_sync_frames": 43,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2737.69140625,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.0630100999987917,
+                  "neural_s": 1.8174867999987327,
+                  "composite_pipe_s": 0.03101309999692603,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.0042111999973712955,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "motion_source": "prepared_listening_loop",
+                  "fresh_body_generation": false,
+                  "looped_prepared_body": true
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.407,
+              "first_text_s": 1.303,
+              "decision_source": "model",
+              "first_media_ready_s": 3.67,
+              "total_s": 3.677
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "remembered": [],
+            "prepared_pose": "base",
+            "idle_video": "/idle/fullbody.mp4"
+          },
+          {
+            "id": "4ea71d324b594851b0cb9f781d81efcb",
+            "state": "done",
+            "text": "Your dog's name is Maple.",
+            "user": "What is my dog's name?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "Your dog's name is Maple.",
+                "audio": "/media/4ea71d324b594851b0cb9f781d81efcb-0.wav",
+                "duration_s": 1.684625,
+                "speech_s": 0.388,
+                "prepared_motion": true,
+                "video": "/media/4ea71d324b594851b0cb9f781d81efcb-0.mp4",
+                "stream": "/api/streams/4ea71d324b594851b0cb9f781d81efcb-0.mp4",
+                "render": {
+                  "render_s": 1.6193511999990733,
+                  "frames": 34,
+                  "fps": 20.996063114671763,
+                  "duration_s": 1.7,
+                  "speech_duration_s": 1.684625,
+                  "lip_sync_frames": 34,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2737.14208984375,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.045968999998876825,
+                  "neural_s": 1.542230400002154,
+                  "composite_pipe_s": 0.02450860000681132,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.004213300002447795,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "motion_source": "prepared_listening_loop",
+                  "fresh_body_generation": false,
+                  "looped_prepared_body": true
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.431,
+              "first_text_s": 1.071,
+              "decision_source": "model",
+              "first_media_ready_s": 3.08,
+              "total_s": 3.088
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "remembered": [],
+            "prepared_pose": "base",
+            "idle_video": "/idle/fullbody.mp4"
+          },
+          {
+            "id": "3c0620c04ae8477d952afaf53c13734f",
+            "state": "done",
+            "text": "Let me try that.",
+            "user": "Could you come closer and say hello?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "Let me try that.",
+                "audio": "/media/3c0620c04ae8477d952afaf53c13734f-0.wav",
+                "duration_s": 1.2806666666666666,
+                "speech_s": 0.312,
+                "prepared_motion": true,
+                "video": "/media/3c0620c04ae8477d952afaf53c13734f-0.mp4",
+                "stream": "/api/streams/3c0620c04ae8477d952afaf53c13734f-0.mp4",
+                "render": {
+                  "render_s": 1.4424088000014308,
+                  "frames": 60,
+                  "fps": 41.59708398890833,
+                  "duration_s": 3.0,
+                  "speech_duration_s": 1.2806875,
+                  "lip_sync_frames": 32,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2738.5517578125,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.05569870000181254,
+                  "neural_s": 1.3405912000052922,
+                  "composite_pipe_s": 0.03420170000390499,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.003990699999121716,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "action": "closer",
+                  "motion_source": "reviewed_prepared_transition",
+                  "fresh_body_generation": false,
+                  "target_pose": "near",
+                  "transition_start_s": 0.0,
+                  "looped_prepared_body": false,
+                  "continues_previous_pose": false
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.426,
+              "first_text_s": 1.176,
+              "decision_source": "model",
+              "first_media_ready_s": 2.978,
+              "total_s": 2.987
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "closer",
+            "remembered": [],
+            "prepared_pose": "near",
+            "idle_video": "/idle/near.mp4"
+          }
+        ]
+      },
+      "selected": {
+        "browser": [
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.52539999999851,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.526300000000745,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 4.704199999999255,
+                "currentTime": 2.132625,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 4.786800000000745,
+                "currentTime": 2.192675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.52s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 3.58s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "greeting",
+            "expected": "Hi Mira, how are you today?",
+            "transcribed": "Hi Mira, how are you today?",
+            "reply": "I'm doing well, thanks for asking!",
+            "engine": {
+              "asr_s": 0.396,
+              "first_text_s": 1.065,
+              "decision_source": "model",
+              "first_media_ready_s": 3.571,
+              "total_s": 3.583
+            },
+            "action": "none",
+            "prepared_pose": "base",
+            "pageErrors": []
+          },
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.2055,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.206300000000745,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 3.927199999999255,
+                "currentTime": 1.684625,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 4.00760000000149,
+                "currentTime": 1.742675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.20s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 2.92s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "memory",
+            "expected": "What is my dog's name?",
+            "transcribed": "What is my dog's name?",
+            "reply": "Your dog's name is Maple.",
+            "engine": {
+              "asr_s": 0.393,
+              "first_text_s": 0.975,
+              "decision_source": "model",
+              "first_media_ready_s": 2.914,
+              "total_s": 2.922
+            },
+            "action": "none",
+            "prepared_pose": "base",
+            "pageErrors": []
+          },
+          {
+            "events": [
+              {
+                "id": "video",
+                "type": "playing",
+                "at": 2.19289999999851,
+                "currentTime": 0,
+                "muted": true,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "playing",
+                "at": 2.193599999997765,
+                "currentTime": 0,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "audio",
+                "type": "ended",
+                "at": 3.513699999999255,
+                "currentTime": 1.280667,
+                "muted": false,
+                "volume": 1
+              },
+              {
+                "id": "video",
+                "type": "ended",
+                "at": 5.315199999999255,
+                "currentTime": 3.042675,
+                "muted": true,
+                "volume": 1
+              }
+            ],
+            "metrics": "First playback: 2.19s from Send. Buffer waits: 0 (0.00s). Between phrases: 0.00s. Server completed: 2.85s.",
+            "audio": {
+              "ended": true,
+              "muted": false
+            },
+            "case": "approach",
+            "expected": "Could you come closer and say hello?",
+            "transcribed": "Could you come closer and say hello?",
+            "reply": "Let me try that.",
+            "engine": {
+              "asr_s": 0.411,
+              "first_text_s": 0.935,
+              "decision_source": "model",
+              "first_media_ready_s": 2.84,
+              "total_s": 2.848
+            },
+            "action": "closer",
+            "prepared_pose": "near",
+            "pageErrors": []
+          }
+        ],
+        "engine": [
+          {
+            "id": "16099d74a3c94655a850f36d81325a86",
+            "state": "done",
+            "text": "I'm doing well, thanks for asking!",
+            "user": "Hi Mira, how are you today?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "I'm doing well, thanks for asking!",
+                "audio": "/media/16099d74a3c94655a850f36d81325a86-0.wav",
+                "duration_s": 2.132625,
+                "speech_s": 0.454,
+                "prepared_motion": true,
+                "video": "/media/16099d74a3c94655a850f36d81325a86-0.mp4",
+                "stream": "/api/streams/16099d74a3c94655a850f36d81325a86-0.mp4",
+                "render": {
+                  "render_s": 2.0484864999998535,
+                  "frames": 43,
+                  "fps": 20.991107337052537,
+                  "duration_s": 2.15,
+                  "speech_duration_s": 2.132625,
+                  "lip_sync_frames": 43,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2737.69140625,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.06259380000119563,
+                  "neural_s": 1.9501595999936399,
+                  "composite_pipe_s": 0.028913200003444217,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.004025499998533633,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "motion_source": "prepared_listening_loop",
+                  "fresh_body_generation": false,
+                  "looped_prepared_body": true
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.396,
+              "first_text_s": 1.065,
+              "decision_source": "model",
+              "first_media_ready_s": 3.571,
+              "total_s": 3.583
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "remembered": [],
+            "prepared_pose": "base",
+            "idle_video": "/idle/fullbody.mp4"
+          },
+          {
+            "id": "61a4f2e24938463780df3ca46529d087",
+            "state": "done",
+            "text": "Your dog's name is Maple.",
+            "user": "What is my dog's name?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "Your dog's name is Maple.",
+                "audio": "/media/61a4f2e24938463780df3ca46529d087-0.wav",
+                "duration_s": 1.684625,
+                "speech_s": 0.392,
+                "prepared_motion": true,
+                "video": "/media/61a4f2e24938463780df3ca46529d087-0.mp4",
+                "stream": "/api/streams/61a4f2e24938463780df3ca46529d087-0.mp4",
+                "render": {
+                  "render_s": 1.54395569999906,
+                  "frames": 34,
+                  "fps": 22.021357219006156,
+                  "duration_s": 1.7,
+                  "speech_duration_s": 1.684625,
+                  "lip_sync_frames": 34,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2737.14208984375,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.05234059999929741,
+                  "neural_s": 1.4599859000045399,
+                  "composite_pipe_s": 0.023857400003180373,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.003957999997510342,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "motion_source": "prepared_listening_loop",
+                  "fresh_body_generation": false,
+                  "looped_prepared_body": true
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.393,
+              "first_text_s": 0.975,
+              "decision_source": "model",
+              "first_media_ready_s": 2.914,
+              "total_s": 2.922
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "none",
+            "remembered": [],
+            "prepared_pose": "base",
+            "idle_video": "/idle/fullbody.mp4"
+          },
+          {
+            "id": "147516de7a254ae293959f598bda4d8a",
+            "state": "done",
+            "text": "Let me try that.",
+            "user": "Could you come closer and say hello?",
+            "chunks": [
+              {
+                "index": 0,
+                "text": "Let me try that.",
+                "audio": "/media/147516de7a254ae293959f598bda4d8a-0.wav",
+                "duration_s": 1.2806666666666666,
+                "speech_s": 0.32,
+                "prepared_motion": true,
+                "video": "/media/147516de7a254ae293959f598bda4d8a-0.mp4",
+                "stream": "/api/streams/147516de7a254ae293959f598bda4d8a-0.mp4",
+                "render": {
+                  "render_s": 1.51732759999868,
+                  "frames": 60,
+                  "fps": 39.54320741285679,
+                  "duration_s": 3.0,
+                  "speech_duration_s": 1.2806875,
+                  "lip_sync_frames": 32,
+                  "resolution": "384x576",
+                  "face_region": "256x256",
+                  "torch_peak_allocated_mib": 2738.5517578125,
+                  "torch_peak_reserved_mib": 3582.0,
+                  "audio_features_s": 0.05612870000186376,
+                  "neural_s": 1.4181439000021783,
+                  "composite_pipe_s": 0.030917099997168407,
+                  "encoder": "libx264",
+                  "body_motion": true,
+                  "face_tracking_s": 0.004034199999296106,
+                  "face_encode_stride": 2,
+                  "prepared_appearance_cache_hit": true,
+                  "motion_start_s": 0.0,
+                  "action": "closer",
+                  "motion_source": "reviewed_prepared_transition",
+                  "fresh_body_generation": false,
+                  "target_pose": "near",
+                  "transition_start_s": 0.0,
+                  "looped_prepared_body": false,
+                  "continues_previous_pose": false
+                },
+                "complete": true
+              }
+            ],
+            "metrics": {
+              "asr_s": 0.411,
+              "first_text_s": 0.935,
+              "decision_source": "model",
+              "first_media_ready_s": 2.84,
+              "total_s": 2.848
+            },
+            "error": null,
+            "presentation": "video",
+            "scene": "fullbody",
+            "action": "closer",
+            "remembered": [],
+            "prepared_pose": "near",
+            "idle_video": "/idle/near.mp4"
+          }
+        ]
+      }
+    },
+    "cloud_requests": 12,
+    "cloud_billed_usage": "Not captured; do not assume free.",
+    "decision": "Retain 16GB GPU and 0.35s buffer. Reject 0.15s buffer because each revised trial stalled.",
+    "limitations": [
+      "Three selected samples, not p95.",
+      "Physical microphone and 0.65s endpoint silence excluded.",
+      "No internet or actual iPhone test.",
+      "No new content capability or provider approval demonstrated.",
+      "Hosted reply wording varied; this is not a controlled percentage speedup.",
+      "Prepared body commands remain limited."
+    ],
+    "checks": {
+      "python": 124,
+      "node": 9,
+      "compile": "passed",
+      "diff_check": "passed"
     }
   }
 }

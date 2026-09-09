@@ -3,9 +3,17 @@ import math
 import subprocess
 import sys
 import unittest
-from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, demo_forecast, ROOT
+from scripts.economics import calculate, load, report, price_floor, forecast, no_sales, demo_forecast, gpu_session_cost, ROOT
 
 class EconomicsTests(unittest.TestCase):
+    def test_gpu_call_cost_charges_startup_and_idle_once(self):
+        self.assertAlmostEqual(gpu_session_cost(1.116,30),.6045)
+        self.assertAlmostEqual(gpu_session_cost(1.116,60),1.1625)
+        self.assertAlmostEqual(gpu_session_cost(.74,30,0,0),.37)
+        self.assertGreater(gpu_session_cost(.74,30),.37)
+        for values in [(True,30,60,90),(1,0,0,0),(1,30,-1,90),(math.nan,30,60,90)]:
+            with self.assertRaises(ValueError):gpu_session_cost(*values)
+
     def test_demo_budget_includes_power_and_single_buffer(self):
         d=demo_forecast(load())
         self.assertEqual(d['months'][0]['expense'],6)

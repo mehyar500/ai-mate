@@ -1,22 +1,22 @@
-# US distribution: native app first, separate web alternative
+# US distribution: PWA first, adult-service eligibility unresolved
 
-## Current Apple direction — September 8
+## Current distribution decision — September 9
 
-The founder now prioritizes a non-explicit native companion app with Apple in-app purchases. This supersedes the earlier explicit-first launch requirement. The existing local demo stays private and fully clothed.
+The founder now chooses a PWA first if foreground call performance is comparable, with lawful consenting-adult explicit content and nudity as the intended eventual paid scope. This supersedes the Apple-native-first direction. Comparable foreground latency is an engineering target, not measured iPhone parity. The existing local demo remains private and fully clothed; its models, fixtures and prompt limits do not establish adult capability or launch clearance.
 
 Apple guideline 1.1.4 excludes overtly sexual/pornographic material. Clothing alone is not a safe-harbor test: a bikini does not guarantee approval, and erotic presentation or revealing sheer clothing can still conflict with that rule. The incidental mature-UGC provision is not general permission for a primarily sexual AI service. Use a non-explicit product, honest review notes and consistent server-side behavior. Apple decides approval. [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/).
 
-Use StoreKit in-app purchases for the proposed digital subscriptions/credits; Apple Pay is a different product. Implement server-verified transactions, restored entitlements and revocation/refund handling before charging. The US storefront permits external purchase links under current guidelines, but the founder's selected path remains Apple billing. Model and hosting terms still apply independently. [Payment guidelines](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase).
+Direct web distribution does not require an App Store listing. It does require a processor that explicitly accepts this actual AI-generated adult service, applicable age/consent/data controls, and model/host rights. A wrapper submitted to the App Store would still face App Review. A later non-explicit native edition can use StoreKit; Apple Pay is a different product. Implement verified entitlements, refunds and revocations for the selected channel before charging. [Payment guidelines](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase).
 
 “Apple approved design” can only describe an actual approval. The current web UI follows relevant design guidance with large touch targets, clear call controls and optional captions; it has not undergone App Review or iOS accessibility/device testing. Cloudflare model selection, an age gate or paying Apple's commission does not authorize otherwise excluded content. [Design guidance](https://developer.apple.com/design/tips/), [App Review](https://developer.apple.com/app-store/review/).
 
-## Deferred explicit web-service review
+## Required explicit web-service review before launch
 
 September 8 remote-provider clarification: "NSFW" is not a sufficiently precise content category for provider selection. Non-explicit romance, factual sexual-health Q&A, suggestive imagery and explicit sexual generation need separate review. One Cloudflare bill does not replace model-specific conditions. [Cloudflare terms](https://www.cloudflare.com/service-specific-terms-developer-platform/) retain third-party terms for Workers AI and AI Gateway; routing also does not establish US-only processing.
 
 Runpod's current terms prohibit pornography/graphic adult content; self-hosting weights there does not waive the restriction. Pruna's general terms do not list a blanket consensual-adult ban, but explicitly retain third-party conditions, and its P-Video documentation links LTX's license: this is not an explicit-content workaround. Inworld's developer AUP restricts suggestive/mature tools, so its TTS is deferred for the proposed mature scope. Published filter controls are not permission to bypass contractual limits. These findings leave remote neutral clip tests feasible, not an approved NSFW launch. [Runpod](https://www.runpod.io/legal/terms-of-service), [Pruna terms](https://docs.api.pruna.ai/terms), [P-Video license reference](https://docs.api.pruna.ai/guides/models/p-video), [Inworld AUP](https://inworld.ai/aup/).
 
-The material below applies only if a separate explicit web scope is later chosen. It does not describe the native MVP or establish permission for it.
+The material below now applies to the intended web launch. None of it establishes an approved, funded or implemented adult service.
 
 **Current stage is a founder-operated private prototype and fundraising demonstration, with no customer billing or public adult access.** The founder can show a non-explicit product preview using synthetic profiles. The commercial launch conditions below remain deferred requirements; they are not waived by calling something a demo.
 
@@ -28,7 +28,7 @@ The launch scope is original fictional adults, lawful consensual adult content, 
 
 **Adult-service eligibility is a selection criterion, not a post-launch check.** Request acceptance for the actual explicit-content service, including generation, storage, private delivery, visual calls and billing. Do not describe it merely as a generic chatbot to obtain approval. A host accepting stored content does not automatically approve model APIs or every underlying provider.
 
-An explicit web service would require its own accepted scope, rights, hosting, access controls and payment route. The founder has now explicitly chosen a non-explicit native direction first. There is no hidden explicit-mode switch, and removed planning-only environment flags were never functioning access controls.
+The intended explicit web service requires accepted scope, rights, hosting, access controls and a payment route. No hidden explicit-mode switch or functioning production adult-access control exists. Non-nudity alone also does not guarantee App Store approval: a bikini, sheer lingerie and sexualized movement are judged in context, not by a clothing allowlist.
 
 ## What self-hosting does and does not permit
 

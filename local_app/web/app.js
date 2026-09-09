@@ -1,4 +1,4 @@
-import {synchronizeSpeech} from './media-sync.mjs';
+import {synchronizeSpeech, streamingSource} from './media-sync.mjs';
 import {Microphone} from './microphone.mjs';
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -146,8 +146,9 @@ async function attemptPlay(media){
 }
 async function playStream(item,media,signal){
   const mime='video/mp4; codecs="avc1.42C01E, mp4a.40.2"';
-  if(!window.MediaSource||!MediaSource.isTypeSupported(mime))return false;
-  const source=new MediaSource();objectURL=URL.createObjectURL(source);media.src=objectURL;
+  const source=streamingSource(media,mime);
+  if(!source)return false;
+  objectURL=URL.createObjectURL(source);media.src=objectURL;
   await waitEvent(source,"sourceopen",signal,10000);
   const buffer=source.addSourceBuffer(mime);
   const response=await fetch(item.stream,{headers:{"X-Local-Token":token},signal});

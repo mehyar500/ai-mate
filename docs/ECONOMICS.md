@@ -89,6 +89,34 @@ A warm RTX 4090 Pod at $0.74/hour costs $0.37 of GPU time per 30-minute call at 
 
 Cloudflare [Realtime SFU pricing](https://developers.cloudflare.com/realtime/sfu/pricing/) is $0.05/GB egress after its shared SFU/TURN allowance. A single 2Mbps downstream for 30 minutes is 0.45GB, or $0.0225 at that rate before protocol overhead and other billable traffic. GPU-provider egress is separate. This is transport only; WebRTC does not perform model inference.
 
+### Autoscaling decision — September 9
+
+PWA first is now the selected distribution plan. Web payments avoid App Store commission but need an accepted processor quote, reserves, refunds, verification and support in the margin model. Adult-service prices cannot inherit the neutral demo's model/hosting assumptions. Higher prices do not by themselves prove willingness to pay or fund idle capacity.
+
+Calls reserve one measured GPU slot for the entire session; do not cold-start a worker per sentence. Short generated clips use a separate queue and can scale to zero. Begin with scheduled local demos. For a later non-explicit online pilot, compare capped Flex workers against scheduled Pods; do not keep a worker on 24/7 before traffic justifies it. Runpod is not selected for the intended explicit service under its published terms.
+
+Runpod endpoint documentation lists 4090 at $0.00031/s ($1.116/hour), versus the rounded $1.10/hour price table. This conservative comparison uses $1.116/hour and $0.74/hour Pods. Assumptions: one call per GPU, 60 seconds startup and 90 seconds idle charged once per call. Those overheads are scenarios, not measured cloud startup. [Endpoint settings](https://docs.runpod.io/serverless/endpoints/endpoint-configurations).
+
+| Delivered call | Flex including startup/idle | Pod running only that window |
+|---|---:|---:|
+| 30 minutes | $0.605 | $0.401 |
+| 60 minutes | $1.163 | $0.771 |
+
+Pod windows require lifecycle automation and available capacity; their lower compute price is not a managed-autoscaling implementation. Neither option guarantees immediate cold admission. Storage, transport, dialogue, speech, monitoring and fees remain additional.
+
+| Monthly 30-minute calls | Flex compute + 80GB storage | One always-on Pod + same storage |
+|---|---:|---:|
+| 20 | $17.69 | $538.40 |
+| 100 | $66.05 | $538.40 |
+| 500 | $307.85 | $538.40 |
+
+This one-worker, non-overlapping-call scenario crosses an always-on Pod at about **61.2% call occupancy**, before extra warm spares, failures or other costs. Scheduled Pods may be cheaper below that point too. Real concurrency, peak demand and worker availability must be measured; a user count alone is not a capacity forecast.
+
+Planning controls: min workers 0 outside demo windows, max workers 1 for the first pilot, no automatic expensive GPU fallback, 90-second post-call idle timeout, at most 60 minutes per admitted call, disconnect grace 30 seconds, and a separately approved daily/monthly spend ceiling. Reserve the worst-case session spend before admission; count startup, idle, already admitted calls and pending workers. Reject new calls before the cap and drain existing calls. A max-worker setting limits burn rate, not total spend. All these cloud controls are proposed, not deployed.
+
+Scale from admitted sessions divided by benchmarked slots per worker, not individual speech requests. Keep call state on the assigned worker, durable memory outside it, and stop idle retention when the call lease expires. Runpod [worker affinity](https://docs.runpod.io/serverless/load-balancing/worker-affinity) supports strict routing but does not preserve lost memory. Its [load-balancing endpoint](https://docs.runpod.io/serverless/load-balancing/overview) has a documented 5.5-minute request limit: send short control/inference requests and transport media separately; qualify worker retention and networking before a 60-minute call. Never treat one hour-long HTTP job as already supported.
+
+
 The existing commercial calculator remains available for later planning; its funded-pilot scenario is deferred, not an immediate requirement or committed fundraising target. Its assumptions are not mixed into the local budget. Full-inclusion feature quality and costs remain unvalidated.
 
 | Future monthly offer | Price to test | Earlier direct contribution hypothesis |

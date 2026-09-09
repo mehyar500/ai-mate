@@ -84,6 +84,22 @@ The paired-motion demonstration is a real improvement, but the requested quality
 
 Output files contain speech, local ASR recovered synthetic test sentences, and the browser completed unmuted playback without media errors. Physical speaker output and subjective phoneme/voice quality still need device testing. Jobs record first text, per-chunk speech generation time, rendering stages, cache hits and completion; the browser separately measures first playback and stalls.
 
+### Full ASR-to-video check — September 9
+
+The real local recognizer, configured Cloudflare Qwen planner, Kokoro voice and MuseTalk renderer were exercised together through browser playback. Only physical microphone capture was replaced with fixed generated WAVs; an isolated database held the synthetic fact "My dog is named Maple." No private conversation was read or modified.
+
+| Selected build, one warm call | ASR | ASR + complete plan | First browser playback | Stalls |
+|---|---:|---:|---:|---:|
+| Greeting | 0.396s | 1.065s | 2.52s | 0 |
+| Recall dog's name | 0.393s | 0.975s | 2.20s | 0 |
+| Contextual approach request | 0.411s | 0.935s | 2.19s | 0 |
+
+All transcripts matched the fixed prompts, memory recall returned Maple, and the approach reached the near pose with unmuted audio completion. Peak Torch allocation was 2,739MiB, not total device memory. The existing 16GB card fits this path. These three samples are not p95; physical microphone, endpoint detection, mobile Safari, internet transport, long calls and concurrent users remain unmeasured. The current microphone waits about 0.65s of silence before submission, so end-of-speech latency is longer than the table.
+
+A 0.15s starting-buffer experiment caused a 0.05–0.09s stall in each of three trials. Keep 0.35s. Baseline timing was 2.60/2.35/2.01s; varying hosted replies mean the selected run is not a claimed speed percentage. The selected change fixes repeated audio-end seeks during a longer silent body gesture: seven ended events became one. iPhone ManagedMediaSource selection is implemented and unit checked with remote playback disabled; no real iPhone performance claim follows from those checks.
+
+Reproduce in a fresh audit directory with `serve_voice_video_benchmark.py --trial selected`, then `review_voice_video_playback.cjs selected`. Existing trial directories cause an error to preserve evidence. Each trial uses four hosted plans including warm-up; all prompts/history are synthetic. Three completed trials made twelve such requests; billing usage was not captured, so these are not declared free. Files remain under `generated/local-app/audit/voice-video-{baseline,revised,selected}`; machine-readable summary is in research/local-poc-benchmarks.json.
+
 ### Preparing appearances before calls — September 9
 
 Same synthetic approach/count/browser workflow, current mouth crop:
@@ -266,10 +282,10 @@ git diff --check
 
 R2 independent security/correctness review, staging, sustained p50/p95, real microphone/speaker testing, natural voice barge-in, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 123 Python tests and seven Node tests. New checks cover Cloudflare nested output/failure parsing, cents-to-dollar budget conversion, video-rate audio context and crop-cache invalidation. The interruption checks cover strict descriptors, authentication/origin, stale generations, reset races, bounded timestamp decoding, cleanup, completed-reply stops and partial-movement continuation. Phrase tests retain complete speech, one-ahead synthesis and per-phrase HTTP completion. `review_call_playback.cjs` covers voice/video playback and captions with synthetic APIs/capture; the phrase and interruption browser scripts exercise real isolated rendering. None starts a physical microphone or reads the live conversation. No memory schema or provider configuration changed.
+Checks for this revision: 124 Python tests and nine Node tests. New checks cover session startup/idle cost, iPhone streaming selection and silent gesture audio completion. The interruption checks cover strict descriptors, authentication/origin, stale generations, reset races, bounded timestamp decoding, cleanup, completed-reply stops and partial-movement continuation. Phrase tests retain complete speech, one-ahead synthesis and per-phrase HTTP completion. `review_call_playback.cjs` covers voice/video playback and captions with synthetic APIs/capture; the phrase and interruption browser scripts exercise real isolated rendering. None starts a physical microphone or reads the live conversation. No memory schema or provider configuration changed.
 
 ## Cost and next decision
 
 The three-month local plan is **$9.60 estimated incremental electricity + $75 contingency = $84.60**, rounded to a $100 ceiling. Power assumptions are unmeasured; hosted dialogue usage adds cost. No paid engineer, rented GPU, hardware or Apple membership has been purchased.
 
-Use the bounded demo to test whether people value the conversation and continuity before buying capacity. [ECONOMICS](ECONOMICS.md) includes optional larger-GPU trials and Apple's 30% baseline / conditional 15% program scenario. Native SwiftUI, StoreKit, device testing and model/hosting clearance remain future work. No profit, legal immunity, App Store acceptance or universal two-second latency is promised.
+Use the bounded demo to test whether people value the conversation and continuity before buying capacity. The latest distribution decision is PWA first; [ECONOMICS](ECONOMICS.md) includes autoscaling and optional native commission sensitivity. Device testing and adult model/hosting/payment qualification remain required for that intended product. No profit, legal immunity, App Store acceptance or universal two-second latency is promised.
