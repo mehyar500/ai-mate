@@ -11,7 +11,7 @@ local_app/engine.py owns planning, speech, media, memory, cancellation and pose 
 1. Browser captures speech and detects its end, or sends a typed command.
 2. Local Whisper transcribes validated PCM (GPU FP16 on this PC; CPU int8 by default). The engine retrieves bounded recent context and saved facts.
 3. Unambiguous supported movement commands take a direct path. Otherwise Cloudflare Qwen returns a validated reply, scene, action and optional in-app message.
-4. Kokoro synthesizes complete short phrases, preparing one phrase ahead. CPU remains selected. Optional CUDA speech releases unused allocator regions after each inference; the initial retained-arena soak failed, and the revision needs sustained qualification.
+4. Kokoro synthesizes complete short phrases, preparing one phrase ahead. This PC selects CUDA speech with unused allocator regions released after each inference. That revision passed 120 commands over 30 minutes; CPU remains the portable default and recovery setting.
 5. MuseTalk creates new speech-driven mouth frames over the matching body source. Reviewed approach, return and wave assets avoid live diffusion for known starting poses. Other movement attempts use the experimental local generator.
 6. The browser plays synchronized speech and fragmented video, then resumes the appropriate listening view. Interrupted playback preserves the displayed pose; approach/return can resume their remaining movement.
 7. Completed turns update memory. Requested messages appear in Text. Generation completion is not proof the reply was heard; playback acknowledgment and recovery remain work.
@@ -28,7 +28,7 @@ The planner prompt and action validator account for ASR punctuation inside expli
 |---|---|---|
 | Dialogue / plan | @cf/qwen/qwen3-30b-a3b-fp8 | Cloudflare, existing API key + email |
 | Recognition | faster-whisper Base English, FP16 on this PC; CPU int8 fallback, eight threads | Local GPU; explicit `AI_MATE_ASR_DEVICE` setting |
-| Speech | Kokoro-82M ONNX v1.0, af_sarah, eight threads | Local CPU |
+| Speech | Kokoro-82M ONNX v1.0, af_sarah, eight host threads, ONNX Runtime GPU 1.26.0 | Local GPU on this PC; CPU default elsewhere |
 | Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features; optional TensorRT 11.2.1.2 FP16 decoder | Local GPU |
 | Face tracking | YuNet ONNX | Local CPU |
 | Reviewed body preparation | LTX-2.3 22B distilled FP8, Gemma 3 12B FP4 encoder | Offline local preparation |
@@ -43,7 +43,7 @@ Five prepared body sources are bounded by frame count/resolution, verified again
 
 `AI_MATE_ASR_DEVICE=cpu` is the portable default; `cuda` selects the same cached Base English weights in FP16. On Windows it uses CUDA/cuDNN libraries from the installed Torch package, and warms recognition at startup. An unavailable explicitly selected GPU fails startup; set `cpu` and restart to recover. No silent device fallback, new download or API is introduced. Device, precision and startup recognition timing are exposed in diagnostics.
 
-`AI_MATE_TTS_DEVICE=cpu` preserves the portable speech path. Optional `cuda` uses the same Kokoro model/voice via ONNX Runtime GPU 1.26.0 in `.cache/ort-gpu-deps`, with pinned Windows wheels and existing Torch CUDA 12.8/cuDNN 9 libraries. It verifies runtime location/version and activated provider, and fails startup on missing/incompatible installation or CPU fallback. GPU calls now shrink unused arena regions after each inference to constrain growth across varied phrases; the 2GiB arena limit is not a total VRAM cap. Diagnostics include `arena_shrink_after_run`. Set `cpu` and restart to recover. No download, credential or memory migration is added. LOCAL_POC records the failed first soak and the revision's incomplete sustained/physical qualification; the GPU path also changes the in-process CPU VAD runtime to 1.26, exercised by the call tests.
+`AI_MATE_TTS_DEVICE=cpu` preserves the portable speech path. This PC selects `cuda`, using the same Kokoro model/voice via ONNX Runtime GPU 1.26.0 in `.cache/ort-gpu-deps`, with pinned Windows wheels and existing Torch CUDA 12.8/cuDNN 9 libraries. It verifies runtime location/version and activated provider, and fails startup on missing/incompatible installation or CPU fallback. GPU calls shrink unused arena regions after each inference; the 2GiB arena limit is not a total VRAM cap. Diagnostics include `arena_shrink_after_run`. Set `cpu` and restart to recover. No download, credential or memory migration is added. LOCAL_POC retains the failed first soak and the successful revised 30-minute run; physical/perceptual qualification remains open. The GPU path also changes the in-process CPU VAD runtime to 1.26, exercised by the call tests.
 
 Recordings remain mono PCM16 WAV, 8–96kHz and 0.15–30 seconds. Decode/validate once, normalize and resample to a 16kHz float32 array, then invoke Whisper with its original VAD, beam size and 30-second encoder padding. This bypasses faster-whisper's redundant PyAV decode/full-GC path. Raw audio stays local. CPU/GPU equivalence on synthetic fixtures does not qualify all speakers or acoustic conditions.
 

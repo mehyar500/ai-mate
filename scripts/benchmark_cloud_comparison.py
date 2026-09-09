@@ -9,6 +9,7 @@ import io
 import json
 from pathlib import Path
 import re
+import socket
 import sys
 import threading
 import time
@@ -29,6 +30,8 @@ MODELS = {
     '@cf/ibm-granite/granite-4.0-h-micro': (.017, .112),
     '@cf/meta/llama-3.1-8b-instruct-fp8-fast': (.045, .384),
     '@cf/meta/llama-3.2-3b-instruct': (.051, .335),
+    # September 9: Google list price, passed through Unified Billing.
+    'google/gemini-3.5-flash-lite': (.300, 2.500),
 }
 DEFAULT_MODELS = list(MODELS)[:3]  # Preserve the default 24-request maximum.
 CASES = {
@@ -40,6 +43,7 @@ CASES = {
 SNAPSHOT = {'memory': 'My dog is named Nori.', 'visual_pose': 'near', 'turns': [
     {'user': 'I have a piano recital on Friday.', 'assistant': 'Which piece are you playing?'}]}
 PRICING = 'https://developers.cloudflare.com/workers-ai/platform/pricing/'
+GOOGLE_PRICING = 'https://ai.google.dev/gemini-api/docs/pricing'
 
 
 def dialogue(auth, repeats, save, selected_model=None, selected_case=None):
@@ -73,8 +77,16 @@ def dialogue(auth, repeats, save, selected_model=None, selected_case=None):
                     if budget_reserved + reservation > .10:
                         raise ValueError('Benchmark nominal price reservation exhausted.')
                     budget_reserved += reservation
+                    # A repeated prompt must measure inference, not a cached
+                    # Gateway response. This does not modify gateway settings.
+                    request.add_header('cf-aig-skip-cache', 'true')
                     began = time.perf_counter()
                     with original(request, timeout=30) as response:
+                        cache_status = response.headers.get('cf-aig-cache-status', 'unknown').upper()
+                        row['gateway_cache_status'] = (cache_status if cache_status in
+                            {'HIT', 'MISS', 'BYPASS', 'UNKNOWN'} else 'OTHER')
+                        if cache_status == 'HIT':
+                            raise ValueError('Cached response cannot qualify inference latency.')
                         first = response.read(1)
                         row['first_response_byte_s'] = round(time.perf_counter() - began, 3)
                         data = first + response.read(1_000_001)
@@ -172,10 +184,23 @@ def main():
         parser.error('Model/case selection applies to dialogue only.')
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
+    try:
+        connection = socket.create_connection(('127.0.0.1', 8766), timeout=.2)
+    except OSError:
+        pass
+    else:
+        connection.close()
+        parser.error('Finish the isolated call benchmark before starting another inference comparison.')
+    from scripts.review_lip_sync import preview_idle
+    preview_idle()
     configure_runtime()
     auth = Conversation('unused')
     if auth.provider != 'cloudflare':
         parser.error('Select the existing Cloudflare authentication configuration.')
+    if args.model and args.model.startswith('google/'):
+        from scripts.check_cloud_gateway import check
+        if check(auth)['credits'] != 'positive':
+            parser.error('Positive Unified Billing credit must be verified before this test.')
     folder = ROOT / 'generated/local-app/audit'
     folder.mkdir(exist_ok=True)
     suffix = '-' + args.label if args.label else ''
@@ -185,7 +210,8 @@ def main():
     results = []
     def save(row):
         results.append(row)
-        target.write_text(json.dumps({'pricing_source': PRICING, 'pricing_checked': '2026-09-08',
+        target.write_text(json.dumps({'pricing_source': GOOGLE_PRICING if args.model and args.model.startswith('google/') else PRICING,
+            'pricing_checked': '2026-09-09' if args.model and args.model.startswith('google/') else '2026-09-08',
             'scope': 'Synthetic prompts only; listed variable prices, not an invoice or end-to-end call latency.',
             'runtime_changed': False, 'results': results}, indent=2) + '\n', encoding='utf-8')
         print(json.dumps(row), flush=True)

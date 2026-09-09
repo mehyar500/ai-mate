@@ -25,7 +25,7 @@ The video fills the height when controls fit in the side space. Tall phone views
 | Component | Selection | Where and when |
 |---|---|---|
 | Conversation / bounded plan | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Hosted JSON response; exact simple body commands bypass the network |
-| Speech | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CPU, eight threads; new WAV per reply |
+| Speech | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CUDA on this PC, eight host threads; new WAV per reply. CPU portable default |
 | Recognition | faster-whisper Base English FP16 on this PC | Optional local GPU; eight host threads. CPU int8 is the portable default |
 | Lip movement | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio encoder | Local GPU FP16; batch eight; 20 FPS output |
 | Face tracking | OpenCV YuNet 2023mar | CPU; tracks supplied body footage |
@@ -46,7 +46,7 @@ Open weights do not automatically establish commercial rights. MuseTalk's model 
 ```text
 typed input / opt-in mic -> local ASR if needed
     -> direct supported command OR Cloudflare conversation plan
-    -> calls: short speech phrases; prepare one CPU TTS phrase ahead
+    -> calls: short speech phrases; prepare one TTS phrase ahead
     -> Text: text only; Voice call: new Kokoro speech
     -> Video call:
          base + closer -> reviewed approach -> near
@@ -72,7 +72,7 @@ Successful fresh video captures its final decoded frame as the next reference. U
 
 ### Optional GPU speech — September 9
 
-The same Kokoro-82M float32 weights and `af_sarah` voice have an explicit CUDA option. **CPU remains selected: the first GPU soak failed and the revised memory policy needs sustained qualification.** No new model, API key, driver or live-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.
+The same Kokoro-82M float32 weights and `af_sarah` voice have an explicit CUDA option. **This PC now selects CUDA after the revised memory policy passed the completed soak below.** CPU remains the default elsewhere and the recovery setting. No new model, API key, driver or main-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.
 
 The initial soak stopped after **64 turns / 945.16s of recorded call activity**, with three speech allocation failures, including "Hello." CUDA's 2GiB speech arena could not satisfy a 65.5MiB allocation. Five-second samples reached 13,034.5MiB used with at least 3,345MiB free; they include other processes and are not an exact peak. This does not establish that the card needs replacement. One successful reply also took 6.73s from Send. Failed responses are excluded from latency samples but remain failures. Evidence: `audit/voice-video-soak-gpu-speech-ready/terminated-summary.json`.
 
@@ -80,7 +80,7 @@ The revision applies ONNX Runtime's [GPU arena shrinkage](https://onnxruntime.ai
 
 The revised integrated candidate passed **20/20 commands** in 101.0s. Nine spoken replies reached synchronized playback in **1.905s median / 2.291s p95**; 19 mixed Send measurements were **1.24/1.65s**. No functional/page errors or reported reply stalls occurred. All **971 frames** received limited diagnostics with no flags; **40 wave/near frames** were inspected visually. A/V clock skew was **24.56ms p95 / 31.22ms maximum** across 589 samples. Three SyncNet clips measured **0/40/80ms**, with injected-delay and reversed-audio controls passing. Hand blur, soft facial detail, normal-speed perception and physical audio remain unresolved. The live preview's Test sound button was exercised; user confirmation of speaker output is pending.
 
-Revised evidence: `audit/speech-memory-retained-arena`, `audit/speech-memory-shrinking-arena`, `audit/voice-video-qualification-speech-arena` and `audit/lip-sync-speech-arena`. A fresh 30-minute test uses `audit/voice-video-soak-speech-arena`; inspect its terminal result before selection. Soaks now end normally after three failed turns, preserving playback statistics and explicitly marking incomplete duration. Replay the memory comparison with `.\.venv\Scripts\python.exe scripts/benchmark_speech_memory.py --source gpu-speech-ready --label new-memory --memory-policy shrink`; use `retain` for the control and a fresh lowercase output label.
+Revised evidence: `audit/speech-memory-retained-arena`, `audit/speech-memory-shrinking-arena`, `audit/voice-video-qualification-speech-arena` and `audit/lip-sync-speech-arena`. The completed sustained run is `audit/voice-video-soak-speech-arena`, summarized below. Soaks end normally after three failed turns, preserving playback statistics and explicitly marking incomplete duration. Replay the memory comparison with `.\.venv\Scripts\python.exe scripts/benchmark_speech_memory.py --source gpu-speech-ready --label new-memory --memory-policy shrink`; use `retain` for the control and a fresh lowercase output label.
 
 Twenty fixed-text samples per configuration compared installed CPU ONNX Runtime 1.29.0, isolated CPU 1.26.0 and isolated CUDA 1.26.0. Each used five phrases repeated four times, eight CPU threads, identical speed and the same model/voice hashes. Warm median synthesis times:
 
@@ -110,6 +110,39 @@ node scripts/qualify_video_call.cjs qualification new-gpu-call --capture
 ```
 
 Earlier short-call/media evidence: `audit/voice-video-qualification-gpu-speech`, `audit/voice-video-qualification-gpu-speech-paused` and `audit/lip-sync-gpu-speech`. Its review page verified frame stepping, notes/export, decoded audio and a 390px layout; human-review checkboxes stay unchecked. A separate earlier soak setup started before server readiness and ended with zero commands; it is retained as a setup failure. Neither earlier run establishes sustained GPU-speech acceptance.
+
+### Completed GPU-speech soak and hosted comparison — September 9
+
+The arena-cleanup revision completed **1,800.048s / 120 commands**, with no failed commands, page errors or reported reply-buffer stalls. Across 54 spoken replies, end-of-speech median/p95 was **2.043/2.500s**. Across 114 mixed submissions, Send-to-playback median/p95 was **1.29/1.75s**. Six cycle speech medians were 2.116/2.048/1.977/2.198/1.959/2.086s: no steadily accumulating delay, but the two-second p95 target remains unmet. The previous CPU baseline was 2.114/2.609s; these sequential runs are not a controlled estimate of the speech change alone.
+
+CUDA `mem_get_info` sampled 7,080.5MiB used initially, 7,138.5MiB finally and 7,306.5MiB maximum over 360 samples. Separate `nvidia-smi` snapshots during the run reported 10,529MiB used. Windows accounting differs; neither is an exact peak, per-worker allocation or proof of room for another call. The revised run did not repeat the three allocation failures from the earlier retained-arena soak.
+
+All **120 clips / 5,945 frames** have face-count, luminance and adjacent-change diagnostics with no flags or missing media; all speech waveforms were nonzero and unclipped. Visual inspection covered 120 frames from six first/final-cycle wave, approach and near-view clips. Identity and framing were consistent in those samples; hand blur and soft facial detail persist. A separate expanded review of the short call covered 252 frames across four complete clips. Neither review certifies every frame anatomically or proves normal-speed naturalness.
+
+Browser A/V clock skew was **25.91ms p95 / 55.59ms maximum** across 3,666 samples. Six SyncNet clips, description/unsupported/conversation from cycles one and six, estimated 0/-40/-80ms respectively; shift and reversed-audio controls passed. These are diagnostic estimates at 40ms resolution, not physical speaker or human-perceived alignment. The frame callback counter recorded zero reply long gaps and 72 idle long gaps; it does not reset on every intervening pause/visibility change, so idle gaps cannot be classified as stalls from this aggregate. Sustained perceptual playback and real mobile/audio evidence remain open.
+
+Evidence: `audit/voice-video-soak-speech-arena/{summary,gpu-memory,frame-review,manual-review}.json`, its `review.html`, and `audit/lip-sync-speech-arena-soak/results.json`. Reproduce with the earlier server/driver commands using `--trial soak`, `soak` and a fresh label, followed by `review_call_frames.py --trial soak` and `review_lip_sync.py --source voice-video-soak-LABEL --label NEW --device cuda`.
+
+A bounded, synthetic-only comparison used the existing funded Cloudflare key/email route for [Gemini 3.5 Flash-Lite](https://developers.cloudflare.com/ai/models/google/gemini-3.5-flash-lite/) and Qwen. Eight requests each passed the four fixture checks. Gemini/Qwen median was **0.933/0.577s**, observed maximum **2.624/0.747s**, and nominal usage cost **$0.003970/$0.000630**. Keep Qwen: this small sequential comparison provides no latency advantage for Gemini. It measures complete planner responses, not an entire call or broad conversation quality.
+
+The harness requests [cache bypass](https://developers.cloudflare.com/ai-gateway/features/caching/) and rejects reported cache hits; responses omitted the status header, so the evidence records UNKNOWN. Google lists **$0.30 input / $2.50 output per million tokens**, including thinking output ([pricing](https://ai.google.dev/gemini-api/docs/pricing), checked September 9). The combined nominal test cost was about $0.00460 before credit-purchase fees; this is not an invoice. No private conversation, new key, purchase or runtime switch was involved. Provider terms still apply; this neutral technical comparison establishes no intended-content eligibility.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/benchmark_cloud_comparison.py dialogue --model google/gemini-3.5-flash-lite --repeats 2 --label new-gemini
+.\.venv\Scripts\python.exe scripts/benchmark_cloud_comparison.py dialogue --model '@cf/qwen/qwen3-30b-a3b-fp8' --repeats 2 --label new-qwen-control
+```
+
+Run between call benchmarks. The harness checks positive Unified Billing credit for Google, limits the selected run to eight requests and a $0.10 nominal reservation, refuses an active benchmark, and never retries a failed model. This is a local request bound, not an account-wide billing cap.
+
+### Shorter prepared wave selected — September 9
+
+The previous wave continued for about two seconds after its hand movement finished. An isolated copy of the reviewed `performance-headroom` bundle now retains the first **48 source frames at 24 FPS**, without changing speed. Its entire source and rendered wave were visually reviewed. The gesture still raises the hand, waves and lowers it; head/feet remain visible and moving fingers remain blurred. Background/pose differences at the listening seam persist; this does not certify an invisible transition.
+
+The revised asset passed **20/20 commands** with no functional/page errors or reported reply-buffer stalls. All **20 clips / 829 frames** received limited diagnostics with no flags; all 40 rendered wave frames were viewed. The wave now lasts **2.043s / 40 output frames**, versus 4.093s / 81 frames previously. Spoken median/p95 across nine replies was **2.007/2.555s**, with A/V clock skew **22.21ms p95 / 31.38ms maximum**. This is a shorter gesture, not evidence of faster general dialogue. The long soak above used the previous wave; no 30-minute result is claimed for this final asset set.
+
+Exact source hashes, encode settings and review notes are in `audit/performance-wave-trim/performance-wave.json`; frame evidence is in `audit/frames-performance-wave-wave-trim` and `audit/voice-video-qualification-wave-trim`. The encode command was `ffmpeg -v error -i SOURCE -frames:v 48 -an -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -movflags +faststart TARGET`, inside the isolated candidate. Updated review hashes were checked before the call test. Reproduce with `serve_voice_video_benchmark.py --trial qualification --label NEW --performance-label wave-trim --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda`, then the normal capture driver and frame reviewer.
+
+The idle preview restarted in **29.476s**, selecting CUDA speech and the two-second wave. The five visual sources warmed in 17.169s; saved SQLite conversation remained byte-identical. This PC's private project `.env` now sets `AI_MATE_TTS_DEVICE=cuda`; provider credentials were untouched. Roll back between calls by restoring the two wave files and prior local runtime settings from ignored `.cache/local-poc/rollback-speech-wave-20260909`, then restart. Do not restore, delete or replace the conversation database. CPU remains the portable default in `.env.example`.
 
 ### Isolated WebRTC transport comparison — September 9
 
@@ -643,7 +676,7 @@ Reproduce with `.\.venv\Scripts\python.exe scripts/serve_phrase_benchmark.py --i
 
 SQLite keeps editable notes, up to 50 exchanges (12 shown, four sent as recent context) and up to 12 bounded verbatim fact excerpts. Users can inspect, correct and delete saved information. It knows only what was shared; automatic check-ins, calendar integrations and push notifications are unimplemented. Preserve `generated/local-app/memory.sqlite3` during normal updates.
 
-Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL`, `AI_MATE_ENV_FILE`, `AI_MATE_VISUAL_DECODER` and `AI_MATE_ASR_DEVICE`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
+Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL`, `AI_MATE_ENV_FILE`, `AI_MATE_VISUAL_DECODER`, `AI_MATE_ASR_DEVICE` and `AI_MATE_TTS_DEVICE`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
 
 ## Reproduce or extend
 
@@ -693,7 +726,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: **158 Python and 23 Node tests**, Python compilation and whitespace checks. New recording checks cover float scaling, duration/pitch at seven sample rates, malformed/truncated/stereo audio, silence and duration boundaries; device tests cover explicit selection and CPU recovery. Existing authentication, cancellation, pose, speech and microphone checks remain green. Real devices, independent review and public staging remain separate requirements. No database migration or new data recipient. Roll back recognition to `cpu` and restart; reverting the code also restores the previous decoding path. Preserve memory and reviewed assets.
+The earlier PCM recognition revision passed **158 Python and 23 Node tests**, Python compilation and whitespace checks. Current totals are in REPORT. New recording checks cover float scaling, duration/pitch at seven sample rates, malformed/truncated/stereo audio, silence and duration boundaries; device tests cover explicit selection and CPU recovery. Existing authentication, cancellation, pose, speech and microphone checks remain green. Real devices, independent review and public staging remain separate requirements. No database migration or new data recipient. Roll back recognition to `cpu` and restart; reverting the code also restores the previous decoding path. Preserve memory and reviewed assets.
 
 ## Cost and next decision
 

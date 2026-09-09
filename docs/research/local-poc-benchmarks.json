@@ -18402,5 +18402,492 @@
       "Physical audibility and real mobile testing remain unverified.",
       "No new rental, public deployment, credential or model selection."
     ]
+  },
+  "speech_soak_wave_trim_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "ee639d236648360ad13bdb616eb0436e9cb7535b",
+    "status": "GPU speech selected after completed corrected soak; shorter wave selected after separate short qualification; goal acceptance incomplete.",
+    "sustained_call": {
+      "artifact": "generated/local-app/audit/voice-video-soak-speech-arena",
+      "summary": {
+        "elapsed_s": 1800.048,
+        "turns": 120,
+        "startup_buffer_ms": 350,
+        "stopped_early_for_failures": false,
+        "soak_duration_met": true,
+        "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+        "buffer_override": false,
+        "failures": [],
+        "response_sample_count": 114,
+        "p50_s": 1.29,
+        "p95_s": 1.75,
+        "playback": {
+          "frames": {
+            "video": {
+              "presented": 19,
+              "callbacks": 5674,
+              "longGaps": 0,
+              "last": 1787987.9,
+              "source": "blob:http://127.0.0.1:8766/637cbe9f-79f3-4ee4-b19e-96a32f7760a0",
+              "wasVisible": true
+            },
+            "idle-video": {
+              "presented": 1122,
+              "callbacks": 32077,
+              "longGaps": 72,
+              "last": 1800720.87,
+              "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+              "wasVisible": true
+            }
+          },
+          "callActive": true,
+          "av_clock_skew_ms": {
+            "samples": 3666,
+            "p50": 9.44199999999995,
+            "p95": 25.907000000000014,
+            "max": 55.59400000000014
+          },
+          "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+        },
+        "errors": [],
+        "speech_end_to_playback_s": {
+          "samples": 54,
+          "p50": 2.0429666666712145,
+          "p95": 2.4999333333348623
+        },
+        "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+      },
+      "frame_diagnostics": {
+        "clips": 120,
+        "frames": 5945,
+        "flagged_frames": 0,
+        "min_audio_rms": 0.07175125926733017,
+        "max_audio_peak": 0.719268798828125,
+        "max_clipped_fraction": 0.0,
+        "scope": "Face/luma/change and waveform diagnostics; not anatomical or acoustic certification."
+      },
+      "manual_review": {
+        "scope": "First twenty frames from each of six first/final-cycle clips viewed in ordered sheets. Other frames have automated diagnostics; normal-speed and physical audio review are not complete.",
+        "visually_inspected_frames": 120,
+        "reviewed": [
+          {
+            "id": "7d8a2788e85f4223835621cc33cb3b52",
+            "case": "wave",
+            "cycle": 1,
+            "frames": [
+              0,
+              19
+            ]
+          },
+          {
+            "id": "cf8cb8d1011840e9b3f89f9955fb1d04",
+            "case": "approach",
+            "cycle": 1,
+            "frames": [
+              0,
+              19
+            ]
+          },
+          {
+            "id": "239ad58efbe54c3cbeef0a3af8df53d9",
+            "case": "description",
+            "cycle": 1,
+            "frames": [
+              0,
+              19
+            ]
+          },
+          {
+            "id": "1be2804b362144f7ba19e76a2a427b53",
+            "case": "wave",
+            "cycle": 6,
+            "frames": [
+              0,
+              19
+            ]
+          },
+          {
+            "id": "43dfce0fa4dd4334a0b9cda01ef9b12d",
+            "case": "approach",
+            "cycle": 6,
+            "frames": [
+              0,
+              19
+            ]
+          },
+          {
+            "id": "adf3f94c6550401e87c5a597835fe2f1",
+            "case": "description",
+            "cycle": 6,
+            "frames": [
+              0,
+              19
+            ]
+          }
+        ],
+        "observations": [
+          "First/final-cycle samples retain the same identity, clothing, scene and framing.",
+          "Wave hand remains blurred; approaching posture is coherent at sheet resolution.",
+          "Near-view mouth shapes change but remain soft, including teeth and surrounding skin.",
+          "No claim of anatomically correct fingers, natural gait/blinking or acoustic lip sync follows from these sheets."
+        ]
+      },
+      "cycle_spoken_median_s": [
+        2.115766666660711,
+        2.048266666668118,
+        1.9772333333318821,
+        2.19760000000149,
+        1.9592333333319985,
+        2.0859333333349785
+      ],
+      "cuda_memory": {
+        "api": "torch.cuda.mem_get_info",
+        "samples": 360,
+        "first": {
+          "elapsed_s": 0.0,
+          "used_mib": 7080.5,
+          "free_mib": 9299.0
+        },
+        "last": {
+          "elapsed_s": 1799.11,
+          "used_mib": 7138.5,
+          "free_mib": 9241.0
+        },
+        "max_sampled_used_mib": 7306.5,
+        "separate_nvidia_smi_used_mib": 10529,
+        "scope": "Windows accounting differs. Not exact peak, isolated per-worker memory or demonstrated spare concurrency."
+      },
+      "lip_sync": {
+        "artifact": "generated/local-app/audit/lip-sync-speech-arena-soak/results.json",
+        "scope": "Six clips, 40ms diagnostic resolution; not physical acoustic acceptance.",
+        "clips": [
+          {
+            "case": "description",
+            "cycle": 1,
+            "pose": "near",
+            "baseline": {
+              "audio_delay_ms": 0,
+              "distance": 7.3712687492370605,
+              "zero_lag_distance": 7.3712687492370605,
+              "confidence": 7.6580424308776855,
+              "at_search_boundary": false,
+              "evaluated_windows": 26
+            },
+            "shift_controls_pass": true,
+            "reverse_confidence_lower": true
+          },
+          {
+            "case": "unsupported",
+            "cycle": 1,
+            "pose": "base",
+            "baseline": {
+              "audio_delay_ms": -40,
+              "distance": 8.617088317871094,
+              "zero_lag_distance": 10.857860565185547,
+              "confidence": 6.001777648925781,
+              "at_search_boundary": false,
+              "evaluated_windows": 54
+            },
+            "shift_controls_pass": true,
+            "reverse_confidence_lower": true
+          },
+          {
+            "case": "conversation",
+            "cycle": 1,
+            "pose": "base",
+            "baseline": {
+              "audio_delay_ms": -80,
+              "distance": 10.059358596801758,
+              "zero_lag_distance": 13.521051406860352,
+              "confidence": 5.084223747253418,
+              "at_search_boundary": false,
+              "evaluated_windows": 21
+            },
+            "shift_controls_pass": true,
+            "reverse_confidence_lower": true
+          },
+          {
+            "case": "description",
+            "cycle": 6,
+            "pose": "near",
+            "baseline": {
+              "audio_delay_ms": 0,
+              "distance": 7.287314414978027,
+              "zero_lag_distance": 7.287314414978027,
+              "confidence": 7.70952033996582,
+              "at_search_boundary": false,
+              "evaluated_windows": 26
+            },
+            "shift_controls_pass": true,
+            "reverse_confidence_lower": true
+          },
+          {
+            "case": "unsupported",
+            "cycle": 6,
+            "pose": "base",
+            "baseline": {
+              "audio_delay_ms": -40,
+              "distance": 8.653162956237793,
+              "zero_lag_distance": 10.830921173095703,
+              "confidence": 5.865947723388672,
+              "at_search_boundary": false,
+              "evaluated_windows": 54
+            },
+            "shift_controls_pass": true,
+            "reverse_confidence_lower": true
+          },
+          {
+            "case": "conversation",
+            "cycle": 6,
+            "pose": "base",
+            "baseline": {
+              "audio_delay_ms": -80,
+              "distance": 9.725761413574219,
+              "zero_lag_distance": 13.623282432556152,
+              "confidence": 5.291258811950684,
+              "at_search_boundary": false,
+              "evaluated_windows": 21
+            },
+            "shift_controls_pass": true,
+            "reverse_confidence_lower": true
+          }
+        ]
+      }
+    },
+    "expanded_short_visual_review": {
+      "scope": "All ordered contact sheets for four selected clips visually inspected; no normal-speed playback, physical audio or anatomical certification. Other clips have automated checks only.",
+      "visually_inspected_frames": 252,
+      "reviewed": [
+        {
+          "id": "fdc11e3246024df6b6d9ab244293a35d",
+          "case": "wave",
+          "frames": [
+            0,
+            80
+          ],
+          "count": 81,
+          "observations": "Coherent hand rise and return; head and feet visible. Moving hand detail remains blurred. After the hand lowers around two seconds, the remaining roughly two seconds are nearly still; test trimming that tail."
+        },
+        {
+          "id": "43eb60dabeee48128eebe35e75097847",
+          "case": "approach",
+          "frames": [
+            0,
+            59
+          ],
+          "count": 60,
+          "observations": "Identity, clothing and scene remain coherent across the forward steps. Feet leave the bottom as the view approaches. Possible prolonged eye narrowing needs full-resolution review; not a confirmed blink defect."
+        },
+        {
+          "id": "f9de7ed6d4574af68202d61e438cf621",
+          "case": "description",
+          "frames": [
+            0,
+            50
+          ],
+          "count": 51,
+          "observations": "Near-view identity, clothing, arms and scene remain coherent. Mouth shapes change, but skin and teeth remain soft. Natural lip motion and acoustic alignment need playback and device review."
+        },
+        {
+          "id": "d0e2c05668274e11afe9f0f1f0375294",
+          "case": "return",
+          "frames": [
+            0,
+            59
+          ],
+          "count": 60,
+          "observations": "Near-to-full framing stays coherent; feet reappear and two arms and legs remain visible at sheet resolution. Natural backward gait is not established by these stills."
+        }
+      ],
+      "physical_sound": "User confirmation of the preview test tone remains pending."
+    },
+    "wave_trim": {
+      "source_bundle": "performance-headroom",
+      "candidate_bundle": "performance-wave-trim",
+      "manifest": {
+        "version": 1,
+        "reviewed": true,
+        "model": "LTX-2.3-22B-distilled-FP8",
+        "source_sha256": "90657dd3b60436a6c6cf2b8cd8c8dddde19d2fc8a405de41555f4101c892a2ee",
+        "source": "generated/local-app/audit/performance-headroom/performance-wave.mp4",
+        "operation": "Keep first 48 source frames at original 24 FPS; no speed change. Remove the nearly static final two seconds.",
+        "source_frames_retained": 48,
+        "sha256": {
+          "fullbody.png": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "performance-wave.mp4": "03da31411fc7303cf123375e0c9c27f53dda3f7e23a8a004b7a085d94b079959"
+        },
+        "review_notes": [
+          "All 48 candidate frames viewed in three ordered contact sheets: complete right-hand rise, wave and return. Head and feet remain visible; identity, sweater, jeans and scene consistent. Moving fingers remain blurred.",
+          "Kept the original playback rate. Last 0.3 seconds show the hand returned down. Normal-speed and acoustic acceptance remain separate; this flag permits an isolated call test."
+        ],
+        "review_artifact": "generated/local-app/audit/frames-performance-wave-wave-trim/review.json",
+        "last_frame_vs_original_last_mae": 7.342612266540527
+      },
+      "encode_command": "ffmpeg -v error -i SOURCE -frames:v 48 -an -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -movflags +faststart TARGET",
+      "summary": {
+        "elapsed_s": 95.176,
+        "turns": 20,
+        "startup_buffer_ms": 350,
+        "stopped_early_for_failures": false,
+        "soak_duration_met": null,
+        "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+        "buffer_override": false,
+        "failures": [],
+        "response_sample_count": 19,
+        "p50_s": 1.25,
+        "p95_s": 2.14,
+        "playback": {
+          "frames": {
+            "video": {
+              "presented": 19,
+              "callbacks": 784,
+              "longGaps": 0,
+              "last": 95246.8,
+              "source": "blob:http://127.0.0.1:8766/77734707-db04-4648-b574-8e75eaa66afa",
+              "wasVisible": true
+            },
+            "idle-video": {
+              "presented": 207,
+              "callbacks": 1178,
+              "longGaps": 9,
+              "last": 95863.526,
+              "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+              "wasVisible": true
+            }
+          },
+          "callActive": true,
+          "av_clock_skew_ms": {
+            "samples": 570,
+            "p50": 8.664000000000005,
+            "p95": 22.20999999999995,
+            "max": 31.38400000000008
+          },
+          "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+        },
+        "errors": [],
+        "speech_end_to_playback_s": {
+          "samples": 9,
+          "p50": 2.006633333330352,
+          "p95": 2.5552333333393036
+        },
+        "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+      },
+      "frame_diagnostics": {
+        "clips": 20,
+        "frames": 829,
+        "flagged_frames": 0,
+        "min_audio_rms": 0.07180400937795639,
+        "max_audio_peak": 0.691864013671875,
+        "max_clipped_fraction": 0.0,
+        "scope": "Face/luma/change and waveform diagnostics; not anatomical or acoustic certification."
+      },
+      "manual_review": {
+        "scope": "All 40 frames of the rendered wave clip visually inspected in two ordered sheets; other rendered clips have limited automated diagnostics.",
+        "reviewed": [
+          {
+            "case": "wave",
+            "id": "66ff83b40f5448faa53a21e6ba0933cd",
+            "frames": [
+              0,
+              39
+            ]
+          }
+        ],
+        "observations": "Hand rises, waves and returns down within the two-second clip. Head/feet stay visible. Hand blur persists. Speech waveform is nonzero/unclipped; no physical audibility or normal-speed quality acceptance."
+      },
+      "preview_selection": {
+        "ready": true,
+        "busy": false,
+        "error": null,
+        "visual_error": null,
+        "startup_s": 29.476,
+        "visual_warmup": {
+          "sources": 5,
+          "decoder": "tensorrt",
+          "seconds": 17.169,
+          "torch_allocated_mib": 1833.688
+        },
+        "asr_device": "cuda",
+        "speech_runtime": {
+          "device": "cuda",
+          "runtime": "1.26.0",
+          "providers": [
+            "CUDAExecutionProvider",
+            "CPUExecutionProvider"
+          ],
+          "cpu_threads": 8,
+          "arena_shrink_after_run": true
+        },
+        "memory_unchanged": true
+      },
+      "rollback": "Ignored .cache/local-poc/rollback-speech-wave-20260909 contains the two previous wave files and prior local runtime settings. Restore between calls; preserve memory.",
+      "limitation": "The completed 30-minute soak predates this wave trim; the final asset has 20-command evidence."
+    },
+    "cloud_dialogue_comparison": {
+      "results": [
+        {
+          "model": "google/gemini-3.5-flash-lite",
+          "requests": 8,
+          "checks_passed": true,
+          "median_s": 0.9325,
+          "nearest_rank_p95_s": 2.624,
+          "nominal_usage_usd": 0.0039695,
+          "cache_bypass_requested": true,
+          "reported_cache_status": [
+            "UNKNOWN"
+          ],
+          "pricing_source": "https://ai.google.dev/gemini-api/docs/pricing",
+          "artifact": "generated/local-app/audit/cloud-dialogue-comparison-gemini-lite.json",
+          "sha256": "2119d1ddfe944015a8348f81ac417ba8932125998c113619ccf7aaedb8a0702a"
+        },
+        {
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "requests": 8,
+          "checks_passed": true,
+          "median_s": 0.5765,
+          "nearest_rank_p95_s": 0.747,
+          "nominal_usage_usd": 0.000629834,
+          "cache_bypass_requested": true,
+          "reported_cache_status": [
+            "UNKNOWN"
+          ],
+          "pricing_source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+          "artifact": "generated/local-app/audit/cloud-dialogue-comparison-qwen-gemini-control.json",
+          "sha256": "330fd42d8c7550aa632eba2a6ef5bc12ef4ea5b3d8006f1ce7da575fef7330cc"
+        }
+      ],
+      "selected_model": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "scope": "Sixteen synthetic requests, sequential model runs, no account changes/new credentials. Cache bypass requested; status header absent. Neutral dialogue only; no intended-content eligibility established.",
+      "nominal_total_usd": 0.004599334
+    },
+    "checks": {
+      "python_unittest": 174,
+      "node_tests": 23,
+      "compileall": true,
+      "node_syntax": true,
+      "diff_check": true,
+      "independent_review": false,
+      "staging": false
+    },
+    "remaining": [
+      "Spoken p95 above two seconds",
+      "Physical speaker/microphone and real mobile testing",
+      "Complete normal-speed/perceptual review",
+      "Hand blur, facial softness and natural movement beyond prepared gestures",
+      "Idle frame-gap probe does not reset on every pause; aggregate cannot classify stalls",
+      "Public transport, concurrency and intended-content model/host/payment/age/privacy acceptance"
+    ],
+    "evidence_sha256": {
+      "generated/local-app/audit/voice-video-soak-speech-arena/summary.json": "8bfd6493f86fe391b267d4afaac1054c38d8d5b1494252b0a487ec9b46881edd",
+      "generated/local-app/audit/voice-video-soak-speech-arena/gpu-memory.json": "20dd521246b305af2c4d89f57d7844576ec34d07f577d616e41a70acc2e75186",
+      "generated/local-app/audit/voice-video-soak-speech-arena/frame-review.json": "b94cbc6bd0238047d35e7e66a7a38b72d4d11db57e316ec54141f66ae340d9b3",
+      "generated/local-app/audit/voice-video-soak-speech-arena/manual-review.json": "72ed9708a6d0482634d492e08268f2fa704ffcd73cddbb4bbbdd420ab414a4e3",
+      "generated/local-app/audit/voice-video-soak-speech-arena/review.html": "687424e35fe0d9327d4740c1000fbf7f76a74b7538d8dd89e2a198460272bcc2",
+      "generated/local-app/audit/voice-video-qualification-wave-trim/summary.json": "e0a4ff17e7549d77f117340b743ef6774c49c2c86f9fe1e015f4708c18b71813",
+      "generated/local-app/audit/voice-video-qualification-wave-trim/frame-review.json": "706f6fe06686dbd0638db9170f8c654721d1ddb68c5d6047b02d324008645391",
+      "generated/local-app/audit/voice-video-qualification-wave-trim/manual-review.json": "cdb13df8d47e95790dae93c12437ddc071c679f3f1744140557db72b9ea0d845",
+      "generated/local-app/audit/voice-video-qualification-wave-trim/preview-selection.json": "4a273c9b813711e306a7f71f08c0035abcafe4e9d6d1de2600ab90466b6b2bb4",
+      "generated/local-app/audit/lip-sync-speech-arena-soak/results.json": "1a8e36ffc90df76e5e6ba9771742587cce9c08150c870bc24912cf52135ce836"
+    }
   }
 }
