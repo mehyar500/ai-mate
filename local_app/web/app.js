@@ -368,7 +368,8 @@ async function startCall(mode){
   replyMode=mode;viewMode=mode;controls();
   if(changed){await interrupt();if(request!==callRequest)return;}
   if(mode!=='video')await closeRtc();
-  else if(rtcEnabled&&!rtcPeer){try{await connectRtc();}catch(error){notice(error.message,true);return;}}
+  else if(rtcEnabled&&!rtcPeer){try{await connectRtc();}catch(error){failRtc(error.message);return;}}
+  if(request!==callRequest)return;
   notice();
   try{await microphone.start();}catch(error){notice(error.message,true);}controls();
 }
@@ -378,7 +379,7 @@ for(const mode of ['text','voice','video'])$('mode-'+mode).addEventListener('cli
   if(mode==='text')$('chat').scrollTop=$('chat').scrollHeight;
 });
 $('join-call').addEventListener('click',()=>startCall(viewMode==='voice'?'voice':'video'));
-$('end-call').addEventListener('click',async()=>{await closeRtc();callRequest++;microphone.stop();replyMode='text';viewMode='text';await interrupt();controls();notice('Call ended. Your messages are here.');});
+$('end-call').addEventListener('click',async()=>{callRequest++;microphone.stop();replyMode='text';viewMode='text';controls();try{await closeRtc();await interrupt();notice('Call ended. Your messages are here.');}catch(error){notice(error.message,true);}finally{controls();}});
 $('return-call').addEventListener('click',()=>{if(replyMode!=='text'){viewMode=replyMode;controls();notice();}});
 $("history-toggle").addEventListener("click",()=>{
   historyOpen=!historyOpen;
@@ -416,7 +417,13 @@ $("reset").addEventListener("click",async()=>{
   if(!confirm("Erase this local conversation, saved facts and generated replies? Prepared pictures remain."))return;
   try{callRequest++;microphone.stop();replyMode=viewMode="text";unread=0;resetPlayback();await api("/api/reset",{});active=null;busy=false;lastMedia=null;$("replay").hidden=true;$("chat").replaceChildren();$("memory").value="";renderFacts();$("settings").close();setScene("mira");notice("Conversation and memory cleared.");controls();}catch(error){notice(error.message,true);}
 });
-window.addEventListener("pagehide",()=>{callRequest++;microphone.stop();abortMedia?.abort();});
+window.addEventListener("pagehide",()=>{
+  callRequest++;microphone.stop();abortMedia?.abort();
+  if(rtcPeer){
+    const peer=rtcPeer;rtcPeer=null;peer.close();
+    fetch('/api/rtc/close',{method:'POST',headers:{'Content-Type':'application/json','X-Local-Token':token},body:'{}',keepalive:true}).catch(()=>{});
+  }
+});
 async function boot(){
   for(;;){
     try{
@@ -424,7 +431,7 @@ async function boot(){
         const data=await api("/api/bootstrap");
         const restarted=token&&token!==data.token;token=data.token;rtcEnabled=Boolean(data.rtc_enabled);connected=true;
         if(firstBoot||restarted){renderHistory(data.turns);setScene(data.scene||"mira");firstBoot=false;}
-        if(restarted){idleSuppressed=false;idleFailed=false;resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
+        if(restarted){if(rtcPeer)failRtc('Server restarted. Please call again.');idleSuppressed=false;idleFailed=false;resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
       }
       const state=await api("/api/status");ready=state.ready;hasVideo=state.visual_loaded;provider=state.provider;
       recognitionPauseWarm=state.recognition_pause_warm===true;
@@ -441,6 +448,11 @@ async function boot(){
 }
 boot();
 
+function failRtc(message){
+  callRequest++;microphone.stop();replyMode='text';
+  closeRtc().catch(()=>{});
+  resetPlayback();controls();notice(message||'Call disconnected. Call again when ready.',true);
+}
 async function closeRtc(){
   const peer=rtcPeer;rtcPeer=null;
   if(!peer)return;
@@ -451,6 +463,9 @@ async function connectRtc(){
   const peer=new RTCPeerConnection({iceServers:[]});rtcPeer=peer;
   const stream=new MediaStream(),video=$('video');video.srcObject=stream;video.muted=false;video.hidden=false;
   peer.ontrack=event=>stream.addTrack(event.track);
+  peer.onconnectionstatechange=()=>{
+    if(rtcPeer===peer&&['failed','closed'].includes(peer.connectionState))failRtc();
+  };
   try{
     peer.addTransceiver('video',{direction:'recvonly'});peer.addTransceiver('audio',{direction:'recvonly'});
     await peer.setLocalDescription(await peer.createOffer());

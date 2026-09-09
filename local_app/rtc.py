@@ -284,8 +284,8 @@ class LocalCall:
         self.peer = self.session = None
         if session:
             session.cancel.set()
-            self.engine.cancel()
             if self.engine.frame_output == session.output:
+                self.engine.cancel()
                 self.engine.frame_output = None
         if peer:
             await peer.close()
@@ -294,3 +294,5 @@ class LocalCall:
         self.request('close', {})
         self.loop.call_soon_threadsafe(self.loop.stop)
         self.thread.join(timeout=3)
+        if not self.thread.is_alive():
+            self.loop.close()

@@ -251,3 +251,35 @@ class LocalMDNSTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(ValueError):
                 await resolve_local_offer(packet, {'127.0.0.1'}, resolve)
         resolve.assert_not_awaited()
+
+
+class LocalCallCleanupTests(unittest.TestCase):
+    def test_close_cancels_owned_playback_and_releases_event_loop(self):
+        from scripts.serve_webrtc_benchmark import PlaybackSession
+        from local_app.rtc import LocalCall
+        from unittest.mock import AsyncMock
+        engine = SimpleNamespace(cancel=MagicMock(), frame_output=None)
+        call = LocalCall(engine)
+        session = PlaybackSession(None, [], [], Path('.'))
+        peer = SimpleNamespace(close=AsyncMock())
+        call.session, call.peer = session, peer
+        engine.frame_output = session.output
+        call.shutdown()
+        self.assertTrue(session.cancel.is_set())
+        engine.cancel.assert_called_once()
+        peer.close.assert_awaited_once()
+        self.assertIsNone(engine.frame_output)
+        self.assertIsNone(call.peer)
+        self.assertFalse(call.thread.is_alive())
+        self.assertTrue(call.loop.is_closed())
+
+    def test_close_does_not_detach_replacement_output(self):
+        from scripts.serve_webrtc_benchmark import PlaybackSession
+        from local_app.rtc import LocalCall
+        replacement = object()
+        engine = SimpleNamespace(cancel=MagicMock(), frame_output=replacement)
+        call = LocalCall(engine)
+        call.session = PlaybackSession(None, [], [], Path('.'))
+        call.shutdown()
+        self.assertIs(engine.frame_output, replacement)
+        engine.cancel.assert_not_called()
