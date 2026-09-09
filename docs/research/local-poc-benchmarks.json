@@ -24404,5 +24404,43 @@
     },
     "resume": "Wave failed because motion.generate restricted references to the default media directory. Adapter now accepts the engine-configured media directory and still rejects escapes. Real fresh-motion resume rerun pending.",
     "tests": "235 Python tests passed on rerun after one unrelated HTTP ConnectionAbortedError."
+  },
+  "fresh_motion_resume_20260909": {
+    "cold": {
+      "result": {
+        "motion_s": 10.11,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true
+      },
+      "elapsed_s": 10.111626999991131,
+      "source": "C:\\Users\\mehya\\ai-mate\\generated\\local-app\\audit\\cloud-live-20260909-160254\\engine\\playback-86051a085d0146efb13cd8fc513b4576.png"
+    },
+    "warm": {
+      "result": {
+        "motion_s": 4.517,
+        "motion_frames": 73,
+        "motion_model": "ltxv-2b-0.9.8-distilled-fp8.safetensors",
+        "motion_resolution": "384x576",
+        "action": "wave",
+        "motion_source": "fresh_diffusion",
+        "fresh_body_generation": true
+      },
+      "elapsed_s": 4.518682199995965
+    },
+    "decoded_review": {
+      "decoded_frames": 73,
+      "fps": 24.000000000000007,
+      "container_average_fps": 24.0,
+      "duration_s": 3.0416666666666665,
+      "flagged_frames": [],
+      "max_adjacent_mae": 2.541,
+      "median_adjacent_mae": 0.9105000000000001
+    },
+    "visual_review": "All 73 cold-run frames inspected in ordered sheets. Right arm raises, waves and lowers; broad identity/clothing/background preserved. Hand/fingers soft and somewhat distorted. No anatomy certification. Warm run quality not inspected.",
+    "assessment": "4.518s warm and 10.112s cold before lip rendering/transport is too slow for a 1-2s live action response. No remote GPU or generation API used."
   }
 }
