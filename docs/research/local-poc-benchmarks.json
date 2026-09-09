@@ -24741,5 +24741,12 @@
     "peak_allocated_bytes": 9563426304,
     "review": "12 sampled warm-run frames: severe scene discontinuity, invented chairs, ghosting, orientation jumps. Rejected despite lower compute.",
     "decision": "Do not shorten attention window to16 in live renderer; visual continuity fails. No promoted change or rental."
+  },
+  "longlive_extended_bf16_limit_20260909": {
+    "artifact": "generated/local-app/audit/longlive2-turn-return-eight-bf16/interruption.json",
+    "first_chunk_s": 81.6688662,
+    "gpu_memory_snapshot_mib": 16025,
+    "status": "Agent cancelled after first decoded chunk; no completed output or quality comparison",
+    "decision": "Extended BF16 configuration rejected locally for latency. Memory pressure suspected, not isolated; remote quality/latency remains unmeasured."
   }
 }
