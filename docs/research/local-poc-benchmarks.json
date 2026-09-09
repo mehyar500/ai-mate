@@ -23906,6 +23906,22 @@
       "Separate interactive pipeline exists, but checkpoint compatibility and image conditioning were not validated.",
       "Model card labels Apache-2.0; inspected pipeline has Apache SPDX; repository root has no LICENSE file. Full dependency/model terms remain unverified."
     ],
-    "decision": "Do not replace working renderer or assume 16 FPS on 4060 Ti. Next candidate experiment requires image-conditioning adapter and bounded-cache audit before GPU/quality evaluation."
+    "decision": "Do not replace working renderer or assume 16 FPS on 4060 Ti. Next candidate experiment requires image-conditioning adapter and bounded-cache audit before GPU/quality evaluation.",
+    "published_checkpoint_revision": "5e5e9fce0112e4bec5f5990c0615702509e9e72f",
+    "published_config_context_frames": 6,
+    "published_config_context_kv_gib": 1.60675048828125,
+    "published_config_total_video_kv_gib": 7.230377197265625,
+    "interactive_signature_inputs": [
+      "noise",
+      "text_prompts_list",
+      "switch_frame_indices",
+      "return_latents",
+      "low_memory"
+    ],
+    "checkpoint_download": {
+      "bytes": 5676356678,
+      "sha256": "91ee340300cb7ec6508ca425cae70ab2190d47397650cd3a8cf54ac8483d2b50",
+      "status": "in progress; not yet verified"
+    }
   }
 }
