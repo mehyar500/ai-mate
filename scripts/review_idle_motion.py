@@ -6,6 +6,7 @@ No assets are edited or promoted by this script.
 import argparse
 import json
 from pathlib import Path
+import re
 
 import cv2
 import numpy as np
@@ -17,8 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
+    parser.add_argument('--label', default='', help='Keep reviews of candidates with the same filename separate.')
     args = parser.parse_args()
     source = args.source.resolve()
+    if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}',args.label):
+        parser.error('Use a short lowercase review label.')
     roots = [ROOT/'generated/local-app', ROOT/'.cache/local-poc/ComfyUI/output/motion']
     if source.suffix != '.mp4' or not any(source.is_relative_to(p.resolve()) for p in roots):
         parser.error('Use a local app or benchmark MP4.')
@@ -70,7 +74,8 @@ def main():
         magnitudes.append(np.sqrt((flow**2).sum(axis=2))[mask])
         previous=gray
     values=np.concatenate(magnitudes)*fps
-    out=ROOT/'generated/local-app/audit'/f'{source.stem}-eyes.jpg'
+    suffix='-'+args.label if args.label else ''
+    out=ROOT/'generated/local-app/audit'/f'{source.stem}{suffix}-eyes.jpg'
     sheet.save(out)
     result={'frames':len(frames),'fps':fps,'duration_s':len(frames)/fps,
             'background_mean_px_s':float(np.mean(values)),

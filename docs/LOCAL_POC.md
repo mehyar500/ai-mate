@@ -14,7 +14,7 @@ On this configured PC:
 
 Open **http://127.0.0.1:8765** and wait for model warm-up. Background launch avoids duplicate servers; logs and process information stay in ignored `.cache/local-poc/`. The PC and process must stay running. This is a loopback URL, not a public deployment or Windows startup service.
 
-In Video call, try **“Wave hello.” → “Come closer.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns after intervening conversation. Each pose has a blinking listening loop. A reviewed right-hand wave is now available from the base pose after restarting the app. These prepared movements are disclosed in Memory & settings. A wave from other positions still uses experimental generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
+In Video call, try **“Wave hello.” → “Come closer.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns after intervening conversation. Each pose has a blinking listening loop. The preview was restarted with the replacement approach, close loop and base-pose right-hand wave on September 9 UTC. These prepared movements are disclosed in Memory & settings. A wave from other positions still uses experimental generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
 
 Select Call Mira (phone icon on wider screens), or Voice/Video to start microphone input. Calls have mute/end icons and automatic sound. The keyboard icon opens an optional compact transparent input: Enter sends a command to the current voice/video call, Shift+Enter adds a line, and Escape hides it. Typed commands also work with the microphone muted or denied; sending during a reply stops it before submitting. Text has a separate draft and shows messages without ending an active call; Return to call restores the same media elements. “Send me a message saying hello from our call” delivers a separate in-app message with an unread badge. End call releases capture and stops playback. Memory & settings contains facts, notes, diagnostics, the prepared-footage disclosure and Test sound. Camera access is disabled.
 
@@ -104,7 +104,41 @@ node scripts/qualify_video_call.cjs qualification
 
 Use `soak` in all three commands for six cycles / 120 interactions across 30 minutes. For a repeat, append `--label new-run` to the Python commands and `new-run` after the Node trial argument; labels preserve prior evidence. Drivers alternate fixed synthetic WAV and typed input; recognition, hosted planning, speech synthesis, GPU rendering and browser playback are real. Default injection excludes physical capture and endpoint wait. The `--capture` mode below includes the actual browser recorder and detector. Neither tests physical acoustics or mobile/internet transport. Frame diagnostics create ordered sheets covering every decoded frame, but cannot certify anatomy, identity or perceptual lip synchronization. The live user's database is never copied into these trials.
 
-To prepare another candidate, use `benchmark_ltx23.py --action wave --silent --return-to-reference --frames 97 --seed 83`, then `prepare_performance.py <local-output-path> --action wave --duration 4.05`. Preparation writes an unreviewed manifest: inspect the new source and rendered output before accepting it. These commands use the configured virtual environment. The current candidate is staged in the live asset directory; an already running server must restart to load it after the user's call has ended.
+Prepare new footage in an isolated bundle using `prepare_performance.py <local-output-path> --action wave --duration 4.05 --candidate-label new-wave`. Preparation writes an unreviewed manifest; inspect source and rendered output before accepting it. The seed-83 result above used the original 32-frame decoder window. The revised decoder and replacement footage are described below.
+
+### Removing double images from prepared motion — September 9
+
+A paired experiment decoded the **same sampled latent** with temporal windows of 32 and 128 frames, holding all other decoder inputs fixed. The larger window removed the pronounced double images at the inspected approach frames. It is now the preparation-script default for the measured 97-frame clips. This changes offline source quality; it does not accelerate dialogue or establish arbitrary live movement. ComfyUI documents the [temporal window and compression handling](https://docs.comfy.org/built-in-nodes/VAEDecodeTiled); [issue 11767](https://github.com/Comfy-Org/ComfyUI/issues/11767) reports similar artifacts, but the local paired experiment is the evidence for this change.
+
+| Replacement | Preparation and review |
+|---|---|
+| Approach and return | Seed 70, 97 source frames; select 72 frames / 3 seconds and reverse for return. Paired generation plus both decoders: 83.09s. |
+| Close listening | Seed 94, matching new close reference; 77.87s preparation. Select source seconds 1.75–4.00 and retime to an 89-frame / 3.708s loop with one bilateral blink. |
+| Right-hand wave | Seed 84, 97 frames / 4.042s; 28.65s with warm generation caches. Seed 83 at the new window was rejected because the face tracker missed frame 28. |
+
+All 291 selected source frames and all 89 final listening frames were visually inspected in ordered sheets. Every approach/return/wave transcode frame was compared with its reviewed source. The largest transcode mean absolute pixel difference was 3.11/255; this is a correspondence check, not an anatomy score. Close-loop background flow measured 0.15 pixels/s mean versus 0.46 in the previous loop, with different generated content. Hand blur, soft skin, close-view crown cropping, subtle loop seams and imperfect mouth shapes remain. Normal-speed motion and perceptual lip-sync acceptance remain separate from frame diagnostics.
+
+The paired job fit this 16GB card. Partial device sampling peaked at 15,376MiB used, including the preview and desktop; it is not model-only VRAM or a complete peak trace. Preparation timings have different cache states and must not be ranked as live response speeds. Release idle ComfyUI model caches before measuring calls.
+
+Reproduce the paired comparison and keep new candidates separate from the running app:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action closer --silent --frames 97 --seed 70 --temporal-size 128 --compare-decode --timeout 600
+.\.venv\Scripts\python.exe scripts/review_motion_frames.py <local-source.mp4> --label source-review
+.\.venv\Scripts\python.exe scripts/prepare_performance.py <reviewed-source.mp4> --candidate-label new-bundle
+# Review approach/return and the new performance-near.png before preparing matching idle.
+# prepare_idle_loop.py accepts --performance-label new-bundle; its manifest remains unreviewed.
+# Once all matching manifests are reviewed, qualify the bundle without using private memory:
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-call --performance-label new-bundle
+node scripts/qualify_video_call.cjs qualification new-call --capture
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-call
+```
+
+Use `--temporal-size 32` to reproduce historical preparation. Longer clips or other resolutions need their own memory and visual qualification. Candidate labels never select assets in the live server automatically; promote the matching set only between calls, retain a rollback copy and restart to rebuild appearance caches.
+
+The `qualification temporal128 --capture` run passed all 20 commands without reported reply stalls. Across nine uninterrupted spoken replies, end-of-speech playback was **2.706s median / 3.421s p95**. Across 19 mixed typed/spoken replies, Send-to-playback was 1.81s median / 2.75s p95. Browser A/V clocks differed by 27.355ms p95 / 38.780ms maximum (635 samples). Every one of the 20 clips / **1,014 frames** was retained and decoded, with zero limited heuristic flags and nonzero unclipped audio. Visual review covered all 81 frames of one rendered wave and 60 transition/close-speech frames, confirming removal of the earlier double image in the inspected region. It did not qualify physical audio, perceptual lip sync or all-frame anatomy.
+
+After the test, the idle preview call was ended and eight matching asset files replaced with a rollback copy in ignored `audit/live-before-temporal128/`. The memory database was unchanged during promotion. The restarted server loaded five appearance sources in **18.071s**; the page was refreshed to the full-body Call Mira screen. No public deployment, credential, provider or memory-schema change was made. Roll back by stopping the preview between calls, restoring those eight files, reverting the code if needed and restarting. Never restore or overwrite private memory as part of an asset rollback.
 
 ### Thirty-minute call and smaller planners - September 9
 
@@ -377,7 +411,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 124 Python tests and 17 Node tests. New checks cover retained interruption audio, duplicate onset, short words, stale capture, failed cancellation, cleanup timeout, reported echo-cancellation settings and typed interruption without microphone support. Existing interruption checks cover strict descriptors, authentication/origin, reset races, bounded timestamp decoding, completed-reply stops and partial-movement continuation. Phrase tests retain complete speech, one-ahead synthesis and per-phrase HTTP completion. `review_call_playback.cjs` covers typed commands in both call modes, failed-submit retry with separate draft preservation, hiding/restoring the input, captions and completed unmuted media with synthetic APIs/capture. Five viewports (320x568 to 1280x720) passed input/control bounds, overlap and 44px touch-target checks; actual iPhone keyboard behavior remains unqualified. The phrase and interruption browser scripts exercise real isolated rendering. None starts a physical microphone or reads the live conversation. No memory schema, environment variable or provider configuration changed.
+Checks for this revision: 130 Python tests and 17 Node tests, Python compilation, JavaScript syntax and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Existing layout checks cover five viewports and 44px touch targets; actual iPhone keyboard behavior remains unqualified. Synthetic benchmark servers use disposable memory. No memory schema, environment variable or provider configuration changed.
 
 ## Cost and next decision
 

@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import time
 import urllib.error
@@ -29,7 +30,7 @@ def request(path,body=None):
         raise RuntimeError(error.read().decode('utf-8')[:4000]) from error
 
 
-def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False, silent=False, framing='fullbody', idle_style='original'):
+def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu', action='wave', return_to_reference=False, silent=False, framing='fullbody', idle_style='original', temporal_size=128, compare_decode=False):
     movement={'wave':'She raises her right hand, waves hello once, then lowers it to her side.',
               'closer':'She walks two small steps straight toward the stationary camera, then stops close to it. Her face and upper body become substantially larger. Her lower legs naturally leave the bottom of the frame as she approaches. She finishes in a relaxed waist-up view, facing the camera.',
               'farther':'She walks two small steps backward away from the fixed camera, becoming smaller in the frame.',
@@ -80,7 +81,7 @@ def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu',
         '15':node('ManualSigmas',sigmas='1.0,0.99375,0.9875,0.98125,0.975,0.909375,0.725,0.421875,0.0'),
         '16':node('SamplerCustomAdvanced',noise=['12',0],guider=['13',0],sampler=['14',0],sigmas=['15',0],latent_image=['11',0]),
         '17':node('LTXVSeparateAVLatent',av_latent=['16',1]),
-        '18':node('VAEDecodeTiled',samples=['17',0],vae=['1',2],tile_size=256,overlap=64,temporal_size=32,temporal_overlap=8),
+        '18':node('VAEDecodeTiled',samples=['17',0],vae=['1',2],tile_size=256,overlap=64,temporal_size=temporal_size,temporal_overlap=8),
         '19':node('LTXVAudioVAEDecode',samples=['17',1],audio_vae=['9',0]),
         '20':node('CreateVideo',images=['18',0],fps=24,audio=['19',0]),
         '21':node('SaveVideo',video=['20',0],filename_prefix='motion/ltx23',format='mp4',**{'format.codec':'h264'}),
@@ -92,6 +93,12 @@ def workflow(reference, width=384, height=576, frames=73, seed=50, device='cpu',
         graph['13']['inputs'].update(positive=['22',0],negative=['22',1])
         graph['23']=node('LTXVCropGuides',positive=['22',0],negative=['22',1],latent=['17',0])
         graph['18']['inputs']['samples']=['23',2]
+    if compare_decode:
+        # Decode exactly the same sampled video twice. This isolates temporal
+        # tiling from prompt/seed/model changes when reviewing double images.
+        graph['24']=node('VAEDecodeTiled',**dict(graph['18']['inputs'],temporal_size=32))
+        graph['25']=node('CreateVideo',images=['24',0],fps=24,audio=['19',0])
+        graph['26']=node('SaveVideo',video=['25',0],filename_prefix='motion/ltx23-temporal32',format='mp4',**{'format.codec':'h264'})
     return graph
 
 
@@ -106,6 +113,8 @@ def main():
     parser.add_argument('--reference-path',type=Path,help='Reviewed app-owned PNG; defaults to the full-body reference.')
     parser.add_argument('--framing',choices=['fullbody','close'],default='fullbody')
     parser.add_argument('--idle-style',choices=['original','calm'],default='original')
+    parser.add_argument('--temporal-size',type=int,choices=[32,64,128,256],default=128,help='Video VAE decode window in output frames; 128 avoids internal time seams in the measured 97-frame clips.')
+    parser.add_argument('--compare-decode',action='store_true',help='Also decode the identical latent with the original 32-frame window.')
     parser.add_argument('--timeout',type=int,default=900)
     args=parser.parse_args()
     if any(n<128 or n%32 for n in (args.width,args.height)) or not 9<=args.frames<=241 or args.frames%8!=1:
@@ -115,12 +124,17 @@ def main():
     state=request('/queue')
     if state.get('queue_running') or state.get('queue_pending'):raise SystemExit('Wait for an idle motion engine.')
     original=(args.reference_path or ROOT/'generated/local-app/fullbody.png').resolve()
-    if original.parent != (ROOT/'generated/local-app').resolve() or original.suffix != '.png' or not original.is_file():
+    candidate_reference = (original.parent.parent == (ROOT/'generated/local-app/audit').resolve()
+                           and re.fullmatch(r'performance-[a-z0-9-]{1,32}', original.parent.name)
+                           and original.name == 'performance-near.png')
+    if (original.parent != (ROOT/'generated/local-app').resolve() and not candidate_reference) or original.suffix != '.png' or not original.is_file():
         parser.error('The reference must be an existing reviewed app-owned PNG.')
     tag='ltx23-'+uuid.uuid4().hex
     source=COMFY/'input'/(tag+'.png');shutil.copyfile(original,source)
-    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference,args.silent,args.framing,args.idle_style)
+    graph=workflow(source.name,args.width,args.height,args.frames,args.seed,args.device,args.action,args.return_to_reference,args.silent,args.framing,args.idle_style,args.temporal_size,args.compare_decode)
     graph['21']['inputs']['filename_prefix']='motion/'+tag
+    if args.compare_decode:
+        graph['26']['inputs']['filename_prefix']='motion/'+tag+'-temporal32'
     audit=ROOT/'generated/local-app/audit';audit.mkdir(exist_ok=True)
     evidence={'model':CHECKPOINT,'encoder':ENCODER,'settings':{k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},'source_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),
               'workflow_source':'https://github.com/Comfy-Org/workflow_templates/blob/main/templates/video_ltx2_3_i2v.json',

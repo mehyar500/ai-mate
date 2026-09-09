@@ -11716,5 +11716,324 @@
       "rollback": "Revert the code commit and restart after the call. No memory schema, credential or active provider change.",
       "live_preview": "Existing port 8765 process was preserved; restart between calls to load the ASR thread change."
     }
+  },
+  "temporal_decode_20260909": {
+    "source_commit": "bf66b162171a95dc9b225931f6ceb7139c883f59",
+    "scope": "Neutral local prepared-motion quality improvement; adult-service eligibility and physical audio remain separate. No GPU rental.",
+    "paired_decode": {
+      "evidence": "generated/local-app/audit/ltx23-fa04895a83494dafbba4d07badebeb1f.json",
+      "evidence_sha256": "19ab3fc6f860ca404aad9bd6846a3c14b128823dfbe9bc963297b1f9333f6204",
+      "same_latent_all_other_decoder_inputs_equal": true,
+      "temporal_windows_output_frames": [
+        32,
+        128
+      ],
+      "selected_window": 128,
+      "spatial_tile_size": 256,
+      "spatial_overlap": 64,
+      "temporal_overlap": 8,
+      "frames": 97,
+      "seed": 70,
+      "total_both_decoders_s": 83.092,
+      "comparison_sha256": "04135ccdb76040f7ab1f5ee2e4b14db0c7c2e50ab1c4bf0b068b790360a369a0",
+      "finding": "Pronounced double images in inspected approach frames disappeared with the larger temporal window. Zero automatic flags in either decode did not detect this defect. Longer clips/resolutions remain unqualified."
+    },
+    "device_monitor": {
+      "sha256": "cb27ec5e005e9ea2a51d051e6d6b95d2d67e36adfb7eb30700299987504f0efc",
+      "scope": "Device totals include existing preview/desktop; collection starts after submission, not allocation attributable solely to this job.",
+      "rows": [
+        {
+          "monitor_elapsed_s": 0.062,
+          "device_total_used_mib": 11512.0,
+          "utilization_pct": 0.0,
+          "power_w": 5.85
+        },
+        {
+          "monitor_elapsed_s": 2.156,
+          "device_total_used_mib": 12120.0,
+          "utilization_pct": 100.0,
+          "power_w": 6.56
+        },
+        {
+          "monitor_elapsed_s": 4.218,
+          "device_total_used_mib": 13536.0,
+          "utilization_pct": 65.0,
+          "power_w": 61.24
+        },
+        {
+          "monitor_elapsed_s": 6.281,
+          "device_total_used_mib": 15376.0,
+          "utilization_pct": 60.0,
+          "power_w": 101.63
+        },
+        {
+          "monitor_elapsed_s": 8.343,
+          "device_total_used_mib": 15376.0,
+          "utilization_pct": 58.0,
+          "power_w": 68.37
+        },
+        {
+          "monitor_elapsed_s": 10.375,
+          "device_total_used_mib": 15280.0,
+          "utilization_pct": 100.0,
+          "power_w": 138.08
+        },
+        {
+          "monitor_elapsed_s": 12.406,
+          "device_total_used_mib": 15280.0,
+          "utilization_pct": 100.0,
+          "power_w": 138.31
+        },
+        {
+          "monitor_elapsed_s": 14.453,
+          "device_total_used_mib": 15280.0,
+          "utilization_pct": 100.0,
+          "power_w": 139.11
+        },
+        {
+          "monitor_elapsed_s": 16.5,
+          "device_total_used_mib": 15280.0,
+          "utilization_pct": 100.0,
+          "power_w": 138.48
+        },
+        {
+          "monitor_elapsed_s": 18.547,
+          "device_total_used_mib": 15312.0,
+          "utilization_pct": 100.0,
+          "power_w": 139.1
+        },
+        {
+          "monitor_elapsed_s": 20.578,
+          "device_total_used_mib": 15312.0,
+          "utilization_pct": 96.0,
+          "power_w": 142.86
+        },
+        {
+          "monitor_elapsed_s": 22.609,
+          "device_total_used_mib": 15312.0,
+          "utilization_pct": 100.0,
+          "power_w": 139.79
+        },
+        {
+          "monitor_elapsed_s": 24.672,
+          "device_total_used_mib": 9976.0,
+          "utilization_pct": 2.0,
+          "power_w": 135.43
+        },
+        {
+          "monitor_elapsed_s": 26.703,
+          "device_total_used_mib": 12568.0,
+          "utilization_pct": 100.0,
+          "power_w": 117.56
+        },
+        {
+          "monitor_elapsed_s": 28.75,
+          "device_total_used_mib": 11512.0,
+          "utilization_pct": 0.0,
+          "power_w": 83.6
+        },
+        {
+          "monitor_elapsed_s": 30.797,
+          "device_total_used_mib": 11864.0,
+          "utilization_pct": 88.0,
+          "power_w": 87.45
+        },
+        {
+          "monitor_elapsed_s": 32.875,
+          "device_total_used_mib": 11512.0,
+          "utilization_pct": 68.0,
+          "power_w": 119.69
+        },
+        {
+          "monitor_elapsed_s": 34.922,
+          "device_total_used_mib": 11512.0,
+          "utilization_pct": 0.0,
+          "power_w": 32.55
+        }
+      ]
+    },
+    "selected_assets": {
+      "performance.json": {
+        "version": 1,
+        "reviewed": true,
+        "model": "LTX-2.3-22B-distilled-FP8",
+        "source_sha256": "1cd15ed13dee8600ac9f021161e8d3966d353f15db66b0901d3221fd33130fda",
+        "duration_s": 3.0,
+        "return_method": "reversed_prepared_approach",
+        "sha256": {
+          "fullbody.png": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "performance-near.png": "2975aca1f546182b4b8cfa10f71ebf2d57d361f1f996c08865bbc6cfb47b8b5f",
+          "performance-closer.mp4": "02089eb6ef7769e92a91b74497d2430f1bab6927d60efa557d8c2a16a9995dea",
+          "performance-farther.mp4": "e15d1476ad4228972b2fb82e62923862e850b75631b9ac8977203e7e77d167c0"
+        },
+        "review": "All 97 source frames inspected in order; select the first 72 frames and their reverse for the local demo. Every transcoded frame compared with its source. Larger temporal VAE window removes the observed double images. Crown cropping and some skin/hand softness remain; normal-speed call qualification follows.",
+        "decode_temporal_size": 128
+      },
+      "idle-near.json": {
+        "version": 1,
+        "scene": "fullbody",
+        "pose": "near",
+        "model": "LTX-2.3-22B-distilled-FP8",
+        "source_sha256": "ec3bc62b5d2a746b628ea5b365502c38194ed76278608caaf5135730ff42cdac",
+        "reference_sha256": "2975aca1f546182b4b8cfa10f71ebf2d57d361f1f996c08865bbc6cfb47b8b5f",
+        "sha256": "334dd9e879ebb465daeb66fef89bcac400f5a2e4305b9b556305bb55426859db",
+        "precomputed": true,
+        "audio": false,
+        "reviewed": true,
+        "review": "All 97 source frames and all 89 prepared frames visually inspected. One bilateral blink in a 3.708-second loop; subtle background movement. Selected source interval 1.75–4.00s, retimed with a separately bounded 0.25s blink and half-speed ambient motion. Loop end position is stable by frame measurements; tiny seam/texture changes remain.",
+        "decode_temporal_size": 128
+      },
+      "performance-wave.json": {
+        "version": 1,
+        "reviewed": true,
+        "model": "LTX-2.3-22B-distilled-FP8",
+        "source_sha256": "1a28db8d98eb858f61b41b2b3c8e87182a8959de18ac256fd0be0f8ae988f298",
+        "sha256": {
+          "fullbody.png": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "performance-wave.mp4": "90657dd3b60436a6c6cf2b8cd8c8dddde19d2fc8a405de41555f4101c892a2ee"
+        },
+        "decode_temporal_size": 128,
+        "seed": 84,
+        "review_notes": "All 97 source frames visually reviewed in ordered sheets; single right-hand wave, consistent full-body framing. All 97 transcoded frames compared and face-detected. Moving hand remains blurred; no claim of arbitrary generated actions or photorealism certification."
+      }
+    },
+    "preparation_runs": [
+      {
+        "tag": "ltx23-cc6e68de4e7c47c5af95b11a84075040",
+        "sha256": "396b127076667fb6bfc3dcfd522336c0a67716454194a9aab92bc120cbd22fc2",
+        "total_s": 77.865,
+        "selected": true
+      },
+      {
+        "tag": "ltx23-7c2111e5770f41a2bfdb592c51c51ba4",
+        "sha256": "c4641e5e29f550341e2eccf7f932db4483b78b623e823045ff34ae5ff1c70c07",
+        "total_s": 78.828,
+        "selected": false
+      },
+      {
+        "tag": "ltx23-f5555eb7c7fd4905b0410113061b1c3b",
+        "sha256": "149ab98125e6b56ef39e981c8b87481f47b86fe62e1d93e04256ef3a992bbc4e",
+        "total_s": 28.65,
+        "selected": true
+      }
+    ],
+    "rejected_wave": "Temporal128 seed83 missed face tracking at source and prepared frame28. Manifest remains unreviewed; chose seed84 instead of relaxing tracker checks.",
+    "idle_retime": {
+      "source_interval_s": [
+        1.75,
+        4.0
+      ],
+      "blink_interval_in_trim_s": [
+        0.416667,
+        0.75
+      ],
+      "blink_target_s": 0.25,
+      "ambient_speed": 0.5,
+      "frames": 89,
+      "duration_s": 3.7083333333333335,
+      "new_flow_mean_px_s": 0.1521403,
+      "previous_flow_mean_px_s": 0.464715,
+      "scope": "Different generated content; flow is descriptive, not a perception score. All97 source and89 prepared frames manually inspected. One bilateral blink; slight texture/seam changes remain."
+    },
+    "call_suite": {
+      "directory": "generated/local-app/audit/voice-video-qualification-temporal128",
+      "summary_sha256": "e6d7f4698f2bad8afbff730a6c2b412ae72525bf1b4002360a4cc87fdea475e2",
+      "elapsed_s": 118.129,
+      "turns": 20,
+      "failures": [],
+      "response_sample_count": 19,
+      "p50_s": 1.81,
+      "p95_s": 2.75,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 969,
+            "longGaps": 0,
+            "last": 118216.7,
+            "source": "blob:http://127.0.0.1:8766/37332509-8154-4036-9fd3-a569dfccb9c4",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 245,
+            "callbacks": 1467,
+            "longGaps": 10,
+            "last": 118816.748,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 635,
+          "p50": 10.101999999999943,
+          "p95": 27.355000000000018,
+          "max": 38.78000000000004
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 9,
+        "p50": 2.705733333331842,
+        "p95": 3.420833333333333
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+      "decoded_clips": 20,
+      "decoded_frames": 1014,
+      "heuristic_flag_count": 0,
+      "all_audio_nonzero_unclipped": true,
+      "frame_review_sha256": "c4885b972fcf6d56e1e0113351ff9d7ebe54beb56ae8959f18583a3d09a10a88"
+    },
+    "visual_review": {
+      "source_frames_manually_reviewed": 291,
+      "prepared_idle_frames_manually_reviewed": 89,
+      "prepared_wave_frames_spot_reviewed": 40,
+      "rendered_frames_manually_reviewed": 141,
+      "rendered_scope": "All81 frames of first rendered wave, plus20 frames each of approach end, resumed approach around the prior defect and close-view speech. Remaining rendered frames received limited automated diagnostics; complete count in call_suite.",
+      "remaining": [
+        "Moving hand blur",
+        "Soft skin and imperfect mouth/teeth shapes",
+        "Crown cropped in close view",
+        "Subtle loop seams",
+        "Prepared return reverses the approach; normal-speed naturalness unqualified",
+        "Physical audio, perceptual lip sync and real mobile testing pending"
+      ]
+    },
+    "validation": {
+      "python_tests": 130,
+      "node_tests": 17,
+      "compileall": "passed",
+      "node_check": "passed",
+      "diff_check": "passed",
+      "promotion": {
+        "files": {
+          "performance-near.png": "2975aca1f546182b4b8cfa10f71ebf2d57d361f1f996c08865bbc6cfb47b8b5f",
+          "performance-closer.mp4": "02089eb6ef7769e92a91b74497d2430f1bab6927d60efa557d8c2a16a9995dea",
+          "performance-farther.mp4": "e15d1476ad4228972b2fb82e62923862e850b75631b9ac8977203e7e77d167c0",
+          "performance.json": "58748843d3d9cfce7764966cf333752ecad38dcbae51248cefea52cb1d911520",
+          "performance-wave.mp4": "90657dd3b60436a6c6cf2b8cd8c8dddde19d2fc8a405de41555f4101c892a2ee",
+          "performance-wave.json": "ad05afe7c8d3db91e58e240ad4debe9462aae74198a6d5d02de71a730a405984",
+          "idle-near.mp4": "334dd9e879ebb465daeb66fef89bcac400f5a2e4305b9b556305bb55426859db",
+          "idle-near.json": "71526f52f30207c083813859aa487c1f6873efa396cd2d7ceb00e365765bc53a"
+        },
+        "backup": "generated/local-app/audit/live-before-temporal128",
+        "memory_unchanged": true,
+        "status": "running_verified",
+        "visual_warmup": {
+          "sources": 5,
+          "seconds": 18.071,
+          "torch_allocated_mib": 1830.767
+        },
+        "served_close_loop_matches": true,
+        "preview": "http://127.0.0.1:8765/",
+        "ui": "Refreshed in-app browser; full-body Call Mira screen verified. Call left ended, microphone not collecting."
+      },
+      "public_release": "Independent security/correctness review and staging pending."
+    },
+    "sources": [
+      "https://docs.comfy.org/built-in-nodes/VAEDecodeTiled",
+      "https://github.com/Comfy-Org/ComfyUI/issues/11767"
+    ]
   }
 }

@@ -7,6 +7,8 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
+import shutil
 import subprocess
 
 import cv2
@@ -19,6 +21,7 @@ def main():
     parser.add_argument('source',type=Path)
     parser.add_argument('--duration',type=float,default=3.0)
     parser.add_argument('--action',choices=['approach','wave'],default='approach')
+    parser.add_argument('--candidate-label',help='Prepare a new isolated bundle under audit; preserve active assets.')
     args=parser.parse_args()
     source=args.source.resolve()
     allowed=[ROOT/'.cache/local-poc/ComfyUI/output/motion',ROOT/'generated/local-app/audit']
@@ -26,7 +29,17 @@ def main():
         parser.error('Use a reviewed local benchmark MP4.')
     if not source.is_file() or source.stat().st_size>40_000_000 or not 1<=args.duration<=4.5:
         parser.error('Use a bounded clip and a 1–4.5 second transition.')
-    folder=ROOT/'generated/local-app'
+    active=ROOT/'generated/local-app'
+    folder=active
+    if args.candidate_label:
+        if not re.fullmatch(r'[a-z0-9-]{1,32}',args.candidate_label):
+            parser.error('Use a short lowercase candidate label.')
+        folder=active/'audit'/('performance-'+args.candidate_label)
+        folder.mkdir(exist_ok=False)
+        for name in ['fullbody.png','idle-fullbody.mp4','idle-fullbody.json',
+                     'performance-wave.mp4','performance-wave.json']:
+            if (active/name).is_file():
+                shutil.copyfile(active/name,folder/name)
     if args.action == 'wave':
         target=folder/'performance-wave.mp4'
         subprocess.run(['ffmpeg','-v','error','-y','-i',str(source),'-t',str(args.duration),

@@ -64,6 +64,17 @@ def inspect_video(path):
     return frames, diagnostics, summary
 
 
+def review_sheets(frames, diagnostics, folder, stem):
+    """Every frame appears once, in sequence; review remains a human judgment."""
+    for start in range(0,len(frames),20):
+        sheet=Image.new('RGB',(1024,5*408),'#161616'); draw=ImageDraw.Draw(sheet)
+        for offset,frame in enumerate(frames[start:start+20]):
+            picture=Image.fromarray(cv2.cvtColor(frame,cv2.COLOR_BGR2RGB));picture.thumbnail((256,384))
+            x,y=offset%4*256,offset//4*408
+            sheet.paste(picture,(x,y));draw.text((x+4,y+387),f'{start+offset}: {diagnostics[start+offset]["time_s"]:.2f}s',fill='white')
+        sheet.save(folder/f'{stem}-frames-{start:03}.jpg')
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--trial',choices=['wave','qualification','soak'],required=True)
@@ -90,14 +101,7 @@ def main():
             audio,rate=sf.read(audio_path,dtype='float32')
             summary.update(audio_seconds=len(audio)/rate,audio_rms=float(np.sqrt(np.mean(audio*audio))),
                            audio_peak=float(np.max(np.abs(audio))),audio_clipped_fraction=float(np.mean(np.abs(audio)>=.999)))
-            # Cover the entire sequence in order: every frame appears exactly once.
-            for start in range(0,len(frames),20):
-                sheet=Image.new('RGB',(1024,5*408),'#161616'); draw=ImageDraw.Draw(sheet)
-                for offset,frame in enumerate(frames[start:start+20]):
-                    picture=Image.fromarray(cv2.cvtColor(frame,cv2.COLOR_BGR2RGB));picture.thumbnail((256,384))
-                    x,y=offset%4*256,offset//4*408
-                    sheet.paste(picture,(x,y));draw.text((x+4,y+387),f'{start+offset}: {diagnostics[start+offset]["time_s"]:.2f}s',fill='white')
-                sheet.save(folder/f'{video_path.stem}-frames-{start:03}.jpg')
+            review_sheets(frames, diagnostics, folder, video_path.stem)
             item={'id':job['id'],'action':job['action'],'chunk':chunk['index'],'summary':summary,'frames':diagnostics,
                   'video_sha256':hashlib.sha256(video_path.read_bytes()).hexdigest()}
             reviews.append(item)

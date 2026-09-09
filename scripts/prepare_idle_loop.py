@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +14,10 @@ def main():
     parser.add_argument('source', type=Path)
     parser.add_argument('--pose',choices=['base','near'],default='base')
     parser.add_argument('--candidate',action='store_true',help='Write to audit for review without replacing active footage.')
+    parser.add_argument('--performance-label',help='Use the matching isolated prepared-performance bundle.')
     args = parser.parse_args()
+    if args.candidate and args.performance_label:
+        parser.error('The performance bundle is already isolated; omit --candidate.')
     source = args.source.resolve()
     allowed = [ROOT/'.cache/local-poc/ComfyUI/output/motion', ROOT/'generated/local-app/audit']
     if source.parent not in [p.resolve() for p in allowed] or source.suffix != '.mp4':
@@ -26,6 +30,12 @@ def main():
     if not 2 <= duration <= 8 or (video['width'],video['height']) != (384,576):
         parser.error('The reviewed loop must be 384x576 and 2–8 seconds.')
     folder = ROOT/'generated/local-app'
+    if args.performance_label:
+        if not re.fullmatch(r'[a-z0-9-]{1,32}',args.performance_label):
+            parser.error('Use a short lowercase performance label.')
+        folder=folder/'audit'/('performance-'+args.performance_label)
+        if not folder.is_dir():
+            parser.error('Prepare the candidate performance bundle first.')
     name='fullbody' if args.pose=='base' else 'near'
     reference=folder/('fullbody.png' if args.pose=='base' else 'performance-near.png')
     out = (folder/'audit'/f'idle-{name}-candidate.mp4') if args.candidate else folder/f'idle-{name}.mp4'

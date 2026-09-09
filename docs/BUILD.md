@@ -35,18 +35,20 @@ Pinned requirements and revisions are in config/local-poc-requirements.txt, conf
 
 Five prepared body sources are bounded by frame count/resolution, verified against reviewed manifests and primed before calls. Only source appearance is cached. Image generation and heavy video preparation run separately from calls. Unknown positions retain their captured frame instead of resetting the character.
 
+Preparation now uses a 128-frame temporal VAE window for the measured 97-frame LTX clips. A same-latent comparison isolated the earlier double-image defect to temporal decoding. Isolated candidate bundles require matching review manifests before the call harness will load them. Promote the complete matching set between calls and rebuild appearance caches on restart; preserve memory and a rollback copy. LOCAL_POC records generation commands and remaining visual defects.
+
 These are **neutral-demo selections**. LTX terms exclude the intended explicit service, and FlashHead's incorporated VAE rights remain unresolved. Hosted routes retain provider/model conditions. Commercial scope needs a separately qualified model/asset pipeline. Self-hosting does not remove license restrictions; USA records the evidence.
 
 ## Acceptance and evidence
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Two capture-inclusive suites: end-of-speech p95 3.39s / 3.83s, nine spoken replies each; synthetic MediaStream includes actual recorder/VAD but excludes physical acoustics |
+| Fast voice and visual response | Replacement assets: end-of-speech median 2.71s / p95 3.42s, nine spoken replies; prior runs 3.39s / 3.83s p95. Synthetic MediaStream includes recorder/VAD but excludes physical acoustics |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | 619 browser clock samples: 27.94ms p95 / 31.86ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
+| Synchronization within 100ms | Latest 635 browser clock samples: 27.36ms p95 / 38.78ms maximum; perceptual phoneme alignment and physical audio remain unqualified |
 | Stable 30-minute call | 120 interactions, zero functional failures/reported stalls; complete frame-quality review remains incomplete |
-| Realistic images and motion | Every-frame diagnostics and ordered review sheets; hand blur, face softness and repetition remain |
+| Realistic images and motion | Double-image defect reduced in reviewed sources and transition frames; latest 1,014 frames checked, 141 visually reviewed. Hand blur, mouth artifacts, close framing and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 

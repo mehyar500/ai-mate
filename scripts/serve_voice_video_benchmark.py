@@ -30,18 +30,31 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--trial', choices=['baseline', 'revised', 'selected', 'wave', 'qualification', 'soak'], required=True)
     parser.add_argument('--label', default='')
+    parser.add_argument('--performance-label', default='', help='Use a reviewed isolated candidate asset bundle.')
     args = parser.parse_args()
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
+    if args.performance_label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.performance_label):
+        parser.error('Use a short lowercase performance label.')
+    assets = ROOT/'generated/local-app'
+    if args.performance_label:
+        assets=assets/'audit'/('performance-'+args.performance_label)
+        from local_app.performance import load_reviewed_performance
+        from local_app.idle import load_reviewed_idle
+        performance=load_reviewed_performance(assets)
+        if not performance or not all(load_reviewed_idle(assets,pose) for pose in ['base','near']):
+            parser.error('The candidate needs reviewed, matching performance and listening manifests.')
+        if args.trial in {'wave','qualification','soak'} and ('base','wave') not in performance:
+            parser.error('This trial also needs a reviewed, matching wave.')
     folder = ROOT/'generated/local-app/audit'/('voice-video-'+args.trial+('-'+args.label if args.label else ''))
     folder.mkdir(parents=True, exist_ok=False)
     for name in ['fullbody.png', 'performance-near.png', 'performance-closer.mp4',
                  'performance-farther.mp4', 'performance.json', 'idle-fullbody.mp4',
                  'idle-fullbody.json', 'idle-near.mp4', 'idle-near.json']:
-        shutil.copyfile(ROOT/'generated/local-app'/name, folder/name)
+        shutil.copyfile(assets/name, folder/name)
     if args.trial in {'wave','qualification','soak'}:
         for name in ['performance-wave.mp4','performance-wave.json']:
-            shutil.copyfile(ROOT/'generated/local-app/audit'/name, folder/name)
+            shutil.copyfile((assets if args.performance_label else ROOT/'generated/local-app/audit')/name, folder/name)
     configure_runtime()
     app = CompanionEngine(folder)
     app.scene = 'fullbody'
