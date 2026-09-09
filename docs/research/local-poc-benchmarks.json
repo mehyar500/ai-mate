@@ -24373,5 +24373,11 @@
       "motion_start_s": 0,
       "final_frame_matches_source": true
     }
+  },
+  "main_rtc_recovery_20260909": {
+    "scope": "Isolated main UI at 127.0.0.1:8773, disposable memory, native browser actions and authenticated local state reads",
+    "reload": "Previous run confirmed connected true before reload, false after reload, and successful reconnection.",
+    "server_close": "Connected state verified; invoked close endpoint; browser showed Call disconnected and Call Mira button; new call state verified connected; normal hang-up returned to text.",
+    "limits": "No measured disconnect latency, abrupt network loss, precise presented-frame interruption, or perceptual audio sync verified."
   }
 }
