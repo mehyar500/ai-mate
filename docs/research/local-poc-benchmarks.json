@@ -20671,5 +20671,738 @@
       "new_gpu_decoder_controls": "passed; 13 frames exact against respective ordinary decode",
       "full_motion_acceptance": "not executed"
     }
+  },
+  "fresh_motion_and_pose_control_20260909": {
+    "scope": "Offline non-explicit fresh-motion experiments; original live-call renderer/UI retained.",
+    "risk_class": "R1",
+    "source_commit": "44a24ae9be64465a17dd3275ed261580e088fcdd",
+    "requirements": [
+      "fresh generated body commands",
+      "continuous identity/position",
+      "low-latency graphics within 16GB",
+      "commercially assessable model provenance"
+    ],
+    "all_longlive_weights_verified": true,
+    "longlive_experiments": [
+      {
+        "label": "raise-lower-light-v2",
+        "benchmark": {
+          "complete": false,
+          "settings": {
+            "label": "raise-lower-light-v2",
+            "case": "raise-lower",
+            "blocks": 2,
+            "width": 320,
+            "height": 480,
+            "repeats": 2,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She slowly raises her right hand beside her shoulder, palm facing the camera. Her left arm stays down.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She gently lowers her raised right hand to her side and stands still with both arms down."
+          ],
+          "prompt_cache_hit": false,
+          "prompt_preparation_s": 6.042660899998737,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.8559098999976413,
+          "runs": [],
+          "error_type": "ModuleNotFoundError",
+          "error": "No module named 'triton'"
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-raise-lower-light-v2/benchmark.json",
+          "sha256": "1d2db52818816fa3a56521a601dacf55e925251c50b3f976ba0720b960184595"
+        }
+      },
+      {
+        "label": "raise-lower-portable-bf16",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "raise-lower-portable-bf16",
+            "case": "raise-lower",
+            "blocks": 2,
+            "width": 320,
+            "height": 480,
+            "repeats": 2,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She slowly raises her right hand beside her shoulder, palm facing the camera. Her left arm stays down.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She gently lowers her raised right hand to her side and stands still with both arms down."
+          ],
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0004948999994667247,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.779836300003808,
+          "runs": [
+            {
+              "inference_s": 5.520030600004247,
+              "generated_frames": 61,
+              "generated_fps": 11.050663378560449,
+              "first_decoded_chunk_s": 2.766354199993657,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.766354199993657,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 5.440752800001064,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 13102817280,
+              "peak_reserved_bytes": 14143193088,
+              "file": "run-0.mp4",
+              "sha256": "c5a5fb13f626ae127dd59bb0de01c7dcb0461124ee7b9f919d24cb6210e0912b"
+            },
+            {
+              "inference_s": 5.228629100005492,
+              "generated_frames": 61,
+              "generated_fps": 11.666537984102932,
+              "first_decoded_chunk_s": 2.5281906000018353,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.5281906000018353,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 5.19685940000636,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 13103570944,
+              "peak_reserved_bytes": 14128513024,
+              "file": "run-1.mp4",
+              "sha256": "c5a5fb13f626ae127dd59bb0de01c7dcb0461124ee7b9f919d24cb6210e0912b"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-raise-lower-portable-bf16/benchmark.json",
+          "sha256": "7f2f1ebac5a28edab635486e954d4463ffa1913df15a7ebe811b9be01b539ce5"
+        },
+        "manual_review": {
+          "inspected_frames": 61,
+          "inspected_run": 0,
+          "run_1_identical_sha256": true,
+          "scope": "All decoded frames inspected in four ordered sheets; not normal-speed/audio acceptance",
+          "requested": "right-hand raise then lower with left arm down",
+          "observed": "Both hands rise and then lower; right-only condition fails",
+          "one_full_figure_visible": true,
+          "head_and_feet_visible": true,
+          "defects": [
+            "both hands raised against instruction",
+            "indistinct fingers and fists",
+            "soft face detail",
+            "background changes"
+          ],
+          "action_acceptance": false,
+          "live_app_selected": false
+        }
+      },
+      {
+        "label": "raise-lower-four-blocks",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "raise-lower-four-blocks",
+            "case": "raise-lower",
+            "blocks": 4,
+            "width": 320,
+            "height": 480,
+            "repeats": 1,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She slowly raises her right hand beside her shoulder, palm facing the camera. Her left arm stays down.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She gently lowers her raised right hand to her side and stands still with both arms down."
+          ],
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0007078999915393069,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.8280636000126833,
+          "runs": [
+            {
+              "inference_s": 10.856381400008104,
+              "generated_frames": 125,
+              "generated_fps": 11.513965417602838,
+              "first_decoded_chunk_s": 2.7371931000088807,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.7371931000088807,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 5.413922799998545,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 8.083328699998674,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 10.760055899998406,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 13114642432,
+              "peak_reserved_bytes": 14153678848,
+              "file": "run-0.mp4",
+              "sha256": "3a05113505128954fec14928039bf4911b62ddfe2f259d1dd031e5529e7f0ca5"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-raise-lower-four-blocks/benchmark.json",
+          "sha256": "7230ba5cc39b0c6044ecbabf0877d034e4df83bfebd6bf57cee2d99be56cd5bc"
+        },
+        "manual_review": {
+          "inspected_frames": 125,
+          "review_scope": "ordered decoded-frame contact sheets",
+          "notes": [
+            "Both hands rise despite requested right hand only; left hand does not stay down.",
+            "Abrupt ghosted position/scale changes at frame 61 and 93; background and foot framing also change.",
+            "All 125 frames reviewed in ordered contact sheets; no audio or normal-speed perceptual review."
+          ],
+          "action_acceptance": false,
+          "live_app_selected": false,
+          "audio_included": false
+        }
+      },
+      {
+        "label": "raise-lower-context32",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "raise-lower-context32",
+            "case": "raise-lower",
+            "blocks": 4,
+            "attention_frames": 32,
+            "width": 320,
+            "height": 480,
+            "repeats": 1,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She slowly raises her right hand beside her shoulder, palm facing the camera. Her left arm stays down.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She gently lowers her raised right hand to her side and stands still with both arms down."
+          ],
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0005160000000614673,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.9392382000078214,
+          "runs": [
+            {
+              "inference_s": 11.29318210000929,
+              "generated_frames": 125,
+              "generated_fps": 11.068625201739833,
+              "first_decoded_chunk_s": 2.7933148000010988,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.7933148000010988,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 5.491808599996148,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 8.295247100002598,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 11.194199200006551,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 14888038400,
+              "peak_reserved_bytes": 15854469120,
+              "file": "run-0.mp4",
+              "sha256": "a8c4fee35368d591941696215afbba47f9036e8accc0b74feecf70ac05fd66d9"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-raise-lower-context32/benchmark.json",
+          "sha256": "6be4f055282bfc29cb1b49c9100c386aab045dd9cedfc5bdba721258eaaaa7fd"
+        },
+        "manual_review": {
+          "inspected_frames": 125,
+          "review_scope": "ordered decoded-frame contact sheets",
+          "notes": [
+            "Both hands still rise; lowering ends with right forearm bent near hip rather than both arms resting down.",
+            "The prior abrupt jumps at frames 61 and 93 are absent in this sample; gradual position/background drift remains.",
+            "All 125 frames reviewed in ordered contact sheets; no audio or normal-speed perceptual review."
+          ],
+          "action_acceptance": false,
+          "live_app_selected": false,
+          "audio_included": false
+        }
+      },
+      {
+        "label": "raise-lower-fp8-context32",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "raise-lower-fp8-context32",
+            "case": "raise-lower",
+            "blocks": 4,
+            "attention_frames": 32,
+            "precision": "fp8-selective",
+            "width": 320,
+            "height": 480,
+            "repeats": 2,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She slowly raises her right hand beside her shoulder, palm facing the camera. Her left arm stays down.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. She gently lowers her raised right hand to her side and stands still with both arms down."
+          ],
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0005196999991312623,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.867878600009135,
+          "quantized_linear_count": 270,
+          "quantization_s": 0.4036822999914875,
+          "runs": [
+            {
+              "inference_s": 10.700341300005675,
+              "generated_frames": 125,
+              "generated_fps": 11.681870371736059,
+              "first_decoded_chunk_s": 2.623363700011396,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.623363700011396,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 5.179032700005337,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 7.840663199996925,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 10.605033100000583,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 11316743168,
+              "peak_reserved_bytes": 12274630656,
+              "file": "run-0.mp4",
+              "sha256": "e022b0de921bd4650ac763516191a7a49b8982094bcc748f34e22ac28b6359e7"
+            },
+            {
+              "inference_s": 10.460581999999704,
+              "generated_frames": 125,
+              "generated_fps": 11.949621923522376,
+              "first_decoded_chunk_s": 2.4157641000056174,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.4157641000056174,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 4.973367700004019,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 7.63817220000783,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 10.402401700004702,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 11317873664,
+              "peak_reserved_bytes": 12274630656,
+              "file": "run-1.mp4",
+              "sha256": "e022b0de921bd4650ac763516191a7a49b8982094bcc748f34e22ac28b6359e7"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-raise-lower-fp8-context32/benchmark.json",
+          "sha256": "2da5f88e8004685e2e98eb2e622a6153dc600df15dfb8743dc3d438a9e0493cd"
+        },
+        "manual_review": {
+          "inspected_frames": 125,
+          "review_scope": "all ordered decoded-frame contact sheets from run-0; run-1 byte-identical",
+          "notes": [
+            "Both hands rise and remain near shoulders despite the later lowering prompt.",
+            "Gradual body and background drift; no abrupt jumps seen at the prior frame-61/93 boundaries.",
+            "Face and hands remain soft; no normal-speed, audio or complete-call review."
+          ],
+          "action_acceptance": false,
+          "live_app_selected": false
+        }
+      }
+    ],
+    "precision_probe": {
+      "scope": "three actual trained linears with synthetic activations; no model/video quality acceptance",
+      "rows": [
+        {
+          "layer": "self_attn.q",
+          "scaling": "bf16",
+          "shape": [
+            1200,
+            3072,
+            3072
+          ],
+          "relative_rms_error": 0.0,
+          "complete_ms": 0.5836299998918548,
+          "finite": true
+        },
+        {
+          "layer": "self_attn.q",
+          "scaling": "tensor",
+          "shape": [
+            1200,
+            3072,
+            3072
+          ],
+          "relative_rms_error": 0.037829361855983734,
+          "complete_ms": 0.5282433334893237,
+          "finite": true
+        },
+        {
+          "layer": "self_attn.q",
+          "scaling": "row",
+          "shape": [
+            1200,
+            3072,
+            3072
+          ],
+          "error_type": "RuntimeError",
+          "error": "Rowwise scaling is not currently supported on your device"
+        },
+        {
+          "layer": "ffn.0",
+          "scaling": "bf16",
+          "shape": [
+            1200,
+            3072,
+            14336
+          ],
+          "relative_rms_error": 0.0,
+          "complete_ms": 2.526723333479216,
+          "finite": true
+        },
+        {
+          "layer": "ffn.0",
+          "scaling": "tensor",
+          "shape": [
+            1200,
+            3072,
+            14336
+          ],
+          "relative_rms_error": 0.037807900458574295,
+          "complete_ms": 1.652056666595551,
+          "finite": true
+        },
+        {
+          "layer": "ffn.0",
+          "scaling": "row",
+          "shape": [
+            1200,
+            3072,
+            14336
+          ],
+          "error_type": "RuntimeError",
+          "error": "Rowwise scaling is not currently supported on your device"
+        },
+        {
+          "layer": "ffn.2",
+          "scaling": "bf16",
+          "shape": [
+            1200,
+            14336,
+            3072
+          ],
+          "relative_rms_error": 0.0,
+          "complete_ms": 2.53951333288569,
+          "finite": true
+        },
+        {
+          "layer": "ffn.2",
+          "scaling": "tensor",
+          "shape": [
+            1200,
+            14336,
+            3072
+          ],
+          "relative_rms_error": 0.0377909280359745,
+          "complete_ms": 3.237386666781579,
+          "finite": true
+        },
+        {
+          "layer": "ffn.2",
+          "scaling": "row",
+          "shape": [
+            1200,
+            14336,
+            3072
+          ],
+          "error_type": "RuntimeError",
+          "error": "Rowwise scaling is not currently supported on your device"
+        }
+      ]
+    },
+    "decision": "Retain larger-cache/FP8 experiments for evidence, not live selection. Explicit pose-driven rendering is next; command correctness still fails.",
+    "review_coverage": {
+      "unique_longlive_clips": 4,
+      "unique_frames_visually_inspected": 436,
+      "normal_speed_or_audio_review": false,
+      "generated_call_acceptance": false
+    },
+    "rain": {
+      "code_revision": "21bc4f3d69e2cd41243fe39ea558315eada6694d",
+      "manifest": "config/rain-benchmark.json",
+      "primary_download_bytes": 9915699839,
+      "pose_download_bytes": 351145849,
+      "primary_download_state": "running at checkpoint; inspect current process before retrying",
+      "pose_assets_verified": true,
+      "isolated_model_imports_pass": true,
+      "pose_preparation_trials": [
+        {
+          "artifact": {
+            "path": "generated/local-app/audit/rain-right-arm-controls/benchmark.json",
+            "sha256": "45aecb70aa787babe68ce9daf6c789609e6772feff1add36cfb37910073441b9"
+          },
+          "benchmark": {
+            "complete": false,
+            "settings": {
+              "label": "right-arm-controls",
+              "side": "right",
+              "size": 512,
+              "frames": 64,
+              "seed": 42,
+              "prepare_only": true
+            },
+            "api_cost_usd": 0,
+            "scope": "offline pose-driven renderer experiment; no speech or browser call",
+            "live_app_selected": false,
+            "error_type": "ModuleNotFoundError",
+            "error": "No module named 'matplotlib'"
+          }
+        },
+        {
+          "artifact": {
+            "path": "generated/local-app/audit/rain-right-arm-controls-ready/benchmark.json",
+            "sha256": "af7acad932dd807e92a1684f99670ca94ca3be433b03c49d3abfe3e641e90813"
+          },
+          "benchmark": {
+            "complete": false,
+            "settings": {
+              "label": "right-arm-controls-ready",
+              "side": "right",
+              "size": 512,
+              "frames": 64,
+              "seed": 42,
+              "prepare_only": true
+            },
+            "api_cost_usd": 0,
+            "scope": "offline pose-driven renderer experiment; no speech or browser call",
+            "live_app_selected": false,
+            "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+            "reference_pose_s": 0.7122572999942349,
+            "controls": {
+              "side": "right",
+              "frames": 64,
+              "size": 512,
+              "max_arm_length_deviation": 5.551115123125783e-17,
+              "type": "deterministic joint-angle raise, hold, lower; no language planner",
+              "other_body_points_fixed": true
+            },
+            "controls_prepared": true
+          },
+          "manual_review": {
+            "scope": "reference and saved pose-control images; not generated photorealistic video",
+            "observed": [
+              "Requested arm raised on the correct side; opposite arm remains down.",
+              "Hand follows wrist; returned pose matches the initial resting control."
+            ],
+            "photorealistic_video_tested": false
+          }
+        },
+        {
+          "artifact": {
+            "path": "generated/local-app/audit/rain-left-arm-controls-ready/benchmark.json",
+            "sha256": "fdeb888beb40796611b2b18742a02c1f164c1328d07c05fec5a769df793c9af9"
+          },
+          "benchmark": {
+            "complete": false,
+            "settings": {
+              "label": "left-arm-controls-ready",
+              "side": "right",
+              "size": 512,
+              "frames": 64,
+              "seed": 42,
+              "prepare_only": true
+            },
+            "api_cost_usd": 0,
+            "scope": "offline pose-driven renderer experiment; no speech or browser call",
+            "live_app_selected": false,
+            "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+            "reference_pose_s": 0.3756279000081122,
+            "controls": {
+              "side": "right",
+              "frames": 64,
+              "size": 512,
+              "max_arm_length_deviation": 5.551115123125783e-17,
+              "type": "deterministic joint-angle raise, hold, lower; no language planner",
+              "other_body_points_fixed": true
+            },
+            "controls_prepared": true
+          },
+          "manual_review": {
+            "excluded_from_left_control_evidence": true,
+            "reason": "Experiment label says left but command omitted --side left; settings correctly record right. Retained as redundant right-control preparation."
+          }
+        },
+        {
+          "artifact": {
+            "path": "generated/local-app/audit/rain-left-arm-controls-explicit/benchmark.json",
+            "sha256": "d2b8f3e88998c8d0dfa7e9e1584b3fb7f41f267eb93ccca562513c729ed68aab"
+          },
+          "benchmark": {
+            "complete": false,
+            "settings": {
+              "label": "left-arm-controls-explicit",
+              "side": "left",
+              "size": 512,
+              "frames": 64,
+              "seed": 42,
+              "prepare_only": true
+            },
+            "api_cost_usd": 0,
+            "scope": "offline pose-driven renderer experiment; no speech or browser call",
+            "live_app_selected": false,
+            "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+            "reference_pose_s": 0.3526572999980999,
+            "controls": {
+              "side": "left",
+              "frames": 64,
+              "size": 512,
+              "max_arm_length_deviation": 5.551115123125783e-17,
+              "type": "deterministic joint-angle raise, hold, lower; no language planner",
+              "other_body_points_fixed": true
+            },
+            "controls_prepared": true
+          },
+          "manual_review": {
+            "scope": "reference and saved pose-control images; not generated photorealistic video",
+            "observed": [
+              "Requested arm raised on the correct side; opposite arm remains down.",
+              "Hand follows wrist; returned pose matches the initial resting control."
+            ],
+            "photorealistic_video_tested": false
+          }
+        }
+      ],
+      "renderer_inference_executed": false
+    },
+    "research_screen": [
+      {
+        "source": "https://github.com/liveanimate/LiveAnimate",
+        "finding": "Code marked coming soon; no locally runnable released inference found."
+      },
+      {
+        "source": "https://github.com/alex4727/MotionStream",
+        "finding": "README says code is under internal release review without firm release timeline."
+      },
+      {
+        "source": "https://github.com/fudan-generative-vision/Hallo-Live",
+        "finding": "Reported 20.38 FPS and 0.94s on two H200 GPUs; not a local 16GB benchmark."
+      },
+      {
+        "source": "https://github.com/nv-tlabs/ardy",
+        "finding": "Released streaming text/spatial motion controls; gated Llama-based text encoder; separate photorealistic renderer needed."
+      },
+      {
+        "source": "https://github.com/MatrixTeam-AI/RAIN",
+        "finding": "Released pose-driven code; model card identifies Apache-2.0. Isolated imports pass; released full-body photorealistic ability unproven."
+      }
+    ],
+    "validation": {
+      "python_tests_passed": 195,
+      "javascript_tests_passed": 32,
+      "python_compile": true,
+      "javascript_syntax": true,
+      "private_memory_unchanged": true,
+      "preview_ready": true,
+      "api_cost_usd": 0,
+      "electricity_cost_measured": false
+    },
+    "migration_rollback": "No live configuration or memory migration. Revert the experiment commit to remove harness changes; downloaded caches remain ignored.",
+    "independent_review": "Pending; no public-release or perceptual acceptance claimed.",
+    "next_experiment": "After checking the active download and verifying all assets, benchmark RAIN with actual synthetic arm poses; inspect output before attempting streaming/speech integration."
   }
 }

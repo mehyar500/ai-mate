@@ -105,9 +105,13 @@ def install_streaming_vae(model):
 
 def run(args, record, output):
     # Isolated optional dependencies; do not alter application packages.
-    sys.path[:0] = [str(ROOT / '.cache/longlive2-deps'), str(CODE)]
+    sys.path[:0] = [str(ROOT / '.cache/longlive2-deps'), str(CODE), str(ROOT)]
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['TRANSFORMERS_OFFLINE'] = '1'
+    # Explicit portable baseline; upstream enables optional Triton kernels by default.
+    os.environ['LLV2_TRITON_ADALN'] = '0'
+    os.environ['LLV2_TRITON_ROPE'] = '0'
+    record['triton_kernels'] = False
     import numpy as np
     import torch
     from PIL import Image
@@ -180,7 +184,7 @@ def run(args, record, output):
             torch.nn.Module.__init__(self)
             config = json.loads((base / 'config.json').read_text(encoding='utf-8'))
             with torch.device('meta'):
-                self.model = CausalWanModel.from_config(config, local_attn_size=16, sink_size=8,
+                self.model = CausalWanModel.from_config(config, local_attn_size=args.attention_frames, sink_size=8,
                                                        num_frame_per_block=8)
             # Upstream deliberately leaves rotary frequencies unregistered, so
             # load_state_dict(assign=True) cannot materialize this meta tensor.
@@ -225,8 +229,19 @@ def run(args, record, output):
     generator = LoadedGenerator()
     record['generator_load_s'] = time.perf_counter() - began
     print(json.dumps({'generator_loaded_s': record['generator_load_s']}), flush=True)
+    if args.precision == 'fp8-selective':
+        from scripts.longlive2_fp8 import quantize_blocks
+        began = time.perf_counter()
+        record['quantized_linear_count'] = quantize_blocks(generator.model, skip_ffn_output=True)
+        torch.cuda.synchronize()
+        record['quantization_s'] = time.perf_counter() - began
+        gc.collect()
+        torch.cuda.empty_cache()
+        print(json.dumps({'quantized_linear_count': record['quantized_linear_count'],
+                          'quantization_s': record['quantization_s']}), flush=True)
     config = normalize_config(OmegaConf.create({
-        'model_kwargs': {'model_name': 'Wan2.2-TI2V-5B', 'timestep_shift': 5., 'num_frame_per_block': 8, 'local_attn_size': 16},
+        'model_kwargs': {'model_name': 'Wan2.2-TI2V-5B', 'timestep_shift': 5., 'num_frame_per_block': 8,
+                         'local_attn_size': args.attention_frames},
         'data': {'image_or_video_shape': [1, args.blocks * 8, 48, args.height // 16, args.width // 16]},
         'inference': {'sampling_steps': 4, 'independent_first_frame': True, 'sink_size': 8, 'guidance_scale': 1.,
                       'multi_shot_sink': False, 'streaming_vae': True, 'async_vae': False},
@@ -281,6 +296,8 @@ def main():
     parser.add_argument('--label', required=True)
     parser.add_argument('--case', choices=['raise-lower', 'turn-return'], default='raise-lower')
     parser.add_argument('--blocks', type=int, choices=[2, 4], default=2)
+    parser.add_argument('--attention-frames', type=int, choices=[16, 32], default=16)
+    parser.add_argument('--precision', choices=['bf16', 'fp8-selective'], default='bf16')
     parser.add_argument('--width', type=int, choices=[256, 320, 384], default=320)
     parser.add_argument('--height', type=int, choices=[384, 480, 576], default=480)
     parser.add_argument('--repeats', type=int, choices=[1, 2], default=2)

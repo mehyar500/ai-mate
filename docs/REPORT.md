@@ -30,7 +30,9 @@ A new pinned, offline body diagnostic evaluated all 5,716 sustained-call frames 
 
 ## What is still missing
 
-The next architecture experiment is LongLive 2.0 5B with a lighter MG-LightVAE v2 decoder. On this PC, the original decoder measured about 8.4 FPS at 320x480; the lighter one measured about 63 FPS at that size and 42 FPS at 384x576. These are synthetic decoder-only tests, with visible smoothing in inspected reconstructions. Fresh motion generation, input-command response and speech integration are not yet demonstrated. The main weights are downloading; the live app remains on its previous renderer. LOCAL_POC records the reproducible experiment and license distinctions.
+LongLive 2.0 5B now generates fresh full-body motion locally with MG-LightVAE v2. At 320x480, the warm two-block test generated 61 frames in 5.23s (11.67 FPS), with the first decoded chunk at 2.53s. It raised both hands instead of only the requested right hand. A longer 125-frame test exposed abrupt jumps when the attention cache rolled. Increasing its history from 16 to 32 latent frames removed those two jumps in the inspected sample, but generation stayed around 11 FPS and peak tensor allocation reached 14.89GB. This is an offline renderer test, with no speech or live command timing.
+
+Selective FP8 reduced that allocation to 11.32GB and generated 11.68–11.95 FPS; the first chunk arrived in 2.42–2.62s. However, the character then failed to lower either hand. Neither variant is selected in the app. All 125 frames of each longer configuration were inspected; these samples do not establish long-call continuity or arbitrary motion. The next candidate is pose-driven RAIN: isolated imports work and pinned weights are downloading. Its released full-body photorealistic behavior is unproven. LOCAL_POC records the comparisons and exact limitations.
 
 - Warm end-of-speech p95 <=2 seconds, including endpoint detection and actual capture.
 - Reliable fresh movement outside the small supported action set.
