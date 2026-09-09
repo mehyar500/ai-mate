@@ -9,17 +9,17 @@ export class CallInput {
     if(this.pending&&this.pending.stamp!==this.state().stamp)this.reset();
     return Boolean(this.pending?.receiving);
   }
-  speech(){
+  speech(force=false){
     const state=this.state();
-    if(this.pending||!state.canInterrupt)return;
+    if(this.pending||(!force&&!state.canInterrupt))return;
     const pending={stamp:state.stamp,receiving:true,failed:false};this.pending=pending;
     // stop() pauses playback synchronously, then preserves the displayed pose.
     pending.stopped=Promise.resolve(this.stop()).then(ok=>{if(ok===false)pending.failed=true;}).catch(()=>{pending.failed=true;});
   }
-  async turn(raw){
+  async turn(raw,{interrupt=false}={}){
     // A short word can pass utterance validation without reaching early onset.
     // It still needs to stop playback before submitting, rather than be dropped.
-    if(!this.pending&&this.state().canInterrupt)this.speech();
+    if(!this.pending&&(interrupt||this.state().canInterrupt))this.speech(interrupt);
     const pending=this.pending;
     if(!pending)return this.submit(raw);
     if(!pending.receiving)return; // Never queue a second utterance behind cleanup.

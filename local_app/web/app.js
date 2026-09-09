@@ -8,6 +8,7 @@ let replyMode="text",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia
 let idleURL=null,idleFailed=false,idleSuppressed=false;
 let nextIdleURL=undefined,pictureStarted=false,motionRequested=false;
 let stopping=false,displayedPlayback=null,frameCallback=null;
+let callInputOpen=false;
 function settleIdle(){
   if(nextIdleURL!==undefined){idleURL=nextIdleURL;nextIdleURL=undefined;idleSuppressed=!idleURL;}
   pictureStarted=false;
@@ -35,9 +36,10 @@ const callInput=new CallInput({
   state:()=>({stamp:callRequest+':'+microphone.generation+':'+replyMode,
     canInterrupt:ready&&microphone.enabled&&microphone.echoCancellation&&playing&&!stopping,
     busy:busy||stopping||submitting}),
-  stop:()=>interrupt(),submit:raw=>submit('',raw,replyMode),onError:error=>notice(error.message,true)
+  stop:()=>interrupt(),submit:input=>submit(input.text||'',input.raw||null,input.mode,input.draftId),
+  onError:error=>notice(error.message,true)
 });
-const microphone=new Microphone({onTurn:raw=>callInput.turn(raw),onSpeech:()=>callInput.speech(),
+const microphone=new Microphone({onTurn:raw=>callInput.turn({raw,mode:replyMode}),onSpeech:()=>callInput.speech(),
   canListen:()=>ready&&replyMode!=='text'&&(callInput.capturing()||
     (!stopping&&!submitting&&((playing&&microphone.echoCancellation)||(!busy&&!playing&&performance.now()>listenAfter)))),
   onState:state=>{if(state==='off')callInput.reset();if(micState!==state){micState=state;controls();}}});
@@ -67,6 +69,11 @@ function controls(){
   $('join-call').querySelector('span').textContent=joinLabel;
   $('join-call').setAttribute('aria-label',joinLabel);$('join-call').title=joinLabel;
   $('composer').hidden=viewMode!=='text';
+  const showCallInput=viewMode!=='text'&&replyMode!=='text';
+  $('call-type').hidden=!showCallInput;
+  $('call-type').setAttribute('aria-expanded',String(showCallInput&&callInputOpen));
+  $('call-composer').hidden=!showCallInput||!callInputOpen;
+  $('call-send').disabled=!ready||!showCallInput||stopping||submitting||Boolean(callInput.pending)||!$('call-message').value.trim();
   $('voice-view').hidden=viewMode!=='voice';$('voice-caption').textContent=$('call-state').textContent;
   $('active-call').hidden=viewMode!=='text'||replyMode==='text';
   $('active-call-title').textContent=(replyMode==='video'?'Video':'Voice')+' call active';
@@ -270,12 +277,12 @@ async function follow(key,node){
   }catch(error){notice(error.message,true);}
   finally{if(active===key){active=null;busy=false;controls();}}
 }
-async function submit(text,raw=null,inputMode=null){
+async function submit(text,raw=null,inputMode=null,draftId='message'){
   if(busy||stopping||!ready||(!raw&&!text.trim()))return;
   resetPlayback(true);lastStart=performance.now();firstPlayed=null;stalls=0;waitingSince=null;waitingSeconds=0;lastServerSeconds=null;updateMetrics();
   pendingStop=false;submitting=true;busy=true;controls();
   const node=bubble(raw?"Listening…":text,"user");
-  if(!raw)$("message").value="";
+  if(!raw)$(draftId).value="";
   notice(raw?"Listening to your message…":"Mira is thinking…");
   try{
     let data;
@@ -286,10 +293,34 @@ async function submit(text,raw=null,inputMode=null){
     }else data=await api("/api/turn",{text,mode,scene:"auto"});
     submitting=false;active=data.id;if(pendingStop)await api("/api/cancel",{id:data.id});
     await follow(data.id,node);
-  }catch(error){submitting=false;busy=false;controls();notice(error.message,true);if(!raw)$("message").value=text;}
+  }catch(error){submitting=false;busy=false;if(!raw&&!$(draftId).value)$(draftId).value=text;controls();notice(error.message,true);}
 }
 $("composer").addEventListener("submit",e=>{e.preventDefault();submit($("message").value);});
 $("message").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();submit($("message").value);}});
+function callKeyboard(){
+  const viewport=window.visualViewport;
+  const offset=viewport&&document.activeElement===$('call-message')?Math.max(0,innerHeight-viewport.height-viewport.offsetTop):0;
+  document.querySelector('.conversation').style.setProperty('--keyboard-offset',offset+'px');
+}
+window.visualViewport?.addEventListener('resize',callKeyboard);
+window.visualViewport?.addEventListener('scroll',callKeyboard);
+for(const event of ['focus','blur'])$('call-message').addEventListener(event,callKeyboard);
+$('call-type').addEventListener('click',()=>{
+  callInputOpen=!callInputOpen;controls();
+  if(callInputOpen)$('call-message').focus();else $('call-message').blur();
+});
+function sendCallText(){
+  const text=$('call-message').value.trim();
+  if(!text||$('call-send').disabled)return;
+  callInput.turn({text,mode:replyMode,draftId:'call-message'},{interrupt:busy||playing});
+  controls();
+}
+$('call-message').addEventListener('input',controls);
+$('call-composer').addEventListener('submit',e=>{e.preventDefault();sendCallText();});
+$('call-message').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){callInputOpen=false;controls();$('call-type').focus();}
+  else if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();sendCallText();}
+});
 async function interrupt(){
   if(stopping)return;
   pendingStop=true;
@@ -322,7 +353,7 @@ $('mic').addEventListener('click',async()=>{
 async function startCall(mode){
   if(!ready)return;
   const request=++callRequest,changed=replyMode!==mode;
-  if(changed)microphone.stop();
+  if(changed){microphone.stop();callInputOpen=false;}
   replyMode=mode;viewMode=mode;controls();
   if(changed){await interrupt();if(request!==callRequest)return;}
   notice();

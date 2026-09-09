@@ -10195,5 +10195,79 @@
       "Short-word fallback and notice priority were added after this GPU trial and covered by unit/synthetic UI checks.",
       "Independent security/correctness review, staging and public release remain pending."
     ]
+  },
+  "optional_call_input": {
+    "source_commit": "2712413",
+    "scope": "Compact typed commands during an ongoing voice/video call. Synthetic APIs and microphone; actual Chromium media playback and layout.",
+    "browser_results": [
+      {
+        "mode": "video",
+        "captures": 1,
+        "typed_submissions": 2,
+        "typed_call_routing": "passed",
+        "retry_draft_preservation": "passed",
+        "optional_input_navigation": "passed",
+        "caption_navigation": "passed",
+        "unmuted_audio_completion": "passed",
+        "end_call": "passed",
+        "limitations": "Synthetic capture/API, real Chromium media playback; not physical speaker or real backend latency."
+      },
+      {
+        "mode": "voice",
+        "captures": 1,
+        "typed_submissions": 2,
+        "typed_call_routing": "passed",
+        "retry_draft_preservation": "passed",
+        "optional_input_navigation": "passed",
+        "caption_navigation": "passed",
+        "unmuted_audio_completion": "passed",
+        "end_call": "passed",
+        "limitations": "Synthetic capture/API, real Chromium media playback; not physical speaker or real backend latency."
+      }
+    ],
+    "layouts": [
+      {
+        "width": 320,
+        "height": 568,
+        "overflow": false,
+        "input_controls_overlap": false
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "overflow": false,
+        "input_controls_overlap": false
+      },
+      {
+        "width": 716,
+        "height": 854,
+        "overflow": false,
+        "input_controls_overlap": false
+      },
+      {
+        "width": 812,
+        "height": 375,
+        "overflow": false,
+        "input_controls_overlap": false
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "overflow": false,
+        "input_controls_overlap": false
+      }
+    ],
+    "checks": {
+      "node": 17,
+      "browser": "passed",
+      "javascript_syntax": "passed"
+    },
+    "cloud_requests": 0,
+    "model_changes": false,
+    "new_environment_variables": [],
+    "limitations": [
+      "No real iPhone keyboard, acoustic device test, backend latency or public deployment evidence.",
+      "Prepared body-action and visual-quality limits remain."
+    ]
   }
 }

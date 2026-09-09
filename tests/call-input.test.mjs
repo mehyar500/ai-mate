@@ -46,3 +46,9 @@ test('short completed words can interrupt without an earlier onset callback',asy
   await rig.input.turn(new Uint8Array([1]));
   assert.equal(rig.stopCount,1);assert.equal(rig.sent.length,1);assert.equal(rig.input.pending,null);
 });
+test('an explicit typed command interrupts without microphone echo cancellation',async()=>{
+  const rig=setup();rig.state.canInterrupt=false;rig.state.busy=false;
+  const command={text:'Please step back.',mode:'video'};
+  await rig.input.turn(command,{interrupt:true});
+  assert.equal(rig.stopCount,1);assert.deepEqual(rig.sent,[command]);
+});

@@ -29,7 +29,7 @@ h1 span{display:inline-block;font-size:9px;letter-spacing:.4px;border:1px solid 
 .mode-tabs button[data-active="true"][aria-pressed="false"]:after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#bee39e;margin-left:5px;vertical-align:middle}
 #unread{display:inline-grid;place-items:center;min-width:16px;height:16px;border-radius:10px;background:#cfddbb;color:#183328;margin-left:3px;font-size:10px}
 .conversation-bottom{margin-top:auto;min-height:0;padding:8px 20px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;z-index:3}
-.conversation:not([data-mode="text"]) .conversation-bottom{position:absolute;bottom:0;left:0;right:0;align-items:center;pointer-events:none}
+.conversation:not([data-mode="text"]) .conversation-bottom{position:absolute;bottom:var(--keyboard-offset,0px);left:0;right:0;align-items:center;pointer-events:none}
 .conversation:not([data-mode="text"]) .conversation-bottom>*{pointer-events:auto}
 .conversation:not([data-mode="text"]) #composer,.conversation:not([data-mode="text"]) #chat{display:none}
 .call-controls,.call-actions{display:flex;align-items:center;justify-content:center;gap:16px}
@@ -62,6 +62,13 @@ h1 span{display:inline-block;font-size:9px;letter-spacing:.4px;border:1px solid 
 #composer{display:flex;align-items:center;gap:6px;padding:7px;border:1px solid #ffffff54;background:#182e26db;border-radius:25px}
 #message{resize:none;flex:1;min-width:0;max-height:100px;min-height:40px;padding:10px 12px;border:0;background:transparent;color:#fff;line-height:1.45;font-size:15px}
 #message::placeholder{color:#d3dcd5}
+#call-composer{display:flex;align-items:center;gap:4px;width:min(420px,100%);padding:5px;border:1px solid #ffffff54;background:#182e268c;backdrop-filter:blur(20px);border-radius:28px}
+#call-composer:focus-within{outline:2px solid #a9d5ab;outline-offset:3px}
+#call-message:focus-visible{outline:none}
+#call-message{resize:none;flex:1;min-width:0;min-height:44px;max-height:78px;padding:11px 12px;border:0;background:transparent;color:#fff;line-height:1.4;font-size:16px}
+#call-message::placeholder{color:#e0e7e1}
+#call-send{width:44px;height:44px;min-width:44px}
+#call-type[aria-expanded="true"]{background:#e7edde;color:#203328}
 .disclosure{text-align:center;font-size:10px;color:#afc0b5;margin:0}
 .conversation[data-mode="voice"] .visual{visibility:hidden}
 #voice-view{position:absolute;inset:80px 0 100px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
@@ -94,11 +101,12 @@ details{margin:24px 0 0;font-size:13px}summary{cursor:pointer}
 }
 @media(min-aspect-ratio:4/5){
   .conversation[data-mode="video"] .visual{inset:0}
-  .conversation[data-mode="video"] .call-controls{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom))}
+  .conversation[data-mode="video"] .call-controls{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(max(20px,env(safe-area-inset-bottom)) + var(--keyboard-offset,0px))}
   .conversation[data-mode="video"] .call-actions{flex-direction:column;gap:12px}
   .conversation[data-mode="video"] .join-call{width:48px;min-width:48px;padding:0}
   .conversation[data-mode="video"] .join-call span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   .conversation[data-mode="video"] #notice{max-width:calc(100% - 144px)}
+  .conversation[data-mode="video"] #call-composer{max-width:calc(100% - 100px)}
 }
 @media(min-aspect-ratio:4/3){.conversation[data-mode="video"] .mode-tabs{left:22px;top:74px;transform:none}}
 @media(prefers-reduced-motion:reduce){#chat{scroll-behavior:auto}}
