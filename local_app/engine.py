@@ -441,7 +441,7 @@ class CompanionEngine:
                                     performance_candidate = None
                                     cursor_candidate = None
                                     motion_metrics = generate(scene, plan["action"], audio_duration, event, motion_path,
-                                                              reference_path=pose_reference)
+                                                              reference_path=pose_reference, media_directory=self.directory)
                                 if plan['action'] == 'closer' and not prepared_transition:
                                     return_candidate = self.directory / (filename+'-return.mp4')
                                     shutil.copyfile(motion_path, return_candidate)

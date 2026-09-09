@@ -144,7 +144,7 @@ def reverse_approach(source, destination, cancel):
         process.stderr.close()
 
 
-def generate(scene, action, duration, cancel, destination, reference_path=None):
+def generate(scene, action, duration, cancel, destination, reference_path=None, media_directory=None):
     """Generate one fresh action. No model-authored URLs, paths or graph nodes."""
     if scene not in {'mira','garden','cafe','fullbody'} or action not in PROMPTS:
         raise ValueError('Unsupported motion scene or action.')
@@ -153,8 +153,9 @@ def generate(scene, action, duration, cancel, destination, reference_path=None):
     tag = 'mate-'+secrets.token_hex(16)
     source = root/'input'/(tag+'.png')
     source.parent.mkdir(parents=True, exist_ok=True)
-    reference = Path(reference_path) if reference_path else ROOT/'generated/local-app'/(scene+'.png')
-    if reference.resolve().parent != (ROOT/'generated/local-app').resolve() or reference.suffix != '.png':
+    media_directory = Path(media_directory) if media_directory is not None else ROOT/'generated/local-app'
+    reference = Path(reference_path) if reference_path else media_directory/(scene+'.png')
+    if reference.resolve().parent != media_directory.resolve() or reference.suffix != '.png':
         raise ValueError('The motion reference must be an app-owned image.')
     shutil.copyfile(reference, source)
     frames = min(97, max(49, math.ceil(duration*24/8)*8+1))

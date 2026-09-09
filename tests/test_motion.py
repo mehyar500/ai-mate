@@ -16,6 +16,17 @@ class MotionBoundaryTests(unittest.TestCase):
             network.assert_not_called()
             copy.assert_not_called()
 
+    def test_explicit_media_directory_rejects_reference_outside_it(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            assets = root/'isolated'
+            assets.mkdir()
+            with patch.object(motion, 'CACHE', root/'cache'), patch.object(motion, 'request') as network:
+                with self.assertRaises(ValueError):
+                    motion.generate('fullbody', 'wave', 2, threading.Event(), assets/'reply.mp4',
+                                    reference_path=root/'private.png', media_directory=assets)
+                network.assert_not_called()
+
     def test_already_cancelled_never_submits(self):
         event = threading.Event()
         event.set()

@@ -58,7 +58,8 @@ class PoseTests(unittest.TestCase):
         self.app.models=FakeModels()
         self.visual=self.app.models.visual
         (Path(self.temp.name)/'fullbody.png').write_bytes(b'reference')
-        def generate(scene, action, duration, event, destination, reference_path=None):
+        def generate(scene, action, duration, event, destination, reference_path=None, media_directory=None):
+            self.assertEqual(Path(media_directory), self.app.directory)
             destination.write_bytes(b'motion')
             return {}
         self.motion=patch('local_app.motion.generate',side_effect=generate)

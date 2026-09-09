@@ -24393,5 +24393,16 @@
       "position_basis": "last_sent_frame"
     },
     "scope": "Real GPU approach consumed by RTC track; no browser/network. Stop selected last sent frame at 0.3s, capture returned 0.29267578125s and pose preserved. Capture took 67ms. Does not establish browser-presented pose accuracy."
+  },
+  "browser_rtc_stop_20260909": {
+    "scope": "Isolated main UI: come closer, step back, interrupt, wave. Browser controls plus local job results.",
+    "stop": {
+      "pose_preserved": true,
+      "time_s": 2.7926757812500003,
+      "source_time_s": 2.75,
+      "capture_s": 0.065
+    },
+    "resume": "Wave failed because motion.generate restricted references to the default media directory. Adapter now accepts the engine-configured media directory and still rejects escapes. Real fresh-motion resume rerun pending.",
+    "tests": "235 Python tests passed on rerun after one unrelated HTTP ConnectionAbortedError."
   }
 }
