@@ -23891,5 +23891,21 @@
     "video_codec": "H264",
     "bundle_policy": "balanced",
     "temporary_app_deleted": true
+  },
+  "shotstream_source_audit_20260909": {
+    "source": "https://github.com/KlingAIResearch/ShotStream",
+    "commit": "917a0478fe47d71ddcf3269d052cbe3be2ae10e8",
+    "source_sha256": "8fe7d9ad42fb154ef358a50bd1a8441b821919e5f3f52bcd79ce52652be50dd1",
+    "scope": "Read-only source audit, no upstream code executed or weights downloaded. Cache estimates use declared 30-layer/12-head/128-head-dim BF16 defaults; exclude weights, activations, VAE and text encoder.",
+    "self_kv_gib_21_frames": 5.623626708984375,
+    "context_kv_gib_10_frames": 2.67791748046875,
+    "findings": [
+      "Published entry point invokes CausalInferenceArPipeline, collects full output and writes MP4 after inference.",
+      "First-shot condition latents are explicitly zeroed; this entry point does not preserve a supplied character image.",
+      "Cache frame token count is hard-coded at 1560; lowering output resolution requires consistent token/cache changes.",
+      "Separate interactive pipeline exists, but checkpoint compatibility and image conditioning were not validated.",
+      "Model card labels Apache-2.0; inspected pipeline has Apache SPDX; repository root has no LICENSE file. Full dependency/model terms remain unverified."
+    ],
+    "decision": "Do not replace working renderer or assume 16 FPS on 4060 Ti. Next candidate experiment requires image-conditioning adapter and bounded-cache audit before GPU/quality evaluation."
   }
 }
