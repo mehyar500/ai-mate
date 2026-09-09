@@ -10,13 +10,17 @@ Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` plans replies. Whisper Base English and 
 
 The revised GPU-speech configuration completed **30 minutes / 120 commands** without failed commands, page errors or reported reply-buffer stalls. Speech-end latency was **2.04s median / 2.50s p95** across 54 replies; the two-second p95 target remains unmet. This replaces an earlier failed GPU soak, whose three allocation errors remain documented.
 
-All **120 clips / 5,945 frames** received limited diagnostics. Visual inspection sampled 120 frames from first/final-cycle clips; hand blur and soft close-up detail remain. Six lip-sync diagnostics passed their controls at estimated offsets of 0–80ms. Browser A/V clock skew was 26ms p95. These checks do not prove physical audibility, natural anatomy or human-perceived lip sync; idle callback gaps also need better classification.
+All **120 clips / 5,945 frames** received limited diagnostics. Visual inspection sampled 120 frames from first/final-cycle clips; hand blur and soft close-up detail remain. Six lip-sync diagnostics passed their controls at estimated offsets of 0–80ms. Browser A/V clock skew was 26ms p95. These checks do not prove physical audibility, natural anatomy or human-perceived lip sync; the older idle callback counter cannot reliably classify pauses.
 
 The preview now uses a **two-second wave**, removing about two seconds of nearly still footage after the gesture. Its separate 20-command qualification passed; all 829 frames received diagnostics and the complete 40-frame rendered wave was visually reviewed. The 30-minute result used the previous wave, so the revised asset has short-call evidence only. Restart completed in 29.48s with saved conversation unchanged.
 
 An isolated H.264/Opus WebRTC experiment did not establish a whole-call speed improvement over the existing fragmented-video player. Public-network transport remains unqualified.
 
-**174 Python and 23 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) contains exact model settings, comparisons, retained review pages and reproduction commands. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
+The latest three short calls passed **60/60 commands**. Recognition warm-up reduced its component median from 136ms to 103–118ms, but whole-call p95 varied from 2.13 to 2.56s. It remains disabled: the apparent first-run gain did not hold reliably. The corrected playback probe observed approximately 19.97 FPS for replies and 24.16 FPS for listening, with no continuous gap over 250ms in the final short call.
+
+Six paused-speech cases also passed. All **2,877 new frames** received limited diagnostics; 80 were visually inspected, with blurred fingers and soft mouth detail still visible. The preview is ready after restart, with private memory unchanged.
+
+**181 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) contains exact model settings, comparisons, retained review pages and reproduction commands. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
 
 ## What is still missing
 

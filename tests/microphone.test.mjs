@@ -31,6 +31,31 @@ test('speech onset fires once after 240ms and preserves the first samples',()=>{
   for(let i=0;i<65;i++)vad.push(silence);assert.equal(turns.length,1);
   assert.equal(new DataView(turns[0]).getInt16(44,true),3276);
 });
+
+test('optional pause notification preserves endpoint and exact captured audio',()=>{
+  const recordings=[[],[]],voice=new Float32Array(160).fill(.1),silence=new Float32Array(160);
+  let signals=0;
+  const detectors=[new SpeechTurns(16000,raw=>recordings[0].push(raw)),
+    new SpeechTurns(16000,raw=>recordings[1].push(raw),()=>{},()=>signals++)];
+  const feed=(chunk,n)=>{for(let i=0;i<n;i++)for(const vad of detectors)vad.push(chunk);};
+  feed(voice,60);feed(silence,19);assert.equal(signals,0);
+  feed(silence,1);assert.equal(signals,1);assert.equal(recordings[1].length,0);
+  feed(silence,44);assert.equal(signals,1);assert.equal(recordings[1].length,0);
+  feed(silence,1);assert.equal(recordings[1].length,1);
+  assert.deepEqual(new Uint8Array(recordings[0][0]),new Uint8Array(recordings[1][0]));
+});
+
+test('pause callbacks ignore clicks, survive errors and do not split resumed speech',()=>{
+  const recordings=[],voice=new Float32Array(160).fill(.1),silence=new Float32Array(160);
+  let signals=0;
+  const vad=new SpeechTurns(16000,raw=>recordings.push(raw),()=>{},()=>{signals++;throw Error('optional');});
+  const feed=(chunk,n)=>{for(let i=0;i<n;i++)vad.push(chunk);};
+  feed(silence,100);feed(voice,1);feed(silence,70);assert.equal(signals,0);
+  feed(voice,30);feed(silence,30);assert.equal(signals,1);assert.equal(recordings.length,0);
+  feed(voice,30);feed(silence,64);assert.equal(signals,2);assert.equal(recordings.length,0);
+  feed(silence,1);assert.equal(recordings.length,1);
+  feed(silence,100);assert.equal(signals,2);
+});
 test('ending a call during permission prompt stops a late microphone stream',async()=>{
   const original=Object.getOwnPropertyDescriptor(globalThis,'navigator'),secure=globalThis.isSecureContext;
   let grant,stopped=0;

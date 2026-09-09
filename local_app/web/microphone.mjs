@@ -11,8 +11,8 @@ export function encodeWav(chunks, rate) {
 }
 
 export class SpeechTurns {
-  constructor(rate,onTurn,onSpeech=()=>{}){this.rate=rate;this.onTurn=onTurn;this.onSpeech=onSpeech;this.reset();}
-  reset(){this.chunks=[];this.pre=[];this.preSamples=0;this.total=0;this.quiet=0;this.voiced=0;this.active=false;this.notified=false;this.noise=.002;}
+  constructor(rate,onTurn,onSpeech=()=>{},onPause=()=>{}){this.rate=rate;this.onTurn=onTurn;this.onSpeech=onSpeech;this.onPause=onPause;this.reset();}
+  reset(){this.chunks=[];this.pre=[];this.preSamples=0;this.total=0;this.quiet=0;this.voiced=0;this.active=false;this.notified=false;this.pauseNotified=false;this.noise=.002;}
   push(chunk){
     let power=0;for(const x of chunk)power+=x*x;
     const rms=Math.sqrt(power/chunk.length), loud=rms>Math.max(.009,this.noise*3);
@@ -23,7 +23,12 @@ export class SpeechTurns {
       this.active=true;this.chunks=this.pre;this.total=this.preSamples;this.pre=[];this.preSamples=0;
     }else{this.chunks.push(chunk);this.total+=chunk.length;}
     this.quiet=loud?0:this.quiet+chunk.length;if(loud)this.voiced+=chunk.length;
+    if(loud)this.pauseNotified=false;
     if(!this.notified&&this.voiced>=this.rate*.24){this.notified=true;this.onSpeech();}
+    if(!this.pauseNotified&&this.quiet>=this.rate*.2&&this.voiced>=this.rate*.16){
+      this.pauseNotified=true;
+      try{this.onPause();}catch{} // Optional preparation cannot discard capture.
+    }
     if(this.quiet>=this.rate*.65||this.total>=this.rate*25){
       const chunks=this.chunks,valid=this.voiced>=this.rate*.16;this.reset();
       if(valid)this.onTurn(encodeWav(chunks,this.rate));
@@ -32,7 +37,7 @@ export class SpeechTurns {
 }
 
 export class Microphone {
-  constructor({onTurn,onState,canListen,onSpeech=()=>{}}){this.onTurn=onTurn;this.onState=onState;this.canListen=canListen;this.onSpeech=onSpeech;this.generation=0;this.enabled=false;this.pending=false;this.echoCancellation=false;}
+  constructor({onTurn,onState,canListen,onSpeech=()=>{},onPause=()=>{}}){this.onTurn=onTurn;this.onState=onState;this.canListen=canListen;this.onSpeech=onSpeech;this.onPause=onPause;this.generation=0;this.enabled=false;this.pending=false;this.echoCancellation=false;}
   async start(){
     if(this.enabled||this.pending)return;
     if(!globalThis.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw Error('Microphone needs localhost or HTTPS and a supported browser. Text chat is available in the Text tab.');
@@ -46,7 +51,7 @@ export class Microphone {
       this.stream=stream;this.context=context;this.source=context.createMediaStreamSource(stream);
       this.worklet=new AudioWorkletNode(context,'local-recorder');
       this.echoCancellation=[true,'all'].includes(stream.getAudioTracks()[0].getSettings?.().echoCancellation);
-      this.turns=new SpeechTurns(context.sampleRate,raw=>{this.onState('processing');this.onTurn(raw);},()=>{this.onState('hearing');this.onSpeech();});
+      this.turns=new SpeechTurns(context.sampleRate,raw=>{this.onState('processing');this.onTurn(raw);},()=>{this.onState('hearing');this.onSpeech();},()=>this.onPause());
       this.enabled=true;this.worklet.port.onmessage=event=>{
         if(!this.enabled)return;
         if(!this.canListen()){this.turns.reset();this.onState('paused');return;}

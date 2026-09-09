@@ -51,13 +51,23 @@ class Models:
             # libraries lazily. Never download a DLL or search arbitrary folders.
             self._asr_dll_directory=os.add_dll_directory(str(Path(torch.__file__).parent/'lib')) if os.name=='nt' else None
         self.asr = WhisperModel(str(CACHE / "asr-base-en"), **asr_settings)
+        from .recognition_warmup import RecognitionWarmup, pause_warm_enabled
+        pause_warm = pause_warm_enabled()
+        self.recognition_warmup = None
         warm_audio,warm_rate=self.tts.create("Hello there.", voice="af_sarah", speed=1, lang="en-us")
         self.asr_warm_s=None
         if self.asr_device=='cuda':
             import soundfile as sf
             stream=io.BytesIO();sf.write(stream,warm_audio,warm_rate,format='WAV',subtype='PCM_16')
             began=time.perf_counter();self.transcribe(stream.getvalue());self.asr_warm_s=time.perf_counter()-began
+            if pause_warm:
+                fixed_audio = stream.getvalue()
+                self.recognition_warmup = RecognitionWarmup(lambda: self.transcribe(fixed_audio))
         self.visual = None
+
+    def finish_recognition_warmup(self):
+        primer = getattr(self, 'recognition_warmup', None)
+        return primer.finish() if primer else None
 
     def plan(self, snapshot, user, mode, scene, available, cancel):
         return self.conversation.plan(snapshot, user, mode, scene, available, cancel)

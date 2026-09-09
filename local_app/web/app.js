@@ -8,7 +8,7 @@ let replyMode="text",scene="mira",hasVideo=false,playing=false,epoch=0,lastMedia
 let idleURL=null,idleFailed=false,idleSuppressed=false;
 let nextIdleURL=undefined,pictureStarted=false,motionRequested=false;
 let stopping=false,displayedPlayback=null,frameCallback=null;
-let callInputOpen=false;
+let callInputOpen=false,recognitionPauseWarm=false;
 function settleIdle(){
   if(nextIdleURL!==undefined){idleURL=nextIdleURL;nextIdleURL=undefined;idleSuppressed=!idleURL;}
   pictureStarted=false;
@@ -41,6 +41,10 @@ const callInput=new CallInput({
   onError:error=>notice(error.message,true)
 });
 const microphone=new Microphone({onTurn:raw=>callInput.turn({raw,mode:replyMode}),onSpeech:()=>callInput.speech(),
+  onPause:()=>{
+    if(recognitionPauseWarm&&ready&&microphone.enabled&&replyMode!=='text'&&!busy&&!playing&&!stopping&&!submitting)
+      api('/api/recognition/warm',{}).catch(()=>{});
+  },
   canListen:()=>speechAccess({...callSpeechState(),capturing:callInput.capturing()}).canListen,
   onState:state=>{if(state==='off')callInput.reset();if(micState!==state){micState=state;controls();}}});
 function callSpeechState(){
@@ -418,6 +422,7 @@ async function boot(){
         if(restarted){idleSuppressed=false;idleFailed=false;resetPlayback();active=null;busy=false;notice("Reconnected. Send your message again if the last reply was interrupted.");}
       }
       const state=await api("/api/status");ready=state.ready;hasVideo=state.visual_loaded;provider=state.provider;
+      recognitionPauseWarm=state.recognition_pause_warm===true;
       if(!active&&!playing&&!submitting&&!state.busy)idleURL=state.idle_video||null;
       if(state.app_version!=="0.2"){ready=false;$("connection").textContent="Server update needed";notice("Restart the local server to finish this update.",true);controls();await sleep(1500);continue;}
       if(!active&&!submitting)busy=state.busy;

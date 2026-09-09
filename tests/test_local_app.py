@@ -151,6 +151,54 @@ class JobTests(unittest.TestCase):
         self.assertEqual(result["error_code"], "no_speech")
         self.assertEqual(self.app.store.snapshot()["turns"], [])
 
+    def test_warmup_drain_precedes_real_work_and_cancel_preserves_memory(self):
+        entered, release = threading.Event(), threading.Event()
+        def finish():
+            entered.set()
+            release.wait(2)
+            return {'ok': True, 'warm_s': .2, 'wait_s': .1}
+        self.fake.finish_recognition_warmup = finish
+        try:
+            key = self.app.submit('Hello', 'text', 'mira')
+            self.assertTrue(entered.wait(1))
+            self.assertFalse(self.fake.entered.is_set())
+            self.app.cancel(key)
+            release.set()
+            result = self.wait(key)
+            self.assertEqual(result['state'], 'cancelled')
+            self.assertEqual(result['metrics']['recognition_warmup']['wait_s'], .1)
+            self.assertFalse(self.fake.entered.is_set())
+            self.assertEqual(self.app.store.snapshot()['turns'], [])
+        finally:
+            release.set()
+
+    def test_warmup_admission_respects_busy_playback_and_readiness(self):
+        from unittest.mock import Mock
+        primer = Mock()
+        primer.request.return_value = True
+        self.fake.recognition_warmup = primer
+        self.assertEqual(self.app.prime_recognition(), {'accepted': True})
+        primer.request.reset_mock()
+        for attr in ['busy', 'playback_pending']:
+            original = getattr(self.app, attr)
+            setattr(self.app, attr, True)
+            self.assertEqual(self.app.prime_recognition(), {'accepted': False})
+            setattr(self.app, attr, original)
+        self.app.ready = False
+        self.assertEqual(self.app.prime_recognition(), {'accepted': False})
+        self.app.ready = True
+        self.fake.recognition_warmup = None
+        self.assertEqual(self.app.prime_recognition(), {'accepted': False})
+        primer.request.assert_not_called()
+
+    def test_optional_warmup_failure_does_not_replace_actual_reply(self):
+        self.fake.finish_recognition_warmup = lambda: {'ok': False, 'error_type': 'RuntimeError', 'wait_s': 0}
+        self.fake.release.set()
+        key = self.app.submit('Hello', 'text', 'mira')
+        result = self.wait(key)
+        self.assertEqual(result['state'], 'done')
+        self.assertFalse(result['metrics']['recognition_warmup']['ok'])
+
     def test_reset_clears_media_from_previous_process_but_keeps_portraits(self):
         directory = Path(self.tmp.name)
         old = directory / ("a"*32 + "-0.mp4")
@@ -250,6 +298,16 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request("/api/memory", b"[]", headers)[0], 400)
         self.assertEqual(self.request("/api/memory", b"broken", headers)[0], 400)
         self.assertEqual(self.request("/api/memory", b"x"*16385, headers)[0], 413)
+
+    def test_recognition_warmup_accepts_only_authenticated_same_origin_empty_body(self):
+        headers = {'X-Local-Token': self.app.token, 'Content-Type': 'application/json'}
+        route = '/api/recognition/warm'
+        self.assertEqual(self.request(route, b'{}', {'Content-Type': 'application/json'})[0], 403)
+        self.assertEqual(self.request(route, b'{}', {**headers, 'Origin': 'https://evil.example'})[0], 403)
+        for body in [b'[]', b'broken', b'{"audio":"private"}']:
+            self.assertEqual(self.request(route, body, headers)[0], 400)
+        status, body, _ = self.request(route, b'{}', headers)
+        self.assertEqual((status, json.loads(body)), (200, {'accepted': False}))
 
     def test_no_arbitrary_files_or_memory_without_token(self):
         for path in ["/.env", "/media/../memory.sqlite3", "/media/memory.sqlite3", "/portrait/../../.env"]:

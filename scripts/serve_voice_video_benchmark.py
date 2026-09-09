@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--fragment-ms',type=int,choices=[100,200],help='Isolated FFmpeg fragment-duration override.')
     parser.add_argument('--asr-device',choices=['cpu','cuda'],help='Isolated speech-recognition device override.')
     parser.add_argument('--tts-device',choices=['cpu','cuda'],help='Isolated speech-synthesis device override.')
+    parser.add_argument('--asr-pause-warm',action='store_true',help='Warm recognition during the existing endpoint pause.')
     args = parser.parse_args()
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
@@ -63,6 +64,7 @@ def main():
     configure_runtime()
     if args.asr_device is not None:os.environ['AI_MATE_ASR_DEVICE']=args.asr_device
     if args.tts_device is not None:os.environ['AI_MATE_TTS_DEVICE']=args.tts_device
+    os.environ['AI_MATE_ASR_PAUSE_WARM']='1' if args.asr_pause_warm else '0'
     os.environ['AI_MATE_VISUAL_DECODER']='tensorrt' if args.decoder=='tensorrt-reviewed' else 'torch'
     app = CompanionEngine(folder)
     app.scene = 'fullbody'
@@ -105,6 +107,7 @@ def main():
         'speech_runtime':app.models.speech_runtime,
         'fragment_ms_override':args.fragment_ms,
         'asr_device':app.models.asr_device,'asr_compute_type':app.models.asr_compute_type,'asr_warm_s':app.models.asr_warm_s,
+        'asr_pause_warm':args.asr_pause_warm,
         'performance_label':args.performance_label,'visual_warmup':app.visual_warmup,
         'scope':'Synthetic isolated call; no private conversation or active preview selection.'
     },indent=2)+'\n',encoding='utf-8')

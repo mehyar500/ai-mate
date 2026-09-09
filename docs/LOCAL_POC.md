@@ -70,6 +70,24 @@ Successful fresh video captures its final decoded frame as the next reference. U
 
 ## Measured results and failures
 
+### Recognition during the speaking pause — September 9
+
+An optional fixed-audio warm-up starts 200ms into the existing 650ms endpoint pause. It never plans from unfinished user speech, uploads early audio or changes the captured WAV. A small offline test after five seconds idle reduced median recognition from **348ms to 43ms** (four samples per policy, identical recognized words). An encoder-only warm-up was inconsistent. The complete call did not reproduce that large improvement:
+
+| Same 20-command call | Recognition median, 10 inputs | Speech-end median / p95, 9 replies |
+|---|---|---|
+| Warm-up disabled | 136ms | 2.153 / 2.421s |
+| Warm-up enabled | 103ms | 1.949 / 2.132s |
+| Enabled repeat | 118ms | 1.972 / 2.563s |
+
+All **60 commands** passed with no page errors or reported reply-buffer stalls. Both enabled runs completed every warm-up before actual submission (maximum warm work 143ms, measured drain wait below 0.01ms). Hosted greeting-plan time varied from 600ms to 1,093ms between enabled runs. **Leave `AI_MATE_ASR_PAUSE_WARM=0`: a reliable whole-call latency improvement is not established, and the two-second p95 target remains unmet.** No configuration, model, prepared asset or private memory was changed in the preview by this experiment. Warm-up uses additional local recognition work; it makes no additional hosted requests.
+
+The frame probe now resets across actual pauses, seeks, source changes and visibility changes, while retaining gaps during continuous playback. Redundant `hidden=false` assignments no longer reset it. The final repeat used this corrected probe: **787 reply intervals, approximately 19.97 presented FPS, maximum gap 83.3ms; 1,128 listening intervals, approximately 24.16 FPS, maximum gap 66.7ms**. Neither had a gap over 250ms. A/V clock skew was **20.55ms p95 / 33.19ms maximum**, 615 samples. The first two trials used an intermediate probe that also reset on redundant visibility assignments; use the repeat for the final probe evidence. These callback measurements exclude physical display and acoustic delay and do not retroactively qualify older long-call counters.
+
+Evidence is in `audit/asr-idle-{encoder,recognizer}-pause` and `audit/voice-video-qualification-pause-{control,warm,repeat}`. Reproduce with the existing qualification commands, a fresh label and `--performance-label wave-trim --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda`; add `--asr-pause-warm` for the candidate. The capture driver records the app and frame-probe hashes. `benchmark_asr_idle.py --label NEW --wake-policy recognizer` reproduces the small offline comparison. BUILD describes admission, serialization, authentication and recovery. This optional path has no 30-minute qualification.
+
+All six paused-speech cases also passed with warm-up enabled, preserving negations/corrections and cancelling three partial jobs (`audit/voice-video-qualification-pause-corrections`). Across the three calls and paused suite, **66 clips / 2,877 frames** received the limited checks with no flags, missing media or clipped/silent waveforms. Visual inspection covered **80 repeat-run frames**: the complete wave and the first 20 approach/close-description frames. Fingers blur and mouth detail stays soft; no normal-speed or physical-audio approval follows. The repeat's `review.html` supports playback/frame stepping; `manual-review.json` records the actual sampled scope. The preview restarted ready in **29.071s**, with warm-up disabled and private memory byte-identical. All test drivers, servers and frame reviewers exited successfully. Existing 30-minute results predate this code/shortened-wave combination.
+
 ### Optional GPU speech — September 9
 
 The same Kokoro-82M float32 weights and `af_sarah` voice have an explicit CUDA option. **This PC now selects CUDA after the revised memory policy passed the completed soak below.** CPU remains the default elsewhere and the recovery setting. No new model, API key, driver or main-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.

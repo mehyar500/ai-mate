@@ -2,6 +2,7 @@
 // --capture uses real turn detection with a synthetic input MediaStream.
 // Default WAV injection bypasses capture and endpoint detection.
 const {chromium}=require('playwright');
+const {installFrameProbe}=require('./playback_probe.cjs');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const trial=process.argv[2];assert.ok(['qualification','soak'].includes(trial));
 const label=process.argv[3]||'';assert.ok(!label||/^[a-z0-9-]{1,32}$/.test(label));
@@ -9,6 +10,7 @@ const capture=process.argv[4]==='--capture';assert.ok(!process.argv[4]||capture)
 assert.ok(!process.argv[5]||process.argv[5]==='--startup-buffer-ms');
 assert.equal(Boolean(process.argv[5]),Boolean(process.argv[6]));
 const appCode=fs.readFileSync(path.resolve(__dirname,'../local_app/web/app.js'),'utf8');
+const probeCode=fs.readFileSync(path.join(__dirname,'playback_probe.cjs'),'utf8');
 const bufferCondition=appCode.match(/media\.buffered\.end\(0\)>=([.\d]+)/g);assert.equal(bufferCondition?.length,1);
 const currentBufferMs=Math.round(Number(bufferCondition[0].split('>=')[1])*1000);
 const startupBufferMs=process.argv[6]?Number(process.argv[6]):currentBufferMs;assert.ok([150,350].includes(startupBufferMs));
@@ -97,20 +99,8 @@ async function main(){
         el.addEventListener(type,()=>window.qual.events.push({id,type,at:(performance.now()-window.qual.start)/1000,
           time:el.currentTime,muted:el.muted,volume:el.volume}));
       }
-      for(const id of ['video','idle-video']){
-        const el=document.getElementById(id),stats={presented:0,callbacks:0,longGaps:0,last:0,source:'',wasVisible:false};
-        window.qual.frames[id]=stats;
-        const frame=(now,metadata)=>{stats.callbacks++;stats.presented=metadata.presentedFrames;
-          const audio=document.getElementById('audio');
-          if(id==='video'&&!el.hidden&&!el.paused&&!audio.paused&&!audio.ended&&Number.isFinite(audio.duration)){
-            window.qual.avClockSkewMs.push(Math.abs(metadata.mediaTime-audio.currentTime)*1000);
-          }
-          const visible=!el.hidden&&!el.paused;
-          if(stats.last&&stats.wasVisible&&visible&&stats.source===el.currentSrc&&now-stats.last>250)stats.longGaps++;
-          stats.last=now;stats.source=el.currentSrc;stats.wasVisible=visible;el.requestVideoFrameCallback(frame);};
-        el.requestVideoFrameCallback(frame);
-      }
     });
+    await page.evaluate(installFrameProbe);
     started=Date.now();
     const cases=JSON.parse(fs.readFileSync(path.join(folder,'fixtures.json')));
     const fixtures=trial==='soak'?Array.from({length:6},()=>cases).flat():cases;
@@ -206,6 +196,7 @@ async function main(){
     const summary={elapsed_s:(Date.now()-started)/1000,turns:results.length,startup_buffer_ms:startupBufferMs,
       stopped_early_for_failures:stoppedEarly,soak_duration_met:trial==='soak'?Date.now()-started>=totalMs:null,
       runtime_app_sha256:crypto.createHash('sha256').update(appCode).digest('hex'),buffer_override:startupBufferMs!==currentBufferMs,
+      frame_probe_sha256:crypto.createHash('sha256').update(probeCode).digest('hex'),
       failures:results.filter(r=>r.failures.length).map(r=>({case:r.case,cycle:r.cycle,failures:r.failures})),
       response_sample_count:latency.length,p50_s:latency[Math.ceil(latency.length*.5)-1],p95_s:latency[Math.ceil(latency.length*.95)-1],playback,errors,
       speech_end_to_playback_s:{samples:speechLatency.length,p50:speechLatency[Math.ceil(speechLatency.length*.5)-1],p95:speechLatency[Math.ceil(speechLatency.length*.95)-1]},

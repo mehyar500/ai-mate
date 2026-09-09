@@ -185,6 +185,10 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/turn":
                 key = self.app.submit(body.get("text"), body.get("mode", "voice"), body.get("scene", "mira"))
                 return self.respond(202, {"id": key})
+            if path == "/api/recognition/warm":
+                if body:
+                    raise ValueError('Recognition warm-up accepts an empty object only.')
+                return self.respond(200, self.app.prime_recognition())
             if path == "/api/cancel":
                 return self.respond(200, self.app.cancel(body.get("id"), body.get("playback")))
             if path == "/api/memory":

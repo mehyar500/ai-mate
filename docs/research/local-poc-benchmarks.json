@@ -18889,5 +18889,599 @@
       "generated/local-app/audit/voice-video-qualification-wave-trim/preview-selection.json": "4a273c9b813711e306a7f71f08c0035abcafe4e9d6d1de2600ab90466b6b2bb4",
       "generated/local-app/audit/lip-sync-speech-arena-soak/results.json": "1a8e36ffc90df76e5e6ba9771742587cce9c08150c870bc24912cf52135ce836"
     }
+  },
+  "recognition_pause_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "bf2e0f7a432ab767cc30691730bf33e03a20d0cb",
+    "selection": "Disabled by default and in preview: integrated ASR improvement was small and whole-call tail improvement did not repeat. Existing GPU speech/TRT/wave remain selected.",
+    "offline_encoder": {
+      "scope": "Five seconds idle, optional fixed encoder warm-up, then recognition at the unchanged endpoint. Eight synthetic inputs; no browser, hosted dialogue, private audio or live selection.",
+      "warmup_shape": [
+        80,
+        3000
+      ],
+      "endpoint_remainder_s": 0.45,
+      "rows": [
+        {
+          "repeat": 0,
+          "policy": "none",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.0,
+          "asr_s": 0.33911329999682494,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true
+        },
+        {
+          "repeat": 0,
+          "policy": "none",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.0,
+          "asr_s": 0.3272595999878831,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true
+        },
+        {
+          "repeat": 0,
+          "policy": "encoder",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.1140400000003865,
+          "asr_s": 0.33893779999925755,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true
+        },
+        {
+          "repeat": 0,
+          "policy": "encoder",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.15739780000876635,
+          "asr_s": 0.04199250000237953,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true
+        },
+        {
+          "repeat": 1,
+          "policy": "encoder",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.1569558000046527,
+          "asr_s": 0.24600920001103077,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true
+        },
+        {
+          "repeat": 1,
+          "policy": "encoder",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.15688009999576025,
+          "asr_s": 0.044791299995267764,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true
+        },
+        {
+          "repeat": 1,
+          "policy": "none",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.0,
+          "asr_s": 0.24527280000620522,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true
+        },
+        {
+          "repeat": 1,
+          "policy": "none",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.0,
+          "asr_s": 0.3361544999934267,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true
+        }
+      ]
+    },
+    "offline_recognizer": {
+      "scope": "Five seconds idle, optional fixed encoder warm-up, then recognition at the unchanged endpoint. Eight synthetic inputs; no browser, hosted dialogue, private audio or live selection.",
+      "warmup_shape": [
+        80,
+        3000
+      ],
+      "endpoint_remainder_s": 0.45,
+      "rows": [
+        {
+          "repeat": 0,
+          "policy": "none",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.0,
+          "asr_s": 0.35026019999349955,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.35026019999349955
+        },
+        {
+          "repeat": 0,
+          "policy": "none",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.0,
+          "asr_s": 0.34660710000025574,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.34660710000025574
+        },
+        {
+          "repeat": 0,
+          "policy": "recognizer",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.36024179999367334,
+          "asr_s": 0.035892499989131466,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.035892499989131466
+        },
+        {
+          "repeat": 0,
+          "policy": "recognizer",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.30868819999159314,
+          "asr_s": 0.04626859999552835,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.04626859999552835
+        },
+        {
+          "repeat": 1,
+          "policy": "recognizer",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.21573989999888,
+          "asr_s": 0.04132670001126826,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.04132670001126826
+        },
+        {
+          "repeat": 1,
+          "policy": "recognizer",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.2979135000059614,
+          "asr_s": 0.04416720000153873,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.04416720000153873
+        },
+        {
+          "repeat": 1,
+          "policy": "none",
+          "case": "greeting",
+          "fixture_sha256": "73c7e9dc6a963857d60dff975f3eebbcfa05f92b2b40d21649e3429a7836448c",
+          "primer_s": 0.0,
+          "asr_s": 0.31866759998956695,
+          "text": "Hi Mira, how are you today?",
+          "expected": "Hi Mira, how are you today?",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.31866759998956695
+        },
+        {
+          "repeat": 1,
+          "policy": "none",
+          "case": "negated_return",
+          "fixture_sha256": "7dcd2bdccd7ebc0708a291397e81a523d41ed48331a5e4fe57adb88562cbfbd8",
+          "primer_s": 0.0,
+          "asr_s": 0.3672666000056779,
+          "text": "Don't move back, stay where you are.",
+          "expected": "Don't move back. Stay where you are.",
+          "same_words": true,
+          "endpoint_delay_s": 0,
+          "ready_after_endpoint_s": 0.3672666000056779
+        }
+      ]
+    },
+    "integrated": {
+      "pause-control": {
+        "artifact": "generated/local-app/audit/voice-video-qualification-pause-control",
+        "summary": {
+          "elapsed_s": 96.182,
+          "turns": 20,
+          "startup_buffer_ms": 350,
+          "stopped_early_for_failures": false,
+          "soak_duration_met": null,
+          "runtime_app_sha256": "b3f376a7713b28d5e6a8c6f0b8ae22d0ae026ebe23f2f8101c724482c27e6896",
+          "buffer_override": false,
+          "failures": [],
+          "response_sample_count": 19,
+          "p50_s": 1.22,
+          "p95_s": 1.75,
+          "playback": {
+            "frames": {
+              "video": {
+                "callbacks": 810,
+                "intervalSamples": 770,
+                "continuousIntervalMs": 38680.251999999986,
+                "continuousPresentedFrames": 770,
+                "longGaps": 0,
+                "maxGapMs": 66.80000000000291,
+                "intervalHistogramMs": {
+                  "15": 2,
+                  "35": 161,
+                  "50": 431,
+                  "65": 176
+                },
+                "gapSamples": [],
+                "resets": {
+                  "element_visibility": 80,
+                  "emptied": 21,
+                  "loadstart": 20,
+                  "pause": 19
+                },
+                "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+              },
+              "idle-video": {
+                "callbacks": 1160,
+                "intervalSamples": 1133,
+                "continuousIntervalMs": 46898.84,
+                "continuousPresentedFrames": 1133,
+                "longGaps": 0,
+                "maxGapMs": 66.70600000000013,
+                "intervalHistogramMs": {
+                  "15": 242,
+                  "35": 142,
+                  "50": 708,
+                  "65": 41
+                },
+                "gapSamples": [],
+                "resets": {
+                  "element_visibility": 110,
+                  "pause": 19,
+                  "seeking": 6,
+                  "emptied": 4,
+                  "loadstart": 4
+                },
+                "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+              }
+            },
+            "callActive": true,
+            "av_clock_skew_ms": {
+              "samples": 597,
+              "p50": 8.390999999999815,
+              "p95": 23.97000000000005,
+              "max": 39.98800000000002
+            },
+            "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+          },
+          "errors": [],
+          "speech_end_to_playback_s": {
+            "samples": 9,
+            "p50": 2.1525333333363124,
+            "p95": 2.421100000008941
+          },
+          "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+        },
+        "asr": {
+          "samples": 10,
+          "median_s": 0.1355
+        },
+        "warmups": {
+          "samples": 0,
+          "failures": 0,
+          "maximum_work_s": null,
+          "maximum_drain_wait_s": null
+        },
+        "frame_diagnostics": {
+          "clips": 20,
+          "frames": 855,
+          "missing": 0,
+          "flagged_frames": 0,
+          "min_audio_rms": 0.07179156690835953,
+          "max_audio_peak": 0.68475341796875,
+          "max_clipped_fraction": 0.0,
+          "scope": "Every decoded frame: face count, luma, adjacent pixel change. No anatomy/identity/perceptual or physical-audio certification."
+        },
+        "probe_scope": "Intermediate probe also reset on redundant visibility assignments. Use pause-repeat for final cadence evidence.",
+        "driver_exit": 0,
+        "server_exit": 0
+      },
+      "pause-warm": {
+        "artifact": "generated/local-app/audit/voice-video-qualification-pause-warm",
+        "summary": {
+          "elapsed_s": 95.796,
+          "turns": 20,
+          "startup_buffer_ms": 350,
+          "stopped_early_for_failures": false,
+          "soak_duration_met": null,
+          "runtime_app_sha256": "b3f376a7713b28d5e6a8c6f0b8ae22d0ae026ebe23f2f8101c724482c27e6896",
+          "buffer_override": false,
+          "failures": [],
+          "response_sample_count": 19,
+          "p50_s": 1.28,
+          "p95_s": 1.49,
+          "playback": {
+            "frames": {
+              "video": {
+                "callbacks": 829,
+                "intervalSamples": 789,
+                "continuousIntervalMs": 39697.062,
+                "continuousPresentedFrames": 789,
+                "longGaps": 0,
+                "maxGapMs": 83.30000000000291,
+                "intervalHistogramMs": {
+                  "15": 3,
+                  "35": 171,
+                  "50": 427,
+                  "65": 184,
+                  "85": 4
+                },
+                "gapSamples": [],
+                "resets": {
+                  "element_visibility": 80,
+                  "emptied": 21,
+                  "loadstart": 20,
+                  "pause": 19
+                },
+                "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+              },
+              "idle-video": {
+                "callbacks": 1134,
+                "intervalSamples": 1102,
+                "continuousIntervalMs": 45682.433999999994,
+                "continuousPresentedFrames": 1102,
+                "longGaps": 0,
+                "maxGapMs": 66.7039999999979,
+                "intervalHistogramMs": {
+                  "15": 238,
+                  "35": 139,
+                  "50": 675,
+                  "65": 50
+                },
+                "gapSamples": [],
+                "resets": {
+                  "element_visibility": 109,
+                  "pause": 19,
+                  "seeking": 6,
+                  "emptied": 4,
+                  "loadstart": 4
+                },
+                "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+              }
+            },
+            "callActive": true,
+            "av_clock_skew_ms": {
+              "samples": 616,
+              "p50": 8.138999999999896,
+              "p95": 23.380999999999872,
+              "max": 31.338000000000086
+            },
+            "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+          },
+          "errors": [],
+          "speech_end_to_playback_s": {
+            "samples": 9,
+            "p50": 1.9492666666756122,
+            "p95": 2.132333333333343
+          },
+          "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+        },
+        "asr": {
+          "samples": 10,
+          "median_s": 0.103
+        },
+        "warmups": {
+          "samples": 10,
+          "failures": 0,
+          "maximum_work_s": 0.14233050000621006,
+          "maximum_drain_wait_s": 6.800008122809231e-06
+        },
+        "frame_diagnostics": {
+          "clips": 20,
+          "frames": 874,
+          "missing": 0,
+          "flagged_frames": 0,
+          "min_audio_rms": 0.07182789593935013,
+          "max_audio_peak": 0.689178466796875,
+          "max_clipped_fraction": 0.0,
+          "scope": "Every decoded frame: face count, luma, adjacent pixel change. No anatomy/identity/perceptual or physical-audio certification."
+        },
+        "probe_scope": "Intermediate probe also reset on redundant visibility assignments. Use pause-repeat for final cadence evidence.",
+        "driver_exit": 0,
+        "server_exit": 0
+      },
+      "pause-repeat": {
+        "artifact": "generated/local-app/audit/voice-video-qualification-pause-repeat",
+        "summary": {
+          "elapsed_s": 96.569,
+          "turns": 20,
+          "startup_buffer_ms": 350,
+          "stopped_early_for_failures": false,
+          "soak_duration_met": null,
+          "runtime_app_sha256": "b3f376a7713b28d5e6a8c6f0b8ae22d0ae026ebe23f2f8101c724482c27e6896",
+          "buffer_override": false,
+          "frame_probe_sha256": "49603575ca87d61447c7e3200435e21537060f018564cd0f730776d1d63c7750",
+          "failures": [],
+          "response_sample_count": 19,
+          "p50_s": 1.18,
+          "p95_s": 1.88,
+          "playback": {
+            "frames": {
+              "video": {
+                "callbacks": 827,
+                "intervalSamples": 787,
+                "continuousIntervalMs": 39414.016,
+                "continuousPresentedFrames": 787,
+                "longGaps": 0,
+                "maxGapMs": 83.29999999999927,
+                "intervalHistogramMs": {
+                  "15": 2,
+                  "35": 168,
+                  "50": 442,
+                  "65": 174,
+                  "85": 1
+                },
+                "gapSamples": [],
+                "resets": {
+                  "emptied": 21,
+                  "loadstart": 20,
+                  "element_visibility": 40,
+                  "pause": 19
+                },
+                "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+              },
+              "idle-video": {
+                "callbacks": 1157,
+                "intervalSamples": 1128,
+                "continuousIntervalMs": 46682.43400000002,
+                "continuousPresentedFrames": 1128,
+                "longGaps": 0,
+                "maxGapMs": 66.70000000000073,
+                "intervalHistogramMs": {
+                  "15": 235,
+                  "35": 155,
+                  "50": 696,
+                  "65": 42
+                },
+                "gapSamples": [],
+                "resets": {
+                  "element_visibility": 38,
+                  "pause": 19,
+                  "seeking": 6,
+                  "emptied": 4,
+                  "loadstart": 4
+                },
+                "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+              }
+            },
+            "callActive": true,
+            "av_clock_skew_ms": {
+              "samples": 615,
+              "p50": 7.929999999999993,
+              "p95": 20.547000000000093,
+              "max": 33.19499999999997
+            },
+            "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+          },
+          "errors": [],
+          "speech_end_to_playback_s": {
+            "samples": 9,
+            "p50": 1.9719333333273716,
+            "p95": 2.562533333321412
+          },
+          "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+        },
+        "asr": {
+          "samples": 10,
+          "median_s": 0.1175
+        },
+        "warmups": {
+          "samples": 10,
+          "failures": 0,
+          "maximum_work_s": 0.14274919999297708,
+          "maximum_drain_wait_s": 5.299996701069176e-06
+        },
+        "frame_diagnostics": {
+          "clips": 20,
+          "frames": 872,
+          "missing": 0,
+          "flagged_frames": 0,
+          "min_audio_rms": 0.07180117815732956,
+          "max_audio_peak": 0.6756591796875,
+          "max_clipped_fraction": 0.0,
+          "scope": "Every decoded frame: face count, luma, adjacent pixel change. No anatomy/identity/perceptual or physical-audio certification."
+        },
+        "probe_scope": "Final probe with actual visibility changes only.",
+        "driver_exit": 0,
+        "server_exit": 0
+      }
+    },
+    "paused_speech": {
+      "artifact": "generated/local-app/audit/voice-video-qualification-pause-corrections",
+      "scenarios": 6,
+      "failures": 0,
+      "cancelled_partial_jobs": 3,
+      "frame_diagnostics": {
+        "clips": 6,
+        "frames": 276,
+        "missing": 0,
+        "flagged_frames": 0,
+        "min_audio_rms": 0.07274200767278671,
+        "max_audio_peak": 0.7921142578125,
+        "max_clipped_fraction": 0.0,
+        "scope": "Every decoded frame: face count, luma, adjacent pixel change. No anatomy/identity/perceptual or physical-audio certification."
+      },
+      "scope": "Six synthetic paused utterances, real browser capture/VAD/ASR/Cloudflare/Kokoro/MuseTalk/playback. AEC capability simulated; no physical audio qualification. Memory carries between emitted turns and scenarios.",
+      "driver_exit": 0,
+      "server_exit": 0
+    },
+    "manual_review": {
+      "scope": "Model visual inspection of four ordered contact sheets: all 40 rendered wave frames, first 20 approach frames and first 20 close-description frames.",
+      "visually_sampled_frames": 80,
+      "sheets": [
+        "0a1b37af3f5a408cb7a21d6d6841e788-0-frames-000.jpg",
+        "0a1b37af3f5a408cb7a21d6d6841e788-0-frames-020.jpg",
+        "4a4bb43e60284d1981d7c0a7b227f205-0-frames-000.jpg",
+        "28000d06aadf4c88bccb84987924c725-0-frames-000.jpg"
+      ],
+      "observations": [
+        "Identity and clothing remain visually consistent in sampled frames.",
+        "The full wave raises and lowers the right hand; fingers remain motion-blurred.",
+        "The sampled approach begins moving closer with feet still in frame.",
+        "Close speech preserves the scene and head framing; mouth/facial detail remains soft."
+      ],
+      "not_validated": [
+        "Physical audibility/acoustics",
+        "Normal-speed perceptual quality",
+        "Every-frame anatomy",
+        "Real mobile/PWA devices"
+      ]
+    },
+    "preview_restart": {
+      "ready": true,
+      "recognition_pause_warm": false,
+      "startup_s": 29.071,
+      "memory_unchanged": true
+    },
+    "checks": {
+      "python_unit_tests": 181,
+      "javascript_unit_tests": 32,
+      "compileall": "pass",
+      "node_syntax": "pass",
+      "diff_check": "pass",
+      "frame_reviewer_exit": 0
+    },
+    "remaining": [
+      "Two-second speech-end p95",
+      "Natural transitions and close-mouth quality",
+      "Arbitrary reliable movement",
+      "Physical audio and mobile qualification",
+      "Final selected-asset 30-minute qualification",
+      "Independent public security review and staging"
+    ]
   }
 }

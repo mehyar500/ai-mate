@@ -30,7 +30,7 @@ def configure_runtime(path=ROOT / ".env", environ=None):
     path = Path(path)
     if not path.is_file():
         return
-    allowed = {"AI_MATE_LLM_PROVIDER", "AI_MATE_LLM_MODEL", "AI_MATE_ENV_FILE", "AI_MATE_VISUAL_DECODER", "AI_MATE_ASR_DEVICE", "AI_MATE_TTS_DEVICE"}
+    allowed = {"AI_MATE_LLM_PROVIDER", "AI_MATE_LLM_MODEL", "AI_MATE_ENV_FILE", "AI_MATE_VISUAL_DECODER", "AI_MATE_ASR_DEVICE", "AI_MATE_TTS_DEVICE", "AI_MATE_ASR_PAUSE_WARM"}
     for line in path.read_text(encoding="utf-8-sig").splitlines():
         key, sep, value = line.strip().removeprefix("export ").partition("=")
         key, value = key.strip(), value.strip().strip('"').strip("'")
@@ -126,6 +126,7 @@ class CompanionEngine:
                     "asr_device":getattr(self.models,'asr_device',None),
                     "asr_compute_type":getattr(self.models,'asr_compute_type',None),
                     "asr_warm_s":getattr(self.models,'asr_warm_s',None),
+                    "recognition_pause_warm":bool(getattr(getattr(self.models,'recognition_warmup',None),'enabled',False)),
                     "speech_runtime":getattr(self.models,'speech_runtime',None),
                     "visual_warmup": self.visual_warmup,
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
@@ -159,6 +160,13 @@ class CompanionEngine:
                 self.jobs.pop(next(iter(self.jobs)))
             threading.Thread(target=self.run, args=(key, text, mode, scene, raw), daemon=True).start()
             return key
+
+    def prime_recognition(self):
+        with self.lock:
+            primer = getattr(self.models, 'recognition_warmup', None)
+            if not self.ready or self.busy or self.playback_pending or not primer:
+                return {'accepted': False}
+            return {'accepted': primer.request()}
 
     def job(self, key):
         with self.lock:
@@ -282,6 +290,14 @@ class CompanionEngine:
         speech_prefetch = None
         candidate_poses = set()
         try:
+            check_cancel(event)
+            finish_warmup = getattr(self.models, 'finish_recognition_warmup', None)
+            if finish_warmup:
+                warmup = finish_warmup()
+                if warmup is not None:
+                    with self.lock:
+                        job['metrics']['recognition_warmup'] = warmup
+            check_cancel(event)
             if raw is not None:
                 text = self.models.transcribe(raw)
                 check_cancel(event)
