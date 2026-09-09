@@ -283,3 +283,11 @@ git diff --check
 ```
 
 Changing hardware, precision, audio backend, source footage or transport needs the relevant complete-call qualification. Keep services private, retain memory and secrets, and use the capped rental proposal in ECONOMICS only after the founder elects to provision it. A working local demonstration does not authorize a public adult service.
+
+### MVP consolidation — September 9
+
+Start with `./scripts/start_local.ps1 -Background` or `.venv/Scripts/python.exe -m local_app`; check with `.venv/Scripts/python.exe -m local_app --check`. Media asset validation and playback are combined in `local_app/media.py`. Speech scheduling lives in the central engine; recognition warm-up lives with the models. Five former helper modules were removed without changing their functions. README now maps the actual PWA/local demo pipeline and removes the obsolete Apple-first direction. Existing experiments remain reproducible; they are not additional app services.
+
+Validation: 214 Python and 32 browser regression tests pass. A fresh isolated synthetic voice-command test produced a prepared wave with generated speech/lips: 40 decoded frames, non-silent audio, private memory unchanged. Cold reply took 15.79s including visual model loading; the warm repeat completed in 0.905s (0.052s ASR, 0.710s rendering). Preview was resident; this is one sample per state, not a p95, perceived latency or arbitrary-motion result. Browser playback, physical audio and perceptual sync were not tested in this run.
+
+Cloudflare comparison through the real dialogue adapter: Qwen3-30B-A3B-FP8 passed four synthetic checks in 0.663–0.738s; Granite-4.0-H-Micro passed in 1.494–2.721s; GLM-4.7-Flash exhausted 512 output tokens after 8.239s and failed its first case. Qwen remains selected. Nine requests total; nominal cost from stored benchmark rates is $0.000701397, not a verified invoice. Cache bypass was requested; the provider returned UNKNOWN cache status. Evidence: `docs/research/local-poc-benchmarks.json`, key `mvp_consolidation_20260909`.

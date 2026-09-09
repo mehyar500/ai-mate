@@ -2,7 +2,7 @@
 import threading
 import unittest
 
-from local_app.recognition_warmup import RecognitionWarmup, pause_warm_enabled
+from local_app.models import RecognitionWarmup, pause_warm_enabled
 
 
 class RecognitionWarmupTests(unittest.TestCase):

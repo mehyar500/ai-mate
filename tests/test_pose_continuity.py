@@ -199,7 +199,7 @@ class PoseTests(unittest.TestCase):
             ordinary = self.reply('hello')
             self.assertEqual(ordinary['state'], 'done')
             self.assertEqual(self.app.visual_cursor, .4)
-            with patch('local_app.playback.video_duration', return_value=3):
+            with patch('local_app.media.video_duration', return_value=3):
                 movement = self.reply(command)
             self.assertEqual(movement['state'], 'done', movement.get('error'))
             self.assertAlmostEqual(self.visual.render_options[-1]['motion_start_s'], offset)

@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from local_app.idle import load_reviewed_idle
+from local_app.media import load_reviewed_idle
 
 
 class IdleAssetTests(unittest.TestCase):

@@ -6,7 +6,7 @@ import unittest
 
 from local_app.engine import CompanionEngine
 from local_app.models import Cancelled, check_cancel
-from local_app.speech import SpeechPrefetch, speech_phrases
+from local_app.engine import SpeechPrefetch, speech_phrases
 
 LONG = ('One, two, three, four, five, six, seven, eight, nine, ten. '
         'Eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen. '

@@ -17,7 +17,7 @@ import time
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from local_app.speech import speech_phrases
+from local_app.engine import speech_phrases
 from local_app.speech_runtime import create_speech
 from scripts.review_lip_sync import preview_idle
 

@@ -46,15 +46,15 @@ def main():
     assets = ROOT/'generated/local-app'
     if args.performance_label:
         assets=assets/'audit'/('performance-'+args.performance_label)
-        from local_app.performance import load_reviewed_performance
-        from local_app.idle import load_reviewed_idle
+        from local_app.media import load_reviewed_performance
+        from local_app.media import load_reviewed_idle
         performance=load_reviewed_performance(assets)
         if not performance or not all(load_reviewed_idle(assets,pose) for pose in ['base','near']):
             parser.error('The candidate needs reviewed, matching performance and listening manifests.')
         if args.trial in {'wave','qualification','soak'} and ('base','wave') not in performance:
             parser.error('This trial also needs a reviewed, matching wave.')
     if args.near_wave:
-        from local_app.performance import load_reviewed_performance
+        from local_app.media import load_reviewed_performance
         if args.trial not in {'qualification','soak'} or ('near','wave') not in load_reviewed_performance(assets):
             parser.error('--near-wave requires a qualification/soak with a reviewed matching close-view wave.')
     folder = ROOT/'generated/local-app/audit'/('voice-video-'+args.trial+('-'+args.label if args.label else ''))

@@ -30,7 +30,7 @@ import numpy as np
 from scipy.io import wavfile
 from scipy.signal import resample_poly
 
-from local_app.idle import load_reviewed_idle
+from local_app.media import load_reviewed_idle
 from local_app.visual import PortraitRenderer
 from scripts.review_lip_sync import preview_idle
 from scripts.webrtc_signaling import validate_offer

@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from local_app.engine import CompanionEngine
-from local_app.playback import capture_playback_frame, stopped_pose, validate_playback
+from local_app.media import capture_playback_frame, stopped_pose, validate_playback
 from local_app.visual import motion_duration
 
 
@@ -58,7 +58,7 @@ class PlaybackTests(unittest.TestCase):
         previous = self.root/'old.png'; previous.write_bytes(b'generated endpoint')
         self.app.pose = ('fullbody', previous)
         self.app.performance_state = 'near'
-        with patch('local_app.playback.capture_playback_frame', side_effect=self.capture) as capture:
+        with patch('local_app.media.capture_playback_frame', side_effect=self.capture) as capture:
             result = self.stop()
             self.assertEqual(self.stop(.9), result)
         self.assertEqual(capture.call_count, 1)
@@ -81,7 +81,7 @@ class PlaybackTests(unittest.TestCase):
             with self.assertRaises(BlockingIOError):
                 self.stop()
             return self.capture(source, destination, seconds)
-        with patch('local_app.playback.capture_playback_frame', side_effect=capture):
+        with patch('local_app.media.capture_playback_frame', side_effect=capture):
             self.assertTrue(self.stop()['pose_preserved'])
         self.assertFalse(self.app.status()['busy'])
         self.assertTrue(self.app.pose[1].exists())
@@ -91,7 +91,7 @@ class PlaybackTests(unittest.TestCase):
         def capture(source, destination, seconds):
             self.app.reset()
             return self.capture(source, destination, seconds)
-        with patch('local_app.playback.capture_playback_frame', side_effect=capture):
+        with patch('local_app.media.capture_playback_frame', side_effect=capture):
             result = self.stop()
         self.assertTrue(result['superseded'])
         self.assertIsNone(self.app.pose)
@@ -104,7 +104,7 @@ class PlaybackTests(unittest.TestCase):
         def fail(source, destination, seconds):
             destination.write_bytes(b'partial')
             raise ValueError('Synthetic truncated media')
-        with patch('local_app.playback.capture_playback_frame', side_effect=fail):
+        with patch('local_app.media.capture_playback_frame', side_effect=fail):
             result = self.stop()
         self.assertFalse(result['pose_preserved'])
         self.assertTrue(self.app.jobs[self.key]['cancel'].is_set())
@@ -118,7 +118,7 @@ class PlaybackTests(unittest.TestCase):
         self.assertFalse(self.app.playback_pending)
 
     def test_reverse_and_continuation_use_remaining_source_duration(self):
-        with patch('local_app.playback.video_duration', return_value=3):
+        with patch('local_app.media.video_duration', return_value=3):
             for destination, expected in [('near', .4), ('base', .6)]:
                 metadata = {'transition': {'path': self.source, 'to': destination}, 'start_s': .6}
                 pose, progress = stopped_pose(metadata, .6)
@@ -131,7 +131,7 @@ class PlaybackTests(unittest.TestCase):
                 motion_duration(1, 72, 24, start_s=offset)
 
     def test_gesture_interruption_never_becomes_an_approach_cursor(self):
-        with patch('local_app.playback.video_duration', return_value=4):
+        with patch('local_app.media.video_duration', return_value=4):
             for pose in ['base','near']:
                 metadata = {'transition': {'kind':'gesture','path':self.source,'from':pose,'to':pose},'start_s':0}
                 self.assertEqual(stopped_pose(metadata, 0), (None, None))

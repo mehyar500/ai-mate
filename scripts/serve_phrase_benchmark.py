@@ -121,9 +121,9 @@ def main():
     server = ThreadingHTTPServer(('127.0.0.1', 8766), Handler)
     server.daemon_threads = True
     server.app = app
-    from local_app.speech import speech_phrases
+    from local_app.engine import speech_phrases
     splitter = (lambda text: [text]) if args.whole else speech_phrases
-    with patch('local_app.speech.speech_phrases', side_effect=splitter):
+    with patch('local_app.engine.speech_phrases', side_effect=splitter):
         worker = threading.Thread(target=server.serve_forever, daemon=True)
         worker.start()
         print(json.dumps({'ready': True, 'label': label, 'url': 'http://127.0.0.1:8766'}), flush=True)

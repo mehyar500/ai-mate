@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from local_app.performance import load_reviewed_performance, load_reviewed_wave
+from local_app.media import load_reviewed_performance, load_reviewed_wave
 
 
 class PerformanceAssetTests(unittest.TestCase):

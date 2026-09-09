@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from local_app.engine import configure_runtime
 from local_app.conversation import Conversation
-from local_app.performance import load_reviewed_performance
+from local_app.media import load_reviewed_performance
 from scripts.check_cloud_gateway import NoRedirect
 
 

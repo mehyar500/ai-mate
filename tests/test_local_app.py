@@ -16,6 +16,30 @@ from local_app.models import Cancelled, Models, check_cancel
 from local_app.server import Application, Handler, ThreadingHTTPServer
 
 
+class LauncherChecks(unittest.TestCase):
+    def test_health_output_omits_private_state_and_requires_video(self):
+        from unittest.mock import patch
+        from local_app.__main__ import main
+        for video_ready, expected in [(True, 0), (False, 1)]:
+            response = io.BytesIO(json.dumps({'ready': True, 'busy': False,
+                'visual_loaded': video_ready, 'token': 'private-token',
+                'memory': 'private-memory'}).encode())
+            output = io.StringIO()
+            with patch('sys.argv', ['local_app', '--check']), patch(
+                    'urllib.request.urlopen', return_value=response), redirect_stdout(output):
+                self.assertEqual(main(), expected)
+            self.assertNotIn('private', output.getvalue())
+            self.assertEqual(json.loads(output.getvalue())['video_ready'], video_ready)
+
+    def test_unavailable_preview_returns_failure_without_traceback(self):
+        from unittest.mock import patch
+        from local_app.__main__ import main
+        with patch('sys.argv', ['local_app', '--check']), patch(
+                'urllib.request.urlopen', side_effect=OSError('private details')), redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main(), 1)
+        self.assertNotIn('private details', output.getvalue())
+
+
 class ClientDisconnectTests(unittest.TestCase):
     def test_browser_closure_during_response_ends_connection_quietly(self):
         from unittest.mock import Mock

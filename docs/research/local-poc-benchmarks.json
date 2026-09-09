@@ -23311,5 +23311,79 @@
       "rental_usd": 0
     },
     "next_experiment": "Implement only a bounded adapter or return to the current prepared-action path; measure first-frame time, cancellation, reference retention and pose fidelity before any app selection."
+  },
+  "mvp_consolidation_20260909": {
+    "scope": "Consolidation and isolated synthetic pipeline checks; no arbitrary-motion or physical-device acceptance.",
+    "source_commit": "03ba9a2",
+    "checks": {
+      "python": 214,
+      "javascript": 32,
+      "compileall": "pass",
+      "independent_review": "not performed",
+      "CI": "not run"
+    },
+    "pipeline": {
+      "scope": "Isolated synthetic ASR -> command -> speech -> prepared wave plus generated lips. Decoding and non-silent audio are not perceptual or physical-device acceptance.",
+      "metrics": {
+        "asr_s": 0.128,
+        "first_text_s": 0.13,
+        "decision_source": "direct_command",
+        "first_media_ready_s": 15.779,
+        "total_s": 15.79
+      },
+      "decoded_frames": 40,
+      "audio_peak": 0.474151611328125,
+      "audio_seconds": 0.9606666666666667,
+      "private_memory_unchanged": true,
+      "warm_repeat_metrics": {
+        "asr_s": 0.052,
+        "first_text_s": 0.054,
+        "decision_source": "direct_command",
+        "first_media_ready_s": 0.895,
+        "total_s": 0.905
+      },
+      "warm_render_s": 0.710232299999916
+    },
+    "decision": "Keep Qwen. Warm prepared-action pipeline passes output integrity; cold load and visual quality remain concerns.",
+    "dialogue": {
+      "@cf/qwen/qwen3-30b-a3b-fp8": {
+        "requests": 4,
+        "complete_seconds": [
+          0.663,
+          0.738,
+          0.707,
+          0.687
+        ],
+        "passed_checks": 4,
+        "errors": []
+      },
+      "@cf/zai-org/glm-4.7-flash": {
+        "requests": 1,
+        "complete_seconds": [
+          8.239
+        ],
+        "passed_checks": 0,
+        "errors": [
+          "RuntimeError"
+        ]
+      },
+      "@cf/ibm-granite/granite-4.0-h-micro": {
+        "requests": 4,
+        "complete_seconds": [
+          1.494,
+          2.721,
+          1.496,
+          1.894
+        ],
+        "passed_checks": 4,
+        "errors": []
+      }
+    },
+    "nominal_api_usd": 0.000701397,
+    "pricing_limit": "Stored benchmark rates, not invoice verification. Cache bypass requested, cache status UNKNOWN.",
+    "local_evidence": [
+      "generated/local-app/audit/cloud-dialogue-comparison-mvp-cleanup.json",
+      "generated/local-app/audit/mvp-cleanup-smoke-final/result.json"
+    ]
   }
 }
