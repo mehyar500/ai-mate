@@ -485,6 +485,7 @@ setInterval(async()=>{
   try{
     const state=await api('/api/rtc/state',{});
     if(rtcPeer!==peer)return;
+    if(peer.remoteDescription&&['closed','failed'].includes(state.connection_state)){failRtc();return;}
     playing=state.playing;
     if(playing&&state.started){pictureStarted=true;$("video").hidden=false;$("held-frame").hidden=true;}
     controls();

@@ -280,6 +280,7 @@ class LocalCallCleanupTests(unittest.TestCase):
         engine = SimpleNamespace(cancel=MagicMock(), frame_output=replacement)
         call = LocalCall(engine)
         call.session = PlaybackSession(None, [], [], Path('.'))
+        self.assertEqual(call.request('state', {})['connection_state'], 'closed')
         call.shutdown()
         self.assertIs(engine.frame_output, replacement)
         engine.cancel.assert_not_called()

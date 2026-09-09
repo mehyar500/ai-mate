@@ -211,7 +211,8 @@ class LocalCall:
             return {'ok': True}
         if action == 'state':
             clip = self.session.clip if self.session else None
-            return {'connected': bool(self.peer and self.peer.connectionState == 'connected'),
+            return {'connection_state': self.peer.connectionState if self.peer else 'closed',
+                    'connected': bool(self.peer and self.peer.connectionState == 'connected'),
                     'playing': bool(clip and not clip['finished'] and not (clip.get('event') and clip['event'].is_set())),
                     'started': bool(clip and clip['start_s'] is not None)}
         if action != 'offer':
