@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from local_app.engine import configure_runtime
 from local_app.conversation import Conversation
-from scripts.benchmark_cloud_comparison import CASES, SNAPSHOT
+from experiments.benchmark_cloud_comparison import CASES, SNAPSHOT
 
 
 def main():

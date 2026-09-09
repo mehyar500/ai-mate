@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from local_app.engine import configure_runtime
 from local_app.conversation import Conversation
-from scripts.benchmark_cloud_speech import CASES as SPEECH_CASES
+from experiments.benchmark_cloud_speech import CASES as SPEECH_CASES
 
 # September 8 list prices; https://developers.cloudflare.com/workers-ai/platform/pricing/
 MODELS = {

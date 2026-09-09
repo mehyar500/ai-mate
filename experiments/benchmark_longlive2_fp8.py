@@ -10,7 +10,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.benchmark_longlive2 import checksum
+from experiments.benchmark_longlive2 import checksum
 
 
 def main():

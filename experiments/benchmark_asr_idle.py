@@ -35,7 +35,7 @@ def main():
     from scripts.review_lip_sync import preview_idle
     from local_app.engine import configure_runtime
     from local_app.models import Models
-    from scripts.benchmark_call_asr import words
+    from experiments.benchmark_call_asr import words
     preview_idle()
     folder = ROOT / 'generated/local-app/audit' / ('asr-idle-' + args.label)
     folder.mkdir(exist_ok=False)

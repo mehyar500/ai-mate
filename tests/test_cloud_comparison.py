@@ -5,7 +5,7 @@ import unittest
 import urllib.request
 from unittest.mock import patch
 
-from scripts import benchmark_cloud_comparison as benchmark
+from experiments import benchmark_cloud_comparison as benchmark
 
 
 class SyntheticAdapter:

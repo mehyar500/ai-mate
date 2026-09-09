@@ -1,7 +1,7 @@
 """Prevent repeated punctuation from appearing as a clean recognition result."""
 import unittest
-from scripts.benchmark_asr_window import artifact_flags
-from scripts.benchmark_call_asr import word_errors
+from experiments.benchmark_asr_window import artifact_flags
+from experiments.benchmark_call_asr import word_errors
 
 
 class ASRBenchmarkScoringTests(unittest.TestCase):

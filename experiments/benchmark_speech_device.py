@@ -17,8 +17,8 @@ import time
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from scripts.benchmark_supertonic import CASES
-from scripts.benchmark_call_asr import words,word_errors
+from experiments.benchmark_supertonic import CASES
+from experiments.benchmark_call_asr import words,word_errors
 from scripts.review_lip_sync import preview_idle
 
 

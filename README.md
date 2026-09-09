@@ -28,7 +28,8 @@ Voice or text input → `server.py` → `engine.py` → dialogue plan → speech
 | `local_app/media.py` | Reviewed clips and playback continuity |
 | `local_app/web/` | Text, voice call and video call UI |
 | `config/` | Model and runtime pins |
-| `scripts/` | Optional setup, experiments and qualification tools; not additional app services |
+| `scripts/` | Setup, launch and qualification tools |
+| `experiments/` | Optional model comparisons and renderer benchmarks; not app services |
 | `tests/` | Regression checks |
 
 Cloudflare currently supplies configured dialogue. Transcription, speech and graphics run locally. Moving graphics to a GPU provider will require an explicit inference API; this local Python process cannot run inside a Cloudflare Worker. Public WebRTC transport and multi-user deployment are still unqualified.
@@ -43,7 +44,7 @@ Technical validation uses clothed, neutral footage. Commercial model licensing, 
 
 ```powershell
 .venv/Scripts/python.exe -m unittest discover -s tests -v
-.venv/Scripts/python.exe -m compileall -q local_app scripts tests
+.venv/Scripts/python.exe -m compileall -q local_app scripts experiments tests
 node --test tests/media-sync.test.mjs tests/microphone.test.mjs tests/call-input.test.mjs tests/playback-probe.test.cjs
 git diff --check
 ```

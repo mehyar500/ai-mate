@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 
-from scripts.benchmark_cloud_video import credits, response_result
+from experiments.benchmark_cloud_video import credits, response_result
 
 
 class CloudVideoResponseTests(unittest.TestCase):

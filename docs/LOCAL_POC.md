@@ -69,7 +69,7 @@ Use isolated candidate bundles; inspect each reference before generating from it
 Example: create another near-wave candidate using the currently reviewed near reference. These commands perform local generation and preserve existing assets:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --reference-path generated/local-app/performance-near.png --action wave --framing close --return-to-reference --silent --frames 73 --seed 85 --temporal-size 128 --timeout 600
+.\.venv\Scripts\python.exe experiments/benchmark_ltx23.py --reference-path generated/local-app/performance-near.png --action wave --framing close --return-to-reference --silent --frames 73 --seed 85 --temporal-size 128 --timeout 600
 ```
 
 Use the returned local MP4 path as `SOURCE.mp4` below, and a fresh lowercase label:
@@ -136,7 +136,7 @@ The new OpenCV Zoo MediaPipe [person](https://github.com/opencv/opencv_zoo/tree/
 
 `qualify_call_modes.cjs` uses the same isolated qualification server with a fresh label, instead of the video-suite driver. Run `node scripts/qualify_call_modes.cjs new-modes` after starting the server with `--label new-modes`. It exercises six actual Text/Voice/Video turns, call navigation and browser playback using a silent synthetic microphone. Body commands in Text/Voice must request Video mode; negative commands must not. The validated `mode-honesty` run passed all six, with three nonzero/unclipped WAVs and all 40 generated video frames analyzed/visually inspected. Physical audio remains unverified.
 
-Planner experiments use `scripts/benchmark_compact_planner.py --label fresh-label --variant compact --repeats 2`; `--variant sparse` preserves the original instructions and changes output defaults. The fixed baseline is read as literal text from commit `341aa93` (that commit must be available locally), never executed. Runs have at most 72 synthetic requests, no request retries, a $0.10 nominal reservation and stop after three request/adapter errors. Run outside call timing. No variant is selected in the app.
+Planner experiments use `experiments/benchmark_compact_planner.py --label fresh-label --variant compact --repeats 2`; `--variant sparse` preserves the original instructions and changes output defaults. The fixed baseline is read as literal text from commit `341aa93` (that commit must be available locally), never executed. Runs have at most 72 synthetic requests, no request retries, a $0.10 nominal reservation and stop after three request/adapter errors. Run outside call timing. No variant is selected in the app.
 
 The complete comparison after the movement fix measured compact versus baseline at 0.433/0.536s median, 36 samples each; compact confused naming direction once. Sparse output measured 0.478/0.607s, also 36 each, but lost two fact corrections. Earlier failed/partial trials remain retained, including one adapter error and one timeout. Across all six trials, 252 scheduled requests had $0.017735 of known nominal token cost; one timeout's usage is unknown. Prices use the [September 9 model page](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), not an invoice. The original prompt remains selected.
 
@@ -152,7 +152,7 @@ Setup is isolated: clone the exact revision in the manifest into `.cache/local-p
 
 `benchmark_longlive2_vae.py --label fresh-vae --vae light-v2 --latent-chunk 8 --width 384 --height 576` measures decoding synthetic repeated reference latents while the preview is idle. The original VAE lacks the expected cached method; the isolated adapter preserves causal decoder state. Both original and lightweight split decoding matched their respective ordinary 13-frame controls exactly. Three measured chunks: original **8.38–8.42 FPS / 4,322MiB peak** at 320x480; lightweight **63.25–63.43 FPS / 815MiB** at 320x480 and **42.28–42.64 FPS / 1,131MiB** at 384x576. These are decoder-only rates, not fresh motion or call FPS. Inspected reconstruction frames remain visibly softened, especially face and foliage.
 
-With the preview deliberately stopped between calls, run `.venv/Scripts/python.exe scripts/benchmark_longlive2.py --label fresh-motion --case raise-lower --blocks 4 --repeats 2 --vae light-v2 --text-device cuda --attention-frames 32`. It requires 14GB free VRAM and separates text preparation, model loading, first decoded chunk and generation timing. It uses `weights_only=True`, native PyTorch attention and the upstream non-Triton fallback. The first attempted full run failed on missing Triton; the explicit fallback fixed execution. Restart the normal preview afterward. No private conversation or prepared motion is substituted for model input.
+With the preview deliberately stopped between calls, run `.venv/Scripts/python.exe experiments/benchmark_longlive2.py --label fresh-motion --case raise-lower --blocks 4 --repeats 2 --vae light-v2 --text-device cuda --attention-frames 32`. It requires 14GB free VRAM and separates text preparation, model loading, first decoded chunk and generation timing. It uses `weights_only=True`, native PyTorch attention and the upstream non-Triton fallback. The first attempted full run failed on missing Triton; the explicit fallback fixed execution. Restart the normal preview afterward. No private conversation or prepared motion is substituted for model input.
 
 | Fresh motion experiment at 320x480 | Measured result | Visual decision |
 |---|---|---|
@@ -193,7 +193,7 @@ The original [Wan2.1-VACE-1.3B](https://huggingface.co/Wan-AI/Wan2.1-VACE-1.3B) 
 
 All 132 frames were visually inspected against the reference and evaluated with the independent body diagnostic. It detects the right arm raised in frames 6–18 and no raised left arm in every trial; black-frame and mirrored-side controls pass. This fixed skeleton misses the visually evident edge defects. Hands/faces remain soft, and the supplied trajectory raises the wrist above the prompt's stated shoulder height. No normal-speed/audio acceptance, left-hand correction, arbitrary-action planner or live streaming was tested. Peak allocated GPU memory is about 9.63GB; four-step timing includes about 7.3s control encoding, 12.9s diffusion and 5.9s decoding, excluding cached prompt preparation and roughly 2.8s model loading. Six new numerical/invalid-input checks pass. No candidate is selected in the app.
 
-The smaller portrait experiment adds [TAEW2.1](https://github.com/madebyollin/taehv/tree/011dfc2112197741c540e0bdd5b7b67bcc930771), an approximate MIT encoder/decoder with pinned 22.64MB weights. Fetch or verify it with `.venv/Scripts/python.exe scripts/download_vace_benchmark.py --tiny-vae-only`. After pausing the verified idle preview, reproduce with `.venv/Scripts/python.exe scripts/benchmark_vace.py --label fresh-tiny-prefix --size 384 --aspect portrait --pose-profile compact --frames 17 --trajectory-frames 33 --generator rcm --steps 2 --vae tiny-both --conditioning masked-body`; always restart the preview afterward. A prefix preserves the full trajectory's timing, rather than compressing the complete movement into one second.
+The smaller portrait experiment adds [TAEW2.1](https://github.com/madebyollin/taehv/tree/011dfc2112197741c540e0bdd5b7b67bcc930771), an approximate MIT encoder/decoder with pinned 22.64MB weights. Fetch or verify it with `.venv/Scripts/python.exe scripts/download_vace_benchmark.py --tiny-vae-only`. After pausing the verified idle preview, reproduce with `.venv/Scripts/python.exe experiments/benchmark_vace.py --label fresh-tiny-prefix --size 384 --aspect portrait --pose-profile compact --frames 17 --trajectory-frames 33 --generator rcm --steps 2 --vae tiny-both --conditioning masked-body`; always restart the preview afterward. A prefix preserves the full trajectory's timing, rather than compressing the complete movement into one second.
 
 | 256x384, fixed seed, cached text | Inference / generated FPS | Visual result |
 |---|---:|---|
@@ -210,7 +210,7 @@ All **135 frames** including a same-latent tiny-decoder comparison were inspecte
 
 Next: test generation with retained temporal state and command cancellation using the separately released causal rCM checkpoint, after verifying reference/pose compatibility. Tiny decoding is no longer the main bottleneck. No paid API or rental was used; electricity and hardware cost remain unmeasured. [Scope's VACE guide](https://docs.daydream.live/scope/guides/vace) documents experimental streaming control, but its actual [source license](https://github.com/daydreamlive/scope/blob/2aced4ded3513a76cd35f0dbfb42fbfbf5e98ab0/LICENSE.md) is CC BY-NC-SA 4.0 despite MIT package metadata; no Scope code or weights were integrated.
 
-The pinned causal rCM checkpoint is now downloaded and hash-verified. Run `.venv/Scripts/python.exe scripts/benchmark_causal_vace_compat.py` for the CPU audit. Its 825 generator tensors transfer exactly into the VACE base while 439 VACE control tensors are retained, but the causal `WanModel.forward` exposes KV-cache state without `vace_context`, whereas `VaceWanModel.forward` exposes `vace_context` without causal KV state. The audit therefore rejects it as a drop-in runtime model. A causal VACE adapter is required before any GPU quality claim; do not select this checkpoint in the app.
+The pinned causal rCM checkpoint is now downloaded and hash-verified. Run `.venv/Scripts/python.exe experiments/benchmark_causal_vace_compat.py` for the CPU audit. Its 825 generator tensors transfer exactly into the VACE base while 439 VACE control tensors are retained, but the causal `WanModel.forward` exposes KV-cache state without `vace_context`, whereas `VaceWanModel.forward` exposes `vace_context` without causal KV state. The audit therefore rejects it as a drop-in runtime model. A causal VACE adapter is required before any GPU quality claim; do not select this checkpoint in the app.
 
 Other research does not justify another large download yet: [LiveAnimate](https://github.com/liveanimate/LiveAnimate) still labels code as forthcoming; [MotionStream](https://github.com/alex4727/MotionStream) also lacks released inference in its inspected tree. [Hallo-Live](https://github.com/fudan-generative-vision/Hallo-Live) reports 20.38 FPS on two H200s. [ARDY](https://github.com/nv-tlabs/ardy) provides streaming text/spatial motion control, but its text encoder needs gated Llama access and it does not render a photorealistic person itself.
 
@@ -266,8 +266,8 @@ TensorRT installation/build comparison is separate and hardware-specific:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install --target .cache/tensorrt-deps --no-deps -r config/tensorrt-benchmark-requirements.txt
-.\.venv\Scripts\python.exe scripts/benchmark_trt_vae.py --label fp16
-.\.venv\Scripts\python.exe scripts/benchmark_trt_media.py
+.\.venv\Scripts\python.exe experiments/benchmark_trt_vae.py --label fp16
+.\.venv\Scripts\python.exe experiments/benchmark_trt_media.py
 ```
 
 These particular build scripts retain fixed experiment paths; inspect existing outputs and their resume behavior first. Only after numerical/media review, copy `decoder.engine` and `build.json` from `audit/visual-trt-fp16` into the reviewed runtime directory, record the actual review and qualify `--decoder tensorrt-reviewed`. No script self-approves its engine. Portable Torch/CPU settings remain available.
@@ -276,7 +276,7 @@ Routine checks:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe -m compileall -q local_app scripts tests
+.\.venv\Scripts\python.exe -m compileall -q local_app scripts experiments tests
 node --check local_app/web/app.js
 node --test tests/media-sync.test.mjs tests/microphone.test.mjs tests/call-input.test.mjs tests/playback-probe.test.cjs
 git diff --check
@@ -291,3 +291,7 @@ Start with `./scripts/start_local.ps1 -Background` or `.venv/Scripts/python.exe 
 Validation: 214 Python and 32 browser regression tests pass. A fresh isolated synthetic voice-command test produced a prepared wave with generated speech/lips: 40 decoded frames, non-silent audio, private memory unchanged. Cold reply took 15.79s including visual model loading; the warm repeat completed in 0.905s (0.052s ASR, 0.710s rendering). Preview was resident; this is one sample per state, not a p95, perceived latency or arbitrary-motion result. Browser playback, physical audio and perceptual sync were not tested in this run.
 
 Cloudflare comparison through the real dialogue adapter: Qwen3-30B-A3B-FP8 passed four synthetic checks in 0.663–0.738s; Granite-4.0-H-Micro passed in 1.494–2.721s; GLM-4.7-Flash exhausted 512 output tokens after 8.239s and failed its first case. Qwen remains selected. Nine requests total; nominal cost from stored benchmark rates is $0.000701397, not a verified invoice. Cache bypass was requested; the provider returned UNKNOWN cache status. Evidence: `docs/research/local-poc-benchmarks.json`, key `mvp_consolidation_20260909`.
+
+Benchmark programs now live in `experiments/` (42 moved files). `scripts/` retains setup, launch and qualification tools. Historical JSON evidence keeps the paths used at measurement time; current runnable commands above use the new paths. All 214 Python checks pass after the move, the Cloudflare comparison and VACE command-line entry points load, and the causal checkpoint audit still passes. Startup remains `./scripts/start_local.ps1 -Background`; no new service, key or runtime dependency was added.
+
+Additional moved-entry-point comparisons: Llama-3.1-8B-Instruct-FP8-Fast passed four checks at 0.662–0.974s; Llama-3.2-3B-Instruct ran at 0.379–0.591s but omitted message delivery in one of four cases. Qwen remains selected. These small synthetic trials do not establish call latency or p95. Evidence key: `mvp_experiment_layout_20260909`.

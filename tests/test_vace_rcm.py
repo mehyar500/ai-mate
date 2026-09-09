@@ -2,7 +2,7 @@
 import importlib.util
 import unittest
 
-from scripts.benchmark_vace import dense_attention
+from experiments.benchmark_vace import dense_attention
 from scripts.vace_rcm import body_control_bounds, schedule, transfer_generator
 
 

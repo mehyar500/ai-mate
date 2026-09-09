@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 from local_app.engine import CompanionEngine, configure_runtime
 from local_app.models import Models
 from local_app.server import Handler, ThreadingHTTPServer
-from scripts.benchmark_cloud_speech import CASES
+from experiments.benchmark_cloud_speech import CASES
 
 
 class SyntheticModels(Models):

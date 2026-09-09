@@ -25,7 +25,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from local_app.engine import configure_runtime
 from local_app.models import Cancelled, Models, check_cancel
-from scripts.benchmark_call_asr import word_errors
+from experiments.benchmark_call_asr import word_errors
 
 
 def run_pair(models, item, folder, kind):

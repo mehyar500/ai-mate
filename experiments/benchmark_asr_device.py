@@ -15,8 +15,8 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from local_app.models import Models,CACHE
-from scripts.benchmark_call_asr import word_errors,words
-from scripts.benchmark_asr_window import artifact_flags
+from experiments.benchmark_call_asr import word_errors,words
+from experiments.benchmark_asr_window import artifact_flags
 
 
 def main():

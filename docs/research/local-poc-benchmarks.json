@@ -23385,5 +23385,48 @@
       "generated/local-app/audit/cloud-dialogue-comparison-mvp-cleanup.json",
       "generated/local-app/audit/mvp-cleanup-smoke-final/result.json"
     ]
+  },
+  "mvp_experiment_layout_20260909": {
+    "scope": "42 benchmark scripts relocated; import paths and documented commands updated, no runtime inference change.",
+    "source_commit": "96176df",
+    "checks": {
+      "python": 214,
+      "compileall": "pass",
+      "relocated_ast_parity": 42,
+      "preview": "ready, video ready, idle",
+      "causal_checkpoint_audit": "pass"
+    },
+    "additional_dialogue_trials": [
+      {
+        "model": "@cf/meta/llama-3.1-8b-instruct-fp8-fast",
+        "seconds": [
+          0.974,
+          0.765,
+          0.662,
+          0.957
+        ],
+        "pass_count": 4,
+        "failed_checks": [],
+        "nominal_usd": 0.000332913
+      },
+      {
+        "model": "@cf/meta/llama-3.2-3b-instruct",
+        "seconds": [
+          0.591,
+          0.549,
+          0.379,
+          0.457
+        ],
+        "pass_count": 3,
+        "failed_checks": [
+          {
+            "message": false
+          }
+        ],
+        "nominal_usd": 0.00032173499999999997
+      }
+    ],
+    "limits": "Four synthetic cases per model, not p95 or call latency. Cache status UNKNOWN; prices from stored benchmark rates, not invoices.",
+    "decision": "Keep Qwen selected; Llama 8B no clear speed improvement, Llama 3B loses message delivery."
   }
 }

@@ -28,7 +28,7 @@ def preflight(manifest, prepare_only, rcm=False, tiny=False):
     revision = subprocess.check_output(['git', '-C', str(CODE), 'rev-parse', 'HEAD'], text=True).strip()
     if revision != manifest['wan_code']['revision'] or subprocess.check_output(['git', '-C', str(CODE), 'diff', '--no-ext-diff']):
         raise ValueError('Expected the clean, pinned Wan checkout.')
-    from scripts.benchmark_rain import preflight as pose_preflight
+    from experiments.benchmark_rain import preflight as pose_preflight
     pose_preflight(json.loads((ROOT / 'config/rain-benchmark.json').read_text()), prepare_only=True)
     if not prepare_only:
         rows = manifest['files'] + manifest['reused_files']
@@ -48,7 +48,7 @@ def dense_attention(q, k, v, q_lens=None, k_lens=None, **kwargs):
         raise ValueError('Padded query sequences are outside this test.')
     if k_lens is not None and not bool((k_lens == k.shape[1]).all()):
         raise ValueError('Padded key sequences are outside this test.')
-    from scripts.benchmark_longlive2 import sdpa_attention
+    from experiments.benchmark_longlive2 import sdpa_attention
     return sdpa_attention(q, k, v, **kwargs)
 
 
@@ -63,7 +63,7 @@ def run(args, record, output, manifest):
     import numpy as np
     import torch
     from safetensors.torch import load_file, save_file
-    from scripts.benchmark_rain import controls
+    from experiments.benchmark_rain import controls
 
     torch.set_num_threads(8)
     torch.set_grad_enabled(False)

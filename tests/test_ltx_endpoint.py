@@ -1,6 +1,6 @@
 """An endpoint constraint must reach sampling and be removed before decoding."""
 import unittest
-from scripts.benchmark_ltx23 import workflow
+from experiments.benchmark_ltx23 import workflow
 
 
 class LTXEndpointTests(unittest.TestCase):

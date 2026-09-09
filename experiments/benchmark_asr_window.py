@@ -17,7 +17,7 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from local_app.models import Models
-from scripts.benchmark_call_asr import words,word_errors
+from experiments.benchmark_call_asr import words,word_errors
 
 
 def artifact_flags(text):
