@@ -32,6 +32,9 @@ from local_app.rtc import PlaybackSession, Picture, Speech
 
 
 class Session(PlaybackSession):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, benchmark=True)
+
     def begin(self, index):
         with self.lock:
             return self._begin(index)

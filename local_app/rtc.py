@@ -20,8 +20,10 @@ from scipy.signal import resample_poly
 
 
 class PlaybackSession:
-    def __init__(self, renderer, idle, fixtures, folder, transport='webrtc'):
+    def __init__(self, renderer, idle, fixtures, folder, transport='webrtc', *, benchmark=False):
         self.renderer, self.idle, self.fixtures, self.folder = renderer, idle, fixtures, folder
+        self.benchmark = benchmark
+        self.sequence = 0
         self.clock_start = None
         self.clip = None
         self.rows = []
@@ -42,7 +44,11 @@ class PlaybackSession:
             raise ValueError('Invalid synthetic WAV.')
         common = math.gcd(rate, 48000)
         pcm = np.clip(np.rint(resample_poly(pcm.astype(float), 48000//common, rate//common)), -32768, 32767).astype(np.int16)
-        row = {'index': len(self.rows)+1, 'case': fixture['case'], 'started': time.perf_counter(),
+        self.sequence += 1
+        # Old diagnostics must not retain PCM and queued image buffers forever.
+        if not self.benchmark:
+            self.rows[:] = self.rows[-7:]
+        row = {'index': self.sequence, 'case': fixture['case'], 'started': time.perf_counter(),
                'queue': queue.Queue(maxsize=32), 'pcm': pcm, 'start_s': None, 'producer_done': False,
                'finished': False, 'underflows': 0, 'frame_count': 0, 'first_frame_ready_s': None,
                'max_queue': 0, 'event': event, 'fixture_index': index, 'audio_sha256': hashlib.sha256(fixture['wav'].read_bytes()).hexdigest()}
@@ -60,7 +66,8 @@ class PlaybackSession:
             # Synthetic timing marker only; the archive written by the renderer
             # remains unmarked. A copy prevents mutations of cached body media.
             frame = frame.copy()
-            frame[-16:, :16] = (0, 255, row['index']*9)
+            if self.benchmark:
+                frame[-16:, :16] = (0, 255, row['index']*9)
             while True:
                 if event is not None:
                     from local_app.models import check_cancel
@@ -89,7 +96,7 @@ class PlaybackSession:
             time.sleep(.02)
         check_cancel(event)
         with self.lock:
-            if not self.receiver_ready or self.cancel.is_set() or len(self.rows) >= 24:
+            if not self.receiver_ready or self.cancel.is_set() or (self.benchmark and self.sequence >= 24):
                 raise RuntimeError('RTC receiver unavailable or experiment limit reached.')
             row, sink = self.prepare_output(index, {'case': 'engine', 'wav': audio_path}, event)
             row['worker'] = threading.current_thread()

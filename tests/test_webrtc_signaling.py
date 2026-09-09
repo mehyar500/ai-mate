@@ -65,9 +65,33 @@ def offer(address='127.0.0.1', direction='recvonly'):
 
 
 class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_runtime_accepts_long_call_without_marker_or_unbounded_history(self):
+        try:
+            from scripts.serve_webrtc_benchmark import PlaybackSession
+            import numpy as np
+            from scipy.io import wavfile
+        except ImportError as error:
+            self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
+        with tempfile.TemporaryDirectory() as folder:
+            audio = Path(folder)/'synthetic.wav'
+            wavfile.write(audio, 24000, np.zeros(240, dtype=np.int16))
+            original = np.full((32,32,3), 77, dtype=np.uint8)
+            session = PlaybackSession(None, [original], [], Path(folder))
+            session.receiver_ready = True
+            for index in range(80):
+                with session.output('test', index, audio, threading.Event()) as sink:
+                    sink(original, 0, 20)
+                _, frame = session.clip['queue'].get_nowait()
+                self.assertTrue((frame == original).all())
+                session.clip['finished'] = True
+            self.assertEqual(session.clip['index'], 80)
+            self.assertEqual(len(session.rows), 8)
+
+
     async def test_frame_underflow_pauses_audio_clock(self):
         try:
-            from scripts.serve_webrtc_benchmark import Picture, Speech, np
+            from scripts.serve_webrtc_benchmark import Picture, Speech
+            import numpy as np
         except ImportError as error:
             self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
         async def pace(seconds):
@@ -90,7 +114,9 @@ class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_engine_output_uses_turn_cancellation_without_closing_session(self):
         try:
-            from scripts.serve_webrtc_benchmark import Session, Picture, Speech, np, wavfile
+            from scripts.serve_webrtc_benchmark import Session, Picture, Speech
+            import numpy as np
+            from scipy.io import wavfile
         except ImportError as error:
             self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
         with tempfile.TemporaryDirectory() as folder:
@@ -118,7 +144,8 @@ class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_cancel_silences_buffered_audio_and_holds_last_frame(self):
         try:
-            from scripts.serve_webrtc_benchmark import Picture, Speech, np
+            from scripts.serve_webrtc_benchmark import Picture, Speech
+            import numpy as np
         except ImportError as error:
             self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
         async def pace(seconds):
