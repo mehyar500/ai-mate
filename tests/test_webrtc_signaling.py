@@ -254,6 +254,31 @@ class LocalMDNSTests(unittest.IsolatedAsyncioTestCase):
 
 
 class LocalCallCleanupTests(unittest.TestCase):
+    def test_old_tab_cannot_control_replacement_call(self):
+        from scripts.serve_webrtc_benchmark import PlaybackSession
+        from local_app.rtc import LocalCall
+        from unittest.mock import AsyncMock
+        engine = SimpleNamespace(cancel=MagicMock(), frame_output=None)
+        call = LocalCall(engine)
+        session = PlaybackSession(None, [], [], Path('.'))
+        peer = SimpleNamespace(close=AsyncMock(), connectionState='connected')
+        call.session, call.peer, call.call_id = session, peer, 'current-call'
+        engine.frame_output = session.output
+        try:
+            for action in ('close', 'stop', 'state'):
+                for payload in ({}, {'call_id':'previous-call'}):
+                    self.assertTrue(call.request(action, payload)['stale'])
+                    self.assertIs(call.session, session)
+                    self.assertIs(call.peer, peer)
+            engine.cancel.assert_not_called()
+            peer.close.assert_not_awaited()
+            self.assertTrue(call.request('state', {'call_id':'current-call'})['connected'])
+            call.request('close', {'call_id':'current-call'})
+            peer.close.assert_awaited_once()
+            self.assertIsNone(call.call_id)
+        finally:
+            call.shutdown()
+
     def test_close_cancels_owned_playback_and_releases_event_loop(self):
         from scripts.serve_webrtc_benchmark import PlaybackSession
         from local_app.rtc import LocalCall

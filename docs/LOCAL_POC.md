@@ -22,6 +22,8 @@ The layout passed five Chromium sizes from 320x568 to 1280x720. Full-body footag
 
 For a rented GPU, run the existing `experiments/benchmark_ltx23.py` on that host after provisioning its pinned dependencies, weights and reference image. `--worker-port` selects a loopback worker; `--hourly-cost` records a job-only compute estimate alongside worker GPU details. Omitted/zero pricing is reported as unknown, not free. Setup, storage and idle charges are excluded. This is a benchmark, not a deployment package or public endpoint.
 
+The optional RTC path tags each connection with a fresh call identifier. Delayed stop, status and hang-up requests from an older tab cannot control its replacement. This is connection correlation only, not user authentication or multi-user isolation. The regression is unit-tested; browser regression and independent review are still required before remote exposure.
+
 ## Runtime and recovery
 
 Exact weights, revisions and dependency versions are pinned in [local-models.json](../config/local-models.json), [local-assets.json](../config/local-assets.json) and [local-poc-requirements.txt](../config/local-poc-requirements.txt). BUILD lists every active pipeline model. The selected PC settings are:

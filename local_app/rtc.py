@@ -206,6 +206,9 @@ class LocalCall:
             return await self._dispatch(action, payload)
 
     async def _dispatch(self, action, payload):
+        if action in {'close', 'stop', 'state'} and getattr(self, 'call_id', None) != payload.get('call_id'):
+            return {'ok': True, 'connection_state': 'closed', 'connected': False,
+                    'playing': False, 'started': False, 'stale': True}
         if action == 'close':
             await self.close()
             return {'ok': True}
@@ -233,6 +236,12 @@ class LocalCall:
             raise ValueError('Unknown call action.')
         if self.peer or self.engine.busy or not self.engine.ready:
             raise BlockingIOError('Call unavailable or already connected.')
+        import uuid
+        try:
+            call_id = str(uuid.UUID(payload.get('call_id', '')))
+        except (ValueError, AttributeError, TypeError):
+            raise ValueError('A valid call identifier is required.') from None
+        payload = {'type': payload.get('type'), 'sdp': payload.get('sdp')}
         from aiortc import RTCPeerConnection, RTCConfiguration, RTCSessionDescription, RTCRtpSender
         from aioice.mdns import create_mdns_protocol
         from scripts.webrtc_signaling import resolve_local_offer
@@ -245,6 +254,7 @@ class LocalCall:
         finally:
             await protocol.close()
         # Reserve the peer before awaiting setup; a second offer cannot replace it.
+        self.call_id = call_id
         peer = self.peer = RTCPeerConnection(RTCConfiguration(iceServers=[]))
         try:
             idle, near = await asyncio.to_thread(self.load_idle)
@@ -297,6 +307,7 @@ class LocalCall:
     async def close(self):
         peer, session = self.peer, self.session
         self.peer = self.session = None
+        self.call_id = None
         if session:
             session.cancel.set()
             if self.engine.frame_output == session.output:
@@ -306,7 +317,8 @@ class LocalCall:
             await peer.close()
 
     def shutdown(self):
-        self.request('close', {})
+        future = asyncio.run_coroutine_threadsafe(self.close(), self.loop)
+        future.result(timeout=12)
         self.loop.call_soon_threadsafe(self.loop.stop)
         self.thread.join(timeout=3)
         if not self.thread.is_alive():
