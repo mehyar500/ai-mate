@@ -23428,5 +23428,56 @@
     ],
     "limits": "Four synthetic cases per model, not p95 or call latency. Cache status UNKNOWN; prices from stored benchmark rates, not invoices.",
     "decision": "Keep Qwen selected; Llama 8B no clear speed improvement, Llama 3B loses message delivery."
+  },
+  "cloud_realtime_transport_20260909": {
+    "source_commit": "efc9d84d6284b259c3701e38daf7bfc9e10bf504",
+    "classification": "progress",
+    "result": {
+      "time": "2026-09-09T18:57:05.685957+00:00",
+      "passed": true,
+      "media": "both",
+      "scope": "Synthetic CPU peers through Cloudflare SFU; no remote GPU, browser, model, microphone or end-to-end call latency test.",
+      "stage": "finished",
+      "first_both_media_after_renegotiation_s": 1.593,
+      "received_frames": {
+        "audio": 323,
+        "video": 151
+      },
+      "audio_peak": 2311,
+      "sender_connected": true,
+      "receiver_connected": true,
+      "sent_packets": {
+        "audio": 643,
+        "video": 387
+      },
+      "received_packets": {
+        "audio": 327,
+        "video": 196
+      },
+      "video_codec": "H264",
+      "bundle_policy": "balanced",
+      "temporary_app_deleted": true
+    },
+    "failed_variants": [
+      "Default urllib user agent: HTTP 403 / 1010 before session creation",
+      "VP8 balanced: peers connected; audio received, zero decoded video frames",
+      "MAX_BUNDLE: repeated publish-tracks timeout"
+    ],
+    "checks": {
+      "python": 217,
+      "compileall": "pass",
+      "independent_review": "not performed",
+      "public_deployment": "not performed"
+    },
+    "cost": {
+      "gpu_rental_usd": 0,
+      "model_inference_usd": 0,
+      "sfu_billed_cost": "not measured"
+    },
+    "sources": [
+      "https://developers.cloudflare.com/realtime/sfu/https-api/",
+      "https://github.com/cloudflare/realtime-examples/tree/main/echo"
+    ],
+    "decision": "Use explicit project User-Agent, H264, balanced bundling for next engine-to-SFU integration test. This standalone synthetic transport test is not an AI video call."
   }
 }

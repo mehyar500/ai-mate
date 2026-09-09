@@ -1,6 +1,40 @@
 import unittest
+import io
+from unittest.mock import patch, MagicMock
 
 from scripts.webrtc_signaling import validate_offer
+
+
+class CloudRTCTransportTests(unittest.TestCase):
+    def test_client_identifier_and_no_redirect_handler(self):
+        from experiments.benchmark_cloud_realtime import exchange, NoRedirect
+        opener = MagicMock()
+        opener.open.return_value = io.BytesIO(b'{"sessionId":"test"}')
+        with patch('urllib.request.build_opener', return_value=opener) as build:
+            self.assertEqual(exchange('https://rtc.live.cloudflare.com/v1/apps/test/sessions/new',
+                                     {'Authorization': 'Bearer private'})['sessionId'], 'test')
+        self.assertIs(build.call_args.args[0], NoRedirect)
+        request = opener.open.call_args.args[0]
+        self.assertEqual(request.get_header('User-agent'), 'AI-Mate-Transport-Probe/1.0')
+        self.assertIsNone(request.data)
+
+    def test_foreign_host_never_receives_credentials(self):
+        from experiments.benchmark_cloud_realtime import exchange
+        with patch('urllib.request.build_opener') as build:
+            for url in ['http://rtc.live.cloudflare.com/', 'https://example.com/',
+                        'https://rtc.live.cloudflare.com@example.com/']:
+                with self.assertRaises(ValueError):
+                    exchange(url, {'Authorization': 'Bearer private'})
+            build.assert_not_called()
+
+    def test_provider_failure_and_oversized_response_cannot_pass(self):
+        from experiments.benchmark_cloud_realtime import exchange
+        for raw in [b'{"errorCode":"failed"}', b'{"tracks":[{"errorCode":"failed"}]}',
+                    b'{"tracks":null}', b'[]', b'x' * 100001]:
+            opener = MagicMock()
+            opener.open.return_value = io.BytesIO(raw)
+            with patch('urllib.request.build_opener', return_value=opener), self.assertRaises(ValueError):
+                exchange('https://rtc.live.cloudflare.com/v1/apps/test/sessions/new', {})
 
 
 def offer(address='127.0.0.1', direction='recvonly'):
