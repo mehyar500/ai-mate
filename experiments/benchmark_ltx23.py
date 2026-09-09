@@ -6,6 +6,7 @@ enhancer, text-encoder LoRA, custom nodes, or automatic promotion into the app.
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import shutil
@@ -127,6 +128,7 @@ def reviewed_reference_path(path):
 
 
 def main():
+    global BASE
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--width',type=int,default=384);parser.add_argument('--height',type=int,default=576)
     parser.add_argument('--frames',type=int,default=73);parser.add_argument('--seed',type=int,default=50)
@@ -142,11 +144,19 @@ def main():
     parser.add_argument('--temporal-size',type=int,choices=[32,64,128,256],default=128,help='Video VAE decode window in output frames; 128 avoids internal time seams in the measured 97-frame clips.')
     parser.add_argument('--compare-decode',action='store_true',help='Also decode the identical latent with the original 32-frame window.')
     parser.add_argument('--timeout',type=int,default=900)
+    parser.add_argument('--worker-port',type=int,default=8188,help='Loopback worker port; run this benchmark on the GPU host.')
+    parser.add_argument('--hourly-cost',type=float,default=0,help='Actual instance hourly rate; estimate excludes storage and unrelated idle time.')
     args=parser.parse_args()
+    if not 1024 <= args.worker_port <= 65535:
+        parser.error('Worker port must be between 1024 and 65535.')
+    if not math.isfinite(args.hourly_cost) or args.hourly_cost < 0:
+        parser.error('Hourly cost must be a finite non-negative number.')
+    BASE=f'http://127.0.0.1:{args.worker_port}'
     if any(n<128 or n%32 for n in (args.width,args.height)) or not 9<=args.frames<=241 or args.frames%8!=1:
         parser.error('Dimensions must be multiples of 32; 9..241 frames must be 8n+1.')
     for folder,name in [('checkpoints',CHECKPOINT),('text_encoders',ENCODER)]:
         if not (COMFY/'models'/folder/name).is_file():raise SystemExit('Finish the pinned LTX-2.3 download first.')
+    hardware=request('/system_stats')
     state=request('/queue')
     if state.get('queue_running') or state.get('queue_pending'):raise SystemExit('Wait for an idle motion engine.')
     try:
@@ -167,7 +177,9 @@ def main():
     audit=ROOT/'generated/local-app/audit';audit.mkdir(exist_ok=True)
     evidence={'model':CHECKPOINT,'encoder':ENCODER,'settings':{k:str(v) if isinstance(v,Path) else v for k,v in vars(args).items()},'source_sha256':hashlib.sha256(original.read_bytes()).hexdigest(),
               'workflow_source':'https://github.com/Comfy-Org/workflow_templates/blob/main/templates/video_ltx2_3_i2v.json',
-              'graph':graph,'promoted_to_demo':False}
+              'graph':graph,'promoted_to_demo':False,
+              'worker_devices':hardware.get('devices',[]),
+              'rental_cost_scope':'Elapsed submitted job only; excludes installation, prewarming, storage, idle time and transfer.'}
     if end_original:
         evidence['end_reference_sha256']=hashlib.sha256(end_original.read_bytes()).hexdigest()
     destination=audit/(tag+'.json');destination.write_text(json.dumps(evidence,indent=2)+'\n')
@@ -181,6 +193,7 @@ def main():
             history=request('/history/'+key)
             if key in history:
                 evidence['history']=history[key];evidence['total_s']=round(time.perf_counter()-started,3)
+                evidence['estimated_job_compute_usd']=round(evidence['total_s']*args.hourly_cost/3600,6) if args.hourly_cost else None
                 evidence['status']='done' if history[key]['status'].get('status_str')=='success' else 'failed'
                 destination.write_text(json.dumps(evidence,indent=2)+'\n')
                 print(json.dumps({'status':evidence['status'],'total_s':evidence['total_s'],

@@ -20,6 +20,8 @@ Memory & settings contains editable notes/facts, optional call captions, Test so
 
 The layout passed five Chromium sizes from 320x568 to 1280x720. Full-body footage keeps its head and feet in tall layouts; wide gestures may cross the phone crop. Buttons have 44px touch targets. Real iPhone/Android PWA, VoiceOver, physical speakers/microphone and acoustic echo remain unverified.
 
+For a rented GPU, run the existing `experiments/benchmark_ltx23.py` on that host after provisioning its pinned dependencies, weights and reference image. `--worker-port` selects a loopback worker; `--hourly-cost` records a job-only compute estimate alongside worker GPU details. Omitted/zero pricing is reported as unknown, not free. Setup, storage and idle charges are excluded. This is a benchmark, not a deployment package or public endpoint.
+
 ## Runtime and recovery
 
 Exact weights, revisions and dependency versions are pinned in [local-models.json](../config/local-models.json), [local-assets.json](../config/local-assets.json) and [local-poc-requirements.txt](../config/local-poc-requirements.txt). BUILD lists every active pipeline model. The selected PC settings are:
