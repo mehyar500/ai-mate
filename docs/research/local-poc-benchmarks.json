@@ -24536,5 +24536,44 @@
     ],
     "api_spend_usd": 0,
     "electricity_cost": "not measured"
+  },
+  "pose_control_compatibility_20260909": {
+    "source_commit": "15d09abb5a187a8dcaea2fc31fe51ee96e6c9d0d",
+    "workflow": "https://github.com/Lightricks/ComfyUI-LTXVideo/blob/15d09abb5a187a8dcaea2fc31fe51ee96e6c9d0d/example_workflows/2.3/LTX-2.3_ICLoRA_Union_Control_Distilled.json",
+    "findings": [
+      "Older pose13B adapter targets 0.9.7 DEV, not installed distilled2B.",
+      "Current 2.3 official Union workflow uses 22B DEV plus distillation LoRA and Union control adapter. Installed checkpoint is 22B distilled FP8; this workflow does not establish its compatibility.",
+      "Current worker disables custom nodes; required LTX guide and loader nodes need a separate reviewed installation."
+    ],
+    "missing_worker_node_types": [
+      "CannyEdgePreprocessor",
+      "DWPreprocessor",
+      "GemmaAPITextEncode",
+      "LTXAddVideoICLoRAGuide",
+      "LTXFloatToInt",
+      "LTXICLoRALoaderModelOnly",
+      "LTXVImgToVideoConditionOnly",
+      "LTXVTiledVAEDecode",
+      "LoadVideoDepthAnythingModel",
+      "Note",
+      "SimpleMath+",
+      "VideoDepthAnythingOutput",
+      "VideoDepthAnythingProcess"
+    ],
+    "runtime_changed": false,
+    "gpu_memory_snapshot_mib": {
+      "total": 16380,
+      "used": 13138
+    },
+    "decision": "Do not load mismatched adapters or replace live worker. Inspect custom-node source and supported distilled-base path before installing or downloading weights."
+  },
+  "pose_control_shape_audit_20260909": {
+    "revision": "b4d1c4d8c9e544e9bbbd6811bb4363708b6093ff",
+    "matched_weight_pairs": 480,
+    "missing_targets": [],
+    "shape_mismatches": [],
+    "adapter_tensor_bytes": 654311424,
+    "reference_downscale_factor": "2",
+    "scope": "Header-only structural check; no tensors loaded, no quality or FP8 patch memory validated."
   }
 }
