@@ -47,7 +47,21 @@ def require_provider(session,device):
         raise RuntimeError('Selected speech execution provider failed; restart with AI_MATE_TTS_DEVICE=cpu to recover.')
 
 
-def create_speech(device):
+class ShrinkingSpeechSession:
+    """Release unused CUDA arena regions after each variable-length inference."""
+    def __init__(self, session, runtime):
+        self._session=session
+        self._run_options=runtime.RunOptions()
+        self._run_options.add_run_config_entry('memory.enable_memory_arena_shrinkage','gpu:0')
+
+    def __getattr__(self,name):
+        return getattr(self._session,name)
+
+    def run(self,output_names,input_feed):
+        return self._session.run(output_names,input_feed,run_options=self._run_options)
+
+
+def create_speech(device, *, shrink_gpu_arena=True):
     """Return preset speech and metadata. No silent fallback or model download."""
     if device=='cuda':
         import torch
@@ -61,6 +75,8 @@ def create_speech(device):
     providers=[('CUDAExecutionProvider',CUDA_OPTIONS),'CPUExecutionProvider'] if device=='cuda' else ['CPUExecutionProvider']
     session=ort.InferenceSession(str(ROOT/'.cache/local-poc/kokoro-v1.0.onnx'),sess_options=options,providers=providers)
     require_provider(session,device)
+    if shrink_gpu_arena and device=='cuda':session=ShrinkingSpeechSession(session,ort)
     # Keep Windows' DLL directory handle alive for lazy library loads.
     voice=Kokoro.from_session(session,str(ROOT/'.cache/local-poc/voices-v1.0.bin'))
-    return voice,{'device':device,'runtime':ort.__version__,'providers':session.get_providers(),'cpu_threads':8},dll
+    return voice,{'device':device,'runtime':ort.__version__,'providers':session.get_providers(),'cpu_threads':8,
+                  'arena_shrink_after_run':bool(shrink_gpu_arena and device=='cuda')},dll

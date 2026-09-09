@@ -4,10 +4,10 @@ import tempfile
 import sys
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock,patch
 
 from local_app.engine import configure_runtime
-from local_app.speech_runtime import speech_device,validate_cuda_runtime,require_provider,load_runtime
+from local_app.speech_runtime import speech_device,validate_cuda_runtime,require_provider,load_runtime,ShrinkingSpeechSession
 
 
 class SpeechRuntimeTests(unittest.TestCase):
@@ -48,6 +48,23 @@ class SpeechRuntimeTests(unittest.TestCase):
             session=SimpleNamespace(get_providers=lambda:providers)
             with self.assertRaises(RuntimeError):require_provider(session,'cuda')
         require_provider(SimpleNamespace(get_providers=lambda:['CUDAExecutionProvider','CPUExecutionProvider']),'cuda')
+
+    def test_arena_cleanup_preserves_outputs_metadata_and_errors(self):
+        # Kokoro reads these session attributes before calling run. The adapter
+        # must not rebuild a session, discard generated audio or retry a failure.
+        runtime=Mock();session=Mock();session._model_path='synthetic.onnx'
+        session.get_outputs.return_value=['waveform']
+        adapter=ShrinkingSpeechSession(session,runtime)
+        feed={'tokens':object()}
+        self.assertEqual(adapter._model_path,'synthetic.onnx')
+        self.assertEqual(adapter.get_outputs(),['waveform'])
+        self.assertIs(adapter.run(None,feed),session.run.return_value)
+        runtime.RunOptions.return_value.add_run_config_entry.assert_called_once_with(
+            'memory.enable_memory_arena_shrinkage','gpu:0')
+        session.run.assert_called_once_with(None,feed,run_options=runtime.RunOptions.return_value)
+        session.run.side_effect=RuntimeError('allocation failed')
+        with self.assertRaisesRegex(RuntimeError,'allocation failed'):adapter.run(None,feed)
+        self.assertEqual(session.run.call_count,2)
 
 
 if __name__=='__main__':unittest.main()

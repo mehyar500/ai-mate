@@ -21,6 +21,7 @@ async function main(){
   const retained=path.join(folder,'retained-media');fs.mkdirSync(retained,{recursive:true});
   const browser=await chromium.launch({headless:true});
   const results=[],errors=[];
+  let stoppedEarly=false;
   let started=Date.now();
   try{
     const page=await browser.newPage({viewport:{width:716,height:854}});
@@ -185,9 +186,13 @@ async function main(){
       results.push(row);
       fs.writeFileSync(path.join(folder,'qualification.json'),JSON.stringify({elapsed_s:(Date.now()-started)/1000,results,errors},null,2)+'\n');
       console.log(JSON.stringify({case:row.case,cycle:row.cycle,input:row.input,metrics:row.metrics,failures:row.failures}));
+      // A soak with three failed turns is already disqualified. Preserve its
+      // playback statistics and close normally instead of spending the balance
+      // of thirty minutes on a known failing candidate.
+      if(trial==='soak'&&results.filter(r=>r.failures.length).length>=3){stoppedEarly=true;break;}
       await page.waitForTimeout(500);
     }
-    const remaining=started+totalMs-Date.now();if(remaining>0)await page.waitForTimeout(remaining);
+    const remaining=started+totalMs-Date.now();if(!stoppedEarly&&remaining>0)await page.waitForTimeout(remaining);
     const playback=await page.evaluate(()=>{
       const samples=window.qual.avClockSkewMs.sort((a,b)=>a-b);
       return {frames:window.qual.frames,callActive:!document.querySelector('#end-call').hidden,
@@ -199,8 +204,9 @@ async function main(){
     const latency=results.filter(r=>!r.expected.interrupt_s).map(r=>Number(r.metrics?.match(/First playback: ([\d.]+)s/)?.[1])).filter(Number.isFinite).sort((a,b)=>a-b);
     const speechLatency=results.filter(r=>!r.expected.interrupt_s&&Number.isFinite(r.speech_end_to_playback_s)).map(r=>r.speech_end_to_playback_s).sort((a,b)=>a-b);
     const summary={elapsed_s:(Date.now()-started)/1000,turns:results.length,startup_buffer_ms:startupBufferMs,
+      stopped_early_for_failures:stoppedEarly,soak_duration_met:trial==='soak'?Date.now()-started>=totalMs:null,
       runtime_app_sha256:crypto.createHash('sha256').update(appCode).digest('hex'),buffer_override:startupBufferMs!==currentBufferMs,
-      failures:results.filter(r=>r.failures.length).map(r=>({case:r.case,failures:r.failures})),
+      failures:results.filter(r=>r.failures.length).map(r=>({case:r.case,cycle:r.cycle,failures:r.failures})),
       response_sample_count:latency.length,p50_s:latency[Math.ceil(latency.length*.5)-1],p95_s:latency[Math.ceil(latency.length*.95)-1],playback,errors,
       speech_end_to_playback_s:{samples:speechLatency.length,p50:speechLatency[Math.ceil(speechLatency.length*.5)-1],p95:speechLatency[Math.ceil(speechLatency.length*.95)-1]},
       scope:capture?'Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.':'Mixed synthetic WAV and typed commands; actual ASR/Cloudflare/Kokoro/MuseTalk/browser playback. Physical capture, endpoint detection and network/device testing excluded. Frame callbacks do not prove anatomy, identity or perceptual lip sync.'};

@@ -72,7 +72,15 @@ Successful fresh video captures its final decoded frame as the next reference. U
 
 ### Optional GPU speech — September 9
 
-The same Kokoro-82M float32 weights and `af_sarah` voice now have an explicit CUDA option. **CPU remains the preview selection until sustained qualification completes.** No new model, API key, driver or live-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.
+The same Kokoro-82M float32 weights and `af_sarah` voice have an explicit CUDA option. **CPU remains selected: the first GPU soak failed and the revised memory policy needs sustained qualification.** No new model, API key, driver or live-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.
+
+The initial soak stopped after **64 turns / 945.16s of recorded call activity**, with three speech allocation failures, including "Hello." CUDA's 2GiB speech arena could not satisfy a 65.5MiB allocation. Five-second samples reached 13,034.5MiB used with at least 3,345MiB free; they include other processes and are not an exact peak. This does not establish that the card needs replacement. One successful reply also took 6.73s from Send. Failed responses are excluded from latency samples but remain failures. Evidence: `audit/voice-video-soak-gpu-speech-ready/terminated-summary.json`.
+
+The revision applies ONNX Runtime's [GPU arena shrinkage](https://onnxruntime.ai/docs/get-started/with-c.html) after each synthesis, returning unused regions while retaining active allocations. In two speech-only replays of the same 64 neutral replies, both policies completed **128/128** phrases. Retained/cleaned memory sampled **2,144.5/1,648.5MiB**, with median synthesis **109/117ms** and p95 **147/162ms**. All waveforms were finite, nonzero and unclipped. The speech-only control did **not** reproduce the integrated failure; this comparison demonstrates memory savings, not a proven sustained-call fix.
+
+The revised integrated candidate passed **20/20 commands** in 101.0s. Nine spoken replies reached synchronized playback in **1.905s median / 2.291s p95**; 19 mixed Send measurements were **1.24/1.65s**. No functional/page errors or reported reply stalls occurred. All **971 frames** received limited diagnostics with no flags; **40 wave/near frames** were inspected visually. A/V clock skew was **24.56ms p95 / 31.22ms maximum** across 589 samples. Three SyncNet clips measured **0/40/80ms**, with injected-delay and reversed-audio controls passing. Hand blur, soft facial detail, normal-speed perception and physical audio remain unresolved. The live preview's Test sound button was exercised; user confirmation of speaker output is pending.
+
+Revised evidence: `audit/speech-memory-retained-arena`, `audit/speech-memory-shrinking-arena`, `audit/voice-video-qualification-speech-arena` and `audit/lip-sync-speech-arena`. A fresh 30-minute test uses `audit/voice-video-soak-speech-arena`; inspect its terminal result before selection. Soaks now end normally after three failed turns, preserving playback statistics and explicitly marking incomplete duration. Replay the memory comparison with `.\.venv\Scripts\python.exe scripts/benchmark_speech_memory.py --source gpu-speech-ready --label new-memory --memory-policy shrink`; use `retain` for the control and a fresh lowercase output label.
 
 Twenty fixed-text samples per configuration compared installed CPU ONNX Runtime 1.29.0, isolated CPU 1.26.0 and isolated CUDA 1.26.0. Each used five phrases repeated four times, eight CPU threads, identical speed and the same model/voice hashes. Warm median synthesis times:
 
@@ -101,7 +109,7 @@ Use the [pinned Windows/Python 3.12 wheel](../config/speech-gpu-benchmark-requir
 node scripts/qualify_video_call.cjs qualification new-gpu-call --capture
 ```
 
-Call/media evidence: `audit/voice-video-qualification-gpu-speech`, `audit/voice-video-qualification-gpu-speech-paused` and `audit/lip-sync-gpu-speech`. The review page verified frame stepping, notes/export, decoded audio and a 390px layout; it leaves human-review checkboxes unchecked. The 30-minute candidate run is `audit/voice-video-soak-gpu-speech-ready`; inspect its completed artifacts before selecting GPU speech in the preview. An earlier soak driver started before server readiness and ended with zero commands; that failed setup is retained and is not call evidence. Five-second whole-GPU memory samples are now recorded by future call benchmarks, including other processes; they are not per-worker peak allocation or concurrency proof.
+Earlier short-call/media evidence: `audit/voice-video-qualification-gpu-speech`, `audit/voice-video-qualification-gpu-speech-paused` and `audit/lip-sync-gpu-speech`. Its review page verified frame stepping, notes/export, decoded audio and a 390px layout; human-review checkboxes stay unchecked. A separate earlier soak setup started before server readiness and ended with zero commands; it is retained as a setup failure. Neither earlier run establishes sustained GPU-speech acceptance.
 
 ### Isolated WebRTC transport comparison — September 9
 
