@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import sys
 import time
+import shutil
 import urllib.error
 import urllib.request
 from urllib.parse import urlsplit
@@ -62,7 +63,7 @@ def fixture_path(value):
     return path
 
 
-def live_session():
+def live_session(engine_turns=False):
     """Reuse the existing GPU stream experiment; no new server or private data."""
     import threading
     import cv2
@@ -94,7 +95,24 @@ def live_session():
         raise ValueError('No reviewed idle')
     folder = ROOT/'generated/local-app/audit'/('cloud-live-'+datetime.now().strftime('%Y%m%d-%H%M%S'))
     folder.mkdir(exist_ok=False)
-    return Session(renderer, idle, fixtures, folder)
+    session = Session(renderer, idle, fixtures, folder)
+    if engine_turns:
+        from local_app.engine import CompanionEngine
+        from local_app.models import Models
+        directory = folder/'engine'
+        directory.mkdir()
+        for name in ['fullbody.png', 'performance-near.png', 'performance.json', 'performance-closer.mp4',
+                     'performance-farther.mp4', 'performance-wave.mp4', 'performance-wave.json',
+                     'performance-near-wave.mp4', 'performance-near-wave.json',
+                     'idle-fullbody.mp4', 'idle-fullbody.json', 'idle-near.mp4', 'idle-near.json']:
+            asset = ROOT/'generated/local-app'/name
+            if asset.is_file():
+                shutil.copyfile(asset, directory/name)
+        session.engine = CompanionEngine(directory, frame_output=session.output)
+        session.engine.models = Models()
+        session.engine.models.visual = renderer
+        session.engine.ready = True
+    return session
 
 
 async def measure(auth, result, media='both', clip=None, session=None, interrupt=False):
@@ -263,6 +281,27 @@ async def measure(auth, result, media='both', clip=None, session=None, interrupt
                 raise TimeoutError('Live stream receiver unavailable')
             session.receiver_ready = True
             for index in range(len(session.fixtures)):
+                if getattr(session, 'engine', None):
+                    command = ['Wave hello.', 'Stop moving.', 'Wave hello.'][index]
+                    started = time.perf_counter()
+                    first_row = len(session.rows)
+                    key = session.engine.submit(command, 'video', 'fullbody')
+                    deadline = time.monotonic()+30
+                    while time.monotonic() < deadline:
+                        if not session.engine.busy and len(session.rows) > first_row and session.clip['finished']:
+                            break
+                        if not session.engine.busy and session.engine.job(key)['state'] != 'done':
+                            raise RuntimeError('Engine reply failed')
+                        await asyncio.sleep(.02)
+                    if session.engine.busy or not session.clip['finished']:
+                        session.engine.cancel(key)
+                        raise TimeoutError('Engine playback did not finish')
+                    row = session.rows[first_row]
+                    job = session.engine.job(key)
+                    result.setdefault('engine_turns', []).append({'command': command, 'state': job['state'],
+                        'action': job['action'], 'metrics': job['metrics'],
+                        'first_decoded_from_submit_s': round(row['started']-started+row['first_decoded_frame_s'], 3)})
+                    continue
                 await asyncio.to_thread(session.begin, index)
                 deadline = time.monotonic()+30
                 while not session.clip['finished'] and time.monotonic() < deadline:
@@ -342,6 +381,7 @@ def main():
     parser.add_argument('--clip', type=fixture_path, help='Reviewed generated audit MP4 plus matching synthetic WAV; sends both through Cloudflare')
     parser.add_argument('--live-render', action='store_true', help='Stream new GPU lip frames for three retained synthetic speech fixtures')
     parser.add_argument('--interrupt', action='store_true', help='Cancel the third live-render reply during playback')
+    parser.add_argument('--engine-turns', action='store_true', help='Use isolated real dialogue/speech engine turns with --live-render')
     args = parser.parse_args()
     if args.clip and args.media != 'both':
         parser.error('--clip requires --media both')
@@ -349,21 +389,26 @@ def main():
         parser.error('--live-render requires both media and no --clip')
     if args.interrupt and not args.live_render:
         parser.error('--interrupt requires --live-render')
+    if args.engine_turns and (not args.live_render or args.interrupt):
+        parser.error('--engine-turns requires --live-render without --interrupt')
     configure_runtime()
     result = {'time': datetime.now(timezone.utc).isoformat(), 'passed': False, 'media': args.media,
               'scope': 'CPU peers through Cloudflare SFU; synthetic media or prerecorded generated fixture. No live inference, browser, microphone or end-to-end call latency test.'}
     if args.live_render:
         result['scope'] = ('Live local GPU lip rendering over reviewed body clips and retained synthetic speech through Cloudflare SFU. '
                            'No ASR, dialogue, TTS, browser display, private conversation or arbitrary-motion test.')
+    if args.engine_turns:
+        result['scope'] = ('Isolated text commands through real engine planning, TTS, GPU lip rendering and Cloudflare SFU. '
+                           'Prepared body motion; no microphone, browser presentation or unrestricted-motion acceptance.')
     try:
-        session = live_session() if args.live_render else None
+        session = live_session(args.engine_turns) if args.live_render else None
         asyncio.run(measure(Conversation(''), result, args.media, args.clip, session, args.interrupt))
     except Exception as error:
         result['error_type'] = type(error).__name__
         if isinstance(error, urllib.error.HTTPError):
             result['http_status'] = error.code
             result['diagnostic'] = getattr(error, 'transport_diagnostic', 'unknown')
-    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"live-cancel" if args.interrupt else "live" if args.live_render else "fixture" if args.clip else args.media}.json'
+    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"engine" if args.engine_turns else "live-cancel" if args.interrupt else "live" if args.live_render else "fixture" if args.clip else args.media}.json'
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(result))

@@ -23956,5 +23956,126 @@
       "CC-BY-NC-SA-4.0": 3
     },
     "decision": "Do not integrate this runtime into the commercial MVP without license clarification or an independently licensed implementation. Model-card Apache labeling does not resolve source-file restrictions. No upstream runtime executed."
+  },
+  "cloud_realtime_engine_20260909": {
+    "time": "2026-09-09T19:35:18.927244+00:00",
+    "passed": true,
+    "media": "both",
+    "scope": "Isolated text commands through actual engine direct-command planning, TTS, GPU lip rendering and Cloudflare. Prepared wave footage. No ASR, browser, physical audio or unrestricted-motion acceptance.",
+    "stage": "finished",
+    "first_both_media_after_renegotiation_s": 0.203,
+    "engine_turns": [
+      {
+        "command": "Wave hello.",
+        "state": "done",
+        "action": "wave",
+        "metrics": {
+          "first_text_s": 0.006,
+          "decision_source": "direct_command",
+          "visual_load_s": 0.0,
+          "visual_prepare_s": 0.0,
+          "first_media_ready_s": 1.807,
+          "total_s": 1.815
+        },
+        "first_decoded_from_submit_s": 1.247
+      },
+      {
+        "command": "Stop moving.",
+        "state": "done",
+        "action": "none",
+        "metrics": {
+          "first_text_s": 0.001,
+          "decision_source": "direct_command",
+          "motion_veto": "stop_command",
+          "visual_load_s": 0.0,
+          "visual_prepare_s": 0.058,
+          "first_media_ready_s": 0.841,
+          "total_s": 0.85
+        },
+        "first_decoded_from_submit_s": 0.492
+      },
+      {
+        "command": "Wave hello.",
+        "state": "done",
+        "action": "wave",
+        "metrics": {
+          "first_text_s": 0.001,
+          "decision_source": "direct_command",
+          "visual_load_s": 0.0,
+          "visual_prepare_s": 0.0,
+          "first_media_ready_s": 0.796,
+          "total_s": 0.801
+        },
+        "first_decoded_from_submit_s": 0.463
+      }
+    ],
+    "live_rows": [
+      {
+        "index": 1,
+        "case": "engine",
+        "start_s": 7.45,
+        "producer_done": true,
+        "finished": true,
+        "underflows": 0,
+        "frame_count": 40,
+        "first_frame_ready_s": 0.9146782999887364,
+        "max_queue": 28,
+        "fixture_index": 0,
+        "audio_sha256": "9572f6719a9e59335454a463e278b3a1141b031208aad6d874e37b208e35cc27",
+        "first_frame_sent_s": 0.9286259999935282,
+        "first_decoded_frame_s": 1.0335688999912236,
+        "completed_s": 2.953158699994674
+      },
+      {
+        "index": 2,
+        "case": "engine",
+        "start_s": 9.9,
+        "producer_done": true,
+        "finished": true,
+        "underflows": 0,
+        "frame_count": 24,
+        "first_frame_ready_s": 0.22028140000475105,
+        "max_queue": 16,
+        "fixture_index": 0,
+        "audio_sha256": "0ba5c54b9e678b71cc5acf5777b7ca64d7564a78fd19b9b4ac032142eadf3caa",
+        "first_frame_sent_s": 0.23160220000136178,
+        "first_decoded_frame_s": 0.3010556000081124,
+        "completed_s": 1.4235617000085767
+      },
+      {
+        "index": 3,
+        "case": "engine",
+        "start_s": 11.5,
+        "producer_done": true,
+        "finished": true,
+        "underflows": 0,
+        "frame_count": 40,
+        "first_frame_ready_s": 0.2315014999912819,
+        "max_queue": 32,
+        "fixture_index": 0,
+        "audio_sha256": "ae8516c60be5bce9329ccc8b63719285520b2d35ffd3d63b83f170d868e92c7d",
+        "first_frame_sent_s": 0.26921589999983553,
+        "first_decoded_frame_s": 0.33945509999466594,
+        "completed_s": 2.269169499995769
+      }
+    ],
+    "received_frames": {
+      "audio": 365,
+      "video": 146
+    },
+    "audio_peak": 15152,
+    "sender_connected": true,
+    "receiver_connected": true,
+    "sent_packets": {
+      "audio": 676,
+      "video": 1242
+    },
+    "received_packets": {
+      "audio": 369,
+      "video": 700
+    },
+    "video_codec": "H264",
+    "bundle_policy": "balanced",
+    "temporary_app_deleted": true
   }
 }

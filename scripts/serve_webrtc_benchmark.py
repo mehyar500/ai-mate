@@ -5,6 +5,7 @@ Signaling is same-origin/token protected on 127.0.0.1:8766. ICE has no external
 STUN/TURN servers. This is an isolated transport benchmark, not the live app.
 """
 import argparse
+from contextlib import contextmanager
 import asyncio
 from fractions import Fraction
 import hashlib
@@ -66,39 +67,7 @@ class Session:
             raise ValueError('Select a bounded synthetic fixture.')
         preview_idle()
         fixture = self.fixtures[index]
-        rate, pcm = wavfile.read(fixture['wav'])
-        if pcm.dtype != np.int16 or pcm.ndim != 1 or not 0 < len(pcm)/rate < 10:
-            raise ValueError('Invalid synthetic WAV.')
-        common = math.gcd(rate, 48000)
-        pcm = np.clip(np.rint(resample_poly(pcm.astype(float), 48000//common, rate//common)), -32768, 32767).astype(np.int16)
-        row = {'index': len(self.rows)+1, 'case': fixture['case'], 'started': time.perf_counter(),
-               'queue': queue.Queue(maxsize=32), 'pcm': pcm, 'start_s': None, 'producer_done': False,
-               'finished': False, 'underflows': 0, 'frame_count': 0, 'first_frame_ready_s': None,
-               'max_queue': 0, 'fixture_index': index, 'audio_sha256': hashlib.sha256(fixture['wav'].read_bytes()).hexdigest()}
-        self.rows.append(row)
-        self.clip = row
-
-        def sink(frame, frame_index, fps):
-            if fps != 20 or frame_index != row['frame_count']:
-                raise ValueError('Frame order/rate changed.')
-            if row['first_frame_ready_s'] is None:
-                row['first_frame_ready_s'] = time.perf_counter()-row['started']
-            if self.transport == 'mse':
-                row['frame_count'] += 1
-                return
-            # Synthetic timing marker only; the archive written by the renderer
-            # remains unmarked. A copy prevents mutations of cached body media.
-            frame[-16:, :16] = (0, 255, row['index']*9)
-            while True:
-                if self.cancel.is_set():
-                    raise RuntimeError('Benchmark stopped.')
-                try:
-                    row['queue'].put((frame_index, frame), timeout=.1)
-                    break
-                except queue.Full:
-                    continue
-            row['frame_count'] += 1
-            row['max_queue'] = max(row['max_queue'], row['queue'].qsize())
+        row, sink = self.prepare_output(index, fixture)
 
         def render():
             try:
@@ -112,10 +81,75 @@ class Session:
                     row['finished'] = True
         row['worker'] = threading.Thread(target=render, daemon=True)
         row['worker'].start()
-        return {'index': row['index'], 'case': row['case'], 'duration_s': len(pcm)/48000}
+        return {'index': row['index'], 'case': row['case'], 'duration_s': len(row['pcm'])/48000}
+
+    def prepare_output(self, index, fixture, event=None):
+        rate, pcm = wavfile.read(fixture['wav'])
+        if pcm.dtype != np.int16 or pcm.ndim != 1 or not 0 < len(pcm)/rate < 10:
+            raise ValueError('Invalid synthetic WAV.')
+        common = math.gcd(rate, 48000)
+        pcm = np.clip(np.rint(resample_poly(pcm.astype(float), 48000//common, rate//common)), -32768, 32767).astype(np.int16)
+        row = {'index': len(self.rows)+1, 'case': fixture['case'], 'started': time.perf_counter(),
+               'queue': queue.Queue(maxsize=32), 'pcm': pcm, 'start_s': None, 'producer_done': False,
+               'finished': False, 'underflows': 0, 'frame_count': 0, 'first_frame_ready_s': None,
+               'max_queue': 0, 'event': event, 'fixture_index': index, 'audio_sha256': hashlib.sha256(fixture['wav'].read_bytes()).hexdigest()}
+        self.rows.append(row)
+        self.clip = row
+
+        def sink(frame, frame_index, fps):
+            if fps != 20 or frame_index != row['frame_count']:
+                raise ValueError('Frame order/rate changed.')
+            if row['first_frame_ready_s'] is None:
+                row['first_frame_ready_s'] = time.perf_counter()-row['started']
+            if self.transport == 'mse':
+                row['frame_count'] += 1
+                return
+            # Synthetic timing marker only; the archive written by the renderer
+            # remains unmarked. A copy prevents mutations of cached body media.
+            frame = frame.copy()
+            frame[-16:, :16] = (0, 255, row['index']*9)
+            while True:
+                if event is not None:
+                    from local_app.models import check_cancel
+                    check_cancel(event)
+                if self.cancel.is_set():
+                    raise RuntimeError('Benchmark stopped.')
+                try:
+                    row['queue'].put((frame_index, frame), timeout=.1)
+                    break
+                except queue.Full:
+                    continue
+            row['frame_count'] += 1
+            row['max_queue'] = max(row['max_queue'], row['queue'].qsize())
+
+        return row, sink
+
+    @contextmanager
+    def output(self, key, index, audio_path, event):
+        """Attach the central engine to this isolated RTC queue."""
+        from local_app.models import check_cancel
+        deadline = time.monotonic()+15
+        while self.clip and not self.clip['finished'] and not (self.clip.get('event') and self.clip['event'].is_set()):
+            check_cancel(event)
+            if self.cancel.is_set() or time.monotonic() >= deadline:
+                raise RuntimeError('RTC playback did not drain.')
+            time.sleep(.02)
+        check_cancel(event)
+        with self.lock:
+            if not self.receiver_ready or self.cancel.is_set() or len(self.rows) >= 24:
+                raise RuntimeError('RTC receiver unavailable or experiment limit reached.')
+            row, sink = self.prepare_output(index, {'case': 'engine', 'wav': audio_path}, event)
+            row['worker'] = threading.current_thread()
+        try:
+            yield sink
+        except BaseException:
+            event.set()
+            raise
+        finally:
+            row['producer_done'] = True
 
     def safe_rows(self):
-        omit = {'queue', 'pcm', 'worker', 'started'}
+        omit = {'queue', 'pcm', 'worker', 'started', 'event'}
         return [{k: v for k, v in row.copy().items() if k not in omit} for row in self.rows.copy()]
 
 
@@ -128,7 +162,7 @@ class Picture(VideoStreamTrack):
         seconds = self.tick/20
         await self.session.pace(seconds)
         clip = self.session.clip
-        stopped = self.session.cancel.is_set()
+        stopped = self.session.cancel.is_set() or bool(clip and clip.get('event') and clip['event'].is_set())
         picture = (self.last if self.last is not None else self.session.idle[0]) if stopped else None
         if not stopped and clip and not clip['finished']:
             try:
@@ -162,7 +196,7 @@ class Speech(AudioStreamTrack):
         await self.session.pace(seconds)
         pcm = np.zeros((1, 960), dtype=np.int16)
         clip = self.session.clip
-        if not self.session.cancel.is_set() and clip and clip['start_s'] is not None:
+        if not self.session.cancel.is_set() and clip and not (clip.get('event') and clip['event'].is_set()) and clip['start_s'] is not None:
             offset = round((seconds-clip['start_s'])*48000)
             begin, end = max(0, offset), min(len(clip['pcm']), offset+960)
             if begin < end:

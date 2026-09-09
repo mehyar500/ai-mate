@@ -65,6 +65,34 @@ def offer(address='127.0.0.1', direction='recvonly'):
 
 
 class RTCPlaybackCancellationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_engine_output_uses_turn_cancellation_without_closing_session(self):
+        try:
+            from scripts.serve_webrtc_benchmark import Session, Picture, Speech, np, wavfile
+        except ImportError as error:
+            self.skipTest(f'Optional RTC test dependencies unavailable: {error.name}')
+        with tempfile.TemporaryDirectory() as folder:
+            audio = Path(folder)/'synthetic.wav'
+            wavfile.write(audio, 24000, np.full(24000, 8000, dtype=np.int16))
+            session = Session(None, [np.zeros((32,32,3), dtype=np.uint8)], [], Path(folder))
+            session.receiver_ready = True
+            event = threading.Event()
+            with session.output('test', 0, audio, event) as sink:
+                original = np.full((32,32,3), 77, dtype=np.uint8)
+                sink(original, 0, 20)
+                self.assertTrue((original == 77).all())
+                picture = Picture(session)
+                await picture.recv()
+                event.set()
+                self.assertFalse((await Speech(session).recv()).to_ndarray().any())
+                self.assertFalse(session.cancel.is_set())
+            self.assertTrue(session.clip['producer_done'])
+            self.assertNotIn('event', session.safe_rows()[0])
+            next_event = threading.Event()
+            with session.output('next', 0, audio, next_event) as sink:
+                sink(original, 0, 20)
+            self.assertEqual(len(session.rows), 2)
+            self.assertFalse(next_event.is_set())
+
     async def test_cancel_silences_buffered_audio_and_holds_last_frame(self):
         try:
             from scripts.serve_webrtc_benchmark import Picture, Speech, np
