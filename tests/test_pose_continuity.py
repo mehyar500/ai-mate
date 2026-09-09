@@ -5,6 +5,7 @@ import threading
 import time
 import unittest
 from unittest.mock import patch, Mock
+from contextlib import contextmanager
 
 from local_app.server import Application
 
@@ -88,6 +89,35 @@ class PoseTests(unittest.TestCase):
         self.assertEqual(self.visual.prepared,[None,b'1'])
         self.assertFalse(previous.exists())
         self.assertEqual(self.app.pose[1].read_bytes(),b'2')
+
+    def test_stream_context_receives_audio_and_closes_on_render_failure(self):
+        lifecycle = []
+        sink = Mock()
+        @contextmanager
+        def output(key, index, audio, event):
+            self.assertEqual(audio.read_bytes(), b'audio')
+            self.assertEqual(index, 0)
+            lifecycle.append('opened')
+            try:
+                yield sink
+            finally:
+                lifecycle.append('closed')
+        self.app.frame_output = output
+        self.assertEqual(self.reply('hello')['state'], 'done')
+        self.assertIs(self.visual.render_options[-1]['frame_sink'], sink)
+        self.visual.fail = True
+        self.assertEqual(self.reply('hello')['state'], 'failed')
+        self.assertEqual(lifecycle, ['opened', 'closed', 'opened', 'closed'])
+
+    def test_stream_cancel_before_render_never_commits(self):
+        @contextmanager
+        def output(key, index, audio, event):
+            event.set()
+            yield Mock()
+        self.app.frame_output = output
+        self.assertEqual(self.reply('hello')['state'], 'cancelled')
+        self.assertEqual(self.visual.count, 0)
+        self.assertEqual(self.app.store.snapshot()['turns'], [])
 
     def test_failed_reply_keeps_previous_pose(self):
         self.reply('wave')

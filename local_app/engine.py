@@ -6,6 +6,7 @@ Microphone input is transcribed before the same turn flow. Cancellation never co
 """
 import copy
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 import os
 from pathlib import Path
 import re
@@ -42,7 +43,7 @@ def configure_runtime(path=ROOT / ".env", environ=None):
 
 
 class CompanionEngine:
-    def __init__(self, directory=MEDIA, model_factory=Models):
+    def __init__(self, directory=MEDIA, model_factory=Models, frame_output=None):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         self.store = Store(self.directory / "memory.sqlite3")
@@ -59,6 +60,9 @@ class CompanionEngine:
         self.startup_s = None
         self.visual_warmup = None
         self.factory = model_factory
+        # Optional transport context: (job, chunk, WAV, cancellation) -> frame sink.
+        # Consumers must discard queued frames/audio when cancellation is set.
+        self.frame_output = frame_output
         self.scene = self.store.current_scene()
         self.pose = None  # (scene, private PNG), committed only after successful video completion.
         from .media import load_reviewed_idle
@@ -450,10 +454,16 @@ class CompanionEngine:
                                 job['_playback'][index] = {'scene': scene, 'pose': performance_candidate,
                                     'cursor': cursor_candidate, 'transition': prepared_transition,
                                     'start_s': motion_start, 'fps': 20}
-                            metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
-                                                      scene, streaming=True, **({"motion_path":motion_path, "loop_motion":prepared_idle,
-                                                          "motion_start_s":listening_offset if prepared_idle else motion_start,
-                                                          "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
+                            output = (self.frame_output(key, index, audio_path, event)
+                                      if self.frame_output else nullcontext(None))
+                            with output as sink:
+                                check_cancel(event)
+                                metrics = renderer.render(audio_path, self.directory / (filename+".mp4"), event,
+                                                          scene, streaming=True, **({'frame_sink': sink} if sink else {}),
+                                                          **({"motion_path":motion_path, "loop_motion":prepared_idle,
+                                                              "motion_start_s":listening_offset if prepared_idle else motion_start,
+                                                              "reuse_motion":bool(prepared_transition or prepared_idle)} if motion_path else {}))
+                                check_cancel(event)
                             metrics.update(motion_metrics)
                             metrics['held_body_pose'] = hold_candidate
                             metrics['looped_prepared_body'] = prepared_idle

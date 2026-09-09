@@ -23705,5 +23705,61 @@
     "video_codec": "H264",
     "bundle_policy": "balanced",
     "temporary_app_deleted": true
+  },
+  "engine_frame_output_20260909": {
+    "scope": "Isolated synthetic stop command -> held body plus generated speech/lips. Decoding and non-silent audio are not perceptual or physical-device acceptance.",
+    "state": "done",
+    "action": "none",
+    "transcript": "Stop moving.",
+    "metrics": {
+      "asr_s": 0.028,
+      "first_text_s": 0.029,
+      "decision_source": "direct_command",
+      "motion_veto": "stop_command",
+      "visual_load_s": 7.385,
+      "visual_prepare_s": 0.152,
+      "first_media_ready_s": 8.488,
+      "total_s": 8.496
+    },
+    "render": {
+      "render_s": 0.6990943999990122,
+      "frames": 24,
+      "fps": 34.33012766234991,
+      "duration_s": 1.194,
+      "speech_duration_s": 1.194,
+      "lip_sync_frames": 24,
+      "resolution": "768x1152",
+      "face_region": "256x256",
+      "torch_peak_allocated_mib": 1960.82568359375,
+      "torch_peak_reserved_mib": 2080.0,
+      "audio_features_s": 0.034447099998942576,
+      "neural_s": 0.583708399994066,
+      "composite_pipe_s": 0.07247840000491124,
+      "encoder": "libx264",
+      "decoder": "tensorrt",
+      "stream_fragment_ms": 200,
+      "body_motion": false,
+      "face_tracking_s": 2.9998773243278265e-07,
+      "face_encode_stride": null,
+      "prepared_appearance_cache_hit": false,
+      "prepared_face_ambiguities_resolved": 0,
+      "motion_start_s": 0,
+      "held_body_pose": true,
+      "looped_prepared_body": false,
+      "continues_previous_pose": false
+    },
+    "decoded_frames": 23,
+    "audio_peak": 0.6744384765625,
+    "audio_seconds": 1.1939583333333332,
+    "private_memory_unchanged": true,
+    "max_lower_body_frame_delta": 1.4906443357467651,
+    "raw_lower_body_unique_frames": 1,
+    "stream_context_events": [
+      "opened",
+      "closed",
+      "cancel_closed"
+    ],
+    "cancelled_mid_render": true,
+    "cancelled_turn_memory_unchanged": true
   }
 }
