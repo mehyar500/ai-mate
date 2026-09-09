@@ -27,7 +27,7 @@ function idlePresence(){
 $('idle-video').addEventListener('error',()=>{idleFailed=true;$('idle-video').hidden=true;});
 document.addEventListener('visibilitychange',idlePresence);
 let historyOpen=false;
-let viewMode='video',unread=0,micState='off',listenAfter=0,callRequest=0;
+let viewMode='video',unread=0,micState='off',listenAfter=0,callRequest=0,plannedMicRequest=null;
 let captionText='';
 function updateCaptions(){
   $('captions').textContent=captionText;
@@ -68,7 +68,7 @@ function controls(){
   for(const mode of ['text','voice','video'])$('mode-'+mode).setAttribute('aria-pressed',String(viewMode===mode));
   for(const mode of ['voice','video'])$('mode-'+mode).dataset.active=replyMode===mode?'true':'false';
   $('mic').hidden=viewMode==='text'||replyMode==='text';$('mic').disabled=!ready;
-  const micLabel=microphone.pending?'Cancel microphone request':microphone.enabled?'Mute microphone':'Unmute microphone';
+  const micLabel=(microphone.pending||plannedMicRequest===callRequest)?'Cancel microphone request':microphone.enabled?'Mute microphone':'Unmute microphone';
   $('mic').setAttribute('aria-label',micLabel);$('mic').title=micLabel;
   $('mic').setAttribute('aria-pressed',String(!microphone.enabled));
   $('mic').dataset.muted=String(!microphone.enabled);
@@ -367,20 +367,25 @@ async function interrupt(){
 }
 $("stop").addEventListener("click",interrupt);
 $('mic').addEventListener('click',async()=>{
-  if(microphone.enabled||microphone.pending){microphone.stop();return;}
+  if(microphone.enabled||microphone.pending||plannedMicRequest===callRequest){plannedMicRequest=null;microphone.stop();return;}
   try{await microphone.start();}catch(error){notice(error.message,true);}controls();
 });
 async function startCall(mode){
   if(!ready)return;
   const request=++callRequest,changed=replyMode!==mode;
   if(changed){microphone.stop();callInputOpen=false;}
+  plannedMicRequest=request;
   replyMode=mode;viewMode=mode;controls();
   if(changed){await interrupt();if(request!==callRequest)return;}
   if(mode!=='video')await closeRtc();
   else if(rtcEnabled&&!rtcPeer){try{await connectRtc();}catch(error){failRtc(error.message);return;}}
   if(request!==callRequest)return;
   notice();
-  try{await microphone.start();}catch(error){notice(error.message,true);}controls();
+  if(plannedMicRequest===request){
+    plannedMicRequest=null;
+    try{await microphone.start();}catch(error){notice(error.message,true);}
+  }
+  controls();
 }
 for(const mode of ['text','voice','video'])$('mode-'+mode).addEventListener('click',async()=>{
   if(mode!=='text'&&replyMode!==mode&&ready){await startCall(mode);return;}
