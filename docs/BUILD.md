@@ -11,7 +11,7 @@ local_app/engine.py owns planning, speech, media, memory, cancellation and pose 
 1. Browser captures speech and detects its end, or sends a typed command.
 2. Local Whisper transcribes validated PCM (GPU FP16 on this PC; CPU int8 by default). The engine retrieves bounded recent context and saved facts.
 3. Unambiguous supported movement commands take a direct path. Otherwise Cloudflare Qwen returns a validated reply, scene, action and optional in-app message.
-4. CPU Kokoro synthesizes complete short phrases, preparing one phrase ahead.
+4. Kokoro synthesizes complete short phrases, preparing one phrase ahead. CPU remains the preview selection; optional CUDA speech is undergoing sustained qualification.
 5. MuseTalk creates new speech-driven mouth frames over the matching body source. Reviewed approach, return and wave assets avoid live diffusion for known starting poses. Other movement attempts use the experimental local generator.
 6. The browser plays synchronized speech and fragmented video, then resumes the appropriate listening view. Interrupted playback preserves the displayed pose; approach/return can resume their remaining movement.
 7. Completed turns update memory. Requested messages appear in Text. Generation completion is not proof the reply was heard; playback acknowledgment and recovery remain work.
@@ -42,6 +42,8 @@ Five prepared body sources are bounded by frame count/resolution, verified again
 `AI_MATE_VISUAL_DECODER=torch` is the portable default. The optional `tensorrt` selection requires a reviewed, locally built engine in `.cache/local-poc/musetalk-vae-trt/`. It verifies the engine and source-weight hashes, GPU name and exact Torch/TensorRT versions before deserialization. Missing or mismatched artifacts fail video warm-up while text/voice remain available. Revert the setting and restart to use Torch. Neither engine nor weights belong in Git; rebuild and requalify on a different GPU. LOCAL_POC records equivalence and call measurements.
 
 `AI_MATE_ASR_DEVICE=cpu` is the portable default; `cuda` selects the same cached Base English weights in FP16. On Windows it uses CUDA/cuDNN libraries from the installed Torch package, and warms recognition at startup. An unavailable explicitly selected GPU fails startup; set `cpu` and restart to recover. No silent device fallback, new download or API is introduced. Device, precision and startup recognition timing are exposed in diagnostics.
+
+`AI_MATE_TTS_DEVICE=cpu` preserves the portable speech path. Optional `cuda` uses the same Kokoro model/voice via ONNX Runtime GPU 1.26.0 in `.cache/ort-gpu-deps`, with pinned Windows wheels and existing Torch CUDA 12.8/cuDNN 9 libraries. It verifies runtime location/version and activated provider, and fails startup on missing/incompatible installation or CPU fallback. Set `cpu` and restart to recover. No automatic download, credential, voice cloning, memory migration or timing offset is added. Diagnostics report speech device/runtime/providers. LOCAL_POC records the short-call evidence and incomplete sustained/physical qualification; the GPU path also changes the in-process CPU VAD runtime to 1.26, which is exercised by the call tests.
 
 Recordings remain mono PCM16 WAV, 8–96kHz and 0.15–30 seconds. Decode/validate once, normalize and resample to a 16kHz float32 array, then invoke Whisper with its original VAD, beam size and 30-second encoder padding. This bypasses faster-whisper's redundant PyAV decode/full-GC path. Raw audio stays local. CPU/GPU equivalence on synthetic fixtures does not qualify all speakers or acoustic conditions.
 
@@ -102,7 +104,7 @@ Production memory needs per-account authorization and source/time metadata. Opt-
 
 ## Configuration and release gates
 
-.env.example documents implemented fields: AI_MATE_LLM_PROVIDER, AI_MATE_LLM_MODEL, AI_MATE_ENV_FILE and AI_MATE_VISUAL_DECODER, plus Cloudflare account ID/key/email or alternative scoped token. MiniMax uses its explicit process credential. No GPU-provider, WebRTC or payment environment variable is wired yet.
+.env.example documents implemented fields: AI_MATE_LLM_PROVIDER, AI_MATE_LLM_MODEL, AI_MATE_ENV_FILE, AI_MATE_VISUAL_DECODER, AI_MATE_ASR_DEVICE and AI_MATE_TTS_DEVICE, plus Cloudflare account ID/key/email or alternative scoped token. MiniMax uses its explicit process credential. No GPU-provider, WebRTC or payment environment variable is wired yet.
 
 The initial remote benchmark can use SSH without another inference API key. Public deployment will need scoped application/Realtime credentials, accepted GPU lifecycle access and processor-specific merchant/webhook secrets. Add exact fields with the implemented adapters; placeholders must not imply a functioning service.
 

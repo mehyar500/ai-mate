@@ -70,6 +70,39 @@ Successful fresh video captures its final decoded frame as the next reference. U
 
 ## Measured results and failures
 
+### Optional GPU speech — September 9
+
+The same Kokoro-82M float32 weights and `af_sarah` voice now have an explicit CUDA option. **CPU remains the preview selection until sustained qualification completes.** No new model, API key, driver or live-environment package was installed. The optional runtime lives in `.cache/ort-gpu-deps`.
+
+Twenty fixed-text samples per configuration compared installed CPU ONNX Runtime 1.29.0, isolated CPU 1.26.0 and isolated CUDA 1.26.0. Each used five phrases repeated four times, eight CPU threads, identical speed and the same model/voice hashes. Warm median synthesis times:
+
+| Phrase | CPU 1.29 | CPU 1.26 | CUDA 1.26 |
+|---|---|---|---|
+| Short acknowledgement | 0.223s | 0.232s | 0.109s |
+| Greeting | 0.383s | 0.390s | 0.153s |
+| Ordinary sentence | 0.471s | 0.481s | 0.162s |
+| Two-sentence memory reply | 0.800s | 0.815s | 0.346s |
+| Count from one through 25 | 1.536s | 1.553s | 0.903s |
+
+All three configurations had zero ordinary-text ASR readback errors, complete 1–25 count readbacks in four repeats, finite nonzero audio and no clipping. Numeric-format differences in the raw word-error metric are retained separately. Ordinary phrase durations matched; small count-duration differences remain. Readback and matching duration do not establish identical sound or physical audibility.
+
+The GPU candidate passed **20/20 call commands** with no functional/page errors or reported reply stalls. Across nine spoken replies, end-of-speech median/p95 was **2.040/2.235s**, versus **2.028/2.631s** in the preceding CPU-speech call. The median is essentially unchanged, the sample is small and hosted dialogue varies. Across 19 mixed submissions, median/p95 was **1.29/1.63s**. Median first-phrase synthesis inside the call fell from **0.238s to 0.171s**. The two-second p95 target is still unmet.
+
+All **970 generated frames** were analyzed; **40 wave/near frames** were visually inspected. A/V clock skew was **23.33ms p95 / 33.54ms maximum** across 588 samples. SyncNet's near description and full-body unsupported-action reply scored **0/40ms**, with injected-delay and reversed-audio controls passing. The third eligible clip scored 40ms but failed the reversed-audio confidence check; treat it as inconclusive. All six paused-speech cases preserved corrections/negations and cancelled three unfinished replies; their **210 frames** passed limited diagnostics. Hand blur, soft facial detail, physical audio and normal-speed perceptual acceptance remain unresolved.
+
+Use the [pinned Windows/Python 3.12 wheel](../config/speech-gpu-benchmark-requirements.txt), with the installed CUDA 12.8/cuDNN 9 libraries. The [ONNX Runtime compatibility table](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html) distinguishes CUDA-13 default packages from the compatible 1.26 release. GPU options use heuristic convolution selection, TF32 off and a 2GiB allocator arena; the arena is not a total GPU-memory cap. CPU nodes and transfers still exist. The runtime checks package location/version and actual provider selection; missing installation, a previously loaded incompatible runtime or CPU fallback fails explicitly. Recovery is `AI_MATE_TTS_DEVICE=cpu` plus restart.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install --target .cache/ort-gpu-deps --no-deps --only-binary=:all: --require-hashes -r config/speech-gpu-benchmark-requirements.txt
+.\.venv\Scripts\python.exe scripts/benchmark_speech_device.py --label new-cpu --device cpu
+.\.venv\Scripts\python.exe scripts/benchmark_speech_device.py --label new-gpu --device cuda --runtime isolated
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-gpu-call --performance-label headroom --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda
+# In another terminal; the driver now waits up to 90 seconds for actual readiness:
+node scripts/qualify_video_call.cjs qualification new-gpu-call --capture
+```
+
+Call/media evidence: `audit/voice-video-qualification-gpu-speech`, `audit/voice-video-qualification-gpu-speech-paused` and `audit/lip-sync-gpu-speech`. The review page verified frame stepping, notes/export, decoded audio and a 390px layout; it leaves human-review checkboxes unchecked. The 30-minute candidate run is `audit/voice-video-soak-gpu-speech-ready`; inspect its completed artifacts before selecting GPU speech in the preview. An earlier soak driver started before server readiness and ended with zero commands; that failed setup is retained and is not call evidence. Five-second whole-GPU memory samples are now recorded by future call benchmarks, including other processes; they are not per-worker peak allocation or concurrency proof.
+
 ### Isolated WebRTC transport comparison — September 9
 
 **Keep the existing player.** A separate benchmark now sends actual GPU-generated mouth frames directly through WebRTC, with continuous H.264 video and Opus audio. The selected preview still uses fragmented MP4/WAV. No new API credential, hosted inference or rental was used.

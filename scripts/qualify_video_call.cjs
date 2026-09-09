@@ -59,6 +59,21 @@ async function main(){
             this.options.onTurn(Uint8Array.from(atob(encoded),c=>c.charCodeAt(0)));};}
         stop(){this.enabled=false;this.options.onState('off');}
       }`}));
+    // Cold model initialization can outlast process creation. Wait for actual
+    // readiness so an early driver cannot terminate a warming benchmark.
+    const readyDeadline=Date.now()+90000;
+    let ready=false;
+    while(Date.now()<readyDeadline){
+      let bootstrap;
+      try{
+        const response=await page.request.get('http://127.0.0.1:8766/api/bootstrap',{timeout:1000});
+        if(response.ok())bootstrap=await response.json();
+      }catch{}
+      if(bootstrap?.error)throw Error('Benchmark model startup failed. Inspect the local server log.');
+      if(bootstrap?.ready){ready=true;break;}
+      await page.waitForTimeout(500);
+    }
+    assert.ok(ready,'Benchmark did not become ready within 90 seconds');
     await page.goto('http://127.0.0.1:8766/');
     await page.waitForFunction(()=>!document.querySelector('#join-call').disabled);
     await page.locator('#join-call').click();

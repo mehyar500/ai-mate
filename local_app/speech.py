@@ -1,4 +1,4 @@
-"""Bounded speech phrases and one-ahead CPU synthesis for call playback."""
+"""Bounded speech phrases and one-ahead synthesis for call playback."""
 from concurrent.futures import ThreadPoolExecutor
 import re
 import time

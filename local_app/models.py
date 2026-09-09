@@ -35,23 +35,15 @@ def recognition_settings(environ=None):
 class Models:
     def __init__(self):
         asr_settings=recognition_settings()
+        from .speech_runtime import create_speech, speech_device
+        tts_device=speech_device()
         from .conversation import Conversation
         self.conversation = Conversation(LLM)
         os.environ["HF_HUB_OFFLINE"] = "1"
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
-        os.environ["ONNX_PROVIDER"] = "CPUExecutionProvider"
-        import onnxruntime as ort
-        from kokoro_onnx import Kokoro
         from faster_whisper import WhisperModel
-        options = ort.SessionOptions()
-        # Same Kokoro weights and preset; eight threads reduced warm synthesis
-        # time on the demo i9. The isolated call suite qualifies CPU contention.
-        self.speech_threads = 8
-        options.intra_op_num_threads = self.speech_threads
-        options.inter_op_num_threads = 1
-        session = ort.InferenceSession(str(CACHE / "kokoro-v1.0.onnx"), sess_options=options,
-                                       providers=["CPUExecutionProvider"])
-        self.tts = Kokoro.from_session(session, str(CACHE / "voices-v1.0.bin"))
+        self.tts,self.speech_runtime,self._speech_dll_directory=create_speech(tts_device)
+        self.speech_threads=self.speech_runtime['cpu_threads']
         self.asr_device=asr_settings['device'];self.asr_compute_type=asr_settings['compute_type']
         if self.asr_device=='cuda':
             import torch

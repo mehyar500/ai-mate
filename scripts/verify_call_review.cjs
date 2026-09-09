@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const trial=process.argv[2],label=process.argv[3];
 assert.ok(['qualification','soak'].includes(trial));assert.match(label,/^[a-z0-9-]{1,32}$/);
-const port=Number(process.argv[4]||8767);assert.ok([8767,8768,8769].includes(port));assert.ok(!process.argv[5]);
+const port=Number(process.argv[4]||8767);assert.ok([8767,8768,8769,8770].includes(port));assert.ok(!process.argv[5]);
 const run=`voice-video-${trial}-${label}`;
 const folder=path.resolve(__dirname,'../generated/local-app/audit',run);
 

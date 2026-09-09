@@ -1,0 +1,3 @@
+# Optional isolated Windows/Python 3.12 speech benchmark; CUDA 12.8/cuDNN 9.
+# Install with --target .cache/ort-gpu-deps --no-deps --require-hashes.
+onnxruntime-gpu==1.26.0 --hash=sha256:5f49c44689894650990e4c8a857d2edafc276fbd79bba57ceb224bd18d25d491

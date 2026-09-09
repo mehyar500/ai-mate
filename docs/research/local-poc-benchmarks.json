@@ -17836,5 +17836,375 @@
       "https://developer.mozilla.org/en-US/docs/Web/API/RTCRtpReceiver/jitterBufferTarget",
       "https://developers.cloudflare.com/realtime/sfu/"
     ]
+  },
+  "gpu_speech_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "eb99fa1df412c2be42b3a10ae66477b8a53c43e2",
+    "risk_class": "R1 local optional inference; public access and commercial eligibility remain separate",
+    "status": "GPU speech candidate implemented and short-tested; CPU preview retained pending sustained evidence",
+    "speech_benchmarks": [
+      {
+        "label": "cpu129",
+        "sha256": "ff90d43d9af0521006d64dee32e06185aaf2f12bfaef4a3d9069e18baae1a998",
+        "onnxruntime": "1.29.0",
+        "device": "cpu",
+        "providers": [
+          "CPUExecutionProvider"
+        ],
+        "load_s": 0.8001764000000549,
+        "cold_warmup_s": 0.2807597999999416,
+        "model_sha256": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices_sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
+        "summary": {
+          "samples": 20,
+          "median_s": 0.4710216999956174,
+          "p95_s": 1.5369079999945825,
+          "by_case_median_s": {
+            "short": 0.22280139999929816,
+            "greeting": 0.3831783000023279,
+            "normal": 0.4710216999956174,
+            "memory": 0.8000080500023614,
+            "long": 1.5355517499956477
+          },
+          "readback_word_errors": 120,
+          "non_count_word_errors": 0,
+          "complete_count_repeats": 4
+        },
+        "max_audio_peak": 0.6392186880111694,
+        "max_clipped_fraction": 0.0
+      },
+      {
+        "label": "cpu126",
+        "sha256": "45fcc42d654d9f84ac418b8fe34e58d26f6e45aab3eea0529a14bb288fec7795",
+        "onnxruntime": "1.26.0",
+        "device": "cpu",
+        "providers": [
+          "CPUExecutionProvider"
+        ],
+        "load_s": 0.7787376999986009,
+        "cold_warmup_s": 0.31418630000553094,
+        "model_sha256": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices_sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
+        "summary": {
+          "samples": 20,
+          "median_s": 0.4814582499966491,
+          "p95_s": 1.560702399998263,
+          "by_case_median_s": {
+            "short": 0.23155215000224416,
+            "greeting": 0.389934449998691,
+            "normal": 0.4814582499966491,
+            "memory": 0.8150645999994595,
+            "long": 1.552969699998357
+          },
+          "readback_word_errors": 120,
+          "non_count_word_errors": 0,
+          "complete_count_repeats": 4
+        },
+        "max_audio_peak": 0.6434706449508667,
+        "max_clipped_fraction": 0.0
+      },
+      {
+        "label": "cuda126",
+        "sha256": "a38c1615cb120820cc51ac24a91dec6f4425bd4a073e8659c0219d401e3b6044",
+        "onnxruntime": "1.26.0",
+        "device": "cuda",
+        "providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "load_s": 2.37904559999879,
+        "cold_warmup_s": 0.5039141999950516,
+        "model_sha256": "beb0d1848dee9a49da392cc3df26958d46cfa35d321edf434f52949153f0df3a",
+        "voices_sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
+        "summary": {
+          "samples": 20,
+          "median_s": 0.16196694999962347,
+          "p95_s": 0.9038534999999683,
+          "by_case_median_s": {
+            "short": 0.10892854999838164,
+            "greeting": 0.15269555000122637,
+            "normal": 0.16183115000239923,
+            "memory": 0.3457013499973982,
+            "long": 0.903432499999326
+          },
+          "readback_word_errors": 120,
+          "non_count_word_errors": 0,
+          "complete_count_repeats": 4
+        },
+        "max_audio_peak": 0.6436769962310791,
+        "max_clipped_fraction": 0.0
+      }
+    ],
+    "qualification": {
+      "elapsed_s": 102.084,
+      "turns": 20,
+      "startup_buffer_ms": 350,
+      "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+      "buffer_override": false,
+      "failures": [],
+      "response_sample_count": 19,
+      "p50_s": 1.29,
+      "p95_s": 1.63,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 924,
+            "longGaps": 0,
+            "last": 102161,
+            "source": "blob:http://127.0.0.1:8766/927be5f5-16ad-4452-88b3-47e621f5fe55",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 197,
+            "callbacks": 1160,
+            "longGaps": 11,
+            "last": 102777.73,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 588,
+          "p50": 8.863999999999983,
+          "p95": 23.32999999999985,
+          "max": 33.53700000000004
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 9,
+        "p50": 2.040333333333332,
+        "p95": 2.235
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+    },
+    "settings": {
+      "speech_model": "Kokoro-82M ONNX v1.0",
+      "speech_voice": "af_sarah",
+      "speech_cpu_threads": 8,
+      "decoder": "tensorrt-reviewed",
+      "speech_runtime": {
+        "device": "cuda",
+        "runtime": "1.26.0",
+        "providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "cpu_threads": 8
+      },
+      "fragment_ms_override": null,
+      "asr_device": "cuda",
+      "asr_compute_type": "float16",
+      "asr_warm_s": 0.5814251999981934,
+      "performance_label": "headroom",
+      "visual_warmup": {
+        "sources": 5,
+        "decoder": "tensorrt",
+        "seconds": 17.944,
+        "torch_allocated_mib": 1834.454
+      },
+      "scope": "Synthetic isolated call; no private conversation or active preview selection."
+    },
+    "frame_review": {
+      "clips": 20,
+      "frames": 970,
+      "flagged": 0,
+      "sha256": "96b413d558916fd58388ff46126817693dd187a4e69395ab97bb7d107b40c92c"
+    },
+    "manual_review": {
+      "reviewer": "Codex visual inspection",
+      "scope": "Forty frames in two ordered sheets; not every frame manually reviewed.",
+      "sheets": [
+        {
+          "file": "207242708e124f89bfb1eb0ee8028c62-0-frames-000.jpg",
+          "sha256": "90c3f708976d3b65992cc2658f95d691961bca4c3ad52f4bb72caaea4c59669b",
+          "frame_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ]
+        },
+        {
+          "file": "9212ccadaad544dcb01c7eee19fef935-0-frames-000.jpg",
+          "sha256": "666692b7500c3f0801b4b104a85a7995790dd7be53beac9bd0b7f03ccae072f5",
+          "frame_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ]
+        }
+      ],
+      "observations": [
+        "Full-body wave keeps both feet and the head in frame; the right hand rises coherently but is blurred during motion.",
+        "Near speech keeps head, hands, clothing and garden consistent across sampled frames.",
+        "Mouth edges and facial detail remain soft; no natural-motion or full-anatomy certification."
+      ],
+      "normal_speed_reviewed": false,
+      "physical_audio_heard": false
+    },
+    "paused_speech": {
+      "cases": 6,
+      "failed": 0,
+      "cancelled_jobs": 3,
+      "frames": 210,
+      "results_sha256": "3694b84911000d19295cad90a02d51816a5c81bef2e2e606b7384227af2a7aea"
+    },
+    "lip_sync": {
+      "scope": "Model estimate at 40ms resolution, not physical/perceptual acceptance. Third clip inconclusive because reverse-audio confidence was higher.",
+      "results_sha256": "d680bcdfe01941c5757f9dae59c2da4ebecaad2cc52daf2213ae4f2f8fa5625c",
+      "clips": [
+        {
+          "case": "description",
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 7.360812187194824,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "reliable_controls": true
+        },
+        {
+          "case": "unsupported",
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 6.084616661071777,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "reliable_controls": true
+        },
+        {
+          "case": "conversation",
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 3.479381561279297,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": false,
+          "reliable_controls": false
+        }
+      ]
+    },
+    "review_page": {
+      "url": "http://127.0.0.1:8770/review.html",
+      "decoded_audio_rms_max": 0.15627687717308794,
+      "decoded_audio_peak_max": 0.5891390442848206,
+      "audio_samples": 48,
+      "physical_audio_heard": false,
+      "frame_stepping_export_and_390px_layout": "passed",
+      "errors": []
+    },
+    "sustained_run": {
+      "label": "gpu-speech-ready",
+      "status": "running; no completion claim",
+      "required_followup": "Inspect summary, all retained frames, sampled visual/perceptual evidence and gpu-memory.json before selecting GPU speech.",
+      "setup_failure": {
+        "label": "gpu-speech",
+        "commands": 0,
+        "cause": "Driver navigated before model readiness; server subsequently exited normally.",
+        "fix": "Driver polls bounded readiness for up to 90 seconds, verified entering the replacement run."
+      }
+    },
+    "runtime": {
+      "ort_gpu": "1.26.0",
+      "install_root": ".cache/ort-gpu-deps",
+      "cuda": "12.8",
+      "cudnn_major": 9,
+      "voice": "af_sarah",
+      "tf32": false,
+      "allocator_arena_limit_mib": 2048,
+      "arena_is_total_gpu_memory_limit": false,
+      "cpu_default_ort": "1.29.0",
+      "gpu_path_cpu_vad_ort": "1.26.0",
+      "configuration": "AI_MATE_TTS_DEVICE=cpu|cuda; restart required; explicit failure instead of CPU fallback"
+    },
+    "package": {
+      "name": "onnxruntime-gpu",
+      "version": "1.26.0",
+      "wheel": "onnxruntime_gpu-1.26.0-cp312-cp312-win_amd64.whl",
+      "sha256": "5f49c44689894650990e4c8a857d2edafc276fbd79bba57ceb224bd18d25d491",
+      "size": 226548963,
+      "url": "https://files.pythonhosted.org/packages/a4/e4/9b378a5466ea0bed65e5beb8e09254973c580a6522810a38afbcc45e5105/onnxruntime_gpu-1.26.0-cp312-cp312-win_amd64.whl",
+      "requires_dist": [
+        "flatbuffers",
+        "numpy>=1.21.6",
+        "packaging",
+        "protobuf",
+        "nvidia-cuda-nvrtc-cu12~=12.0; extra == \"cuda\"",
+        "nvidia-cuda-runtime-cu12~=12.0; extra == \"cuda\"",
+        "nvidia-cufft-cu12~=11.0; extra == \"cuda\"",
+        "nvidia-curand-cu12~=10.0; extra == \"cuda\"",
+        "nvidia-cudnn-cu12~=9.0; extra == \"cudnn\"",
+        "ml-dtypes; extra == \"quantization\"",
+        "sympy; extra == \"symbolic\""
+      ],
+      "license": "MIT License"
+    },
+    "checks": {
+      "python_unittest_passed": 168,
+      "node_tests_passed": 23,
+      "compileall": "passed: local_app scripts tests",
+      "javascript_syntax": "passed: qualification and review drivers",
+      "diff_check": "passed"
+    },
+    "working_source_sha256": {
+      ".env.example": "e8b093dafc53d13644feec48713718aac7656a6b782d82c57ac9c007935952ad",
+      "local_app/models.py": "5ab05f4880a3baa5eb7a90d64845eb0ae27e31423dd01a38604572deca8cad8d",
+      "local_app/engine.py": "48dec38fb5608b8bea3bd4ebbcc7b8d82ae2ebaff68de34e29b6919d5292b160",
+      "local_app/speech.py": "23f379fd40fb192a3ac5771a08ec877df2a4fe55dcd6f645e16226ddbe2da8ba",
+      "local_app/speech_runtime.py": "2437eafd9916c8da82019f25accc50dd3e79a8a6af7c3f53ba485da05c20912c",
+      "scripts/benchmark_speech_device.py": "41c46e411964f40b7c1aff531d7be9c3932762f965d43799a08595d51eab4749",
+      "scripts/serve_voice_video_benchmark.py": "8763576d771ad8bcfcd274995699dd89521d03fd112221c3e9d4e6bd5f8a0e9d",
+      "scripts/qualify_video_call.cjs": "c625ab88770bfa09a6ad42523b38bde39d9e0345e5565a76fd94f0a0fd7c9c0f",
+      "scripts/verify_call_review.cjs": "2e7bcdd0b3320fb9d20f5606522a85e5ec80056e6a629e506c3cb3da0374a5e4",
+      "tests/test_speech_runtime.py": "ef197b9c0cf0bb81d6f9143b02c2647cc5515dde8a62b5a3c79b9d0b35614bed",
+      "config/speech-gpu-benchmark-requirements.txt": "1e119a6d58f27f9a90d56c0bb0b0f662df6ffbc352c3978b70212db534f9a0be"
+    },
+    "limitations": [
+      "Small sequential speech corpus and only nine uninterrupted spoken call replies; no SLA or guaranteed latency reduction.",
+      "Mean first-phrase speech time inside the call differs from isolated longer-sentence timings.",
+      "Same words/durations and ASR readback do not prove identical sound quality.",
+      "Perceptual audio, real microphone/speaker echo, real mobile/PWA and complete anatomy/identity review remain unqualified.",
+      "CUDA node/host transfer and generic ScatterND index warnings were observed; no inference failure, nonfinite audio or ordinary-word regression in the fixed corpus.",
+      "No private memory write, production deployment, new key, GPU purchase or new model weights in this experiment."
+    ],
+    "sources": [
+      "https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html",
+      "https://pypi.org/project/onnxruntime-gpu/1.26.0/"
+    ]
   }
 }

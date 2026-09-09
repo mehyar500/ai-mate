@@ -35,6 +35,7 @@ def main():
     parser.add_argument('--decoder', choices=['torch','tensorrt','tensorrt-reviewed'], default='torch', help='Torch, experimental engine, or the reviewed runtime path.')
     parser.add_argument('--fragment-ms',type=int,choices=[100,200],help='Isolated FFmpeg fragment-duration override.')
     parser.add_argument('--asr-device',choices=['cpu','cuda'],help='Isolated speech-recognition device override.')
+    parser.add_argument('--tts-device',choices=['cpu','cuda'],help='Isolated speech-synthesis device override.')
     args = parser.parse_args()
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
@@ -61,6 +62,7 @@ def main():
             shutil.copyfile((assets if args.performance_label else ROOT/'generated/local-app/audit')/name, folder/name)
     configure_runtime()
     if args.asr_device is not None:os.environ['AI_MATE_ASR_DEVICE']=args.asr_device
+    if args.tts_device is not None:os.environ['AI_MATE_TTS_DEVICE']=args.tts_device
     os.environ['AI_MATE_VISUAL_DECODER']='tensorrt' if args.decoder=='tensorrt-reviewed' else 'torch'
     app = CompanionEngine(folder)
     app.scene = 'fullbody'
@@ -100,6 +102,7 @@ def main():
     (folder/'benchmark-settings.json').write_text(json.dumps({
         'speech_model':'Kokoro-82M ONNX v1.0','speech_voice':'af_sarah',
         'speech_cpu_threads':app.models.speech_threads,'decoder':args.decoder,
+        'speech_runtime':app.models.speech_runtime,
         'fragment_ms_override':args.fragment_ms,
         'asr_device':app.models.asr_device,'asr_compute_type':app.models.asr_compute_type,'asr_warm_s':app.models.asr_warm_s,
         'performance_label':args.performance_label,'visual_warmup':app.visual_warmup,
@@ -112,15 +115,26 @@ def main():
     worker = threading.Thread(target=server.serve_forever, daemon=True)
     worker.start()
     print(json.dumps({'ready': True, 'trial': args.trial, 'visual_warmup': app.visual_warmup}), flush=True)
-    deadline = time.monotonic()+(2160 if args.trial == 'soak' else 600)
+    measurement_started=time.monotonic()
+    deadline = measurement_started+(2160 if args.trial == 'soak' else 600)
+    memory_samples=[]
+    next_memory_sample=0
     try:
         while time.monotonic()<deadline and not (folder/'browser-done.json').exists():
+            if time.monotonic()>=next_memory_sample:
+                free,total=renderer.torch.cuda.mem_get_info()
+                memory_samples.append({'elapsed_s':round(time.monotonic()-measurement_started,3),
+                                       'used_mib':round((total-free)/1048576,3),'free_mib':round(free/1048576,3)})
+                next_memory_sample=time.monotonic()+5
             time.sleep(.2)
         app.cancel()
         while app.busy:
             time.sleep(.05)
         jobs = [app.job(key) for key in app.jobs]
         (folder/'engine-results.json').write_text(json.dumps(jobs, indent=2)+'\n')
+        (folder/'gpu-memory.json').write_text(json.dumps({'scope':'Whole-GPU used/free memory sampled every five seconds, including other processes; not an exact peak or per-worker allocation.',
+            'samples':memory_samples,'max_sampled_used_mib':max((r['used_mib'] for r in memory_samples),default=None),
+            'min_sampled_free_mib':min((r['free_mib'] for r in memory_samples),default=None)},indent=2)+'\n')
         print(json.dumps({'finished': True, 'jobs': len(jobs)}), flush=True)
     finally:
         server.shutdown()
