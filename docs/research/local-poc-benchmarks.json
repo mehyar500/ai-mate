@@ -23921,7 +23921,18 @@
     "checkpoint_download": {
       "bytes": 5676356678,
       "sha256": "91ee340300cb7ec6508ca425cae70ab2190d47397650cd3a8cf54ac8483d2b50",
-      "status": "in progress; not yet verified"
+      "status": "verified: exact size and SHA-256 matched; weights-only meta inspection passed"
     }
+  },
+  "shotstream_tensor_audit_20260909": {
+    "checkpoint_sha256": "91ee340300cb7ec6508ca425cae70ab2190d47397650cd3a8cf54ac8483d2b50",
+    "tensor_count": 825,
+    "parameters": 1418996800,
+    "stored_tensor_gib": 5.286175012588501,
+    "bf16_tensor_gib": 2.6430875062942505,
+    "dtypes": [
+      "torch.float32"
+    ],
+    "scope": "Meta-device weights-only inspection, no checkpoint code execution or GPU allocation."
   }
 }
