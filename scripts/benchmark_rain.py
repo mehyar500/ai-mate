@@ -44,8 +44,11 @@ def controls(args, output, record):
     from src.dwpose.wholebody import Wholebody
 
     reference_path = ROOT / 'generated/local-app/fullbody.png'
+    width, height = getattr(args, 'width', args.size), getattr(args, 'height', args.size)
+    dimensions = np.array([width, height])
+    compact = getattr(args, 'pose_profile', 'wide') == 'compact'
     record['reference_sha256'] = checksum(reference_path)
-    reference = ImageOps.pad(Image.open(reference_path).convert('RGB'), (args.size, args.size),
+    reference = ImageOps.pad(Image.open(reference_path).convert('RGB'), (width, height),
                              method=Image.Resampling.LANCZOS, color=(0, 0, 0))
     reference.save(output / 'reference.png')
     detector = Wholebody(str(WEIGHTS / 'dwpose/yolox_l.onnx'), str(WEIGHTS / 'dwpose/dw-ll_ucoco_384.onnx'),
@@ -55,7 +58,7 @@ def controls(args, output, record):
     record['reference_pose_s'] = time.perf_counter() - started
     if points.shape != (1, 134, 2) or scores.shape != (1, 134):
         raise ValueError('Expected one complete DWPose reference skeleton.')
-    points = points[0] / args.size
+    points = points[0]
     scores = scores[0]
     shoulder, elbow, wrist = (2, 3, 4) if args.side == 'right' else (5, 6, 7)
     hand = slice(113, 134) if args.side == 'right' else slice(92, 113)
@@ -71,15 +74,17 @@ def controls(args, output, record):
 
     frames, trajectories = [], []
     for i in range(args.frames):
-        phase = i / (args.frames - 1)
+        phase = (getattr(args, 'frame_offset', 0) + i) / (getattr(args, 'trajectory_frames', args.frames) - 1)
         progress = min(1., phase * 4) if phase < .5 else max(0., 3 - phase * 4)
         progress = progress * progress * (3 - 2 * progress)
         if args.motion == 'static':
             progress = 0.
         moved = points.copy()
-        moved[elbow] = points[shoulder] + rotate(upper, sign * np.deg2rad(70) * progress)
-        moved[wrist] = moved[elbow] + rotate(lower, sign * np.deg2rad(160) * progress)
-        moved[hand] = moved[wrist] + rotate(hand_offsets, sign * np.deg2rad(160) * progress)
+        upper_angle, lower_angle = (0, 180) if compact else (70, 160)
+        moved[elbow] = points[shoulder] + rotate(upper, sign * np.deg2rad(upper_angle) * progress)
+        moved[wrist] = moved[elbow] + rotate(lower, sign * np.deg2rad(lower_angle) * progress)
+        moved[hand] = moved[wrist] + rotate(hand_offsets, sign * np.deg2rad(lower_angle) * progress)
+        moved = moved / dimensions
         if ((moved[[shoulder, elbow, wrist]] < 0) | (moved[[shoulder, elbow, wrist]] > 1)).any():
             raise ValueError('Control arm leaves the reference frame.')
         trajectories.append(moved.copy())
@@ -87,14 +92,17 @@ def controls(args, output, record):
         subset = np.where(scores[:18] > .3, np.arange(18), -1)[None]
         pose = {'bodies': {'candidate': moved[:18], 'subset': subset}, 'faces': moved[None, 24:92],
                 'hands': np.stack([moved[92:113], moved[113:134]])}
-        canvas = draw_pose(pose, args.size, args.size, [], None, args.pose_format == 'face-only')
+        canvas = draw_pose(pose, height, width, [], None, args.pose_format == 'face-only')
         frames.append(Image.fromarray(canvas))
     trajectory = np.stack(trajectories)
     for i in sorted({0, args.frames // 4, args.frames // 2, args.frames - 1}):
         frames[i].save(output / f'control-{i:03}.png')
-    lengths = np.stack([np.linalg.norm(trajectory[:, elbow] - trajectory[:, shoulder], axis=-1),
-                        np.linalg.norm(trajectory[:, wrist] - trajectory[:, elbow], axis=-1)])
+    lengths = np.stack([np.linalg.norm((trajectory[:, elbow] - trajectory[:, shoulder]) * dimensions / height, axis=-1),
+                        np.linalg.norm((trajectory[:, wrist] - trajectory[:, elbow]) * dimensions / height, axis=-1)])
     record['controls'] = {'side': args.side, 'frames': args.frames, 'size': args.size,
+                          'width': width, 'height': height, 'pose_profile': 'compact' if compact else 'wide',
+                          'trajectory_frames': getattr(args, 'trajectory_frames', args.frames),
+                          'frame_offset': getattr(args, 'frame_offset', 0),
                           'max_arm_length_deviation': float(np.abs(lengths - lengths[:, :1]).max()),
                           'type': ('static reference pose' if args.motion == 'static' else
                                    'deterministic joint-angle raise, hold, lower; no language planner'),

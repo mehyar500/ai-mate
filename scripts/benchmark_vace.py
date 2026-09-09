@@ -24,7 +24,7 @@ def checksum(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def preflight(manifest, prepare_only, rcm=False):
+def preflight(manifest, prepare_only, rcm=False, tiny=False):
     revision = subprocess.check_output(['git', '-C', str(CODE), 'rev-parse', 'HEAD'], text=True).strip()
     if revision != manifest['wan_code']['revision'] or subprocess.check_output(['git', '-C', str(CODE), 'diff', '--no-ext-diff']):
         raise ValueError('Expected the clean, pinned Wan checkout.')
@@ -34,6 +34,8 @@ def preflight(manifest, prepare_only, rcm=False):
         rows = manifest['files'] + manifest['reused_files']
         if rcm:
             rows += manifest['rcm_experiment']['files']
+        if tiny:
+            rows += manifest['tiny_vae_experiment']['files']
         for row in rows:
             path = ROOT / row['path'] if 'path' in row else WEIGHTS.parent / row['folder'] / row['filename']
             if not path.is_file() or path.stat().st_size != row['size'] or checksum(path) != row['sha256']:
@@ -72,7 +74,7 @@ def run(args, record, output, manifest):
         sys.path.remove(pose_dependencies)
     control_rgb = np.stack([np.asarray(im) for im in control_images])
     subprocess.run(['ffmpeg', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgb24',
-                    '-video_size', f'{args.size}x{args.size}', '-framerate', '16', '-i', 'pipe:0',
+                    '-video_size', f'{args.width}x{args.height}', '-framerate', '16', '-i', 'pipe:0',
                     '-an', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p',
                     str(output / 'controls.mp4')], input=control_rgb.tobytes(), check=True, timeout=60)
     if args.prepare_only:
@@ -162,21 +164,29 @@ def run(args, record, output, manifest):
                             model_module.rope_params(1024, 2 * (d // 6)),
                             model_module.rope_params(1024, 2 * (d // 6))], dim=1)
     pipe.model = model.eval().requires_grad_(False).to(device=device, dtype=dtype)
-    pipe.vae = WanVAE(vae_pth=str(reused['Wan2.1_VAE.pth']), dtype=dtype, device=device)
-    pipe.vae.model.to(dtype=dtype)
+    if args.vae == 'tiny-both':
+        from scripts.vace_tiny_vae import TinyWanVAE
+        pipe.vae = TinyWanVAE(device=device)
+    else:
+        pipe.vae = WanVAE(vae_pth=str(reused['Wan2.1_VAE.pth']), dtype=dtype, device=device)
+        pipe.vae.model.to(dtype=dtype)
+        if args.vae == 'tiny-decode':
+            from scripts.vace_tiny_vae import TinyWanVAE
+            tiny = TinyWanVAE(device=device)
+            pipe.vae.decode = tiny.decode
     torch.cuda.synchronize()
     record['model_load_s'] = time.perf_counter() - started
     print(json.dumps({'model_load_s': record['model_load_s']}), flush=True)
 
     frames = torch.from_numpy(control_rgb.copy()).permute(3, 0, 1, 2).to(device=device, dtype=dtype) / 127.5 - 1
     ref = torch.from_numpy(np.asarray(reference).copy()).permute(2, 0, 1)[:, None].to(device=device, dtype=dtype) / 127.5 - 1
-    mask = torch.ones((1, args.frames, args.size, args.size), device=device, dtype=dtype)
+    mask = torch.ones((1, args.frames, args.height, args.width), device=device, dtype=dtype)
     if args.conditioning in ('masked-body', 'masked-body-open-canvas'):
         # VACE sees original pixels outside the union of commanded body poses.
         # This is an inpainting condition, not post-render background compositing.
         from scripts.vace_rcm import body_control_bounds
         pose = np.load(output / 'controls.npz', allow_pickle=False)
-        left, top, right, bottom = body_control_bounds(pose['points'], pose['scores'], args.size)
+        left, top, right, bottom = body_control_bounds(pose['points'], pose['scores'], (args.width, args.height))
         mask.zero_()
         mask[:, :, top:bottom, left:right] = 1
         padding_count = 0
@@ -196,22 +206,42 @@ def run(args, record, output, manifest):
         from scripts.vace_rcm import sample
         video = sample(pipe, prompt, frames, mask, ref, args, record)
     else:
-        video = pipe.generate(prompt, [frames], [mask], [[ref]], size=(args.size, args.size), frame_num=args.frames,
+        video = pipe.generate(prompt, [frames], [mask], [[ref]], size=(args.width, args.height), frame_num=args.frames,
                               context_scale=args.context_scale, sampling_steps=args.steps, guide_scale=5., shift=16.,
                               seed=args.seed, offload_model=False, n_prompt=negative)
     torch.cuda.synchronize()
     elapsed = time.perf_counter() - began
-    if tuple(video.shape) != (3, args.frames, args.size, args.size) or not torch.isfinite(video).all():
+    if args.generator == 'rcm':
+        save_file({'latents': pipe._benchmark_latents.detach().cpu().contiguous()}, str(output / 'latents.safetensors'))
+    if tuple(video.shape) != (3, args.frames, args.height, args.width) or not torch.isfinite(video).all():
         raise ValueError('Invalid generated frame dimensions or nonfinite pixels.')
     rgb = ((video.permute(1, 2, 3, 0).cpu().float().clamp(-1, 1).numpy() + 1) * 127.5).round().astype(np.uint8)
     path = output / 'run-0.mp4'
     subprocess.run(['ffmpeg', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgb24',
-                    '-video_size', f'{args.size}x{args.size}', '-framerate', '16', '-i', 'pipe:0',
+                    '-video_size', f'{args.width}x{args.height}', '-framerate', '16', '-i', 'pipe:0',
                     '-an', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', str(path)],
                    input=rgb.tobytes(), check=True, timeout=60)
     record['run'] = {'inference_s': elapsed, 'generated_frames': len(rgb), 'generated_fps': len(rgb) / elapsed,
                      'first_decoded_output_s': elapsed, 'peak_allocated_bytes': torch.cuda.max_memory_allocated(),
                      'peak_reserved_bytes': torch.cuda.max_memory_reserved(), 'sha256': checksum(path)}
+    if args.decoder_comparison:
+        from scripts.vace_tiny_vae import TinyWanVAE
+        tiny = TinyWanVAE(device=device)
+        began = time.perf_counter()
+        compared = tiny.decode([pipe._benchmark_latents[:, 1:]])[0]
+        torch.cuda.synchronize()
+        decode_s = time.perf_counter() - began
+        if compared.shape != video.shape or not torch.isfinite(compared).all():
+            raise ValueError('Tiny decoder produced invalid frame dimensions/pixels.')
+        comparison_rgb = ((compared.permute(1, 2, 3, 0).cpu().float().clamp(-1, 1).numpy() + 1) * 127.5).round().astype(np.uint8)
+        comparison_path = output / 'tiny-decoded.mp4'
+        subprocess.run(['ffmpeg', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgb24',
+                        '-video_size', f'{args.width}x{args.height}', '-framerate', '16', '-i', 'pipe:0',
+                        '-an', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', str(comparison_path)],
+                       input=comparison_rgb.tobytes(), check=True, timeout=60)
+        record['decoder_comparison'] = {'same_generated_latents': True, 'tiny_decode_s': decode_s,
+                                        'pixel_mae_0_1': float((compared - video).abs().mean() / 2),
+                                        'sha256': checksum(comparison_path), 'scope': 'Decoder only; excludes model loading'}
     record['complete'] = True
     print(json.dumps(record['run']), flush=True)
 
@@ -223,21 +253,34 @@ def main():
     parser.add_argument('--side', choices=['right', 'left'], default='right')
     parser.add_argument('--motion', choices=['raise-lower', 'static'], default='raise-lower')
     parser.add_argument('--size', type=int, choices=[384, 512], default=512)
+    parser.add_argument('--aspect', choices=['square', 'portrait'], default='square')
+    parser.add_argument('--pose-profile', choices=['wide', 'compact'], default='wide')
     parser.add_argument('--frames', type=int, choices=[17, 33, 49], default=33)
+    parser.add_argument('--trajectory-frames', type=int, choices=[17, 33, 49], default=None)
+    parser.add_argument('--frame-offset', type=int, default=0)
     parser.add_argument('--generator', choices=['original', 'rcm'], default='original')
+    parser.add_argument('--vae', choices=['original', 'tiny-decode', 'tiny-both'], default='original')
+    parser.add_argument('--decoder-comparison', action='store_true')
     parser.add_argument('--conditioning', choices=['full-mask', 'masked-body', 'masked-body-open-canvas'], default='full-mask')
     parser.add_argument('--steps', type=int, choices=[1, 2, 4, 20, 30, 50], default=30)
     parser.add_argument('--context-scale', type=float, choices=[.5, 1., 1.5], default=1.)
     parser.add_argument('--seed', type=int, default=42)
     args = parser.parse_args()
+    args.height = args.size
+    args.width = args.size if args.aspect == 'square' else (args.size * 2 // 3 // 16 * 16)
+    args.trajectory_frames = args.trajectory_frames or args.frames
+    if args.frame_offset < 0 or args.frame_offset + args.frames > args.trajectory_frames:
+        parser.error('The rendered frame range must fit the requested trajectory.')
     if (args.generator == 'rcm') != (args.steps in (1, 2, 4)):
         parser.error('rCM requires 1/2/4 steps; original baseline requires 20/30/50 steps.')
+    if args.decoder_comparison and (args.generator != 'rcm' or args.vae != 'original'):
+        parser.error('Decoder comparison requires rCM and original VAE.')
     args.pose_format = 'full-body'
     if not re.fullmatch('[a-z0-9][a-z0-9-]{0,47}', args.label):
         parser.error('Use a fresh lowercase experiment label.')
     manifest = json.loads((ROOT / 'config/vace-benchmark.json').read_text(encoding='utf-8'))
     sys.path.insert(0, str(ROOT))
-    preflight(manifest, args.prepare_only, rcm=args.generator == 'rcm')
+    preflight(manifest, args.prepare_only, rcm=args.generator == 'rcm', tiny=args.vae != 'original' or args.decoder_comparison)
     output = ROOT / 'generated/local-app/audit' / ('vace-' + args.label)
     output.mkdir(exist_ok=False)
     record = {'complete': False, 'settings': vars(args), 'model_revision': manifest['files'][0]['revision'],

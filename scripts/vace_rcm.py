@@ -24,8 +24,11 @@ def body_control_bounds(points, scores, size):
     selected = points[:, scores >= .3]
     if selected.shape[1] < 8 or not np.isfinite(selected).all():
         raise ValueError('Insufficient finite body controls.')
-    low = np.floor((selected.min(axis=(0, 1)) - .06) * size).astype(int).clip(0, size)
-    high = np.ceil((selected.max(axis=(0, 1)) + .06) * size).astype(int).clip(0, size)
+    extent = np.broadcast_to(np.asarray(size), (2,))
+    if not np.isfinite(extent).all() or (extent <= 0).any():
+        raise ValueError('Expected positive canvas dimensions.')
+    low = np.floor((selected.min(axis=(0, 1)) - .06) * extent).astype(int).clip(0, extent)
+    high = np.ceil((selected.max(axis=(0, 1)) + .06) * extent).astype(int).clip(0, extent)
     if (high <= low).any():
         raise ValueError('Empty editable body region.')
     return int(low[0]), int(low[1]), int(high[0]), int(high[1])
@@ -106,6 +109,7 @@ def sample(pipe, prompt, frames, mask, reference, args, record):
             timings['denoising_steps_s'].append(time.perf_counter() - started)
             print('rCM completed step ' + str(len(timings['denoising_steps_s'])), flush=True)
         started = time.perf_counter()
+        pipe._benchmark_latents = x.float()
         video = pipe.decode_latent([x.float()], refs)[0]
         torch.cuda.synchronize()
         timings['decode_s'] = time.perf_counter() - started

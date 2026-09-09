@@ -8,6 +8,18 @@ from scripts.vace_rcm import body_control_bounds, schedule, transfer_generator
 
 @unittest.skipUnless(importlib.util.find_spec('torch'), 'Requires optional PyTorch')
 class VaceRcmTests(unittest.TestCase):
+    def test_body_region_uses_both_portrait_dimensions(self):
+        import numpy as np
+        points = np.full((2, 134, 2), .5)
+        points[0, 0], points[1, 0] = [.1, .2], [.8, .9]
+        bounds = body_control_bounds(points, np.ones(134), (200, 400))
+        self.assertEqual(bounds[:2], (8, 56))
+        self.assertTrue(172 <= bounds[2] <= 173)
+        self.assertEqual(bounds[3], 384)
+        for size in [(0, 400), (200, float('nan')), (-1, 400)]:
+            with self.assertRaises(ValueError):
+                body_control_bounds(points, np.ones(134), size)
+
     def test_body_region_contains_motion_without_uncertain_landmarks(self):
         import numpy as np
         points = np.full((3, 134, 2), .5)

@@ -22724,5 +22724,567 @@
     "owner": "current AI Mate engineering task",
     "rollback": "Revert this experiment checkpoint; no selected application model, UI, private memory or dependency environment was changed",
     "timing_scope": "Control/reference encoding, denoising and GPU video decoding; excludes preflight, model load, prompt encoding, MP4 encoding, browser/network playback."
+  },
+  "vace_tiny_vae_short_segments_20260909": {
+    "source_commit": "d9d1e679bd9264f372b86c6dc5e97362037e7aad",
+    "risk": "R1 isolated renderer/decoder experiments; runtime, credentials and user memory unchanged",
+    "classification": "progress",
+    "revalidation": "Previous goal response only rewrote a prompt: no implementation progress. Current worktree and completed tiny-VAE outputs were inspected before new tests; all current renderer sessions confirmed terminal exit 0.",
+    "scope": "Six independent neutral silent clips plus same-latent decoder comparison; no continuous generation, speech, language commands or call integration",
+    "models": [
+      "Wan2.1-VACE-1.3B",
+      "rCM_Wan2.1_T2V_1.3B_480p",
+      "Wan2.1_VAE",
+      "TAEW2.1",
+      "UMT5-XXL",
+      "DWPose"
+    ],
+    "pins": "config/vace-benchmark.json; optional 22.64MB tiny weights and MIT source verified",
+    "source": "https://github.com/madebyollin/taehv/tree/011dfc2112197741c540e0bdd5b7b67bcc930771",
+    "hardware": "RTX 4060 Ti 16GB, 48GB system RAM",
+    "trials": [
+      {
+        "folder": "generated/local-app/audit/vace-compact-prefix-original",
+        "settings": {
+          "label": "compact-prefix-original",
+          "prepare_only": false,
+          "side": "right",
+          "motion": "raise-lower",
+          "size": 384,
+          "aspect": "portrait",
+          "pose_profile": "compact",
+          "frames": 17,
+          "trajectory_frames": 33,
+          "frame_offset": 0,
+          "generator": "rcm",
+          "vae": "original",
+          "decoder_comparison": true,
+          "conditioning": "masked-body",
+          "steps": 4,
+          "context_scale": 1.0,
+          "seed": 42,
+          "height": 384,
+          "width": 256,
+          "pose_format": "full-body"
+        },
+        "run": {
+          "inference_s": 4.632709199999226,
+          "generated_frames": 17,
+          "generated_fps": 3.6695590562867273,
+          "first_decoded_output_s": 4.632709199999226,
+          "peak_allocated_bytes": 6455617536,
+          "peak_reserved_bytes": 7381975040,
+          "sha256": "735b41a62be05bbb3c0a80e773b11427bd0c3270e8ad69b8008cbe35dfb08669"
+        },
+        "rcm_timing": {
+          "control_encode_s": 1.5816272999945795,
+          "denoising_steps_s": [
+            0.5210425999975996,
+            0.45746029999281745,
+            0.4569206999876769,
+            0.4577881000004709
+          ],
+          "decode_s": 1.1545891999994637
+        },
+        "prompt_preparation_s": 0.0005119999987073243,
+        "prompt_cache_hit": true,
+        "model_load_s": 2.861132299993187,
+        "control_bone_length_deviation": 5.551115123125783e-17,
+        "frame_review": {
+          "decoded_frames": 17,
+          "fps": 16.0,
+          "container_average_fps": 16.0,
+          "duration_s": 1.0625,
+          "flagged_frames": [],
+          "max_adjacent_mae": 9.706,
+          "median_adjacent_mae": 4.231
+        },
+        "visual_review": {
+          "review_type": "Ordered visual inspection of every decoded frame",
+          "frames_reviewed": 17,
+          "notes": "Original VAE: right hand raises near the face; moving hand reaches the left border at frame 4; soft face/hands, upper arm deviates from fixed-elbow control.",
+          "normal_speed_review": false,
+          "audio_review": false,
+          "call_quality_pass": false,
+          "source_sha256": "735b41a62be05bbb3c0a80e773b11427bd0c3270e8ad69b8008cbe35dfb08669"
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-compact-prefix-tiny",
+        "settings": {
+          "label": "compact-prefix-tiny",
+          "prepare_only": false,
+          "side": "right",
+          "motion": "raise-lower",
+          "size": 384,
+          "aspect": "portrait",
+          "pose_profile": "compact",
+          "frames": 17,
+          "trajectory_frames": 33,
+          "frame_offset": 0,
+          "generator": "rcm",
+          "vae": "tiny-both",
+          "decoder_comparison": false,
+          "conditioning": "masked-body",
+          "steps": 4,
+          "context_scale": 1.0,
+          "seed": 42,
+          "height": 384,
+          "width": 256,
+          "pose_format": "full-body"
+        },
+        "run": {
+          "inference_s": 2.2696991999982856,
+          "generated_frames": 17,
+          "generated_fps": 7.4899792888911625,
+          "first_decoded_output_s": 2.2696991999982856,
+          "peak_allocated_bytes": 5447057408,
+          "peak_reserved_bytes": 5937037312,
+          "sha256": "c7999211edd851aa063e0230a84225c340d8be14cded72aa9490c8ef2f5d9caa"
+        },
+        "rcm_timing": {
+          "control_encode_s": 0.25701140001183376,
+          "denoising_steps_s": [
+            0.578724200007855,
+            0.45763410000654403,
+            0.4573720000043977,
+            0.4576972999930149
+          ],
+          "decode_s": 0.057052200005273335
+        },
+        "prompt_preparation_s": 0.0005069000035291538,
+        "prompt_cache_hit": true,
+        "model_load_s": 2.6405120999988867,
+        "control_bone_length_deviation": 5.551115123125783e-17,
+        "frame_review": {
+          "decoded_frames": 17,
+          "fps": 16.0,
+          "container_average_fps": 16.0,
+          "duration_s": 1.0625,
+          "flagged_frames": [],
+          "max_adjacent_mae": 8.154,
+          "median_adjacent_mae": 3.7795
+        },
+        "visual_review": {
+          "review_type": "Ordered visual inspection of every decoded frame",
+          "frames_reviewed": 17,
+          "notes": "Tiny encoder+decoder preserves broad pose and patio; hand smears on frames 2-6 and clips the left border at frame 4; face/hands remain soft.",
+          "normal_speed_review": false,
+          "audio_review": false,
+          "call_quality_pass": false,
+          "source_sha256": "c7999211edd851aa063e0230a84225c340d8be14cded72aa9490c8ef2f5d9caa"
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-compact-prefix-tiny-two",
+        "settings": {
+          "label": "compact-prefix-tiny-two",
+          "prepare_only": false,
+          "side": "right",
+          "motion": "raise-lower",
+          "size": 384,
+          "aspect": "portrait",
+          "pose_profile": "compact",
+          "frames": 17,
+          "trajectory_frames": 33,
+          "frame_offset": 0,
+          "generator": "rcm",
+          "vae": "tiny-both",
+          "decoder_comparison": false,
+          "conditioning": "masked-body",
+          "steps": 2,
+          "context_scale": 1.0,
+          "seed": 42,
+          "height": 384,
+          "width": 256,
+          "pose_format": "full-body"
+        },
+        "run": {
+          "inference_s": 1.3379962000035448,
+          "generated_frames": 17,
+          "generated_fps": 12.705566727285893,
+          "first_decoded_output_s": 1.3379962000035448,
+          "peak_allocated_bytes": 5447057408,
+          "peak_reserved_bytes": 5937037312,
+          "sha256": "550f36295db38600733bd893b73a0f7a0fc0238cb6397dfd9aa427f2d8455d75"
+        },
+        "rcm_timing": {
+          "control_encode_s": 0.23818429998937063,
+          "denoising_steps_s": [
+            0.5821189999987837,
+            0.4574626999965403
+          ],
+          "decode_s": 0.057473699998809025
+        },
+        "prompt_preparation_s": 0.0005087999888928607,
+        "prompt_cache_hit": true,
+        "model_load_s": 2.5886513000004925,
+        "control_bone_length_deviation": 5.551115123125783e-17,
+        "frame_review": {
+          "decoded_frames": 17,
+          "fps": 16.0,
+          "container_average_fps": 16.0,
+          "duration_s": 1.0625,
+          "flagged_frames": [],
+          "max_adjacent_mae": 8.066,
+          "median_adjacent_mae": 3.9455
+        },
+        "visual_review": {
+          "review_type": "Ordered visual inspection of every decoded frame",
+          "frames_reviewed": 17,
+          "notes": "Two steps preserve right-arm raise and lowered left arm; hand still smears and reaches the left edge at frame 4; face detail degrades.",
+          "normal_speed_review": false,
+          "audio_review": false,
+          "call_quality_pass": false,
+          "source_sha256": "550f36295db38600733bd893b73a0f7a0fc0238cb6397dfd9aa427f2d8455d75"
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-compact-prefix-tiny-one",
+        "settings": {
+          "label": "compact-prefix-tiny-one",
+          "prepare_only": false,
+          "side": "right",
+          "motion": "raise-lower",
+          "size": 384,
+          "aspect": "portrait",
+          "pose_profile": "compact",
+          "frames": 17,
+          "trajectory_frames": 33,
+          "frame_offset": 0,
+          "generator": "rcm",
+          "vae": "tiny-both",
+          "decoder_comparison": false,
+          "conditioning": "masked-body",
+          "steps": 1,
+          "context_scale": 1.0,
+          "seed": 42,
+          "height": 384,
+          "width": 256,
+          "pose_format": "full-body"
+        },
+        "run": {
+          "inference_s": 0.9237647999980254,
+          "generated_frames": 17,
+          "generated_fps": 18.40295278628969,
+          "first_decoded_output_s": 0.9237647999980254,
+          "peak_allocated_bytes": 5447057408,
+          "peak_reserved_bytes": 5937037312,
+          "sha256": "5e8005e1bb2da9bec118408b0f05ebb61d2fb2b1d85cd62b5b19505f2072459b"
+        },
+        "rcm_timing": {
+          "control_encode_s": 0.28036610000708606,
+          "denoising_steps_s": [
+            0.5792418000055477
+          ],
+          "decode_s": 0.06141909999132622
+        },
+        "prompt_preparation_s": 0.0005762999935541302,
+        "prompt_cache_hit": true,
+        "model_load_s": 2.675590500002727,
+        "control_bone_length_deviation": 5.551115123125783e-17,
+        "frame_review": {
+          "decoded_frames": 17,
+          "fps": 16.0,
+          "container_average_fps": 16.0,
+          "duration_s": 1.0625,
+          "flagged_frames": [],
+          "max_adjacent_mae": 9.137,
+          "median_adjacent_mae": 4.428
+        },
+        "visual_review": {
+          "review_type": "Ordered visual inspection of every decoded frame",
+          "frames_reviewed": 17,
+          "notes": "One step exceeds 16 generated FPS but visibly deforms facial features, hand and sweater boundaries; rejected for call quality.",
+          "normal_speed_review": false,
+          "audio_review": false,
+          "call_quality_pass": false,
+          "source_sha256": "5e8005e1bb2da9bec118408b0f05ebb61d2fb2b1d85cd62b5b19505f2072459b"
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-compact-full-tiny-two",
+        "settings": {
+          "label": "compact-full-tiny-two",
+          "prepare_only": false,
+          "side": "right",
+          "motion": "raise-lower",
+          "size": 384,
+          "aspect": "portrait",
+          "pose_profile": "compact",
+          "frames": 33,
+          "trajectory_frames": 33,
+          "frame_offset": 0,
+          "generator": "rcm",
+          "vae": "tiny-both",
+          "decoder_comparison": false,
+          "conditioning": "masked-body",
+          "steps": 2,
+          "context_scale": 1.0,
+          "seed": 42,
+          "height": 384,
+          "width": 256,
+          "pose_format": "full-body"
+        },
+        "run": {
+          "inference_s": 2.33410819999699,
+          "generated_frames": 33,
+          "generated_fps": 14.13816206122859,
+          "first_decoded_output_s": 2.33410819999699,
+          "peak_allocated_bytes": 6320128000,
+          "peak_reserved_bytes": 6964641792,
+          "sha256": "573382e322857bdcbd840cf776949f3eee4af4b26e9c16266c40f321ca23e55e"
+        },
+        "rcm_timing": {
+          "control_encode_s": 0.30887529999017715,
+          "denoising_steps_s": [
+            1.0227518000028795,
+            0.8983379999990575
+          ],
+          "decode_s": 0.10103710000112187
+        },
+        "prompt_preparation_s": 0.0004894000012427568,
+        "prompt_cache_hit": true,
+        "model_load_s": 2.6571489999914775,
+        "control_bone_length_deviation": 5.551115123125783e-17,
+        "frame_review": {
+          "decoded_frames": 33,
+          "fps": 16.0,
+          "container_average_fps": 16.0,
+          "duration_s": 2.0625,
+          "flagged_frames": [],
+          "max_adjacent_mae": 8.275,
+          "median_adjacent_mae": 3.7645
+        },
+        "visual_review": {
+          "review_type": "Ordered visual inspection of every decoded frame",
+          "frames_reviewed": 33,
+          "notes": "Complete raise/hold/lower is visible. Feet stay in frame. Moving hand smears on ascent/descent and clips left edge around frames 4 and 20; face remains soft.",
+          "normal_speed_review": false,
+          "audio_review": false,
+          "call_quality_pass": false,
+          "source_sha256": "573382e322857bdcbd840cf776949f3eee4af4b26e9c16266c40f321ca23e55e"
+        }
+      },
+      {
+        "folder": "generated/local-app/audit/vace-compact-prefix-tiny-strong",
+        "settings": {
+          "label": "compact-prefix-tiny-strong",
+          "prepare_only": false,
+          "side": "right",
+          "motion": "raise-lower",
+          "size": 384,
+          "aspect": "portrait",
+          "pose_profile": "compact",
+          "frames": 17,
+          "trajectory_frames": 33,
+          "frame_offset": 0,
+          "generator": "rcm",
+          "vae": "tiny-both",
+          "decoder_comparison": false,
+          "conditioning": "masked-body",
+          "steps": 2,
+          "context_scale": 1.5,
+          "seed": 42,
+          "height": 384,
+          "width": 256,
+          "pose_format": "full-body"
+        },
+        "run": {
+          "inference_s": 1.3859116999956314,
+          "generated_frames": 17,
+          "generated_fps": 12.266293732893363,
+          "first_decoded_output_s": 1.3859116999956314,
+          "peak_allocated_bytes": 5447057408,
+          "peak_reserved_bytes": 5937037312,
+          "sha256": "8239a0b04f8149212638210ee97ea096dd6992b07eaa7438525bb4b571761397"
+        },
+        "rcm_timing": {
+          "control_encode_s": 0.2858819999964908,
+          "denoising_steps_s": [
+            0.5818647999985842,
+            0.45773019999614917
+          ],
+          "decode_s": 0.05731629999354482
+        },
+        "prompt_preparation_s": 0.0005307999963406473,
+        "prompt_cache_hit": true,
+        "model_load_s": 2.517062500002794,
+        "control_bone_length_deviation": 5.551115123125783e-17,
+        "frame_review": {
+          "decoded_frames": 17,
+          "fps": 16.0,
+          "container_average_fps": 16.0,
+          "duration_s": 1.0625,
+          "flagged_frames": [],
+          "max_adjacent_mae": 8.603,
+          "median_adjacent_mae": 4.327
+        },
+        "visual_review": {
+          "review_type": "Ordered visual inspection of every decoded frame",
+          "frames_reviewed": 17,
+          "notes": "1.5 control strength does not remove left-edge hand loss and worsens face/eye appearance and scene texture; retain 1.0 for further experiments.",
+          "normal_speed_review": false,
+          "audio_review": false,
+          "call_quality_pass": false,
+          "source_sha256": "8239a0b04f8149212638210ee97ea096dd6992b07eaa7438525bb4b571761397"
+        }
+      }
+    ],
+    "control_checks": {
+      "prefix_equals_full_first_17": true,
+      "trajectory_returns_to_start": true,
+      "fixed_elbow": true
+    },
+    "same_latent_decoder_comparison": {
+      "same_generated_latents": true,
+      "tiny_decode_s": 0.18386430000828113,
+      "pixel_mae_0_1": 0.039699237793684006,
+      "sha256": "ec752b0fe9407b33129d01b8c536f2d1bef206a4c0cefe763be372b448dd37da",
+      "scope": "Decoder only; excludes model loading"
+    },
+    "same_latent_visual_review": {
+      "review_type": "All 17 ordered frames inspected against original decoding of the same latents",
+      "frames_reviewed": 17,
+      "source_sha256": "ec752b0fe9407b33129d01b8c536f2d1bef206a4c0cefe763be372b448dd37da",
+      "notes": "Same right-arm trajectory; softer moving hand detail, same left-edge clipping. Not a call-quality pass.",
+      "normal_speed_review": false,
+      "audio_review": false,
+      "call_quality_pass": false
+    },
+    "decoder_streaming": {
+      "complete": true,
+      "source": "generated/local-app/audit/vace-compact-prefix-original/latents.safetensors",
+      "sha256": "3d31bb65fcfee00c619f5c961b44d973d9055dd5585d2d7413e627a53a53510a",
+      "scope": "Decoder only on already generated latents; no live generation or audio",
+      "api_cost_usd": 0,
+      "live_app_selected": false,
+      "batch_decode_s": 0.2451135000010254,
+      "shape": [
+        3,
+        17,
+        384,
+        256
+      ],
+      "batch_agreement_limits_0_1": {
+        "mean": 0.000980392156862745,
+        "maximum": 0.00784313725490196
+      },
+      "runs": [
+        {
+          "first_frame_s": 0.03475600000820123,
+          "total_s": 0.06475700000009965,
+          "arrival_s": [
+            0.03475600000820123,
+            0.039183800006867386,
+            0.03974690000177361,
+            0.04173840000294149,
+            0.04228530000546016,
+            0.04666600000928156,
+            0.0472184000100242,
+            0.0492348999978276,
+            0.04978590000246186,
+            0.05416939999850001,
+            0.05472520001058001,
+            0.05672439999761991,
+            0.057301100008771755,
+            0.061656200006837025,
+            0.062210500007495284,
+            0.06420290000096429,
+            0.06475700000009965
+          ],
+          "batch_pixel_mae_0_1": 0.00016107682313304394,
+          "batch_pixel_max_error_0_1": 0.004150390625,
+          "reset_exact": null
+        },
+        {
+          "first_frame_s": 0.00748800000292249,
+          "total_s": 0.03855640000256244,
+          "arrival_s": [
+            0.00748800000292249,
+            0.011979799994151108,
+            0.012555900000734255,
+            0.014556299996911548,
+            0.015111000000615604,
+            0.01947210000071209,
+            0.0200600999960443,
+            0.02205169999797363,
+            0.022607099992455915,
+            0.02694599999813363,
+            0.027521999989403412,
+            0.029531699998187833,
+            0.03008399999816902,
+            0.03444170000148006,
+            0.03499800000281539,
+            0.037936399996397085,
+            0.03855640000256244
+          ],
+          "batch_pixel_mae_0_1": 0.00016107682313304394,
+          "batch_pixel_max_error_0_1": 0.004150390625,
+          "reset_exact": true
+        },
+        {
+          "first_frame_s": 0.007413599989376962,
+          "total_s": 0.03800129999581259,
+          "arrival_s": [
+            0.007413599989376962,
+            0.011819699997431599,
+            0.012434199990821071,
+            0.014458099991315976,
+            0.01507829999900423,
+            0.019482699994114228,
+            0.020037899987073615,
+            0.022038699986296706,
+            0.022595599992200732,
+            0.02697269999771379,
+            0.02756609999050852,
+            0.029630299992277287,
+            0.03019799999310635,
+            0.034827099996618927,
+            0.03541509999195114,
+            0.03744379999989178,
+            0.03800129999581259
+          ],
+          "batch_pixel_mae_0_1": 0.00016107682313304394,
+          "batch_pixel_max_error_0_1": 0.004150390625,
+          "reset_exact": true
+        }
+      ],
+      "cancel_restart_exact": true
+    },
+    "decoder_measurement_context": "Preview resident and idle; already generated latents. First batch decode and first stream incur different warmup; do not interpret their ratio as a controlled speedup.",
+    "body_diagnostic": {
+      "scope": "Independent fixed-skeleton diagnostic; not anatomy or visual acceptance",
+      "raised_right": [
+        6,
+        7,
+        17,
+        18
+      ],
+      "raised_left": [],
+      "flagged_frames": []
+    },
+    "visually_reviewed_frames": 135,
+    "measurement_limits": [
+      "One render per configuration, fixed seed 42; no statistical p95 or concurrency evidence.",
+      "Inference excludes preflight, pose extraction, cached text lookup, model loading, MP4 encoding and playback.",
+      "17 frames at 16 FPS represent only the raise/hold prefix of a 33-frame trajectory; no lowering is claimed for prefixes.",
+      "256x384 reduces detail; isolated generated FPS is not delivered call FPS.",
+      "No network transport, audio, user command interpretation or renderer continuity tested."
+    ],
+    "cost": {
+      "paid_api_usd": 0,
+      "rental_usd": 0,
+      "electricity_and_hardware_cost": "unmeasured"
+    },
+    "checks": {
+      "python": 211,
+      "javascript": 32,
+      "syntax": "pass",
+      "independent_review": "not performed",
+      "CI": "not run"
+    },
+    "decision": "Keep tiny VAE as an optional experimental acceleration. Do not select any new renderer in the app; one-step quality and stronger control fail.",
+    "next_experiment": "Prototype incremental generation with retained temporal state using the separately pinned causal-rCM 1.3B candidate; first verify reference/pose-control compatibility and stop-command cancellation in a bounded test. Decoder is no longer the dominant latency cost."
   }
 }
