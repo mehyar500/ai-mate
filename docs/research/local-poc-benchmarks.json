@@ -24656,6 +24656,24 @@
       }
     ],
     "review_scope": "All 49 frames of each output inspected as reduced contact sheets; no audio generated.",
-    "decision": "Do not promote. Shorter horizon did not preserve command reliability."
+    "decision": "Do not promote. Shorter horizon did not preserve command reliability.",
+    "without_final_guide": {
+      "runs": [
+        {
+          "seed": 914,
+          "server_s": 2.983,
+          "wall_s": 3.172,
+          "prompt_id": "c2dee61b-2b9e-4c75-90ca-4f313e40a649"
+        },
+        {
+          "seed": 2718,
+          "server_s": 2.342,
+          "wall_s": 3.027,
+          "prompt_id": "625f13bb-7fd3-4d4f-91b6-4ff9f80f6dad"
+        }
+      ],
+      "review": "All 49 frames per clip inspected at contact-sheet scale. Both raise both arms overhead; neither follows single-hand wave. Greater motion does not improve action correctness.",
+      "decision": "Reject. Next investigate explicit pose control rather than shortening text-only generation."
+    }
   }
 }
