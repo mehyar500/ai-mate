@@ -18,7 +18,9 @@ All **20 clips / 978 frames** from that call were retained and analyzed, with no
 
 Before this crop adjustment, all six paused-speech cases passed, preserving negations and corrections while cancelling three unfinished replies. Their **276 frames** passed limited diagnostics and twenty were inspected. The preceding configuration also passed a **30-minute / 120-command** call with zero functional failures, page errors or reported reply stalls. Across 54 spoken replies, end-of-speech median/p95 was **2.114/2.609s**. Cycle medians showed no accumulating delay. All **5,952 frames** were analyzed; 120 wave/approach/near-speech frames from the first and last cycles were inspected. A/V clock skew was **26.19ms p95 / 45.69ms maximum** across 3,667 samples. The new crop has the 20-command evidence above; it has not received another 30-minute run.
 
-The preview restarted successfully with private memory unchanged. **162 Python and 23 Node tests pass.** The retained review page supports playback, exact frame stepping and notes. Physical sound and real mobile/PWA behavior still need device evidence. The economics generator now matches the document's existing GPU-recognition description; cost formulas are unchanged.
+An isolated WebRTC prototype now delivers actual GPU frames through H.264/Opus. In twelve fixed-speech replies per transport, first-picture medians were 0.517s for WebRTC and 0.476s for the existing player; decoded-audio onset was 0.603s versus 0.550s. WebRTC slightly improved motion onset, but did not establish a whole-call latency improvement. Keep the current preview. All 4,488 archival frames across six experiments passed limited diagnostics; receiver perception and public networking remain unqualified.
+
+The preview's previous restart preserved private memory. **164 Python and 23 Node tests pass.** The retained review page supports playback, exact frame stepping and notes. Physical sound and real mobile/PWA behavior still need device evidence.
 
 [LOCAL_POC](LOCAL_POC.md) records reproducible commands, model settings, rejected experiments and machine evidence. Private conversation is excluded from benchmarks.
 
@@ -29,7 +31,7 @@ The preview restarted successfully with private memory unchanged. **162 Python a
 - Natural appearance throughout every transition and stronger close-view lip quality.
 - Complete perceptual review of the retained sustained-call media, including natural movement and audible speech on a real device.
 - Physical speaker/microphone echo testing, perceptual A/V alignment within 100ms and real mobile PWA evidence.
-- WebRTC output, Linux/GPU deployment, account isolation, public access controls and accepted billing.
+- WebRTC integration and public-network qualification, Linux/GPU deployment, account isolation, public access controls and accepted billing.
 
 The local HTTP/MSE demonstration is not a deployed WebRTC service. Prepared gestures are useful measured progress, not proof of arbitrary real-time generation or a production-ready product.
 

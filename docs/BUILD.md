@@ -55,12 +55,12 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Latest GPU/PCM 30-minute run: end-of-speech median 2.114s / p95 2.609s across 54 spoken replies. Short qualification: 1.994s / 2.525s across nine. Synthetic recorder/VAD included; physical acoustics and public concurrency excluded |
+| Fast voice and visual response | Latest face-crop qualification: end-of-speech median 2.028s / p95 2.631s across nine spoken replies. Prior GPU/PCM 30-minute run: 2.114s / 2.609s across 54. Synthetic recorder/VAD included; physical acoustics and public concurrency excluded |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | Latest sustained 3,667 clock samples: 26.19ms p95 / 45.69ms maximum. Perceptual alignment and physical audio remain unqualified |
+| Synchronization within 100ms | Latest crop qualification: 598 clock samples, 24.24ms p95 / 28.71ms maximum. Three eligible SyncNet estimates: 0–80ms with injected-delay controls. Perceptual alignment and physical audio remain unqualified |
 | Stable 30-minute call | TensorRT/eight-thread Kokoro/GPU FP16 recognition: 120 interactions over 1,800.049 seconds, no functional failures or reported reply stalls; cycle medians show no accumulating delay |
-| Realistic images and motion | Latest 5,952 sustained frames analyzed, 120 visually sampled; short qualification 1,003/40 and paused-speech 276/20 also retained. Hand blur, mouth artifacts and repetition remain |
+| Realistic images and motion | Latest crop qualification: 978 frames analyzed, 40 visually sampled. Prior sustained run: 5,952 analyzed / 120 sampled. Hand blur, mouth artifacts and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 
@@ -81,6 +81,8 @@ Transfer pinned code, permitted weights and synthetic fixtures to a compatible L
 Compare end-to-end latency, preparation, visual defects, throughput and billed time against this rig. More VRAM adds capacity; it does not itself prove faster inference. Reject a rental without enough measured benefit. No automatic expensive fallback or open-ended runtime.
 
 ## Public PWA architecture
+
+An isolated local WebRTC prototype now sends actual MuseTalk frames and retained synthetic speech through aiortc 1.15.0, H.264 and Opus. It runs separately on port 8766 with no microphone, planner, private memory or external ICE servers. The ordinary preview still uses HTTP/MSE. LOCAL_POC records the measured transport comparison, bounded installation and incomplete receiver-quality/public-signaling qualification. It adds no runtime environment variable or provider credential.
 
 Cloudflare is the preferred application and WebRTC transport candidate. The GPU provider runs inference; Gateway routing and WebRTC transport do not generate frames.
 

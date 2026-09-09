@@ -62,7 +62,7 @@
         "input_tokens": 51,
         "tokens_per_second": 94.98357215945151,
         "model_load_s": 0.0026355,
-        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022"
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. ðŸŒ¿â˜•"
       },
       {
         "first_token_s": 0.06251069996505976,
@@ -112,7 +112,7 @@
         "input_tokens": 51,
         "tokens_per_second": 95.22325525026403,
         "model_load_s": 0.0022774,
-        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022"
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. ðŸŒ¿â˜•"
       },
       {
         "first_token_s": 0.05107929999940097,
@@ -388,7 +388,7 @@
         "audio_s": 1.918
       },
       {
-        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022",
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. ðŸŒ¿â˜•",
         "llm_s": 0.26285250001819804,
         "tts_s": 1.2375127000268549,
         "ready_s": 1.500365200045053,
@@ -435,7 +435,7 @@
         "audio_s": 1.918
       },
       {
-        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022",
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. ðŸŒ¿â˜•",
         "llm_s": 0.26429610000923276,
         "tts_s": 1.4020240999525413,
         "ready_s": 1.666320199961774,
@@ -924,7 +924,7 @@
         },
         {
           "prompt": "What should I name a new houseplant?",
-          "reply": "How about \"Maple\"? It's a great name for a plant\u00e2\u20ac\u201dlike your dog.",
+          "reply": "How about \"Maple\"? It's a great name for a plantâ€”like your dog.",
           "seconds": 0.3051776999491267
         }
       ]
@@ -1034,7 +1034,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Try planting a few herbs like mint or basil\u00e2\u20ac\u201dthey grow easily and smell great.",
+          "text": "Try planting a few herbs like mint or basilâ€”they grow easily and smell great.",
           "metrics": {
             "first_text_s": 0.472,
             "first_media_ready_s": 2.524,
@@ -1056,7 +1056,7 @@
         {
           "state": "done",
           "user": "What name should you call me?",
-          "text": "You can call me Alex\u00e2\u20ac\u201dyour name, of course.",
+          "text": "You can call me Alexâ€”your name, of course.",
           "metrics": {
             "first_text_s": 0.446,
             "first_media_ready_s": 1.642,
@@ -1067,7 +1067,7 @@
         {
           "state": "done",
           "user": "Let's have a short, quiet conversation.",
-          "text": "I love gardening and cooking, just like you. Maple\u00e2\u20ac\u2122s bark is soft, and I\u00e2\u20ac\u2122ve seen your dog enjoy the garden too.",
+          "text": "I love gardening and cooking, just like you. Mapleâ€™s bark is soft, and Iâ€™ve seen your dog enjoy the garden too.",
           "metrics": {
             "first_text_s": 0.414,
             "first_media_ready_s": 1.622,
@@ -1089,7 +1089,7 @@
         {
           "state": "done",
           "user": "What is my dog's name?",
-          "text": "Maple. Your dog\u00e2\u20ac\u2122s name is Maple.",
+          "text": "Maple. Your dogâ€™s name is Maple.",
           "metrics": {
             "first_text_s": 0.393,
             "first_media_ready_s": 1.485,
@@ -1122,7 +1122,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to the soil\u00e2\u20ac\u201deasy and great for planting.",
+          "text": "Add a few composted leaves to the soilâ€”easy and great for planting.",
           "metrics": {
             "first_text_s": 0.448,
             "first_media_ready_s": 2.308,
@@ -1133,7 +1133,7 @@
         {
           "state": "done",
           "user": "I have ten minutes free. What could I practice?",
-          "text": "Try playing one simple piece from your piano lesson\u00e2\u20ac\u201dstart slow and focus on smooth finger movement.",
+          "text": "Try playing one simple piece from your piano lessonâ€”start slow and focus on smooth finger movement.",
           "metrics": {
             "first_text_s": 0.47,
             "first_media_ready_s": 3.029,
@@ -1144,7 +1144,7 @@
         {
           "state": "done",
           "user": "What name should you call me?",
-          "text": "You can call me Alex. It\u00e2\u20ac\u2122s a nice name to know.",
+          "text": "You can call me Alex. Itâ€™s a nice name to know.",
           "metrics": {
             "first_text_s": 0.326,
             "first_media_ready_s": 1.16,
@@ -1155,7 +1155,7 @@
         {
           "state": "done",
           "user": "Let's have a short, quiet conversation.",
-          "text": "I love how you care for Maple and cook\u00e2\u20ac\u201dwhat\u00e2\u20ac\u2122s one recipe you\u00e2\u20ac\u2122ve tried lately?",
+          "text": "I love how you care for Maple and cookâ€”whatâ€™s one recipe youâ€™ve tried lately?",
           "metrics": {
             "first_text_s": 0.461,
             "first_media_ready_s": 2.456,
@@ -1177,7 +1177,7 @@
         {
           "state": "done",
           "user": "What is my dog's name?",
-          "text": "Maple. Your dog\u00e2\u20ac\u2122s name is Maple.",
+          "text": "Maple. Your dogâ€™s name is Maple.",
           "metrics": {
             "first_text_s": 0.349,
             "first_media_ready_s": 1.458,
@@ -1210,7 +1210,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to your soil\u00e2\u20ac\u201deasy and great for plant growth.",
+          "text": "Add a few composted leaves to your soilâ€”easy and great for plant growth.",
           "metrics": {
             "first_text_s": 0.582,
             "first_media_ready_s": 2.568,
@@ -1221,7 +1221,7 @@
         {
           "state": "done",
           "user": "I have ten minutes free. What could I practice?",
-          "text": "Try playing one simple piece slowly\u00e2\u20ac\u201dfocus on steady rhythm and clean notes.",
+          "text": "Try playing one simple piece slowlyâ€”focus on steady rhythm and clean notes.",
           "metrics": {
             "first_text_s": 0.323,
             "first_media_ready_s": 2.314,
@@ -1298,7 +1298,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to the soil\u00e2\u20ac\u201deasy and helps plants grow.",
+          "text": "Add a few composted leaves to the soilâ€”easy and helps plants grow.",
           "metrics": {
             "first_text_s": 0.505,
             "first_media_ready_s": 2.341,
@@ -4015,7 +4015,7 @@
       },
       "run2": {
         "metrics": "First playback: 2.56s from Send. Buffer waits: 0 (0.00s). Server completed: 4.07s.",
-        "scene": "Garden \u00c2\u00b7 Generated video",
+        "scene": "Garden Â· Generated video",
         "videoError": null,
         "videoTime": 2.782666,
         "videoVisible": true
@@ -11880,7 +11880,7 @@
         "precomputed": true,
         "audio": false,
         "reviewed": true,
-        "review": "All 97 source frames and all 89 prepared frames visually inspected. One bilateral blink in a 3.708-second loop; subtle background movement. Selected source interval 1.75\u00e2\u20ac\u201c4.00s, retimed with a separately bounded 0.25s blink and half-speed ambient motion. Loop end position is stable by frame measurements; tiny seam/texture changes remain.",
+        "review": "All 97 source frames and all 89 prepared frames visually inspected. One bilateral blink in a 3.708-second loop; subtle background movement. Selected source interval 1.75â€“4.00s, retimed with a separately bounded 0.25s blink and half-speed ambient motion. Loop end position is stable by frame measurements; tiny seam/texture changes remain.",
         "decode_temporal_size": 128
       },
       "performance-wave.json": {
@@ -17286,6 +17286,555 @@
       "40ms model offset estimates are not human phoneme or physical-acoustic verification.",
       "Small faces, soft mouths/skin, hand blur and prepared body movements remain.",
       "No real mobile or physical-speaker test; public security/correctness review and staging remain pending."
+    ]
+  },
+  "webrtc_transport_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "10b7ac44586c6e3b36c29fa68eaef5d1f3452b30",
+    "status": "isolated transport prototype complete; live MSE retained; overall goal incomplete",
+    "risk_class": "R2; public transport security/correctness review and staging pending",
+    "scope": "Same-PC warm renderer-request to decoded picture/audio. Three neutral retained WAVs repeated four times in each of six sequential runs. No speech recognition, planner, TTS synthesis, physical speakers, public networking or arbitrary action test.",
+    "runs": [
+      {
+        "label": "raw-frames",
+        "source_hashes": {
+          "browser": "75958747f7f942fa6a00cca9850946ddeb6b1af6338172bed7cfd604307505d2",
+          "server": "1064e3d967f04c5fc08591f5a03708928cf1b37a9a04897a127543ca569bda3f"
+        },
+        "transport": "webrtc",
+        "timings_s": {
+          "firstVideo_s": {
+            "n": 12,
+            "median": 0.5621000000014902,
+            "p95_nearest_rank": 0.6872999999970197
+          },
+          "firstAudio_s": {
+            "n": 12,
+            "median": 0.6047999999970197,
+            "p95_nearest_rank": 0.771
+          }
+        },
+        "first_generated_frame_s": {
+          "n": 12,
+          "median": 0.41801925000254414,
+          "p95_nearest_rank": 0.5856419000047026
+        },
+        "archive_frames": 748,
+        "archive_flagged_frames": 0,
+        "archive_timing_marker_frames": 0,
+        "reply_callback_gaps_over_100ms": 0,
+        "renderer_underflows": 0,
+        "page_errors": [],
+        "media_errors": [],
+        "signaling_checks": [],
+        "receiver": [
+          {
+            "kind": "audio",
+            "codec": "audio/opus",
+            "packetsLost": 0,
+            "concealedSamples": 0,
+            "concealmentEvents": 0,
+            "mean_jitter_buffer_ms": 49.75672687062292
+          },
+          {
+            "kind": "video",
+            "codec": "video/VP8",
+            "packetsLost": 0,
+            "framesDecoded": 1085,
+            "framesDropped": 0,
+            "freezeCount": 0,
+            "mean_jitter_buffer_ms": 62.83952626728111
+          }
+        ],
+        "jitter_targets": [],
+        "cancellation": null,
+        "fixture_audio_sha256": [
+          "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce",
+          "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983",
+          "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        ],
+        "source_video_sha256": {
+          "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+          "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+          "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+        },
+        "screenshots": {},
+        "comparison_status": "preliminary VP8 or MSE baseline"
+      },
+      {
+        "label": "mse-comparison",
+        "source_hashes": {
+          "browser": "31137f2a1b9c784c901118ed202bfe587c9105e045825118127e4b6a747f8313",
+          "server": "1d889dbcfd6384f470ca43ea47e1f5d23e5d5a0df9b3ca60727ff4e0a0ce075c"
+        },
+        "transport": "mse",
+        "timings_s": {
+          "firstVideo_s": {
+            "n": 12,
+            "median": 0.45944999999925495,
+            "p95_nearest_rank": 0.6226000000014901
+          },
+          "firstAudio_s": {
+            "n": 12,
+            "median": 0.5409000000022351,
+            "p95_nearest_rank": 0.6597999999970198
+          }
+        },
+        "first_generated_frame_s": {
+          "n": 12,
+          "median": 0.39883704999738256,
+          "p95_nearest_rank": 0.5647746000031475
+        },
+        "archive_frames": 748,
+        "archive_flagged_frames": 0,
+        "archive_timing_marker_frames": 0,
+        "reply_callback_gaps_over_100ms": 12,
+        "renderer_underflows": 0,
+        "page_errors": [],
+        "media_errors": [],
+        "signaling_checks": [],
+        "receiver": [],
+        "jitter_targets": [],
+        "cancellation": null,
+        "fixture_audio_sha256": [
+          "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce",
+          "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983",
+          "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        ],
+        "source_video_sha256": {
+          "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+          "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+          "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+        },
+        "screenshots": {},
+        "comparison_status": "preliminary VP8 or MSE baseline"
+      },
+      {
+        "label": "jitter20",
+        "source_hashes": {
+          "browser": "8aa15b8de499284754a1963ba6e209a9340caaa7fa8b91cee51f3335828b3e9e",
+          "server": "6e4ac4f45c48d31d21017278f6e2d3f919023a28c48b16b96dd221e4b1673256"
+        },
+        "transport": "webrtc",
+        "timings_s": {
+          "firstVideo_s": {
+            "n": 12,
+            "median": 0.5121000000014901,
+            "p95_nearest_rank": 0.6944000000059605
+          },
+          "firstAudio_s": {
+            "n": 12,
+            "median": 0.5804000000022351,
+            "p95_nearest_rank": 0.7779000000059605
+          }
+        },
+        "first_generated_frame_s": {
+          "n": 12,
+          "median": 0.3914479500017478,
+          "p95_nearest_rank": 0.5906209999957355
+        },
+        "archive_frames": 748,
+        "archive_flagged_frames": 0,
+        "archive_timing_marker_frames": 0,
+        "reply_callback_gaps_over_100ms": 0,
+        "renderer_underflows": 0,
+        "page_errors": [],
+        "media_errors": [],
+        "signaling_checks": [
+          {
+            "name": "missing-token",
+            "status": 403
+          },
+          {
+            "name": "cross-origin",
+            "status": 403
+          },
+          {
+            "name": "invalid-offer",
+            "status": 400
+          },
+          {
+            "name": "oversized",
+            "status": 400
+          }
+        ],
+        "receiver": [
+          {
+            "kind": "audio",
+            "codec": "audio/opus",
+            "packetsLost": 0,
+            "concealedSamples": 360,
+            "concealmentEvents": 1,
+            "mean_jitter_buffer_ms": 47.96597633136095
+          },
+          {
+            "kind": "video",
+            "codec": "video/VP8",
+            "packetsLost": 0,
+            "framesDecoded": 1081,
+            "framesDropped": 0,
+            "freezeCount": 0,
+            "mean_jitter_buffer_ms": 48.12602127659574
+          }
+        ],
+        "jitter_targets": [
+          {
+            "kind": "video",
+            "supported": true,
+            "value": 20
+          },
+          {
+            "kind": "audio",
+            "supported": true,
+            "value": 20
+          }
+        ],
+        "cancellation": null,
+        "fixture_audio_sha256": [
+          "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce",
+          "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983",
+          "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        ],
+        "source_video_sha256": {
+          "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+          "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+          "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+        },
+        "screenshots": {},
+        "comparison_status": "preliminary VP8 or MSE baseline"
+      },
+      {
+        "label": "h264-final",
+        "source_hashes": {
+          "browser": "4c9256d87bef1ec9d837ed8f7c85009611c2df109638a6bedf25b8251cccc9a9",
+          "server": "cafbb2072cb31edc9700a827ed4b08215303f9d7cb176741d09c8c1133e32c0a"
+        },
+        "transport": "webrtc",
+        "timings_s": {
+          "firstVideo_s": {
+            "n": 12,
+            "median": 0.5166499999985099,
+            "p95_nearest_rank": 0.6148999999985099
+          },
+          "firstAdvancingVideo_s": {
+            "n": 12,
+            "median": 0.58,
+            "p95_nearest_rank": 0.6493999999985098
+          },
+          "firstAudio_s": {
+            "n": 12,
+            "median": 0.6028000000044703,
+            "p95_nearest_rank": 0.6766999999955297
+          }
+        },
+        "first_generated_frame_s": {
+          "n": 12,
+          "median": 0.4259723999966809,
+          "p95_nearest_rank": 0.4810785000008764
+        },
+        "archive_frames": 748,
+        "archive_flagged_frames": 0,
+        "archive_timing_marker_frames": 0,
+        "reply_callback_gaps_over_100ms": 0,
+        "renderer_underflows": 0,
+        "page_errors": [],
+        "media_errors": [],
+        "signaling_checks": [
+          {
+            "name": "missing-token",
+            "status": 403
+          },
+          {
+            "name": "cross-origin",
+            "status": 403
+          },
+          {
+            "name": "invalid-offer",
+            "status": 400
+          },
+          {
+            "name": "oversized",
+            "status": 400
+          },
+          {
+            "name": "run-before-connected",
+            "status": 409
+          }
+        ],
+        "receiver": [
+          {
+            "kind": "audio",
+            "codec": "audio/opus",
+            "packetsLost": 0,
+            "concealedSamples": 0,
+            "concealmentEvents": 0,
+            "mean_jitter_buffer_ms": 46.40942028985507
+          },
+          {
+            "kind": "video",
+            "codec": "video/H264",
+            "packetsLost": 0,
+            "framesDecoded": 1104,
+            "framesDropped": 0,
+            "freezeCount": 0,
+            "mean_jitter_buffer_ms": 38.71952355072463
+          }
+        ],
+        "jitter_targets": [
+          {
+            "kind": "video",
+            "supported": true,
+            "value": 20
+          },
+          {
+            "kind": "audio",
+            "supported": true,
+            "value": 20
+          }
+        ],
+        "cancellation": {
+          "index": 13,
+          "producer_done": true,
+          "error": "RuntimeError: Benchmark stopped.",
+          "partial_archive_removed": true
+        },
+        "fixture_audio_sha256": [
+          "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce",
+          "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983",
+          "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        ],
+        "source_video_sha256": {
+          "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+          "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+          "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+        },
+        "screenshots": {
+          "received-conversation.png": "ae6b2b9b231e579b83f4c247b8ade9ed80bcebeead70c573a7433c3af2e61b23",
+          "received-description.png": "785e424675d6799a6a45604f56f5cc45c1192512f49a46c789010db959db03b8",
+          "received-unsupported.png": "76b9a3b640314b6b50778f38fbeb15b617060fc022e4025a396d8bb44602cb5c"
+        },
+        "comparison_status": "final isolated comparison"
+      },
+      {
+        "label": "mse-final",
+        "source_hashes": {
+          "browser": "f300b34a3c539cc149c4d0a20a5169f43241e95d6c64d585d5bb77122fc10829",
+          "server": "882111a6eb9016813ef493086b2e17ee2a7fff1d4920ccba9723aee1ffce4ad4"
+        },
+        "transport": "mse",
+        "timings_s": {
+          "firstVideo_s": {
+            "n": 12,
+            "median": 0.5054000000022352,
+            "p95_nearest_rank": 0.549
+          },
+          "firstAdvancingVideo_s": {
+            "n": 12,
+            "median": 0.6299500000029803,
+            "p95_nearest_rank": 0.6883999999985099
+          },
+          "firstAudio_s": {
+            "n": 12,
+            "median": 0.5798500000014901,
+            "p95_nearest_rank": 0.6555
+          }
+        },
+        "first_generated_frame_s": {
+          "n": 12,
+          "median": 0.44074320000072476,
+          "p95_nearest_rank": 0.49007439999695634
+        },
+        "archive_frames": 748,
+        "archive_flagged_frames": 0,
+        "archive_timing_marker_frames": 0,
+        "reply_callback_gaps_over_100ms": 12,
+        "renderer_underflows": 0,
+        "page_errors": [],
+        "media_errors": [],
+        "signaling_checks": [
+          {
+            "name": "missing-token",
+            "status": 403
+          },
+          {
+            "name": "cross-origin",
+            "status": 403
+          },
+          {
+            "name": "invalid-offer",
+            "status": 400
+          },
+          {
+            "name": "oversized",
+            "status": 400
+          }
+        ],
+        "receiver": [],
+        "jitter_targets": [],
+        "cancellation": null,
+        "fixture_audio_sha256": [
+          "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce",
+          "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983",
+          "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        ],
+        "source_video_sha256": {
+          "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+          "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+          "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+        },
+        "screenshots": {
+          "received-conversation.png": "a1be898fd828fad8c5a12316ccf3bf89295cf72173c894b735f2670aef9d9fdd",
+          "received-description.png": "2e4afeb55c0e2310365233b5beb9b8c8dcf7eabbb88de53dd3b6d5aac5f15d3a",
+          "received-unsupported.png": "00faf567d504180cdc939a0f51d6775ce8e88626a12e8d7e1861e869966bf804"
+        },
+        "comparison_status": "excluded: analysis started near the last two replies"
+      },
+      {
+        "label": "mse-clean",
+        "source_hashes": {
+          "browser": "19c08eeb8aba90d8a4e8e8f29f4b22637214d2402f1f018228a93ecdf0405f32",
+          "server": "36f735c8eb5aa1a7efc0a4082dce8fa5328d7b1a446dc836620eb72c36d30131"
+        },
+        "transport": "mse",
+        "timings_s": {
+          "firstVideo_s": {
+            "n": 12,
+            "median": 0.4761000000014901,
+            "p95_nearest_rank": 0.6597999999970198
+          },
+          "firstAdvancingVideo_s": {
+            "n": 12,
+            "median": 0.5926999999992549,
+            "p95_nearest_rank": 0.7762999999970198
+          },
+          "firstAudio_s": {
+            "n": 12,
+            "median": 0.5503000000044703,
+            "p95_nearest_rank": 0.7091000000014901
+          }
+        },
+        "first_generated_frame_s": {
+          "n": 12,
+          "median": 0.42212859999926877,
+          "p95_nearest_rank": 0.5978069000047981
+        },
+        "archive_frames": 748,
+        "archive_flagged_frames": 0,
+        "archive_timing_marker_frames": 0,
+        "reply_callback_gaps_over_100ms": 12,
+        "renderer_underflows": 0,
+        "page_errors": [],
+        "media_errors": [],
+        "signaling_checks": [
+          {
+            "name": "missing-token",
+            "status": 403
+          },
+          {
+            "name": "cross-origin",
+            "status": 403
+          },
+          {
+            "name": "invalid-offer",
+            "status": 400
+          },
+          {
+            "name": "oversized",
+            "status": 400
+          }
+        ],
+        "receiver": [],
+        "jitter_targets": [],
+        "cancellation": null,
+        "fixture_audio_sha256": [
+          "055c87535444c2e0441e3da58c43a220d4793f82526ef2b165c356b3ec8658ce",
+          "5e88da5b9b80ae71fbd4f49c48ec5b0f3975a02e6bee85b1a98eb72fc3e38983",
+          "7048668ac95dbca31b7024afa868f89ff931e23e1079ef921d9816d873a01e6e"
+        ],
+        "source_video_sha256": {
+          "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+          "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+          "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+        },
+        "screenshots": {
+          "received-conversation.png": "a1be898fd828fad8c5a12316ccf3bf89295cf72173c894b735f2670aef9d9fdd",
+          "received-description.png": "2e4afeb55c0e2310365233b5beb9b8c8dcf7eabbb88de53dd3b6d5aac5f15d3a",
+          "received-unsupported.png": "00faf567d504180cdc939a0f51d6775ce8e88626a12e8d7e1861e869966bf804"
+        },
+        "comparison_status": "final isolated comparison"
+      }
+    ],
+    "final_comparison": [
+      "h264-final",
+      "mse-clean"
+    ],
+    "decision": "Keep live HTTP/MSE. H.264 improves initial motion pacing but median decoded audio arrives later. No measured whole-call p95 improvement; further receiver AV/perception and network tests required.",
+    "runtime": {
+      "aiortc": "1.15.0",
+      "isolated_av": "17.1.0",
+      "live_av_unchanged": "18.1.0",
+      "video": "H.264 CPU encoding",
+      "audio": "Opus",
+      "frame_rate": 20,
+      "face_shift": -0.05,
+      "frame_queue_limit": 32,
+      "reply_limit": 24,
+      "session_deadline_s": 360,
+      "external_ice_servers": [],
+      "signaling": "127.0.0.1:8766, same-origin token, bounded receive-only SDP and assigned-PC candidates"
+    },
+    "limitations": [
+      "Archives precede RTC compression; only three H.264 receiver stills visually inspected.",
+      "Archive encoding continues alongside RTC encoding; a future unarchived path may differ.",
+      "Sequential twelve-sample runs; nearest-rank p95 is the maximum. Not a public latency SLA.",
+      "Requested 20ms jitter target differs from actual receiver buffering.",
+      "MSE first-frame callback precedes advancing motion; audio RMS timing is not a phoneme/AV alignment test.",
+      "No cloud calls, new API keys, rental, production migration or memory writes by this experiment.",
+      "Independent review, staging, real-device sound/mobile and intended-service model/host/processor eligibility remain pending."
+    ],
+    "manual_review": {
+      "reviewer": "Codex visual inspection of three received H.264 screenshots",
+      "scope": "Only received-description.png, received-unsupported.png and received-conversation.png were viewed.",
+      "observations": [
+        "Near view retains head, torso and both hands; full-body view retains head and both shoes.",
+        "Clothing and garden are consistent in these stills.",
+        "Facial detail and mouth edges are soft; stills cannot establish natural movement, identity stability over time or lip sync."
+      ],
+      "normal_speed_reviewed": false,
+      "physical_audio_heard": false,
+      "received_video_every_frame_reviewed": false
+    },
+    "checks": {
+      "python_unittest": {
+        "command": ".venv/Scripts/python.exe -m unittest discover -s tests -v",
+        "passed": 164
+      },
+      "node_test": {
+        "command": "node --test tests/microphone.test.mjs tests/media-sync.test.mjs tests/call-input.test.mjs",
+        "passed": 23
+      },
+      "python_compileall": "passed: local_app scripts tests",
+      "javascript_syntax": "passed: three benchmark clients/driver",
+      "diff_whitespace": "passed",
+      "preview_ready": true,
+      "preview_busy": false,
+      "preview_visual_loaded": true
+    },
+    "working_source_sha256": {
+      "local_app/visual.py": "d8d328e62ea207787d402f73bf687e166ef7c21bc2b7974e4741908b7abd79de",
+      "scripts/serve_webrtc_benchmark.py": "7ec1d1c0cc98ad13f64d9ba4e45042408ef27ab50dcd76a6f2ac9a67389c6448",
+      "scripts/webrtc_signaling.py": "f36e954d4a28d0ace009755e00a46876072916935d8449a4e06e5d374859e756",
+      "scripts/webrtc_benchmark_client.js": "1f09a18aa902f3ff99f1d46224e567e83419cf98e6f9cc431b5632f975b94898",
+      "scripts/mse_benchmark_client.js": "b066723963558c713de6aaafec4fbea1cbfb4bfeb3f6bd0619df179ed55d4105",
+      "scripts/qualify_webrtc.cjs": "6c987fab3f99eb2f110332da26275489196c46dbaa1e07a36c74ad7296649f44",
+      "scripts/review_webrtc_benchmark.py": "b00acc712d40c2d6e1c14e06a28c74292c1195d5176d8e4e233884a220b639fd",
+      "config/webrtc-benchmark-requirements.txt": "1fb01f7f7fc1241d9e000781e8a22098ecd54af595fbfa0ec7b61a05f2e00094",
+      "tests/test_webrtc_signaling.py": "a8776d31ce1649a3b311e41f01c3ea51c9f19e23316212d15d91b8e819cd0422"
+    },
+    "sources": [
+      "https://aiortc.readthedocs.io/en/latest/api.html",
+      "https://developer.mozilla.org/en-US/docs/Web/API/RTCRtpReceiver/jitterBufferTarget",
+      "https://developers.cloudflare.com/realtime/sfu/"
     ]
   }
 }

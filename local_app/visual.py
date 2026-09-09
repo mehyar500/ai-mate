@@ -270,7 +270,7 @@ class PortraitRenderer:
             return self.prediction_decoder(prediction)
         return self.vae.decode(prediction / self.vae.config.scaling_factor).sample
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0, fragment_ms=200):
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0, fragment_ms=200, frame_sink=None):
         if fragment_ms not in {100,200}:
             raise ValueError('Streaming fragments must be 100 or 200 milliseconds.')
         if streaming:
@@ -342,7 +342,9 @@ class PortraitRenderer:
                         # Speech has finished: deliver real LTX body frames, including
                         # their natural facial expression, without inventing silent speech.
                         composite_start = time.perf_counter()
-                        for item in movement[offset:offset+batch_size]:
+                        for local_index, item in enumerate(movement[offset:offset+batch_size]):
+                            if frame_sink is not None:
+                                frame_sink(item[0].copy(), offset+local_index, fps)
                             process.stdin.write(item[0].tobytes())
                         composite_seconds += time.perf_counter()-composite_start
                         continue
@@ -371,6 +373,10 @@ class PortraitRenderer:
                         result = frame.copy()
                         patch = cv.resize(img[:, :, ::-1], (x2-x1, y2-y1), interpolation=cv.INTER_LANCZOS4)
                         result[y1:y2, x1:x2] = (patch * mask + result[y1:y2, x1:x2] * (1-mask)).astype("uint8")
+                        if frame_sink is not None:
+                            # A transport may consume the picture before MP4 fragment
+                            # completion. Never expose mutable cached/source frames.
+                            frame_sink(result.copy(), offset+local_index, fps)
                         process.stdin.write(result.tobytes())
                     composite_seconds += time.perf_counter()-composite_start
             process.stdin.close()

@@ -70,6 +70,41 @@ Successful fresh video captures its final decoded frame as the next reference. U
 
 ## Measured results and failures
 
+### Isolated WebRTC transport comparison — September 9
+
+**Keep the existing player.** A separate benchmark now sends actual GPU-generated mouth frames directly through WebRTC, with continuous H.264 video and Opus audio. The selected preview still uses fragmented MP4/WAV. No new API credential, hosted inference or rental was used.
+
+The final comparison reused three retained synthetic WAVs and matching reviewed body sources, four repetitions each, in separate warm processes on the same PC. Times start at the browser's render request; recognition, dialogue, speech synthesis and public networking are excluded. Twelve samples per transport give only a small diagnostic comparison; nearest-rank p95 is the maximum observation.
+
+| Transport | First picture median / p95 | Advancing picture median / p95 | Decoded audio onset median / p95 |
+|---|---|---|---|
+| Existing MSE, 350ms media threshold | 0.476 / 0.660s | 0.593 / 0.776s | 0.550 / 0.709s |
+| WebRTC H.264, requested 20ms jitter target | 0.517 / 0.615s | 0.580 / 0.649s | 0.603 / 0.677s |
+
+MSE showed one 116–139ms callback gap immediately after each initial picture. WebRTC had no reply callback gaps above 100ms, no renderer underflows, packet loss, video drops or reported freezes; decoded audio required no concealment in the final H.264 run. Its measured mean video/audio jitter buffers were 38.7/46.4ms. A requested [jitter target](https://developer.mozilla.org/en-US/docs/Web/API/RTCRtpReceiver/jitterBufferTarget) is not an achieved delay. First advancing picture means the next distinct media timestamp; audio onset uses decoded RMS, not a physical speaker or phoneme-sync measurement.
+
+The first generated frame took approximately 0.42s in both final runs. WebRTC slightly improved motion onset but delayed median audio onset by about 53ms. These sequential, small-sample runs do not establish a whole-call speed improvement. MSE's 350ms threshold is buffered *media duration*, not a mandatory 350ms wall-clock wait. The latest actual spoken-call p95 remains 2.63s.
+
+Two preliminary RTC runs negotiated VP8: codec preferences had been applied after the remote offer. Moving preference selection before negotiation fixed that; the driver now asserts the received codec. Their first-picture medians were 0.562s and 0.512s. All six runs are retained, including an MSE run excluded from the final timing comparison because frame analysis began near its last two replies. The replacement `mse-clean` run finished before analysis started.
+
+Every archival frame across **72 completed replies / 4,488 frames** was analyzed for face count, luminance, adjacent-pixel changes and timing-marker isolation, with no flags. These repeat three phrases; they are not 72 distinct command tests. Archives precede RTC encoding, so they do not qualify every received frame. Three H.264 receiver screenshots were visually inspected: full-body/near framing and clothing were consistent, with soft facial detail and mouth edges still visible. Normal-speed receiver review, perceptual A/V timing and physical audio remain unqualified.
+
+The prototype binds signaling to 127.0.0.1:8766, requires the same origin and per-process token, restricts SDP to receiving audio/video with this PC's candidate addresses, and uses no external STUN/TURN. Five HTTP rejection/preconnection checks passed in the H.264 run. A thirteenth reply was cancelled during generation; the worker stopped and removed the partial archive. This is a bounded local **R2 transport experiment**, with independent security/correctness review and staging still pending before any public exposure. It does not yet implement voice capture, app session continuity, Cloudflare SFU, NAT traversal or multi-user isolation.
+
+Reproduce on this configured Windows/Python 3.12 rig, using fresh labels and keeping other inference/frame analysis idle:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install --target .cache/webrtc-deps --no-deps --only-binary=:all: --require-hashes -r config/webrtc-benchmark-requirements.txt
+.\.venv\Scripts\python.exe scripts/serve_webrtc_benchmark.py --label rtc-check --jitter-ms 20
+# In a second terminal after the server reports ready:
+node scripts/qualify_webrtc.cjs rtc-check
+# After both processes finish, repeat with a fresh server label and --transport mse.
+# Analyze only after timing runs have finished:
+.\.venv\Scripts\python.exe scripts/review_webrtc_benchmark.py --labels rtc-check
+```
+
+The driver uses the configured Playwright runtime described below. [Pinned wheels](../config/webrtc-benchmark-requirements.txt) install aiortc 1.15.0 and PyAV 17.1.0 under `.cache/webrtc-deps`; the live environment remains unchanged. Top-level package licenses do not establish codec/bundled-library or intended-service eligibility. The renderer's optional copied-frame callback defaults off; rolling back this experiment requires no memory migration or production configuration change. Evidence lives under `generated/local-app/audit/webrtc-*`, with hashes and scope in `docs/research/local-poc-benchmarks.json`.
+
 ### Mouth timing and selected face crop — September 9
 
 The selected MuseTalk face shift is now **-0.05**, previously -0.10. This adjusts the face region supplied to synthesis; it does not delay speech, alter timestamps or change the body footage. Appearance caches already include the crop setting in their key.
