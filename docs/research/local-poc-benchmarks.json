@@ -62,7 +62,7 @@
         "input_tokens": 51,
         "tokens_per_second": 94.98357215945151,
         "model_load_s": 0.0026355,
-        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕"
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022"
       },
       {
         "first_token_s": 0.06251069996505976,
@@ -112,7 +112,7 @@
         "input_tokens": 51,
         "tokens_per_second": 95.22325525026403,
         "model_load_s": 0.0022774,
-        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕"
+        "reply": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022"
       },
       {
         "first_token_s": 0.05107929999940097,
@@ -388,7 +388,7 @@
         "audio_s": 1.918
       },
       {
-        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕",
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022",
         "llm_s": 0.26285250001819804,
         "tts_s": 1.2375127000268549,
         "ready_s": 1.500365200045053,
@@ -435,7 +435,7 @@
         "audio_s": 1.918
       },
       {
-        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. 🌿☕",
+        "text": "That's wonderful! You've earned a well-deserved rest and a cozy drink. \u00f0\u0178\u0152\u00bf\u00e2\u02dc\u2022",
         "llm_s": 0.26429610000923276,
         "tts_s": 1.4020240999525413,
         "ready_s": 1.666320199961774,
@@ -924,7 +924,7 @@
         },
         {
           "prompt": "What should I name a new houseplant?",
-          "reply": "How about \"Maple\"? It's a great name for a plant—like your dog.",
+          "reply": "How about \"Maple\"? It's a great name for a plant\u00e2\u20ac\u201dlike your dog.",
           "seconds": 0.3051776999491267
         }
       ]
@@ -1034,7 +1034,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Try planting a few herbs like mint or basil—they grow easily and smell great.",
+          "text": "Try planting a few herbs like mint or basil\u00e2\u20ac\u201dthey grow easily and smell great.",
           "metrics": {
             "first_text_s": 0.472,
             "first_media_ready_s": 2.524,
@@ -1056,7 +1056,7 @@
         {
           "state": "done",
           "user": "What name should you call me?",
-          "text": "You can call me Alex—your name, of course.",
+          "text": "You can call me Alex\u00e2\u20ac\u201dyour name, of course.",
           "metrics": {
             "first_text_s": 0.446,
             "first_media_ready_s": 1.642,
@@ -1067,7 +1067,7 @@
         {
           "state": "done",
           "user": "Let's have a short, quiet conversation.",
-          "text": "I love gardening and cooking, just like you. Maple’s bark is soft, and I’ve seen your dog enjoy the garden too.",
+          "text": "I love gardening and cooking, just like you. Maple\u00e2\u20ac\u2122s bark is soft, and I\u00e2\u20ac\u2122ve seen your dog enjoy the garden too.",
           "metrics": {
             "first_text_s": 0.414,
             "first_media_ready_s": 1.622,
@@ -1089,7 +1089,7 @@
         {
           "state": "done",
           "user": "What is my dog's name?",
-          "text": "Maple. Your dog’s name is Maple.",
+          "text": "Maple. Your dog\u00e2\u20ac\u2122s name is Maple.",
           "metrics": {
             "first_text_s": 0.393,
             "first_media_ready_s": 1.485,
@@ -1122,7 +1122,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to the soil—easy and great for planting.",
+          "text": "Add a few composted leaves to the soil\u00e2\u20ac\u201deasy and great for planting.",
           "metrics": {
             "first_text_s": 0.448,
             "first_media_ready_s": 2.308,
@@ -1133,7 +1133,7 @@
         {
           "state": "done",
           "user": "I have ten minutes free. What could I practice?",
-          "text": "Try playing one simple piece from your piano lesson—start slow and focus on smooth finger movement.",
+          "text": "Try playing one simple piece from your piano lesson\u00e2\u20ac\u201dstart slow and focus on smooth finger movement.",
           "metrics": {
             "first_text_s": 0.47,
             "first_media_ready_s": 3.029,
@@ -1144,7 +1144,7 @@
         {
           "state": "done",
           "user": "What name should you call me?",
-          "text": "You can call me Alex. It’s a nice name to know.",
+          "text": "You can call me Alex. It\u00e2\u20ac\u2122s a nice name to know.",
           "metrics": {
             "first_text_s": 0.326,
             "first_media_ready_s": 1.16,
@@ -1155,7 +1155,7 @@
         {
           "state": "done",
           "user": "Let's have a short, quiet conversation.",
-          "text": "I love how you care for Maple and cook—what’s one recipe you’ve tried lately?",
+          "text": "I love how you care for Maple and cook\u00e2\u20ac\u201dwhat\u00e2\u20ac\u2122s one recipe you\u00e2\u20ac\u2122ve tried lately?",
           "metrics": {
             "first_text_s": 0.461,
             "first_media_ready_s": 2.456,
@@ -1177,7 +1177,7 @@
         {
           "state": "done",
           "user": "What is my dog's name?",
-          "text": "Maple. Your dog’s name is Maple.",
+          "text": "Maple. Your dog\u00e2\u20ac\u2122s name is Maple.",
           "metrics": {
             "first_text_s": 0.349,
             "first_media_ready_s": 1.458,
@@ -1210,7 +1210,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to your soil—easy and great for plant growth.",
+          "text": "Add a few composted leaves to your soil\u00e2\u20ac\u201deasy and great for plant growth.",
           "metrics": {
             "first_text_s": 0.582,
             "first_media_ready_s": 2.568,
@@ -1221,7 +1221,7 @@
         {
           "state": "done",
           "user": "I have ten minutes free. What could I practice?",
-          "text": "Try playing one simple piece slowly—focus on steady rhythm and clean notes.",
+          "text": "Try playing one simple piece slowly\u00e2\u20ac\u201dfocus on steady rhythm and clean notes.",
           "metrics": {
             "first_text_s": 0.323,
             "first_media_ready_s": 2.314,
@@ -1298,7 +1298,7 @@
         {
           "state": "done",
           "user": "Suggest one simple thing I could do in my garden.",
-          "text": "Add a few composted leaves to the soil—easy and helps plants grow.",
+          "text": "Add a few composted leaves to the soil\u00e2\u20ac\u201deasy and helps plants grow.",
           "metrics": {
             "first_text_s": 0.505,
             "first_media_ready_s": 2.341,
@@ -4015,7 +4015,7 @@
       },
       "run2": {
         "metrics": "First playback: 2.56s from Send. Buffer waits: 0 (0.00s). Server completed: 4.07s.",
-        "scene": "Garden · Generated video",
+        "scene": "Garden \u00c2\u00b7 Generated video",
         "videoError": null,
         "videoTime": 2.782666,
         "videoVisible": true
@@ -11880,7 +11880,7 @@
         "precomputed": true,
         "audio": false,
         "reviewed": true,
-        "review": "All 97 source frames and all 89 prepared frames visually inspected. One bilateral blink in a 3.708-second loop; subtle background movement. Selected source interval 1.75–4.00s, retimed with a separately bounded 0.25s blink and half-speed ambient motion. Loop end position is stable by frame measurements; tiny seam/texture changes remain.",
+        "review": "All 97 source frames and all 89 prepared frames visually inspected. One bilateral blink in a 3.708-second loop; subtle background movement. Selected source interval 1.75\u00e2\u20ac\u201c4.00s, retimed with a separately bounded 0.25s blink and half-speed ambient motion. Loop end position is stable by frame measurements; tiny seam/texture changes remain.",
         "decode_temporal_size": 128
       },
       "performance-wave.json": {
@@ -15647,6 +15647,921 @@
       "AEC capability is simulated in paused-speech browser tests; physical echo/audio and real mobile remain unqualified.",
       "Latest input flow needs a new 30-minute qualification; older soak is preserved but not relabelled.",
       "Independent review/staging and model/host/payment eligibility remain pending before public release."
+    ]
+  },
+  "gpu_recognition_pcm_20260909": {
+    "source_commit": "b56ab31abdd5793a519b2e54fdd9cb17ff172e30",
+    "date": "2026-09-09",
+    "risk_class": "R1 local recording preprocessing and explicit device selection; public R2/R3 gates remain pending",
+    "requirement_links": [
+      "Spoken input accuracy",
+      "Warm end-of-speech latency",
+      "Stable 30-minute call",
+      "Preserve memory and credentials"
+    ],
+    "runtime_files": [
+      {
+        "path": "local_app/models.py",
+        "sha256": "3854ee73717d4a9799d85147d8dfef91e8040033b9ebb10fd259aa2adebc3357"
+      },
+      {
+        "path": "local_app/engine.py",
+        "sha256": "4c83159bf6d92ca2fa5a7d64d377bf719657aee2b35296ff6b19dfd41fd33cef"
+      },
+      {
+        "path": "local_app/visual.py",
+        "sha256": "83a2b27a5e8f872977b62676aa6f0eb75d42c1f9875f306205b80ec857147dad"
+      },
+      {
+        "path": "local_app/web/app.js",
+        "sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a"
+      },
+      {
+        "path": "local_app/web/call-input.mjs",
+        "sha256": "564c0099986a2334b570058d632f39db676975d471adff7e525bbbf84c0198cc"
+      }
+    ],
+    "changes": [
+      "Explicit optional CUDA FP16 recognition on the existing Base English weights; portable CPU int8 default.",
+      "Validate mono PCM16 WAV once, normalize and polyphase-resample to 16 kHz, then pass float32 samples to Whisper.",
+      "Avoid the redundant PyAV decode and its full-process GC sweep without disabling normal garbage collection.",
+      "Keep original VAD, beam size, 30-second encoder padding, 650ms endpoint and 350ms/200ms delivery defaults.",
+      "Retain optional isolated buffering experiments and richer failure/append diagnostics."
+    ],
+    "recognition_corpora": {
+      "gpu-comparison": {
+        "scope": "119 fixed synthetic fixtures, real WAV validation and Whisper recognition, no private inputs/API calls/live selection. Device-wide memory includes idle preview and CUDA context, not exclusive model usage.",
+        "torch": "2.11.0+cu128",
+        "ctranslate2": "4.8.2",
+        "device_memory_before_mib": 4262,
+        "results": [
+          {
+            "device": "cpu",
+            "compute_type": "int8",
+            "load_s": 0.23016719999577617,
+            "cold_transcribe_s": 0.35152360000211047,
+            "device_memory_after_mib": 4262,
+            "summary": {
+              "cpu-comparison": {
+                "samples": 83,
+                "median_s": 0.29213924999930896,
+                "p95_s": 0.31858170000487007,
+                "word_errors": 0,
+                "reference_words": 352,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0
+              },
+              "challenge": {
+                "samples": 36,
+                "median_s": 0.3112192500011588,
+                "p95_s": 0.4053716999987955,
+                "word_errors": 4,
+                "reference_words": 564,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0
+              }
+            }
+          },
+          {
+            "device": "cuda",
+            "compute_type": "int8_float16",
+            "load_s": 0.29844459999731043,
+            "cold_transcribe_s": 0.1772461000000476,
+            "device_memory_after_mib": 4515,
+            "summary": {
+              "cpu-comparison": {
+                "samples": 83,
+                "median_s": 0.06475185000090278,
+                "p95_s": 0.0801318000012543,
+                "word_errors": 0,
+                "reference_words": 352,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0
+              },
+              "challenge": {
+                "samples": 36,
+                "median_s": 0.08935344999918016,
+                "p95_s": 0.17867239999759477,
+                "word_errors": 4,
+                "reference_words": 564,
+                "negation_failures": 0,
+                "artifact_outputs": 1,
+                "non_speech_hallucinations": 0
+              }
+            }
+          },
+          {
+            "device": "cuda",
+            "compute_type": "float16",
+            "load_s": 0.1492809000046691,
+            "cold_transcribe_s": 0.07776670000021113,
+            "device_memory_after_mib": 4555,
+            "summary": {
+              "cpu-comparison": {
+                "samples": 83,
+                "median_s": 0.06345069999952102,
+                "p95_s": 0.07462900000246009,
+                "word_errors": 0,
+                "reference_words": 352,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0
+              },
+              "challenge": {
+                "samples": 36,
+                "median_s": 0.08780759999717702,
+                "p95_s": 0.16142219999892404,
+                "word_errors": 4,
+                "reference_words": 564,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0
+              }
+            }
+          }
+        ]
+      },
+      "pcm-comparison": {
+        "scope": "119 fixed synthetic fixtures, real WAV validation and Whisper recognition, no private inputs/API calls/live selection. Device-wide memory includes idle preview and CUDA context, not exclusive model usage.",
+        "adapter_sha256": "3854ee73717d4a9799d85147d8dfef91e8040033b9ebb10fd259aa2adebc3357",
+        "audio_input": "validated mono PCM, scipy polyphase resampling, float32 16 kHz ndarray",
+        "compare_with": "gpu-comparison",
+        "torch": "2.11.0+cu128",
+        "ctranslate2": "4.8.2",
+        "device_memory_before_mib": 4262,
+        "results": [
+          {
+            "device": "cpu",
+            "compute_type": "int8",
+            "load_s": 0.22776679999515181,
+            "cold_transcribe_s": 0.8100960000010673,
+            "device_memory_after_mib": 4262,
+            "summary": {
+              "cpu-comparison": {
+                "samples": 83,
+                "median_s": 0.25837254999714787,
+                "p95_s": 0.2771213000014541,
+                "word_errors": 0,
+                "reference_words": 352,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0,
+                "changed_word_outputs": 0
+              },
+              "challenge": {
+                "samples": 36,
+                "median_s": 0.28255764999994426,
+                "p95_s": 0.3665599000014481,
+                "word_errors": 4,
+                "reference_words": 564,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0,
+                "changed_word_outputs": 0
+              }
+            }
+          },
+          {
+            "device": "cuda",
+            "compute_type": "int8_float16",
+            "load_s": 0.2998197000051732,
+            "cold_transcribe_s": 0.14241469999979017,
+            "device_memory_after_mib": 4515,
+            "summary": {
+              "cpu-comparison": {
+                "samples": 83,
+                "median_s": 0.03373275000194553,
+                "p95_s": 0.04878030000691069,
+                "word_errors": 0,
+                "reference_words": 352,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0,
+                "changed_word_outputs": 0
+              },
+              "challenge": {
+                "samples": 36,
+                "median_s": 0.05571590000181459,
+                "p95_s": 0.14521329999843147,
+                "word_errors": 4,
+                "reference_words": 564,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0,
+                "changed_word_outputs": 0
+              }
+            }
+          },
+          {
+            "device": "cuda",
+            "compute_type": "float16",
+            "load_s": 0.15439980000519427,
+            "cold_transcribe_s": 0.036114000002271496,
+            "device_memory_after_mib": 4555,
+            "summary": {
+              "cpu-comparison": {
+                "samples": 83,
+                "median_s": 0.031113400000322144,
+                "p95_s": 0.042337300001236144,
+                "word_errors": 0,
+                "reference_words": 352,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0,
+                "changed_word_outputs": 0
+              },
+              "challenge": {
+                "samples": 36,
+                "median_s": 0.052477599998383084,
+                "p95_s": 0.1320798000015202,
+                "word_errors": 4,
+                "reference_words": 564,
+                "negation_failures": 0,
+                "artifact_outputs": 0,
+                "non_speech_hallucinations": 0,
+                "changed_word_outputs": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    "runtime_profile": {
+      "previous": {
+        "blas_threads_override": null,
+        "scope": "Fixed synthetic greeting; actual Models and selected renderer loaded, no cloud inference or private inputs. Component wrappers preserve arguments. Five-second pause probes idle recovery; not a call benchmark.",
+        "rows": [
+          {
+            "phase": "models_only",
+            "index": 0,
+            "seconds": 0.06926320000638952,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.03282770000078017,
+            "vad_s": 0.0021081000013509765,
+            "features_s": 0.0009697000059532002,
+            "encode_s": 0.01178760000038892
+          },
+          {
+            "phase": "models_only",
+            "index": 1,
+            "seconds": 0.06800519999524113,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.0319727000023704,
+            "vad_s": 0.0020901000025332905,
+            "features_s": 0.0008173000023816712,
+            "encode_s": 0.013045400002738461
+          },
+          {
+            "phase": "models_only",
+            "index": 2,
+            "seconds": 0.06692829999519745,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.031001600000308827,
+            "vad_s": 0.0020832000009249896,
+            "features_s": 0.0009758000014699064,
+            "encode_s": 0.012339699998847209
+          },
+          {
+            "phase": "renderer_loaded",
+            "index": 0,
+            "seconds": 0.1432323000044562,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.09844439999869792,
+            "vad_s": 0.0021452000000863336,
+            "features_s": 0.00738390000333311,
+            "encode_s": 0.014091299999563489
+          },
+          {
+            "phase": "renderer_loaded",
+            "index": 1,
+            "seconds": 0.13328570000157924,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.09341530000529019,
+            "vad_s": 0.0020619999995687976,
+            "features_s": 0.0032509000011486933,
+            "encode_s": 0.013965099999040831
+          },
+          {
+            "phase": "renderer_loaded",
+            "index": 2,
+            "seconds": 0.1375114000038593,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.09379630000330508,
+            "vad_s": 0.0020315000001573935,
+            "features_s": 0.005555600000661798,
+            "encode_s": 0.01474900000175694
+          },
+          {
+            "phase": "after_pause",
+            "index": 0,
+            "seconds": 0.44435360000352375,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.09939769999618875,
+            "vad_s": 0.002021300002525095,
+            "features_s": 0.004022600005555432,
+            "encode_s": 0.1546717000019271
+          },
+          {
+            "phase": "after_pause",
+            "index": 1,
+            "seconds": 0.13110199999937322,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.09096959999442333,
+            "vad_s": 0.00208349999593338,
+            "features_s": 0.0054348999983631074,
+            "encode_s": 0.011587799999688286
+          },
+          {
+            "phase": "after_pause",
+            "index": 2,
+            "seconds": 0.1367686000012327,
+            "text": "Hi Mira, how are you today?",
+            "audio_decode_s": 0.09800589999940712,
+            "vad_s": 0.0020499999955063686,
+            "features_s": 0.0029947000002721325,
+            "encode_s": 0.01301919999968959
+          }
+        ]
+      },
+      "pcm": {
+        "blas_threads_override": null,
+        "scope": "Fixed synthetic greeting; actual Models and selected renderer loaded, no cloud inference or private inputs. Component wrappers preserve arguments. Five-second pause probes idle recovery; not a call benchmark.",
+        "rows": [
+          {
+            "phase": "models_only",
+            "index": 0,
+            "seconds": 0.04197040000144625,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.0020336000015959144,
+            "features_s": 0.007427899996400811,
+            "encode_s": 0.011552399999345653
+          },
+          {
+            "phase": "models_only",
+            "index": 1,
+            "seconds": 0.03657289999682689,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.0020701999965240248,
+            "features_s": 0.0013293000010889955,
+            "encode_s": 0.012553000000480097
+          },
+          {
+            "phase": "models_only",
+            "index": 2,
+            "seconds": 0.03618240000650985,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.0020121999987168238,
+            "features_s": 0.0019534000020939857,
+            "encode_s": 0.011828900002001319
+          },
+          {
+            "phase": "renderer_loaded",
+            "index": 0,
+            "seconds": 0.03618260000075679,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.001954399995156564,
+            "features_s": 0.0018013000008068047,
+            "encode_s": 0.011744700001145247
+          },
+          {
+            "phase": "renderer_loaded",
+            "index": 1,
+            "seconds": 0.03507810000155587,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.001948700002685655,
+            "features_s": 0.0011058999953093007,
+            "encode_s": 0.011535199999343604
+          },
+          {
+            "phase": "renderer_loaded",
+            "index": 2,
+            "seconds": 0.036914700001943856,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.00208280000515515,
+            "features_s": 0.0016288999977405183,
+            "encode_s": 0.01269999999931315
+          },
+          {
+            "phase": "after_pause",
+            "index": 0,
+            "seconds": 0.2236715999970329,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.0052100000029895455,
+            "features_s": 0.005928500002482906,
+            "encode_s": 0.1548185999999987
+          },
+          {
+            "phase": "after_pause",
+            "index": 1,
+            "seconds": 0.03634600000077626,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.0019783999960054643,
+            "features_s": 0.0013087000043014996,
+            "encode_s": 0.011987199999566656
+          },
+          {
+            "phase": "after_pause",
+            "index": 2,
+            "seconds": 0.039261600002646446,
+            "text": "Hi Mira, how are you today?",
+            "vad_s": 0.0020131999990553595,
+            "features_s": 0.0025030999968294054,
+            "encode_s": 0.013273900003696326
+          }
+        ]
+      },
+      "interpretation": "Decode/GC overhead removed. First recognition after five seconds idle still slows; no GPU clock setting was changed."
+    },
+    "buffer_experiments": {
+      "buffer150": {
+        "selected": false,
+        "result": {
+          "elapsed_s": 164.111,
+          "turns": 20,
+          "startup_buffer_ms": 150,
+          "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+          "buffer_override": true,
+          "failures": [
+            {
+              "case": "wave",
+              "failures": [
+                "playback_stall"
+              ]
+            },
+            {
+              "case": "message",
+              "failures": [
+                "page.waitForFunction: Timeout 60000ms exceeded."
+              ]
+            }
+          ],
+          "response_sample_count": 18,
+          "p50_s": 1.22,
+          "p95_s": 2.04,
+          "playback": {
+            "frames": {
+              "video": {
+                "presented": 19,
+                "callbacks": 933,
+                "longGaps": 0,
+                "last": 164168.5,
+                "source": "blob:http://127.0.0.1:8766/9d74a2ad-6467-4164-b18c-1c29d05e21a6",
+                "wasVisible": true
+              },
+              "idle-video": {
+                "presented": 183,
+                "callbacks": 2580,
+                "longGaps": 10,
+                "last": 164785.264,
+                "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+                "wasVisible": true
+              }
+            },
+            "callActive": true,
+            "av_clock_skew_ms": {
+              "samples": 580,
+              "p50": 8.224999999999927,
+              "p95": 24.130000000000095,
+              "max": 32.74200000000005
+            },
+            "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+          },
+          "errors": [],
+          "speech_end_to_playback_s": {
+            "samples": 9,
+            "p50": 2.263033333328862,
+            "p95": 2.716733333331824
+          },
+          "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+          "actual_call_asr": {
+            "samples": 10,
+            "median_s": 0.362
+          }
+        },
+        "limit": "One brief waiting event and one completion timeout. Failure events were not retained in the old harness for the timed-out message; exact cause unproven."
+      },
+      "fragment100": {
+        "selected": false,
+        "result": {
+          "elapsed_s": 107.867,
+          "turns": 20,
+          "startup_buffer_ms": 350,
+          "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+          "buffer_override": false,
+          "failures": [],
+          "response_sample_count": 19,
+          "p50_s": 1.41,
+          "p95_s": 2.04,
+          "playback": {
+            "frames": {
+              "video": {
+                "presented": 19,
+                "callbacks": 933,
+                "longGaps": 0,
+                "last": 107940.1,
+                "source": "blob:http://127.0.0.1:8766/5ca8452c-eac0-437d-afab-18dfad6ec517",
+                "wasVisible": true
+              },
+              "idle-video": {
+                "presented": 219,
+                "callbacks": 1286,
+                "longGaps": 8,
+                "last": 108523.5,
+                "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+                "wasVisible": true
+              }
+            },
+            "callActive": true,
+            "av_clock_skew_ms": {
+              "samples": 595,
+              "p50": 8.55399999999995,
+              "p95": 21.768999999999927,
+              "max": 29.265000000000096
+            },
+            "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+          },
+          "errors": [],
+          "speech_end_to_playback_s": {
+            "samples": 9,
+            "p50": 2.442,
+            "p95": 2.693333333333343
+          },
+          "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+          "actual_call_asr": {
+            "samples": 10,
+            "median_s": 0.3685
+          }
+        },
+        "limit": "Passed but no meaningful whole-call gain established."
+      }
+    },
+    "gpu_previous_decode": {
+      "elapsed_s": 107.799,
+      "turns": 20,
+      "startup_buffer_ms": 350,
+      "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+      "buffer_override": false,
+      "failures": [],
+      "response_sample_count": 19,
+      "p50_s": 1.45,
+      "p95_s": 1.98,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 931,
+            "longGaps": 0,
+            "last": 107862.4,
+            "source": "blob:http://127.0.0.1:8766/0cdf30c2-42a4-4491-84a9-df56045cb0e3",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 215,
+            "callbacks": 1280,
+            "longGaps": 10,
+            "last": 108445.748,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 594,
+          "p50": 8.230999999999877,
+          "p95": 22.187999999999874,
+          "max": 33.015999999999934
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 9,
+        "p50": 2.1209333333273714,
+        "p95": 2.6576666666666715
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+      "actual_call_asr": {
+        "samples": 10,
+        "median_s": 0.2435
+      }
+    },
+    "qualification": {
+      "elapsed_s": 108.311,
+      "turns": 20,
+      "startup_buffer_ms": 350,
+      "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+      "buffer_override": false,
+      "failures": [],
+      "response_sample_count": 19,
+      "p50_s": 1.52,
+      "p95_s": 1.86,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 958,
+            "longGaps": 0,
+            "last": 108401.4,
+            "source": "blob:http://127.0.0.1:8766/476af1ee-2f9a-41e6-9206-2ebd76126200",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 226,
+            "callbacks": 1264,
+            "longGaps": 11,
+            "last": 108968.16,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 623,
+          "p50": 9.954999999999936,
+          "p95": 25.357000000000074,
+          "max": 36.96999999999995
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 9,
+        "p50": 1.994233333331842,
+        "p95": 2.5251333333303627
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+      "actual_call_asr": {
+        "samples": 10,
+        "median_s": 0.1475
+      }
+    },
+    "paused": {
+      "cases": 6,
+      "errors": [],
+      "failures": [],
+      "cancelled_preparations": 3,
+      "final_transcripts": [
+        {
+          "case": "af_sarah-paused_negation",
+          "transcript": "Please do not. Wave, just tell me what you can see.",
+          "action": "none"
+        },
+        {
+          "case": "af_sarah-paused_correction",
+          "transcript": "Come closer. Actually stay there and do not move.",
+          "action": "none"
+        },
+        {
+          "case": "am_michael-paused_negation",
+          "transcript": "Please do not. Wave, just tell me what you can see.",
+          "action": "none"
+        },
+        {
+          "case": "am_michael-paused_correction",
+          "transcript": "Come closer. Actually stay there and do not move.",
+          "action": "none"
+        },
+        {
+          "case": "bf_emma-paused_negation",
+          "transcript": "Please do not. Wave. Just tell me what you can see.",
+          "action": "none"
+        },
+        {
+          "case": "bf_emma-paused_correction",
+          "transcript": "Come closer. Actually stay there and do not move.",
+          "action": "none"
+        }
+      ]
+    },
+    "soak": {
+      "elapsed_s": 1800.049,
+      "turns": 120,
+      "startup_buffer_ms": 350,
+      "runtime_app_sha256": "258127d2b72b8200c8d335600ae0477961ae0f49d001b9b0f8cbd776ed7d459a",
+      "buffer_override": false,
+      "failures": [],
+      "response_sample_count": 114,
+      "p50_s": 1.44,
+      "p95_s": 1.92,
+      "playback": {
+        "frames": {
+          "video": {
+            "presented": 19,
+            "callbacks": 5681,
+            "longGaps": 0,
+            "last": 1788082,
+            "source": "blob:http://127.0.0.1:8766/a0ea8ff8-9f2a-42e5-ac7e-5c7cd9820bf3",
+            "wasVisible": true
+          },
+          "idle-video": {
+            "presented": 1133,
+            "callbacks": 32063,
+            "longGaps": 71,
+            "last": 1800731.572,
+            "source": "http://127.0.0.1:8766/idle/fullbody.mp4",
+            "wasVisible": true
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 3667,
+          "p50": 9.319000000000077,
+          "p95": 26.191000000000074,
+          "max": 45.68800000000001
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 54,
+        "p50": 2.1137333333319983,
+        "p95": 2.609033333328863
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded.",
+      "actual_call_asr": {
+        "samples": 60,
+        "median_s": 0.267
+      },
+      "cycle_speech_medians_s": [
+        2.13139999999851,
+        1.9876000000014902,
+        2.1523000000044705,
+        2.2388999999985097,
+        2.1137333333319983,
+        2.1007999999970197
+      ]
+    },
+    "frame_review": {
+      "qualification": {
+        "clips": 20,
+        "frames": 1003,
+        "flagged": 0,
+        "missing": 0,
+        "nonzero_unclipped_audio": true
+      },
+      "paused": {
+        "clips": 6,
+        "frames": 276,
+        "flagged": 0,
+        "missing": 0,
+        "nonzero_unclipped_audio": true
+      },
+      "soak": {
+        "clips": 120,
+        "frames": 5952,
+        "flagged": 0,
+        "missing": 0,
+        "nonzero_unclipped_audio": true
+      },
+      "manually_viewed_qualification_frames": 40,
+      "manually_viewed_paused_frames": 20,
+      "manually_viewed_soak_frames": 120,
+      "observations": "Sampled whole-head approach/near framing retained. Hand, skin and mouth softness remain. Diagnostic flags cannot certify anatomy, natural motion or phoneme alignment."
+    },
+    "review_ui": {
+      "clips": 120,
+      "frameStepping": true,
+      "export": true,
+      "defaultUnreviewed": true,
+      "audio": {
+        "samples": 48,
+        "maxRms": 0.15629905446246936,
+        "maxPeak": 0.5809617042541504,
+        "scope": "Decoded MP4 audio reached an AudioContext destination in headless Chromium. No physical speaker, microphone, listening or perceptual lip-sync claim."
+      },
+      "layout": {
+        "width": 390,
+        "scroll": 390,
+        "buttons": [
+          {
+            "id": "export",
+            "height": 44
+          },
+          {
+            "id": "back-frame",
+            "height": 44
+          },
+          {
+            "id": "next-frame",
+            "height": 44
+          },
+          {
+            "id": "previous",
+            "height": 45.1875
+          },
+          {
+            "id": "next",
+            "height": 45.1875
+          },
+          {
+            "id": "flag",
+            "height": 45.1875
+          }
+        ]
+      },
+      "errors": [],
+      "consoleErrors": []
+    },
+    "restart": {
+      "ready": true,
+      "busy": false,
+      "visual_loaded": true,
+      "startup_s": 31.026,
+      "visual_warmup": {
+        "sources": 5,
+        "decoder": "tensorrt",
+        "seconds": 19.158,
+        "torch_allocated_mib": 1834.454
+      },
+      "visual_error": null,
+      "asr_device": "cuda",
+      "asr_compute_type": "float16",
+      "asr_warm_s": 0.6015365999992355,
+      "memory_unchanged": true
+    },
+    "evidence": [
+      {
+        "path": "generated/local-app/audit/asr-device-gpu-comparison/results.json",
+        "sha256": "d660172e30b0c4ea0e34b20139c3b02b1023e5682681a3114ba04f22c3edfe5d"
+      },
+      {
+        "path": "generated/local-app/audit/asr-device-pcm-comparison/results.json",
+        "sha256": "642af37a0c3eff36b3b15592acb7e08c178cb6d4fb159fa15106e622df789658"
+      },
+      {
+        "path": "generated/local-app/audit/asr-runtime-default/results.json",
+        "sha256": "7d302e9a528459bc5196c15b338236b5d52a83632139aa5e1691ee518f5818ce"
+      },
+      {
+        "path": "generated/local-app/audit/asr-runtime-pcm/results.json",
+        "sha256": "51774b9648171d3d4680ef99cac6cccf43860969f17d40556896cf7153e74a7e"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-buffer150/summary.json",
+        "sha256": "8ff5d9e3874062286d5e3397834fa50401c553071a62bcf284514bc8a99dcfa8"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-fragment100/summary.json",
+        "sha256": "b2f7ffee5a0e3bb9bda3d6c227cf551f84798b1d989bda6c6798afbda009feb9"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-gpu-asr/summary.json",
+        "sha256": "4f37b5197a98ab6347640bc8fafcaeee01c15b34df9f503ee30c053125c4ca26"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-gpu-pcm/summary.json",
+        "sha256": "c75e7399df66e07846730ccfce54082a48e7a9327a47317bb237f196e17695c0"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-gpu-pcm/qualification.json",
+        "sha256": "08a31fb4e2c03201b975711d3299704595af52503b9783b3de8128011987fe5b"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-gpu-pcm/frame-review.json",
+        "sha256": "be10f9085e941394e8eeb76f82547590cec8bd881f04111f40f5f117cc7b53e2"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-paused-gpu-pcm/paused-results.json",
+        "sha256": "137bebf4c0f73c9cb6a298344036da14120a28b49869bcdbb7fa9eafec3a0df6"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-qualification-paused-gpu-pcm/frame-review.json",
+        "sha256": "a7fab801bf211a1db864b8f680cb227f72c7fdea651b4f1d5206c48d4ea368a9"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-soak-gpu-pcm/summary.json",
+        "sha256": "d84b334ebfec44d3199e32042cf727f3b64a6d78925a36df22e574b8ef2aa297"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-soak-gpu-pcm/qualification.json",
+        "sha256": "d42993406d50907369a560bcf8914574fd6eca69624d423da0229df0dd98040b"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-soak-gpu-pcm/frame-review.json",
+        "sha256": "b5c5c016c825e94a1977a21fcc4f9d4539ebd167850efb978c5348ef0371bf2f"
+      },
+      {
+        "path": "generated/local-app/audit/voice-video-soak-gpu-pcm/review-ui-results.json",
+        "sha256": "6ae393e4110f1d756aa478b41f0e168a3b96bb92a40db8c37f31769608e93619"
+      }
+    ],
+    "checks": {
+      "python_tests": 158,
+      "node_tests": 23,
+      "compileall": "passed",
+      "whitespace": "passed"
+    },
+    "data_handling": "Synthetic corpora and disposable call memory only. Live memory unchanged at restart. No new data recipient, provider, model weights, API key or database schema.",
+    "rollback": "Set AI_MATE_ASR_DEVICE=cpu and restart between calls. Revert this code to restore the prior decode path. Preserve private memory and prepared assets.",
+    "limits": [
+      "Warm two-second p95 is a target, not a promise; use the retained sustained result.",
+      "Speech end and playback are measured synthetically; physical acoustics, actual mobile/PWA behavior and perceptual lip sync remain unqualified.",
+      "Device-wide VRAM points are not exclusive model usage or peak/concurrency capacity.",
+      "Prepared body actions remain limited; no new arbitrary movement or visual-quality improvement is claimed.",
+      "No rental, public deployment, independent public-release review or staging approval. Model/host/payment eligibility remains separate."
     ]
   }
 }

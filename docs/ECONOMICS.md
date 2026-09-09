@@ -35,7 +35,7 @@ Quarter planning total: **$57.38**, including the existing credit purchase, leav
 | Stage | Selected prototype component | Cost treatment |
 |---|---|---|
 | Capture / endpoint detection | Browser AudioWorklet and VAD | Client device; current endpoint wait approximately 0.65s |
-| Recognition | faster-whisper Base English int8 | CPU on the same worker; capacity must be tested |
+| Recognition | faster-whisper Base English FP16, CPU int8 fallback | Same worker; optional GPU selection and concurrency need qualification |
 | Context and planning | Cloudflare @cf/qwen/qwen3-30b-a3b-fp8 | $0.051/M input tokens, $0.34/M output tokens |
 | Voice | Kokoro-82M ONNX, af_sarah | Same-worker CPU; no external per-character tariff |
 | Speech video | MuseTalk 1.5 + SD VAE + Whisper-tiny, prepared body media | Occupied GPU session, not per-frame API pricing |
@@ -45,7 +45,7 @@ Quarter planning total: **$57.38**, including the existing credit purchase, leav
 
 [Qwen rates](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/), [SFU rates](https://developers.cloudflare.com/realtime/sfu/pricing/). The current demo uses loopback HTTP media, not WebRTC. Hosted dialogue and the LTX preparation pipeline are neutral-demo selections, not an approved adult-content route. In particular, LTX terms exclude the intended explicit scope; a lawful commercial pipeline needs separately qualified assets/models. See USA.md.
 
-Sizing scenario: two replies/minute, 2,000 input tokens and 60 output tokens per reply. Bound context; do not resend an unlimited transcript. One 2Mbps downstream is 0.45GB per 30 minutes before protocol overhead. Calculations ignore free tiers and add a 20% inference/transport contingency. Same-worker CPU speech is included in the configured rental, but co-resident throughput is untested.
+Sizing scenario: two replies/minute, 2,000 input tokens and 60 output tokens per reply. Bound context; do not resend an unlimited transcript. One 2Mbps downstream is 0.45GB per 30 minutes before protocol overhead. Calculations ignore free tiers and add a 20% inference/transport contingency. Same-worker speech and optional GPU recognition are included in the configured rental. Co-resident throughput and power are unmeasured; the recognition speed improvement does not establish cheaper billed sessions or more concurrent users.
 
 | Call | Input / output tokens | Dialogue | GPU, including 60s startup + 90s idle | SFU | Technical total +20% | At 50% call occupancy +20% |
 |---|---:|---:|---:|---:|---:|---:|

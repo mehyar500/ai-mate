@@ -9,7 +9,7 @@ The app listens on 127.0.0.1:8765. Text, Voice and Video share local memory. The
 local_app/engine.py owns planning, speech, media, memory, cancellation and pose continuity:
 
 1. Browser captures speech and detects its end, or sends a typed command.
-2. CPU Whisper transcribes. The engine retrieves bounded recent context and saved facts.
+2. Local Whisper transcribes validated PCM (GPU FP16 on this PC; CPU int8 by default). The engine retrieves bounded recent context and saved facts.
 3. Unambiguous supported movement commands take a direct path. Otherwise Cloudflare Qwen returns a validated reply, scene, action and optional in-app message.
 4. CPU Kokoro synthesizes complete short phrases, preparing one phrase ahead.
 5. MuseTalk creates new speech-driven mouth frames over the matching body source. Reviewed approach, return and wave assets avoid live diffusion for known starting poses. Other movement attempts use the experimental local generator.
@@ -27,7 +27,7 @@ The planner prompt and action validator account for ASR punctuation inside expli
 | Stage | Model / configuration | Where it runs |
 |---|---|---|
 | Dialogue / plan | @cf/qwen/qwen3-30b-a3b-fp8 | Cloudflare, existing API key + email |
-| Recognition | faster-whisper Base English, int8, eight threads | Local CPU |
+| Recognition | faster-whisper Base English, FP16 on this PC; CPU int8 fallback, eight threads | Local GPU; explicit `AI_MATE_ASR_DEVICE` setting |
 | Speech | Kokoro-82M ONNX v1.0, af_sarah, eight threads | Local CPU |
 | Lip synchronization | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny features; optional TensorRT 11.2.1.2 FP16 decoder | Local GPU |
 | Face tracking | YuNet ONNX | Local CPU |
@@ -41,6 +41,10 @@ Five prepared body sources are bounded by frame count/resolution, verified again
 
 `AI_MATE_VISUAL_DECODER=torch` is the portable default. The optional `tensorrt` selection requires a reviewed, locally built engine in `.cache/local-poc/musetalk-vae-trt/`. It verifies the engine and source-weight hashes, GPU name and exact Torch/TensorRT versions before deserialization. Missing or mismatched artifacts fail video warm-up while text/voice remain available. Revert the setting and restart to use Torch. Neither engine nor weights belong in Git; rebuild and requalify on a different GPU. LOCAL_POC records equivalence and call measurements.
 
+`AI_MATE_ASR_DEVICE=cpu` is the portable default; `cuda` selects the same cached Base English weights in FP16. On Windows it uses CUDA/cuDNN libraries from the installed Torch package, and warms recognition at startup. An unavailable explicitly selected GPU fails startup; set `cpu` and restart to recover. No silent device fallback, new download or API is introduced. Device, precision and startup recognition timing are exposed in diagnostics.
+
+Recordings remain mono PCM16 WAV, 8–96kHz and 0.15–30 seconds. Decode/validate once, normalize and resample to a 16kHz float32 array, then invoke Whisper with its original VAD, beam size and 30-second encoder padding. This bypasses faster-whisper's redundant PyAV decode/full-GC path. Raw audio stays local. CPU/GPU equivalence on synthetic fixtures does not qualify all speakers or acoustic conditions.
+
 Preparation now uses a 128-frame temporal VAE window for the measured 97-frame LTX clips. A same-latent comparison isolated the earlier double-image defect to temporal decoding. Isolated candidate bundles require matching review manifests before the call harness will load them. Promote the complete matching set between calls and rebuild appearance caches on restart; preserve memory and a rollback copy. LOCAL_POC records generation commands and remaining visual defects.
 
 The benchmark can also constrain the final pose with `--end-reference-path`. Both starting and final images must be reviewed app-owned PNGs; it cannot be combined with `--return-to-reference`. The selected three-second approach uses this constraint to keep the head visible, excluding a defective final guide frame. This is offline asset preparation, with no new live-call dependency or API key.
@@ -51,12 +55,12 @@ These are **neutral-demo selections**. LTX terms exclude the intended explicit s
 
 | Requirement | Evidence / remaining work |
 |---|---|
-| Fast voice and visual response | Latest speech-continuity trial: end-of-speech median 2.47s / p95 2.75s, nine spoken replies. Earlier four-thread sustained p95 2.90s across 54. Synthetic MediaStream includes recorder/VAD; no physical-acoustic or sustained speed-gain claim |
+| Fast voice and visual response | Latest GPU/PCM 30-minute run: end-of-speech median 2.114s / p95 2.609s across 54 spoken replies. Short qualification: 1.994s / 2.525s across nine. Synthetic recorder/VAD included; physical acoustics and public concurrency excluded |
 | Command behavior | Repeatable 20-command suite covering negation, unsupported action, memory and interrupted approach |
 | 20–25 FPS playback | Output timestamps at 20 FPS; continuous delivery and dropped frames still need qualification |
-| Synchronization within 100ms | Latest 596 clock samples: 24.51ms p95 / 30.14ms maximum; sustained four-thread TTS maximum 51.72ms. Perceptual alignment and physical audio remain unqualified |
-| Stable 30-minute call | TensorRT/four-thread TTS: 120 interactions without functional failures/reported reply stalls; eight-thread TTS passed 20 commands but sustained qualification remains pending |
-| Realistic images and motion | Latest 976 frames analyzed, 40 visually sampled; six additional paused-speech clips / 276 frames analyzed, 20 sampled. Sustained/source reviews retained. Hand blur, mouth artifacts and repetition remain |
+| Synchronization within 100ms | Latest sustained 3,667 clock samples: 26.19ms p95 / 45.69ms maximum. Perceptual alignment and physical audio remain unqualified |
+| Stable 30-minute call | TensorRT/eight-thread Kokoro/GPU FP16 recognition: 120 interactions over 1,800.049 seconds, no functional failures or reported reply stalls; cycle medians show no accumulating delay |
+| Realistic images and motion | Latest 5,952 sustained frames analyzed, 120 visually sampled; short qualification 1,003/40 and paused-speech 276/20 also retained. Hand blur, mouth artifacts and repetition remain |
 | Mobile PWA calling | Layout and ManagedMediaSource selection covered; actual devices, speaker echo and background recovery pending |
 | Public access and billing | Not implemented or approved |
 

@@ -4,6 +4,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const trial=process.argv[2],label=process.argv[3];
 assert.ok(['qualification','soak'].includes(trial));assert.match(label,/^[a-z0-9-]{1,32}$/);
+const port=Number(process.argv[4]||8767);assert.ok([8767,8768].includes(port));assert.ok(!process.argv[5]);
 const run=`voice-video-${trial}-${label}`;
 const folder=path.resolve(__dirname,'../generated/local-app/audit',run);
 
@@ -14,7 +15,7 @@ async function main(){
     const page=await browser.newPage({viewport:{width:1000,height:850},acceptDownloads:true});
     page.on('pageerror',e=>errors.push(e.message));
     page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
-    await page.goto('http://127.0.0.1:8767/review.html');
+    await page.goto(`http://127.0.0.1:${port}/review.html`);
     const report=await page.locator('#report').evaluate(el=>JSON.parse(el.textContent));
     assert.equal(report.run,run);assert.equal(await page.locator('#clips option').count(),report.items.length);
     await page.waitForFunction(()=>document.querySelector('#video').readyState>=2);

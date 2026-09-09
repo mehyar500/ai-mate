@@ -268,7 +268,9 @@ class PortraitRenderer:
             return self.prediction_decoder(prediction)
         return self.vae.decode(prediction / self.vae.config.scaling_factor).sample
 
-    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0):
+    def render(self, audio_path, destination, cancel, scene="mira", fps=25, batch_size=8, streaming=False, motion_path=None, face_encode_stride=2, loop_motion=False, reuse_motion=False, motion_start_s=0, fragment_ms=200):
+        if fragment_ms not in {100,200}:
+            raise ValueError('Streaming fragments must be 100 or 200 milliseconds.')
         if streaming:
             fps = 20
         cv, np, torch = self.cv, self.np, self.torch
@@ -312,7 +314,7 @@ class PortraitRenderer:
         # Pipe raw frames to one local encoder; no per-frame PNG disk round trips.
         encoding = ["-c:v", "h264_nvenc", "-preset", "p1", "-tune", "ll"] if self.encoder == "h264_nvenc" else ["-c:v", "libx264", "-preset", "ultrafast", "-tune", "zerolatency", "-crf", "20", "-threads", "2"]
         delivery = (["-g", "4", "-bf", "0", "-profile:v", "baseline", "-level:v", "3.0",
-                     "-movflags", "+frag_keyframe+empty_moov+default_base_moof", "-frag_duration", "200000", "-flush_packets", "1"]
+                     "-movflags", "+frag_keyframe+empty_moov+default_base_moof", "-frag_duration", str(fragment_ms*1000), "-flush_packets", "1"]
                     if streaming else ["-movflags", "+faststart"])
         command = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24",
                    "-s", f"{width}x{height}", "-r", str(fps), "-i", "pipe:0", "-i", str(audio_path),
@@ -396,6 +398,7 @@ class PortraitRenderer:
                 "audio_features_s": features_seconds, "neural_s": neural_seconds,
                 "composite_pipe_s": composite_seconds,
                 "encoder": self.encoder, "decoder": self.decoder_backend,
+                "stream_fragment_ms":fragment_ms if streaming else None,
                 "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
                 "face_encode_stride": face_encode_stride if movement else None,
                 "prepared_appearance_cache_hit": self.motion_cache_hit if movement else False,

@@ -26,7 +26,7 @@ The video fills the height when controls fit in the side space. Tall phone views
 |---|---|---|
 | Conversation / bounded plan | Cloudflare `@cf/qwen/qwen3-30b-a3b-fp8` | Hosted JSON response; exact simple body commands bypass the network |
 | Speech | Kokoro-82M ONNX v1.0 float32, `af_sarah` | CPU, eight threads; new WAV per reply |
-| Recognition | faster-whisper Base English int8 | CPU, eight threads; opt-in microphone or synthetic WAV |
+| Recognition | faster-whisper Base English FP16 on this PC | Optional local GPU; eight host threads. CPU int8 is the portable default |
 | Lip movement | MuseTalk 1.5, SD VAE ft-mse, Whisper-tiny audio encoder | Local GPU FP16; batch eight; 20 FPS output |
 | Face tracking | OpenCV YuNet 2023mar | CPU; tracks supplied body footage |
 | Reviewed movement / listening preparation | LTX-2.3-22B distilled FP8 with Gemma-3-12B mixed FP4 text encoder | Offline native ComfyUI graph; prompt encoder on CPU, diffusion offload on 16GB |
@@ -70,6 +70,57 @@ Successful fresh video captures its final decoded frame as the next reference. U
 ## Measured results and failures
 
 The tables distinguish individual samples from repeated suites. Different configurations and capture boundaries are not directly comparable; none is a performance guarantee. [Machine-readable history](research/local-poc-benchmarks.json) preserves settings and rejected trials. Raw synthetic traces and reviewed contact sheets stay in ignored `generated/local-app/audit/`.
+
+### Current recognition and call selection — September 9
+
+The preview selects `AI_MATE_ASR_DEVICE=cuda`: faster-whisper 1.2.1 / CTranslate2 4.8.2, Base English FP16, pinned model revision `3d3d5dee26484f91867d81cb899cfcf72b96be6c`. The same cached model supports the default `cpu` int8 setting. Windows CUDA/cuDNN libraries come from the installed Torch 2.11.0+cu128 package. Explicit GPU initialization failure stops startup; set `cpu` and restart to recover. No new package, weight or credential was installed.
+
+The WAV boundary still checks mono PCM16, 8–96kHz, complete frames and 0.15–30 seconds. Normalize validated PCM and use SciPy polyphase resampling when needed, then pass a 16kHz float32 array directly to Whisper. This bypasses the [upstream audio loader and its explicit full garbage collection](https://github.com/SYSTRAN/faster-whisper/blob/v1.2.1/faster_whisper/audio.py). The 650ms endpoint, VAD, beam size and full encoder window remain unchanged.
+
+| Fixed corpus / recognition path | Ordinary speech median / p95 | Harder speech median / p95 | Recognition differences |
+|---|---:|---:|---|
+| CPU int8, previous decoding | 292 / 319ms | 311 / 405ms | Baseline: 0 / 4 word errors |
+| GPU FP16, previous decoding | 63 / 75ms | 88 / 161ms | Same normalized words as CPU |
+| CPU int8, validated PCM | 258 / 277ms | 283 / 367ms | Same words as its baseline |
+| GPU FP16, validated PCM — selected | 31 / 42ms | 52 / 132ms | Same words as its baseline |
+
+There are 80 ordinary utterances plus three non-speech probes and 36 harder utterances, across three synthetic voices; the ordinary set includes noise. All 119 normalized transcripts matched between each previous and new decoding path. Selected CPU/FP16 outputs had no negation losses, non-speech hallucinations or repeated-punctuation flags. Four known errors remain across 564 harder-corpus reference words. These are fixed synthetic fixtures, not real-speaker accuracy evidence. The earlier GPU INT8/FP16 trial emitted repeated punctuation once; it did not repeat with PCM input, but FP16 is the configuration taken through full call qualification.
+
+Loading the actual renderer increased previous GPU recognition to roughly 133–143ms, including 93–98ms in audio decoding. Direct PCM measured 35–37ms with that renderer loaded. After five seconds idle, its first recognition still took 224ms versus subsequent 36–39ms: GPU wake-up remains. Device-wide point samples rose from 4,262 to 4,555MiB during the sequential comparison, including the idle preview and CUDA context. Those are not model-only or peak allocation measurements.
+
+| Full browser capture suite | Commands / spoken samples | Speech-end median / p95 | Outcome |
+|---|---:|---:|---|
+| Previous CPU speech-continuity | 20 / 9 | 2.471 / 2.755s | Passed |
+| GPU FP16, previous decoding | 20 / 9 | 2.121 / 2.658s | Passed |
+| GPU FP16, validated PCM | 20 / 9 | **1.994 / 2.525s** | Passed |
+
+The selected run took 108.311 seconds. Mixed Send-to-playback median/p95 was 1.52/1.86s across 19 replies. There were no functional failures, page errors or reported reply stalls. A/V clock skew: 25.357ms p95 / 36.970ms maximum over 623 samples. All 20 clips / 1,003 frames passed limited diagnostics with nonzero unclipped speech; forty approach/near frames were inspected. Natural mouth detail and hands remain imperfect. The whole-call measurements include variable hosted planning and response lengths, so they are not a controlled universal speed ratio.
+
+All six paused-speech cases also passed with GPU/PCM: final transcripts preserved negation/correction, actions stayed `none`, and three pending replies were cancelled before playback. All 276 frames passed diagnostics and twenty were inspected. Faster preparation did not break the tested recovery flow. AEC remains simulated; physical echo and mobile use are unqualified.
+
+Two isolated buffering changes remain unselected. A 150ms starting threshold produced one brief waiting event and one end-of-playback timeout in 20 commands; the timeout's cause was not captured. The driver now retains events and media state on failures. 100ms FFmpeg fragments passed 20 commands but did not establish an improvement (spoken p95 2.693s). Keep the **350ms threshold and 200ms fragments**; these are separate from inference batch size.
+
+Reproduce after other GPU work finishes, using fresh labels and the retained synthetic fixtures:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/benchmark_asr_device.py --label new-pcm --compare-with gpu-comparison
+.\.venv\Scripts\python.exe scripts/benchmark_asr_runtime.py --label new-runtime
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-gpu-pcm --performance-label headroom --decoder tensorrt-reviewed --asr-device cuda
+# Second terminal with the existing Playwright NODE_PATH:
+node scripts/qualify_video_call.cjs qualification new-gpu-pcm --capture
+# After call timing finishes:
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-gpu-pcm
+```
+
+For paused speech, start a separate qualification server with a new label and run `review_paused_voice.cjs <label>`, then the same frame reviewer. For 30 minutes / 120 commands, use `soak` in both server and browser commands. These processes use disposable memory on port 8766. Corpus comparison requires the retained baseline audit; a fresh checkout lacks private generated fixtures/media and must prepare a new baseline. The GPU/PCM preview restarted in 31.026s with five-source preparation in 19.158s and memory unchanged. The same configuration then completed **1,800.049 seconds / 120 commands**, with no functional failures, page errors or reported reply stalls. Across 54 spoken replies, speech-end median/p95 was **2.114/2.609s**; mixed Send-to-playback across 114 was **1.44/1.92s**. Six cycle speech medians were 2.131/1.988/2.152/2.239/2.114/2.101s, showing no steadily accumulating delay. Actual ASR median was 267ms across the spaced call inputs, illustrating the idle-recovery difference from the 31ms isolated benchmark. The p95 target remains unmet.
+
+All **120 clips / 5,952 frames** were retained and decoded with zero limited flags, 20FPS median timestamp spacing, and nonzero unclipped speech. Six sheets covering 120 frames were inspected across first/last-cycle wave, approach and near speech. Soft hands/mouth and repeated prepared motion remain. Browser A/V clock skew was **26.191ms p95 / 45.688ms maximum** across 3,667 samples. No long reply-video callback gaps were reported; raw idle-gap counters include intentional hidden/paused intervals and are not stall counts. One synthetic sequential session cannot establish physical acoustics, normal-speed perceptual acceptance, mobile behavior or public concurrency.
+
+Build the retained review page with `build_call_review.py --trial soak --label gpu-pcm`. The current page is served only on loopback **http://127.0.0.1:8768/review.html**; the earlier review on 8767 remains available. Reproduce its browser checks using `node scripts/verify_call_review.cjs soak gpu-pcm 8768` after call timing. This checks decoded audio, frame stepping, note export and layout, not physical speaker output. Review boxes stay unchecked until a person records an observation. Previous soaks remain historical evidence.
+
+The next lip-sync measurement candidate is [SyncNet](https://github.com/joonson/syncnet_python), which estimates audio/video offset from mouth imagery and speech. Its code is MIT; Oxford's [model page](https://www.robots.ox.ac.uk/~vgg/software/lipsync/) links CC BY 4.0 and describes research use. This is an uninstalled offline-evaluation candidate, not production eligibility or a measured result. Calibrate any evaluator with deliberately shifted positive/negative controls and consistent face crops. Neither a score nor a clock-skew pass alone can qualify perceptual lip sync.
+
+### Earlier input and latency evidence
 
 The paused-speech regression uses six fixed recordings through the real AudioWorklet, turn detector, ASR, Cloudflare, Kokoro and MuseTalk. Initially, one negated wave was performed after ASR inserted a period inside "do not wave"; other paused corrections lost their beginning while the microphone was gated during preparation. Listening during preparation restored the correction, but one split negation still lost "do not". The final change combines the recorder audio when speech resumes before any reply playback. All six final transcripts retain the negation/correction, all final actions are none, and four unfinished replies were cancelled before a displayed video frame. The complete 276 output frames passed limited diagnostics; twenty were visually inspected. Synthetic AEC capability was simulated; physical echo remains untested.
 
@@ -468,7 +519,7 @@ The complete six-file approach/near/return/listening set was replaced between ca
 
 ## Playback, microphone and memory
 
-The browser consumes about 200ms MP4 fragments with about 400ms initial media buffered. Its embedded audio stays muted; a separate WAV follows the video clock, pauses during stalls and corrects drift above 120ms. If MediaSource is unsupported, playback waits for the finished file. Autoplay rejection exposes Play reply. Interrupt aborts both tracks. These paths have Node tests, but mobile Safari and lengthy calls remain unqualified.
+The browser consumes 200ms MP4 fragments and starts after at least 350ms is buffered (typically about 427ms with current fragment batches). Its embedded audio stays muted; a separate WAV follows the video clock, pauses during stalls and corrects drift above 120ms. If MediaSource is unsupported, playback waits for the finished file. Autoplay rejection exposes Play reply. Interrupt aborts both tracks. These paths have Node tests, but mobile Safari and lengthy calls remain unqualified.
 
 Microphone capture uses AudioWorklet, mono PCM16 WAV, 200ms pre-roll, a 650ms silence boundary and a 25s turn cap. During playback, a browser reporting echo cancellation permits voice interruption after 240ms of above-threshold audio. The energy detector is not a speech/noise classifier. `call-input.mjs` holds one utterance while the authenticated stop preserves the displayed pose and releases the previous render. Cleanup has a 10s bound after the stop response; stale call/microphone generations, rejected cancellation and timeout discard pending audio. Valid short words below the early-onset threshold also stop before submission. Browsers without reported echo cancellation retain manual Interrupt and resume listening 450ms after playback. Raw capture stays in memory; the transcript enters local history and hosted dialogue context.
 
@@ -478,7 +529,7 @@ Reproduce with `.\.venv\Scripts\python.exe scripts/serve_phrase_benchmark.py --i
 
 SQLite keeps editable notes, up to 50 exchanges (12 shown, four sent as recent context) and up to 12 bounded verbatim fact excerpts. Users can inspect, correct and delete saved information. It knows only what was shared; automatic check-ins, calendar integrations and push notifications are unimplemented. Preserve `generated/local-app/memory.sqlite3` during normal updates.
 
-Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL`, `AI_MATE_ENV_FILE` and `AI_MATE_VISUAL_DECODER`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
+Private `.env` loads only `AI_MATE_LLM_PROVIDER`, `AI_MATE_LLM_MODEL`, `AI_MATE_ENV_FILE`, `AI_MATE_VISUAL_DECODER` and `AI_MATE_ASR_DEVICE`; process/launcher overrides win. This PC selects `C:\Users\mehya\.env` for Cloudflare account ID, API key and email (`X-Auth-Key` / `X-Auth-Email`). A scoped token is an alternative. Secrets never reach browser/artifacts. Hosted dialogue receives text, recent context and saved notes; images, video and raw audio stay local. MiniMax/Ollama are explicit alternatives; subscriptions are not presumed API entitlements. [.env.example](../.env.example) contains only implemented configuration.
 
 ## Reproduce or extend
 
@@ -528,7 +579,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 150 Python tests and 23 Node tests, Python compilation and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Added checks cover incorrect negated movement plans, listening during preparation, preserving resumed PCM, stale/typed/playback input, changed devices, malformed WAVs and the 30-second limit. Actual iPhone behavior remains unqualified. Synthetic benchmark servers use disposable memory. This cycle changes call input recovery and movement validation; private memory, credentials, model selection and prepared assets are preserved.
+Checks for this revision: **158 Python and 23 Node tests**, Python compilation and whitespace checks. New recording checks cover float scaling, duration/pitch at seven sample rates, malformed/truncated/stereo audio, silence and duration boundaries; device tests cover explicit selection and CPU recovery. Existing authentication, cancellation, pose, speech and microphone checks remain green. Real devices, independent review and public staging remain separate requirements. No database migration or new data recipient. Roll back recognition to `cpu` and restart; reverting the code also restores the previous decoding path. Preserve memory and reviewed assets.
 
 ## Cost and next decision
 

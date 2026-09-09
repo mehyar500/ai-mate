@@ -1,6 +1,7 @@
 """Local-only inference adapters. Weights must be downloaded explicitly beforehand."""
 import io
 import json
+import math
 import os
 from pathlib import Path
 import time
@@ -23,8 +24,17 @@ def check_cancel(event):
         raise Cancelled("Stopped.")
 
 
+def recognition_settings(environ=None):
+    device=(os.environ if environ is None else environ).get('AI_MATE_ASR_DEVICE','cpu')
+    if device not in {'cpu','cuda'}:
+        raise ValueError('AI_MATE_ASR_DEVICE must be cpu or cuda.')
+    return {'device':device,'compute_type':'float16' if device=='cuda' else 'int8',
+            'cpu_threads':8,'num_workers':1,'local_files_only':True}
+
+
 class Models:
     def __init__(self):
+        asr_settings=recognition_settings()
         from .conversation import Conversation
         self.conversation = Conversation(LLM)
         os.environ["HF_HUB_OFFLINE"] = "1"
@@ -42,10 +52,19 @@ class Models:
         session = ort.InferenceSession(str(CACHE / "kokoro-v1.0.onnx"), sess_options=options,
                                        providers=["CPUExecutionProvider"])
         self.tts = Kokoro.from_session(session, str(CACHE / "voices-v1.0.bin"))
-        # Eight CPU threads reduced recognition time on the demo i9 without
-        # changing any word in the 83-fixture comparison. Keep GPU for visuals.
-        self.asr = WhisperModel(str(CACHE / "asr-base-en"), device="cpu", compute_type="int8", cpu_threads=8, num_workers=1, local_files_only=True)
-        self.tts.create("Hello there.", voice="af_sarah", speed=1, lang="en-us")
+        self.asr_device=asr_settings['device'];self.asr_compute_type=asr_settings['compute_type']
+        if self.asr_device=='cuda':
+            import torch
+            # Keep this handle alive: CTranslate2 loads the installed CUDA/cuDNN
+            # libraries lazily. Never download a DLL or search arbitrary folders.
+            self._asr_dll_directory=os.add_dll_directory(str(Path(torch.__file__).parent/'lib')) if os.name=='nt' else None
+        self.asr = WhisperModel(str(CACHE / "asr-base-en"), **asr_settings)
+        warm_audio,warm_rate=self.tts.create("Hello there.", voice="af_sarah", speed=1, lang="en-us")
+        self.asr_warm_s=None
+        if self.asr_device=='cuda':
+            import soundfile as sf
+            stream=io.BytesIO();sf.write(stream,warm_audio,warm_rate,format='WAV',subtype='PCM_16')
+            began=time.perf_counter();self.transcribe(stream.getvalue());self.asr_warm_s=time.perf_counter()-began
         self.visual = None
 
     def plan(self, snapshot, user, mode, scene, available, cancel):
@@ -102,9 +121,18 @@ class Models:
         except (wave.Error, EOFError) as error:
             raise ValueError("Recording is not a valid WAV file.") from error
         import numpy as np
-        if np.max(np.abs(np.frombuffer(pcm, dtype=np.int16).astype(np.float32))) < 100:
+        audio = np.frombuffer(pcm, dtype="<i2").astype(np.float32)
+        if np.max(np.abs(audio)) < 100:
             return ""
-        segments, _ = self.asr.transcribe(io.BytesIO(raw), language="en", beam_size=1,
+        audio /= 32768.0
+        if rate != 16000:
+            from scipy.signal import resample_poly
+            divisor = math.gcd(rate, 16000)
+            audio = resample_poly(audio, 16000 // divisor, rate // divisor)
+        # Whisper accepts mono float32 samples at 16 kHz. Reusing the validated
+        # PCM avoids a second PyAV decode and its per-recording full GC sweep.
+        # Keep Whisper's normal VAD and encoder window; neither is shortened.
+        segments, _ = self.asr.transcribe(audio, language="en", beam_size=1,
                                          vad_filter=True, condition_on_previous_text=False)
         return " ".join(segment.text.strip() for segment in segments).strip()
 

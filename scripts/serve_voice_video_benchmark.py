@@ -33,6 +33,8 @@ def main():
     parser.add_argument('--label', default='')
     parser.add_argument('--performance-label', default='', help='Use a reviewed isolated candidate asset bundle.')
     parser.add_argument('--decoder', choices=['torch','tensorrt','tensorrt-reviewed'], default='torch', help='Torch, experimental engine, or the reviewed runtime path.')
+    parser.add_argument('--fragment-ms',type=int,choices=[100,200],help='Isolated FFmpeg fragment-duration override.')
+    parser.add_argument('--asr-device',choices=['cpu','cuda'],help='Isolated speech-recognition device override.')
     args = parser.parse_args()
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
@@ -58,6 +60,7 @@ def main():
         for name in ['performance-wave.mp4','performance-wave.json']:
             shutil.copyfile((assets if args.performance_label else ROOT/'generated/local-app/audit')/name, folder/name)
     configure_runtime()
+    if args.asr_device is not None:os.environ['AI_MATE_ASR_DEVICE']=args.asr_device
     os.environ['AI_MATE_VISUAL_DECODER']='tensorrt' if args.decoder=='tensorrt-reviewed' else 'torch'
     app = CompanionEngine(folder)
     app.scene = 'fullbody'
@@ -78,6 +81,11 @@ def main():
         duration = app.models.speech(prompt, target)
         fixtures.append(dict(spec, duration_s=duration))
     renderer = app.models.load_visual()
+    if args.fragment_ms is not None:
+        original_render=renderer.render
+        def render_fragment_trial(*render_args,**render_kwargs):
+            return original_render(*render_args,**{**render_kwargs,'fragment_ms':args.fragment_ms})
+        renderer.render=render_fragment_trial
     if args.decoder=='tensorrt':
         sys.path.insert(0,str(ROOT/'.cache/tensorrt-deps'))
         from scripts.trt_vae_runtime import ExperimentalDecoder
@@ -92,6 +100,8 @@ def main():
     (folder/'benchmark-settings.json').write_text(json.dumps({
         'speech_model':'Kokoro-82M ONNX v1.0','speech_voice':'af_sarah',
         'speech_cpu_threads':app.models.speech_threads,'decoder':args.decoder,
+        'fragment_ms_override':args.fragment_ms,
+        'asr_device':app.models.asr_device,'asr_compute_type':app.models.asr_compute_type,'asr_warm_s':app.models.asr_warm_s,
         'performance_label':args.performance_label,'visual_warmup':app.visual_warmup,
         'scope':'Synthetic isolated call; no private conversation or active preview selection.'
     },indent=2)+'\n',encoding='utf-8')

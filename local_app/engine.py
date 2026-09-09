@@ -30,7 +30,7 @@ def configure_runtime(path=ROOT / ".env", environ=None):
     path = Path(path)
     if not path.is_file():
         return
-    allowed = {"AI_MATE_LLM_PROVIDER", "AI_MATE_LLM_MODEL", "AI_MATE_ENV_FILE", "AI_MATE_VISUAL_DECODER"}
+    allowed = {"AI_MATE_LLM_PROVIDER", "AI_MATE_LLM_MODEL", "AI_MATE_ENV_FILE", "AI_MATE_VISUAL_DECODER", "AI_MATE_ASR_DEVICE"}
     for line in path.read_text(encoding="utf-8-sig").splitlines():
         key, sep, value = line.strip().removeprefix("export ").partition("=")
         key, value = key.strip(), value.strip().strip('"').strip("'")
@@ -123,6 +123,9 @@ class CompanionEngine:
         with self.lock:
             return {"app_version": "0.2", "ready": self.ready, "error": self.error, "busy": self.busy or self.playback_pending,
                     "startup_s": self.startup_s,
+                    "asr_device":getattr(self.models,'asr_device',None),
+                    "asr_compute_type":getattr(self.models,'asr_compute_type',None),
+                    "asr_warm_s":getattr(self.models,'asr_warm_s',None),
                     "visual_warmup": self.visual_warmup,
                     "visual_loaded": bool(self.models and self.models.visual is not None and self.visual_error is None),
                     "visual_error": self.visual_error,
