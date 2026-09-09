@@ -32,6 +32,7 @@ document.getElementById('connect').onclick=async()=>{
     };
     peer.onconnectionstatechange=()=>{status.textContent=peer.connectionState;window.rtcBench.connected=peer.connectionState==='connected';};
     await peer.setLocalDescription(await peer.createOffer());await gathered();
+    window.rtcBench.offerSummary=peer.localDescription.sdp.split(/\r?\n/).filter(line=>line.startsWith('a=candidate:')).map(line=>{const f=line.split(' ');return {transport:f[2],addressKind:f[4].endsWith('.local')?'mdns':'ip',type:f[7]};});
     const answer=await post('/offer',{type:peer.localDescription.type,sdp:peer.localDescription.sdp});
     await peer.setRemoteDescription(answer);await video.play();
     const canvas=document.createElement('canvas');canvas.width=384;canvas.height=576;
@@ -66,3 +67,21 @@ window.runRtcFixture=async fixture=>{
 };
 window.rtcResults=()=>post('/results');
 window.finishRtc=async()=>{const stats=[];for(const value of (await peer.getStats()).values())if(['inbound-rtp','codec'].includes(value.type))stats.push(value);await post('/done');peer.close();return stats;};
+
+// Visible controls keep the probe usable without executing console helpers.
+const controls=document.createElement('p');
+for(let fixture=0;fixture<3;fixture++){
+  const button=document.createElement('button');button.textContent='Run fixture '+(fixture+1);
+  button.onclick=async()=>{try{await window.runRtcFixture(fixture);}catch(error){status.textContent=error.message;}};
+  controls.append(button);
+}
+const finish=document.createElement('button');finish.textContent='Finish test';
+finish.onclick=async()=>{try{await window.finishRtc();status.textContent='Test finished';}catch(error){status.textContent=error.message;}};
+controls.append(finish);document.body.append(controls);
+const report=document.createElement('pre');document.body.append(report);
+setInterval(()=>{
+  const turn=window.rtcBench.turn;
+  const elapsed=key=>turn&&turn[key]!==null?Math.round(turn[key]-turn.started):null;
+  report.textContent=JSON.stringify({connected:window.rtcBench.connected,frames:window.rtcBench.frames.length,
+    firstVideoMs:elapsed('firstVideo'),firstAudioMs:elapsed('firstAudio'),errors:window.rtcBench.errors,offer:window.rtcBench.offerSummary});
+},250);

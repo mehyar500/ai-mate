@@ -5,6 +5,7 @@ Signaling is same-origin/token protected on 127.0.0.1:8766. ICE has no external
 STUN/TURN servers. This is an isolated transport benchmark, not the live app.
 """
 import argparse
+import hashlib
 import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -18,6 +19,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / '.cache/webrtc-deps'), str(ROOT)]
 
+import av
 from aiortc import RTCPeerConnection, RTCConfiguration, RTCSessionDescription, RTCRtpSender
 import cv2
 import ifaddr
