@@ -22,6 +22,18 @@ class PerformanceAssetTests(unittest.TestCase):
             result=load_reviewed_performance(folder)
             self.assertEqual(result[('base','closer')]['to'],'near')
             self.assertEqual(result[('near','farther')]['to'],'base')
+            near=folder/'performance-near-wave.mp4';near.write_bytes(b'near wave')
+            near_record=folder/'performance-near-wave.json'
+            near_manifest={'version':1,'reviewed':True,'pose':'near','sha256':{
+                'performance-near.png':manifest['sha256']['performance-near.png'],
+                near.name:hashlib.sha256(near.read_bytes()).hexdigest()}}
+            near_record.write_text(json.dumps(near_manifest))
+            self.assertEqual(load_reviewed_performance(folder)[('near','wave')]['to'],'near')
+            near.write_bytes(b'changed')
+            result=load_reviewed_performance(folder)
+            self.assertNotIn(('near','wave'),result)
+            self.assertIn(('base','closer'),result)
+            self.assertIn(('near','farther'),result)
             for name in names:
                 (folder/name).write_bytes(b'changed')
                 self.assertEqual(load_reviewed_performance(folder),{})
@@ -51,3 +63,22 @@ class PerformanceAssetTests(unittest.TestCase):
             self.assertIsNone(load_reviewed_wave(folder,'reference'))
             record.write_text('null')
             self.assertIsNone(load_reviewed_wave(folder,'reference'))
+
+    def test_near_wave_requires_its_own_pose_review_and_reference(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder=Path(temp)
+            media=folder/'performance-near-wave.mp4';media.write_bytes(b'near wave')
+            record=folder/'performance-near-wave.json'
+            manifest={'version':1,'reviewed':True,'pose':'near','sha256':{
+                'performance-near.png':'near reference',media.name:hashlib.sha256(media.read_bytes()).hexdigest()}}
+            record.write_text(json.dumps(manifest))
+            result=load_reviewed_wave(folder,'near reference',pose='near')
+            self.assertEqual((result['from'],result['to'],result['kind']),('near','near','gesture'))
+            self.assertIsNone(load_reviewed_wave(folder,'base reference',pose='near'))
+            self.assertIsNone(load_reviewed_wave(folder,'near reference',pose='base'))
+            self.assertIsNone(load_reviewed_wave(folder,'near reference',pose='../near'))
+            for field,value in [('pose','base'),('pose',None),('reviewed',False)]:
+                changed={**manifest,field:value};record.write_text(json.dumps(changed))
+                self.assertIsNone(load_reviewed_wave(folder,'near reference',pose='near'))
+            record.write_text(json.dumps(manifest));media.write_bytes(b'changed')
+            self.assertIsNone(load_reviewed_wave(folder,'near reference',pose='near'))

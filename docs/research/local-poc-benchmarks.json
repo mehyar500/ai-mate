@@ -19483,5 +19483,328 @@
       "Final selected-asset 30-minute qualification",
       "Independent public security review and staging"
     ]
+  },
+  "close_view_wave_20260909": {
+    "date": "2026-09-09",
+    "source_commit": "bc81e9e37b24ce39c8057739c43e8265e7a03d31",
+    "change": "Optional reviewed close-view wave, six-source cache, bounded face correspondence and expanded call qualification.",
+    "models_changed": false,
+    "selection": "Local neutral demo only; physical/perceptual/public qualification remains open.",
+    "source_candidates": [
+      {
+        "record": "audit/ltx23-d856f6b25a26482799c4be56aff493d7.json",
+        "seed": 85,
+        "elapsed_s": 146.318,
+        "decision": "selected after trim and review"
+      },
+      {
+        "record": "audit/ltx23-4963ff9328a046bb9cdaad5c8810425f.json",
+        "seed": 86,
+        "elapsed_s": 24.447,
+        "decision": "rejected: left hand instead of right"
+      },
+      {
+        "record": "audit/ltx23-967e27382ad84021a9d2623c3ca13ff1.json",
+        "seed": 87,
+        "elapsed_s": 136.883,
+        "decision": "rejected: left hand despite stronger prompt"
+      }
+    ],
+    "selected_manifest": {
+      "version": 1,
+      "reviewed": true,
+      "pose": "near",
+      "model": "LTX-2.3-22B-distilled-FP8",
+      "source_sha256": "efb538c97e07d4e490bbc9de0494b0834983218cfc8650570443fe37f2f37f44",
+      "sha256": {
+        "performance-near.png": "ff2cc848915d65c45341a65f3c4809c02e04379b681bafb234f9b9ddf70211e7",
+        "performance-near-wave.mp4": "577adcb3a5dd59e6cb1530f6dbd977dabf5dd568bf6d3d39cb710b1a5a2d1fa2"
+      },
+      "review": {
+        "scope": "Local neutral demo candidate only, not full perceptual qualification.",
+        "source_frames_visually_reviewed": 73,
+        "prepared_frames_visually_reviewed": 51,
+        "raw_face_flags": [
+          33
+        ],
+        "flag_disposition": "Palm false positive; sequential track retains the only overlapping face.",
+        "visible_limitations": [
+          "Blurred waving fingers",
+          "Slight end-pose seam remains"
+        ],
+        "generation_seed": 85
+      }
+    },
+    "face_tracking": {
+      "scope": "Reviewed bounded/cacheable sources only; raw flags preserved; fresh generation retains strict single-face detection.",
+      "frames": 493,
+      "sources": 6,
+      "resolved_palm_detections": 1,
+      "match_rule": "Unique IoU >=0.5, width/height ratios 0.5 to 2.0, first frame requires one face.",
+      "telemetry": "prepared_face_ambiguities_resolved"
+    },
+    "benchmark_settings": {
+      "speech_model": "Kokoro-82M ONNX v1.0",
+      "speech_voice": "af_sarah",
+      "speech_cpu_threads": 8,
+      "decoder": "tensorrt-reviewed",
+      "speech_runtime": {
+        "device": "cuda",
+        "runtime": "1.26.0",
+        "providers": [
+          "CUDAExecutionProvider",
+          "CPUExecutionProvider"
+        ],
+        "cpu_threads": 8,
+        "arena_shrink_after_run": true
+      },
+      "fragment_ms_override": null,
+      "asr_device": "cuda",
+      "asr_compute_type": "float16",
+      "asr_warm_s": 0.6055598999955691,
+      "asr_pause_warm": false,
+      "near_wave_check": true,
+      "performance_label": "near-wave",
+      "visual_warmup": {
+        "sources": 6,
+        "decoder": "tensorrt",
+        "seconds": 16.984,
+        "torch_allocated_mib": 1834.485
+      },
+      "scope": "Synthetic isolated call; no private conversation or active preview selection."
+    },
+    "call_summary": {
+      "elapsed_s": 106.284,
+      "turns": 22,
+      "startup_buffer_ms": 350,
+      "stopped_early_for_failures": false,
+      "soak_duration_met": null,
+      "runtime_app_sha256": "b3f376a7713b28d5e6a8c6f0b8ae22d0ae026ebe23f2f8101c724482c27e6896",
+      "buffer_override": false,
+      "frame_probe_sha256": "49603575ca87d61447c7e3200435e21537060f018564cd0f730776d1d63c7750",
+      "failures": [],
+      "response_sample_count": 21,
+      "p50_s": 1.2,
+      "p95_s": 1.6,
+      "playback": {
+        "frames": {
+          "video": {
+            "callbacks": 903,
+            "intervalSamples": 859,
+            "continuousIntervalMs": 43046.59999999999,
+            "continuousPresentedFrames": 859,
+            "longGaps": 0,
+            "maxGapMs": 66.80000000000291,
+            "intervalHistogramMs": {
+              "15": 1,
+              "35": 183,
+              "50": 484,
+              "65": 191
+            },
+            "gapSamples": [],
+            "resets": {
+              "emptied": 23,
+              "loadstart": 22,
+              "element_visibility": 44,
+              "pause": 21
+            },
+            "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+          },
+          "idle-video": {
+            "callbacks": 1297,
+            "intervalSamples": 1261,
+            "continuousIntervalMs": 52265.69400000001,
+            "continuousPresentedFrames": 1261,
+            "longGaps": 0,
+            "maxGapMs": 66.76600000000326,
+            "intervalHistogramMs": {
+              "15": 276,
+              "35": 158,
+              "50": 764,
+              "65": 63
+            },
+            "gapSamples": [],
+            "resets": {
+              "element_visibility": 42,
+              "pause": 21,
+              "seeking": 7,
+              "emptied": 4,
+              "loadstart": 4
+            },
+            "scope": "Presented-frame callbacks during uninterrupted visible playback. Intentional pauses/source/visibility changes excluded; physical display not measured."
+          }
+        },
+        "callActive": true,
+        "av_clock_skew_ms": {
+          "samples": 664,
+          "p50": 8.447000000000093,
+          "p95": 21.589999999999996,
+          "max": 33.649000000000015
+        },
+        "av_scope": "Presented video timestamps versus playing audio clock; not acoustic output or perceptual phoneme alignment."
+      },
+      "errors": [],
+      "speech_end_to_playback_s": {
+        "samples": 10,
+        "p50": 1.5555333333363233,
+        "p95": 2.276833333333333
+      },
+      "scope": "Synthetic speech enters a virtual MediaStream through real AudioWorklet/turn detection/ASR/planning/TTS/GPU/browser playback. End-of-speech uses last synthetic block above the VAD energy floor. Physical acoustics and network/mobile devices excluded."
+    },
+    "near_wave_speech_end_to_playback_s": 1.4221333333303627,
+    "frame_review": {
+      "clips": 22,
+      "frames": 948,
+      "missing_media": 0,
+      "flagged": [
+        {
+          "id": "b902ac354f754c7381335f63920b160e",
+          "frames": [
+            28
+          ]
+        }
+      ],
+      "nonzero_unclipped_audio": true
+    },
+    "manual_review": {
+      "scope": "Ordered visual inspection, not a complete perceptual or acoustic qualification.",
+      "source_frames_visually_reviewed": 73,
+      "prepared_frames_visually_reviewed": 51,
+      "rendered_clips": [
+        {
+          "case": "near_wave",
+          "id": "b902ac354f754c7381335f63920b160e",
+          "frames": 43
+        },
+        {
+          "case": "near_wave_speech",
+          "id": "b5d83cce901643df8b9f05bb4983ee35",
+          "frames": 34
+        },
+        {
+          "case": "return_again",
+          "id": "7884c2d393b242759b441ef55a02bb8f",
+          "frames": 60
+        }
+      ],
+      "rendered_frames_visually_reviewed": 137,
+      "flag_disposition": "Rendered wave frame 28 is a palm false positive; the face remains on the character.",
+      "observations": [
+        "Right hand raises and returns; fingers remain blurred.",
+        "Identity, clothing and close pose persist through the wave and following speech.",
+        "Return reaches full-body framing with feet visible.",
+        "Soft mouth detail and small pose seam remain."
+      ],
+      "browser_playback": {
+        "near_wave_ended": true,
+        "playback_rate": 1,
+        "muted": false,
+        "duration_s": 2.192676
+      },
+      "physical_audibility_confirmed": false,
+      "normal_speed_perceptual_approval": false,
+      "real_mobile_tested": false
+    },
+    "lip_sync": {
+      "source": "voice-video-qualification-near-wave",
+      "scope": "Offline diagnostic only. YuNet crop and interior-window scoring differ from upstream. 40ms estimate resolution. No perceptual, physical-audio or public eligibility acceptance.",
+      "evaluator": {
+        "name": "SyncNet v2 offline timing evaluator",
+        "source_commit": "907c0b579c2e2d83f0eae1b2ac9e720cde4e5623",
+        "repository": "https://github.com/joonson/syncnet_python",
+        "model_page": "https://www.robots.ox.ac.uk/~vgg/software/lipsync/",
+        "paper": "Chung and Zisserman, Out of time: automated lip sync in the wild, ACCV workshop 2016",
+        "license_scope": "Source MIT; Oxford model page describes research use with a CC BY 4.0 link. Used only as an offline research evaluator; production eligibility is not established.",
+        "downloads": {
+          "SyncNetModel.py": "https://raw.githubusercontent.com/joonson/syncnet_python/907c0b579c2e2d83f0eae1b2ac9e720cde4e5623/SyncNetModel.py",
+          "LICENSE.md": "https://raw.githubusercontent.com/joonson/syncnet_python/907c0b579c2e2d83f0eae1b2ac9e720cde4e5623/LICENSE.md",
+          "syncnet_v2.model": "https://www.robots.ox.ac.uk/~vgg/software/lipsync/data/syncnet_v2.model",
+          "python_speech_features-0.6.tar.gz": "https://files.pythonhosted.org/packages/ff/d1/94c59e20a2631985fbd2124c45177abaa9e0a4eee8ba8a305aa26fc02a8e/python_speech_features-0.6.tar.gz"
+        },
+        "download_sha256": {
+          "SyncNetModel.py": "41b85aed0006546cb2d6dc9180c5bc3dac737ab80eff643022e397a349c30c22",
+          "LICENSE.md": "70155ceb20fb7aae10fc1e9d5c9753de6a10a50a8937e0f5ab3afcdf96c8754d",
+          "syncnet_v2.model": "961e8696f888fce4f3f3a6c3d5b3267cf5b343100b238e79b2659bff2c605442",
+          "python_speech_features-0.6.tar.gz": "a0aebf746464bc929dc3162cb369d7ff967c398c5120ddf5fb40a65f01b92b11"
+        },
+        "runtime_sha256": {
+          "SyncNetModel.py": "41b85aed0006546cb2d6dc9180c5bc3dac737ab80eff643022e397a349c30c22",
+          "syncnet_v2.model": "961e8696f888fce4f3f3a6c3d5b3267cf5b343100b238e79b2659bff2c605442",
+          "python_speech_features/__init__.py": "1119a63b1cfff6652422e71c35bcd46b963a8152cb543772738702c5b08251b6",
+          "python_speech_features/base.py": "5da9dd3a98ebf697d5ac0dec1cc79e605f6df4874d1aa327096acf3002aaabd1",
+          "python_speech_features/sigproc.py": "f4769a1c7b01c1d42d11549e2c5db4a84159e755d61a2f72c59afdbaad0b1352"
+        }
+      },
+      "device": "cuda",
+      "evidence": "generated/local-app/audit/lip-sync-near-wave/results.json",
+      "sha256": "3206d7a47362fd34b4dd23c159eeca91df5a99827ce9403dbe7cc8a7297292ef",
+      "complete": true,
+      "clips": [
+        {
+          "case": "description",
+          "pose": "near",
+          "audio_delay_ms": 0,
+          "confidence": 7.37261962890625,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "human_acceptance": false
+        },
+        {
+          "case": "unsupported",
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 5.8195905685424805,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "human_acceptance": false
+        },
+        {
+          "case": "conversation",
+          "pose": "base",
+          "audio_delay_ms": -40,
+          "confidence": 5.075221061706543,
+          "shift_controls_pass": true,
+          "reverse_confidence_lower": true,
+          "human_acceptance": false
+        }
+      ]
+    },
+    "gpu_memory": {
+      "scope": "Whole-GPU used/free memory sampled every five seconds, including other processes; not an exact peak or per-worker allocation.",
+      "max_sampled_used_mib": 7208.5,
+      "min_sampled_free_mib": 9171.0
+    },
+    "preview_restart": {
+      "ready": true,
+      "busy": false,
+      "visual_error": null,
+      "startup_s": 30.883,
+      "visual_warmup": {
+        "sources": 6,
+        "decoder": "tensorrt",
+        "seconds": 18.926,
+        "torch_allocated_mib": 1834.485
+      },
+      "memory_unchanged": true
+    },
+    "checks": {
+      "python_tests": 186,
+      "javascript_tests": 32,
+      "compileall": "pass",
+      "node_syntax": "pass",
+      "diff_check": "pass",
+      "qualification_driver_exit": 0,
+      "benchmark_server_exit": 0,
+      "frame_reviewer_exit": 0,
+      "lip_sync_evaluator_exit": 0
+    },
+    "remaining": [
+      "Two-second speech-end p95",
+      "Six-source 30-minute qualification",
+      "Natural fingers, transitions and mouth detail",
+      "Physical audio and real mobile tests",
+      "Reliable arbitrary motion",
+      "Public deployment and intended-content eligibility"
+    ]
   }
 }

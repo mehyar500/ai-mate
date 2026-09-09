@@ -21,8 +21,11 @@ def main():
     parser.add_argument('source',type=Path)
     parser.add_argument('--duration',type=float,default=3.0)
     parser.add_argument('--action',choices=['approach','wave'],default='approach')
+    parser.add_argument('--pose',choices=['base','near'],default='base',help='Starting and ending pose for a wave.')
     parser.add_argument('--candidate-label',help='Prepare a new isolated bundle under audit; preserve active assets.')
     args=parser.parse_args()
+    if args.pose == 'near' and (args.action != 'wave' or not args.candidate_label):
+        parser.error('A near-view wave requires --action wave and an isolated --candidate-label.')
     source=args.source.resolve()
     allowed=[ROOT/'.cache/local-poc/ComfyUI/output/motion',ROOT/'generated/local-app/audit']
     if source.parent not in [p.resolve() for p in allowed] or source.suffix!='.mp4':
@@ -40,16 +43,25 @@ def main():
                      'performance-wave.mp4','performance-wave.json']:
             if (active/name).is_file():
                 shutil.copyfile(active/name,folder/name)
+        if args.action == 'wave':
+            for name in ['performance.json','performance-near.png','performance-closer.mp4',
+                         'performance-farther.mp4','idle-near.mp4','idle-near.json']:
+                if (active/name).is_file():
+                    shutil.copyfile(active/name,folder/name)
     if args.action == 'wave':
-        target=folder/'performance-wave.mp4'
+        stem='performance-wave' if args.pose=='base' else 'performance-near-wave'
+        reference='fullbody.png' if args.pose=='base' else 'performance-near.png'
+        if not (folder/reference).is_file():
+            parser.error('The matching reviewed pose reference is required.')
+        target=folder/(stem+'.mp4')
         subprocess.run(['ffmpeg','-v','error','-y','-i',str(source),'-t',str(args.duration),
                         '-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p',
                         '-movflags','+faststart',str(target)],check=True,timeout=30)
-        manifest={'version':1,'reviewed':False,'model':'LTX-2.3-22B-distilled-FP8',
+        manifest={'version':1,'reviewed':False,'pose':args.pose,'model':'LTX-2.3-22B-distilled-FP8',
                   'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
                   'sha256':{name:hashlib.sha256((folder/name).read_bytes()).hexdigest()
-                            for name in ['fullbody.png','performance-wave.mp4']}}
-        record=folder/'performance-wave.json'
+                            for name in [reference,target.name]}}
+        record=folder/(stem+'.json')
         record.write_text(json.dumps(manifest,indent=2)+'\n')
         print(json.dumps({'manifest':str(record),'requires_output_review':True}))
         return

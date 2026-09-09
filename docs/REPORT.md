@@ -20,7 +20,9 @@ The latest three short calls passed **60/60 commands**. Recognition warm-up redu
 
 Six paused-speech cases also passed. All **2,877 new frames** received limited diagnostics; 80 were visually inspected, with blurred fingers and soft mouth detail still visible. The preview is ready after restart, with private memory unchanged.
 
-**181 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) contains exact model settings, comparisons, retained review pages and reproduction commands. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
+The preview also supports a separate **close-view wave** without fresh generation or losing the near pose. Its expanded call passed **22/22 commands**, with **1.56s median / 2.28s p95** from speech end. The wave itself responded in 1.42s. All 948 frames received diagnostics; the complete wave, following speech and return (137 frames) were visually inspected. A palm false detection is retained in the evidence and resolved by continuity tracking. Blurred fingers, a small transition seam and soft mouth detail remain. The six-source configuration still needs its own 30-minute qualification.
+
+**186 Python and 32 JavaScript tests pass.** [LOCAL_POC](LOCAL_POC.md) contains exact model settings, comparisons, retained review pages and reproduction commands. Physical speaker/microphone tests, normal-speed visual acceptance and real mobile/PWA behavior still need device evidence.
 
 ## What is still missing
 

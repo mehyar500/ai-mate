@@ -17,6 +17,33 @@ from .models import CACHE, ROOT, check_cancel
 DEFAULT_FACE_SHIFT = -.05
 
 
+def select_tracked_face(faces, previous=None):
+    """Follow one unambiguous face in reviewed footage, including palm false positives."""
+    failure = 'The reviewed movement lost its unambiguous face track.'
+    if faces is None or not len(faces):
+        raise RuntimeError(failure)
+    if previous is None:
+        if len(faces) != 1:
+            raise RuntimeError(failure)
+        x, y, w, h = map(float, faces[0][:4])
+        if not all(math.isfinite(v) for v in (x,y,w,h)) or min(w,h) <= 0:
+            raise RuntimeError(failure)
+        return faces[0]
+    px, py, pw, ph = map(float, previous[:4])
+    matches = []
+    for face in faces:
+        x, y, w, h = map(float, face[:4])
+        if not all(math.isfinite(v) for v in (x,y,w,h)) or min(w,h,pw,ph) <= 0:
+            continue
+        intersection = max(0, min(x+w,px+pw)-max(x,px))*max(0,min(y+h,py+ph)-max(y,py))
+        overlap = intersection/(w*h+pw*ph-intersection)
+        if overlap >= .5 and .5 <= w/pw <= 2 and .5 <= h/ph <= 2:
+            matches.append(face)
+    if len(matches) != 1:
+        raise RuntimeError(failure)
+    return matches[0]
+
+
 def audio_left_padding(fps):
     """MuseTalk v1.5 uses two video frames of Whisper context, rounded up."""
     if not math.isfinite(fps) or not 1 <= fps <= 60:
@@ -180,16 +207,31 @@ class PortraitRenderer:
         if not frames or not 1 <= source_fps <= 60 or len(frames) > 1800:
             raise RuntimeError("The motion clip is missing or has an invalid duration/frame rate.")
         height, width = frames[0].shape[:2]
-        # Cache only short, reviewed, speech-free source footage. At most five
+        # Cache only short, reviewed, speech-free source footage. At most six
         # 384x576/144-frame entries; no generated mouths or user audio survives.
         if not cached and key and len(frames) <= 144 and width*height <= 384*576:
             cached = {'frames':frames, 'fps':source_fps, 'tracked':{}, 'latents':{}}
             self._motion_cache[key] = cached
-            while len(self._motion_cache) > 5:
+            while len(self._motion_cache) > 6:
                 self._motion_cache.popitem(last=False)
         self._appearance_latents = cached['latents'] if cached else None
         detector = cv.FaceDetectorYN.create(str(CACHE / "yunet.onnx"), "", (width, height), .65, .3, 5000)
         tracked = cached['tracked'] if cached else {}
+        # Sequential correspondence is restricted to bounded reviewed/cacheable
+        # sources. Fresh generated clips retain the strict single-face check.
+        # Preserve raw face-count flags in the separate every-frame review.
+        if cached and lip_frames != 0 and 'faces' not in cached:
+            face_track = []
+            resolved = 0
+            for frame in frames:
+                check_cancel(cancel)
+                _, faces = detector.detect(frame)
+                face = select_tracked_face(faces, face_track[-1] if face_track else None)
+                face_track.append(face)
+                resolved += int(len(faces) > 1)
+            cached['faces'] = face_track
+            cached['resolved_detections'] = resolved
+        self.motion_resolved_detections = cached.get('resolved_detections', 0) if cached else 0
         result = []
         for i in range(nframes):
             check_cancel(cancel)
@@ -200,10 +242,13 @@ class PortraitRenderer:
                 continue
             if index not in tracked:
                 frame = frames[index]
-                _, faces = detector.detect(frame)
-                if faces is None or len(faces) != 1:
-                    raise RuntimeError("The generated movement lost its clear face. Please retry the movement.")
-                face = faces[0]
+                if cached:
+                    face = cached['faces'][index]
+                else:
+                    _, faces = detector.detect(frame)
+                    if faces is None or len(faces) != 1:
+                        raise RuntimeError("The generated movement lost its clear face. Please retry the movement.")
+                    face = faces[0]
                 x, y, w, h = map(float, face[:4])
                 mid = float(face[9]) + getattr(self, 'face_shift', DEFAULT_FACE_SHIFT)*h
                 x1, y1 = max(0, int(x)), max(0, int(2*mid-(y+h)))
@@ -239,9 +284,9 @@ class PortraitRenderer:
         return torch.cat([appearance[id(crop)] for crop in crops]) if appearance is not None else encoded
 
     def prime_motion(self, paths, cancel):
-        """Prepare at most five verified sources before admitting a call."""
-        if len(paths)>5:
-            raise ValueError('Motion warm-up is limited to five reviewed sources.')
+        """Prepare at most six verified sources before admitting a call."""
+        if len(paths)>6:
+            raise ValueError('Motion warm-up is limited to six reviewed sources.')
         started=time.perf_counter()
         with self.torch.inference_mode():
             for path in paths:
@@ -410,4 +455,5 @@ class PortraitRenderer:
                 "body_motion": bool(movement), "face_tracking_s": tracking_seconds,
                 "face_encode_stride": face_encode_stride if movement else None,
                 "prepared_appearance_cache_hit": self.motion_cache_hit if movement else False,
+                "prepared_face_ambiguities_resolved": self.motion_resolved_detections if movement else 0,
                 "motion_start_s": motion_start_s}

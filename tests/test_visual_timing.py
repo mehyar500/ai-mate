@@ -10,7 +10,7 @@ class VisualTimingTests(unittest.TestCase):
     def test_priming_is_bounded_and_cancelled_before_reading_source(self):
         renderer=PortraitRenderer.__new__(PortraitRenderer)
         with self.assertRaises(ValueError):
-            renderer.prime_motion(['synthetic']*6,threading.Event())
+            renderer.prime_motion(['synthetic']*7,threading.Event())
         renderer.torch=MagicMock(); renderer.cv=MagicMock()
         event=threading.Event();event.set()
         with self.assertRaises(Cancelled):

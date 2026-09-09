@@ -14,7 +14,7 @@ On this configured PC:
 
 Open **http://127.0.0.1:8765** and wait for model warm-up. Background launch avoids duplicate servers; logs and process information stay in ignored `.cache/local-poc/`. The PC and process must stay running. This is a loopback URL, not a public deployment or Windows startup service.
 
-In Video call, try **“Wave hello.” → “Come closer.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns after intervening conversation. Each pose has a blinking listening loop. The preview was restarted with the replacement approach, close loop and base-pose right-hand wave on September 9 UTC. These prepared movements are disclosed in Memory & settings. A wave from other positions still uses experimental generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
+In Video call, try **“Come closer.” → “Wave hello.” → “Say hello.” → “Step back.”** The reviewed approach moves from full body to close view; its reverse returns after intervening conversation. Each pose has a blinking listening loop and its own prepared right-hand wave. These prepared movements are disclosed in Memory & settings. A wave from unknown positions still uses experimental generation and can fail framing, hand count or direction; arbitrary body commands are not implemented.
 
 Select Call Mira (phone icon on wider screens), or Voice/Video to start microphone input. Calls have mute/end icons and automatic sound. The keyboard icon opens an optional compact transparent input: Enter sends a command to the current voice/video call, Shift+Enter adds a line, and Escape hides it. Typed commands also work with the microphone muted or denied; sending during a reply stops it before submitting. Text has a separate draft and shows messages without ending an active call; Return to call restores the same media elements. “Send me a message saying hello from our call” delivers a separate in-app message with an unread badge. End call releases capture and stops playback. Memory & settings contains facts, notes, diagnostics, the prepared-footage disclosure and Test sound. Camera access is disabled.
 
@@ -52,6 +52,7 @@ typed input / opt-in mic -> local ASR if needed
          base + closer -> reviewed approach -> near
          near + farther -> reviewed reverse -> base
          base + wave -> reviewed right-hand gesture -> base
+         near + wave -> matching reviewed right-hand gesture -> near
          conversation at base/near -> corresponding listening footage
          other supported action -> experimental LTX-2B generation
        -> requested action once, then continue the destination pose/loop phase
@@ -62,13 +63,33 @@ typed input / opt-in mic -> local ASR if needed
 
 Scene changes require a current visual request. Talking about a garden does not reset a close view to the garden portrait. The planner receives the trusted current pose; it cannot execute code, paths, URLs or shell commands.
 
-Prepared assets must have an explicit local review flag and matching reference/video hashes. Fixed files: `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png`, optional `performance-wave.json/.mp4`, plus `idle-fullbody.json/.mp4` and `idle-near.json/.mp4`. They are private generated artifacts, not in Git. Preparation scripts default to unreviewed. Missing/changed/unreviewed assets fall back to the experimental renderer or held portrait; a fresh checkout does not contain the demonstration clips.
+Prepared assets must have an explicit local review flag and matching reference/video hashes. Fixed files: `performance.json`, `performance-closer.mp4`, `performance-farther.mp4`, `performance-near.png`, optional `performance-wave.json/.mp4` and `performance-near-wave.json/.mp4`, plus `idle-fullbody.json/.mp4` and `idle-near.json/.mp4`. Near waves also require `pose: near`. They are private generated artifacts, not in Git. Preparation scripts default to unreviewed. Missing/changed/unreviewed assets fall back to the experimental renderer or held portrait; a fresh checkout does not contain the demonstration clips.
 
-Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Ambient reply video now ends with speech instead of forcing a whole idle-loop duration; deliberate approach/return clips still finish their movement. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for five short reviewed clips. User speech and generated mouth frames are not cached there.
+Listening footage continues while a reply buffers, pauses when the reply actually plays, and resumes in the correct pose afterward. Ambient reply video now ends with speech instead of forcing a whole idle-loop duration; deliberate approach/return clips still finish their movement. Longer speech loops the prepared body instead of freezing its last frame; physical action clips never loop. Text/Voice navigation and backgrounding pause hidden idle playback. A bounded appearance cache reuses decoded source frames, face tracking and VAE appearance latents for six short reviewed clips. User speech and generated mouth frames are not cached there.
 
 Successful fresh video captures its final decoded frame as the next reference. Unknown positions disable known-pose loops. The older one-shot reverse cache remains only for an unprepared approach followed immediately by a return. Cancelled generation cannot commit its endpoint. Interrupt reports the displayed frame timestamp; the engine separately preserves that observed pose. Restart clears transient pose/return files and starts at the base pose while preserving conversation. Voice now triggers this interruption flow when echo cancellation is reported; actual acoustic behavior and playback recovery after browser closure remain open.
 
 ## Measured results and failures
+
+### Close-view wave — September 9
+
+The preview now has a separate **2.125s close-view wave**, so waving after an approach preserves the near position through the following reply and return. Preparation used the same LTX-2.3 model, near reference, 73 frames at 384x576/24 FPS, seed 85 and return-to-reference guidance. Three local generations took 146.3/24.4/136.9s; the latter two used the wrong hand. The selected clip trims stationary tail footage without speeding up motion. All 73 source and 51 prepared frames were visually inspected. Fingers blur; the endpoint seam remains visible. This is limited neutral demo acceptance.
+
+YuNet mistook a palm for a second face. Sequential tracking now resolves only an unambiguous overlapping face in reviewed clips; all **493 frames across six sources** produced valid face crops. Raw flags remain visible: prepared frame 33 and rendered wave frame 28. Fresh-generation checks are unchanged. BUILD describes tracking and telemetry; a failed optional near manifest leaves other prepared movements available.
+
+The expanded suite passed **22/22 commands** in 106.3s, including the close wave, memory reply and return. Ten spoken replies measured **1.556s median / 2.277s p95** from speech end; 21 mixed submissions measured **1.20/1.60s** from Send. The close wave itself took **1.422s from speech end / 0.76s from Send**, with no fresh diffusion. No page errors, buffer stalls or continuous frame gaps over 250ms occurred. Presented replies/listening were approximately **19.96/24.13 FPS**; maximum gaps were 66.8/66.8ms. Browser A/V clock skew was **21.59ms p95 / 33.65ms maximum**, 664 samples. Six-source appearance warm-up took 16.984s, excluding other startup work.
+
+All **22 clips / 948 frames** received limited diagnostics; all waveforms were nonzero and unclipped. Complete close-wave, subsequent speech and return clips (**137 frames**) were visually reviewed. Three separate eligible speech clips estimated **0/-40/-40ms** lip-sync offsets with delay/reversal controls passing. Normal-speed playback was exercised in the in-app browser, but physical audibility and perceptual approval remain unverified. The preview restarted ready in **30.883s** with six sources and private memory byte-identical. No 30-minute test yet covers this sixth source and tracker together; the two-second p95 target remains unmet.
+
+Evidence: `audit/performance-near-wave`, `audit/voice-video-qualification-near-wave/{summary,frame-review,manual-review}.json`, `review.html`, and `audit/lip-sync-near-wave/results.json`. Reproduce with fresh labels:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/prepare_performance.py SOURCE.mp4 --action wave --pose near --duration 2.125 --candidate-label new-near-wave
+# Review every frame and hashes before enabling the candidate manifest.
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-near-wave --performance-label new-near-wave --near-wave --decoder tensorrt-reviewed --asr-device cuda --tts-device cuda
+node scripts/qualify_video_call.cjs qualification new-near-wave --capture
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-near-wave
+```
 
 ### Recognition during the speaking pause — September 9
 

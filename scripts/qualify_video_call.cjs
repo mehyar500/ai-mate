@@ -146,6 +146,8 @@ async function main(){
         }
         if(job.action!==fixture.action)row.failures.push('wrong_action');
         if('pose' in fixture&&job.prepared_pose!==fixture.pose)row.failures.push('wrong_pose');
+        if(fixture.prepared&&(!job.chunks.length||job.chunks.some(c=>!c.prepared_motion||c.render?.fresh_body_generation!==false)))
+          row.failures.push('expected_prepared_motion');
         if(fixture.reply_contains&&!job.text.toLowerCase().includes(fixture.reply_contains.toLowerCase()))row.failures.push('memory_recall');
         if(fixture.unsupported&&!/cannot|can't|not able|unavailable|not supported/i.test(job.text))row.failures.push('unsupported_action_claim');
         if(!fixture.interrupt_s&&!/Buffer waits: 0/.test(row.metrics))row.failures.push('playback_stall');

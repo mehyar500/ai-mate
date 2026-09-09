@@ -246,6 +246,23 @@ class PoseTests(unittest.TestCase):
         self.assertIsNone(self.app.performance_state)
         self.assertIsNone(self.app.visual_cursor)
 
+    def test_near_wave_preserves_close_listening_and_return_path(self):
+        self.install_performance()
+        wave=Path(self.temp.name)/'near-wave.mp4';wave.write_bytes(b'near wave')
+        self.app.performance[('near','wave')]={'path':wave,'from':'near','to':'near','kind':'gesture'}
+        self.reply('closer')
+        job=self.reply('wave')
+        self.assertEqual(job['state'],'done')
+        self.assertEqual(job['prepared_pose'],'near')
+        self.assertEqual(job['idle_video'],'/idle/near.mp4')
+        self.assertFalse(job['chunks'][0]['render']['fresh_body_generation'])
+        self.assertEqual(self.visual.render_options[-1]['motion_start_s'],0)
+        hello=self.reply('hello')
+        self.assertEqual(hello['prepared_pose'],'near')
+        self.assertEqual(hello['chunks'][0]['render']['motion_source'],'prepared_listening_loop')
+        self.assertEqual(self.reply('farther')['prepared_pose'],'base')
+        self.generate.assert_not_called();self.reverse.assert_not_called()
+
     def test_only_listening_footage_loops_beyond_source_duration(self):
         from local_app.visual import PortraitRenderer
         class Frame:
@@ -287,9 +304,11 @@ class PoseTests(unittest.TestCase):
         read('third.mp4',b'near')
         read('fourth.mp4',b'farther')
         read('fifth.mp4',b'closer')
-        self.assertEqual(len(renderer._motion_cache),5)
+        self.assertEqual(len(renderer._motion_cache),6)
         read('sixth.mp4',b'wave')
-        self.assertEqual(len(renderer._motion_cache),5)
+        self.assertEqual(len(renderer._motion_cache),6)
+        read('seventh.mp4',b'near wave')
+        self.assertEqual(len(renderer._motion_cache),6)
         read('first.mp4',b'base')
         self.assertFalse(renderer.motion_cache_hit)  # Oldest content was evicted.
         read('first.mp4',b'base',reuse=False)

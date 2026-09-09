@@ -131,12 +131,13 @@ class PlaybackTests(unittest.TestCase):
                 motion_duration(1, 72, 24, start_s=offset)
 
     def test_gesture_interruption_never_becomes_an_approach_cursor(self):
-        metadata = {'transition': {'kind':'gesture','path':self.source,'from':'base','to':'base'},'start_s':0}
         with patch('local_app.playback.video_duration', return_value=4):
-            self.assertEqual(stopped_pose(metadata, 0), (None, None))
-            self.assertEqual(stopped_pose(metadata, 1.5), (None, None))
-            self.assertEqual(stopped_pose(metadata, 4), ('base', None))
-            self.assertEqual(stopped_pose(metadata, 5), ('base', None))
+            for pose in ['base','near']:
+                metadata = {'transition': {'kind':'gesture','path':self.source,'from':pose,'to':pose},'start_s':0}
+                self.assertEqual(stopped_pose(metadata, 0), (None, None))
+                self.assertEqual(stopped_pose(metadata, 1.5), (None, None))
+                self.assertEqual(stopped_pose(metadata, 4), (pose, None))
+                self.assertEqual(stopped_pose(metadata, 5), (pose, None))
 
     @unittest.skipUnless(importlib.util.find_spec('cv2'), 'Optional local video runtime is not installed')
     def test_real_decoded_timestamp_selects_middle_frame_and_rejects_unavailable_tail(self):

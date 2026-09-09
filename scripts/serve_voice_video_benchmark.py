@@ -37,6 +37,7 @@ def main():
     parser.add_argument('--asr-device',choices=['cpu','cuda'],help='Isolated speech-recognition device override.')
     parser.add_argument('--tts-device',choices=['cpu','cuda'],help='Isolated speech-synthesis device override.')
     parser.add_argument('--asr-pause-warm',action='store_true',help='Warm recognition during the existing endpoint pause.')
+    parser.add_argument('--near-wave',action='store_true',help='Add close-view wave and following-speech checks to the unchanged 20-command suite.')
     args = parser.parse_args()
     if args.label and not re.fullmatch(r'[a-z0-9-]{1,32}', args.label):
         parser.error('Use a short lowercase label, digits and hyphens only.')
@@ -52,6 +53,10 @@ def main():
             parser.error('The candidate needs reviewed, matching performance and listening manifests.')
         if args.trial in {'wave','qualification','soak'} and ('base','wave') not in performance:
             parser.error('This trial also needs a reviewed, matching wave.')
+    if args.near_wave:
+        from local_app.performance import load_reviewed_performance
+        if args.trial not in {'qualification','soak'} or ('near','wave') not in load_reviewed_performance(assets):
+            parser.error('--near-wave requires a qualification/soak with a reviewed matching close-view wave.')
     folder = ROOT/'generated/local-app/audit'/('voice-video-'+args.trial+('-'+args.label if args.label else ''))
     folder.mkdir(parents=True, exist_ok=False)
     for name in ['fullbody.png', 'performance-near.png', 'performance-closer.mp4',
@@ -61,6 +66,9 @@ def main():
     if args.trial in {'wave','qualification','soak'}:
         for name in ['performance-wave.mp4','performance-wave.json']:
             shutil.copyfile((assets if args.performance_label else ROOT/'generated/local-app/audit')/name, folder/name)
+        for name in ['performance-near-wave.mp4', 'performance-near-wave.json']:
+            if (assets/name).is_file():
+                shutil.copyfile(assets/name, folder/name)
     configure_runtime()
     if args.asr_device is not None:os.environ['AI_MATE_ASR_DEVICE']=args.asr_device
     if args.tts_device is not None:os.environ['AI_MATE_TTS_DEVICE']=args.tts_device
@@ -79,6 +87,11 @@ def main():
     cases = [('wave','Please wave hello with your right hand.'), *CASES,
              ('return','Please step back to the full body view.')] if args.trial == 'wave' else CASES
     specifications = json.loads((ROOT/'config/video-call-qualification.json').read_text()) if args.trial in {'qualification','soak'} else [dict(case=case,prompt=prompt) for case,prompt in cases]
+    if args.near_wave:
+        before_return=next(i for i,row in enumerate(specifications) if row['case']=='return_again')
+        specifications[before_return:before_return]=[
+            {'case':'near_wave','prompt':'Wave hello.','action':'wave','pose':'near','prepared':True},
+            {'case':'near_wave_speech','prompt':"What is my dog's name?",'action':'none','pose':'near','reply_contains':'Maple','prepared':True}]
     for spec in specifications:
         case, prompt = spec['case'], spec['prompt']
         target = folder/(case+'.wav')
@@ -108,6 +121,7 @@ def main():
         'fragment_ms_override':args.fragment_ms,
         'asr_device':app.models.asr_device,'asr_compute_type':app.models.asr_compute_type,'asr_warm_s':app.models.asr_warm_s,
         'asr_pause_warm':args.asr_pause_warm,
+        'near_wave_check':args.near_wave,
         'performance_label':args.performance_label,'visual_warmup':app.visual_warmup,
         'scope':'Synthetic isolated call; no private conversation or active preview selection.'
     },indent=2)+'\n',encoding='utf-8')
