@@ -39,6 +39,8 @@ Five prepared body sources are bounded by frame count/resolution, verified again
 
 Preparation now uses a 128-frame temporal VAE window for the measured 97-frame LTX clips. A same-latent comparison isolated the earlier double-image defect to temporal decoding. Isolated candidate bundles require matching review manifests before the call harness will load them. Promote the complete matching set between calls and rebuild appearance caches on restart; preserve memory and a rollback copy. LOCAL_POC records generation commands and remaining visual defects.
 
+The benchmark can also constrain the final pose with `--end-reference-path`. Both starting and final images must be reviewed app-owned PNGs; it cannot be combined with `--return-to-reference`. The selected three-second approach uses this constraint to keep the head visible, excluding a defective final guide frame. This is offline asset preparation, with no new live-call dependency or API key.
+
 These are **neutral-demo selections**. LTX terms exclude the intended explicit service, and FlashHead's incorporated VAE rights remain unresolved. Hosted routes retain provider/model conditions. Commercial scope needs a separately qualified model/asset pipeline. Self-hosting does not remove license restrictions; USA records the evidence.
 
 ## Acceptance and evidence

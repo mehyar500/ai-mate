@@ -419,6 +419,32 @@ The full `qualification kokoro8 --capture` call passed **20/20 commands**, with 
 
 Use `serve_voice_video_benchmark.py --trial qualification --label new-kokoro8 --performance-label temporal128 --decoder tensorrt-reviewed`, then `qualify_video_call.cjs qualification new-kokoro8 --capture` and `review_call_frames.py --trial qualification --label new-kokoro8`. `benchmark-settings.json` records the actual CPU thread count and decoder. The idle preview restarted with startup 28.989s and five-source warm-up 17.676s; private memory was unchanged and the page refreshed. Roll back by reverting the CPU-thread change and restarting between calls. No model weight, voice preset, credential, schema or prepared asset changed.
 
+### Wider near framing — September 9
+
+The preview now uses the `headroom` prepared bundle. A reviewed frame from the previous approach constrains a new LTX-2.3 final pose. The selected clip preserves the whole head, giving a medium near view instead of the previous crown-cropped close-up. Seed 95 / 97 frames was rejected for delayed motion and endpoint correction; seed 96 / 73 frames starts earlier. Keep its first 72 frames, excluding the visibly corrective final guide frame, and reverse them for the return. The two preparations took 147.695s and 25.009s respectively; different cache state and lengths prevent a direct speed comparison.
+
+Matching near listening uses seed 97 / 97 frames, calm style and return-to-reference guidance (79.823s preparation). Select source 0.5–3.5s, slow ambient motion to half speed and retime the observed bilateral blink to 0.25s. The prepared loop has **125 frames / 5.208s**. Side-strip background flow fell from 0.527 to 0.280px/s relative to its own source; the previous active loop was quieter at 0.152px/s. Its seam MAE is **3.036/255 versus previous 2.195**, so this is a framing improvement with remaining loop/skin/hand softness, not universal visual acceptance.
+
+`qualification headroom --capture` passed **20/20 commands** with zero functional failures, browser errors or reported reply stalls. Spoken end-of-speech median/p95 was **2.456/2.898s** (nine replies); mixed Send-to-playback was **1.41/2.23s** (19). Browser clock skew was **22.643ms p95 / 30.437ms maximum** (610 samples). All **20 clips / 991 frames** were analyzed with zero limited heuristic flags and nonzero unclipped audio. All 73 selected-candidate source frames and 80 rendered approach/near-speech frames were visually inspected. Every prepared forward/reverse frame was compared with its source. Physical sound, normal-speed perceptual quality, full anatomy/lip-sync acceptance, mobile use and a sustained run with the latest combination remain unqualified.
+
+Reproduction uses existing local weights and the reviewed PNG, with fresh candidate/run labels:
+
+```powershell
+# Endpoint was extracted by prepare_performance.py from the previous seed-70
+# temporal-128 source at duration 1.375 (last decoded frame 32), then inspected.
+.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action closer --frames 73 --seed 96 --silent --end-reference-path generated/local-app/audit/performance-framed-endpoint/performance-near.png --temporal-size 128
+# Review source, then prepare_performance.py <source> --duration 3 --candidate-label <new>
+# Review the new performance-near.png before generating its matching listening source:
+.\.venv\Scripts\python.exe scripts/benchmark_ltx23.py --action idle --frames 97 --seed 97 --silent --framing close --idle-style calm --reference-path generated/local-app/audit/performance-headroom/performance-near.png --return-to-reference --temporal-size 128
+# Trim to source 0.5–3.5s; retime_idle_motion.py uses blink-start 1.666667,
+# blink-end 2, blink-seconds 0.25, speed 0.5; prepare_idle_loop.py makes the loop.
+.\.venv\Scripts\python.exe scripts/serve_voice_video_benchmark.py --trial qualification --label new-headroom --performance-label headroom --decoder tensorrt-reviewed
+node scripts/qualify_video_call.cjs qualification new-headroom --capture
+.\.venv\Scripts\python.exe scripts/review_call_frames.py --trial qualification --label new-headroom
+```
+
+The complete six-file approach/near/return/listening set was replaced between calls. The previous set is retained in ignored `audit/rollback-headroom-20260909`; restore those exact six files and restart to roll back. Base listening, wave, model weights, runtime code, memory schema, credentials and public deployment remain unchanged. Detailed generation records, rejection reasons and checksums are retained in machine evidence and ignored local audits.
+
 ## Playback, microphone and memory
 
 The browser consumes about 200ms MP4 fragments with about 400ms initial media buffered. Its embedded audio stays muted; a separate WAV follows the video clock, pauses during stalls and corrects drift above 120ms. If MediaSource is unsupported, playback waits for the finished file. Autoplay rejection exposes Play reply. Interrupt aborts both tracks. These paths have Node tests, but mobile Safari and lengthy calls remain unqualified.
@@ -481,7 +507,7 @@ git diff --check
 
 R2 independent security/correctness review, staging, end-of-speech p95, complete long-call visual review, real microphone/speaker interruption, iPhone qualification, browser-close recovery and public concurrency remain pending. The founder owns those gates before any public launch. No SQLite migration; rollback is a reviewed code revert and restart, preserving memory, credentials and reviewed assets.
 
-Checks for this revision: 145 Python tests and 17 Node tests, Python compilation and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Three new scoring tests expose punctuation artifacts hidden by normalized word error. Actual iPhone behavior remains unqualified. Synthetic benchmark servers use disposable memory. Only the live CPU speech thread count changed in this cycle; private memory, credentials and reviewed assets were preserved.
+Checks for this revision: 148 Python tests and 17 Node tests, Python compilation and whitespace checks. Regression coverage includes reviewed asset hashes, interruption/pose continuity, cancellation failures, authentication/origin, microphone lifecycle and synchronized playback. Three added endpoint tests cover distinct final-pose conditioning, removal of guide latents before both decoders, and conflicting endpoints. Actual iPhone behavior remains unqualified. Synthetic benchmark servers use disposable memory. This cycle changes the offline benchmark and the reviewed approach/near footage; private memory and credentials are preserved.
 
 ## Cost and next decision
 
