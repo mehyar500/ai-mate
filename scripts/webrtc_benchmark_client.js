@@ -85,3 +85,12 @@ setInterval(()=>{
   report.textContent=JSON.stringify({connected:window.rtcBench.connected,frames:window.rtcBench.frames.length,
     firstVideoMs:elapsed('firstVideo'),firstAudioMs:elapsed('firstAudio'),errors:window.rtcBench.errors,offer:window.rtcBench.offerSummary});
 },250);
+
+for(const command of ['Wave hello','Stop moving','Come closer','Step back']){
+  const button=document.createElement('button');button.textContent=command;
+  button.onclick=async()=>{
+    window.rtcBench.turn={started:performance.now(),firstVideo:null,firstAdvancingVideo:null,firstAudio:null};
+    try{await post('/turn',{text:command});}catch(error){status.textContent=error.message;}
+  };
+  controls.append(button);
+}

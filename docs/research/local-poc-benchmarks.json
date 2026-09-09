@@ -24224,5 +24224,66 @@
         "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
       }
     }
+  },
+  "browser_engine_transport_20260909": {
+    "commands": [
+      "Wave hello",
+      "Stop moving"
+    ],
+    "first_video_ms": [
+      1264,
+      665
+    ],
+    "first_detected_audio_ms": [
+      1367,
+      731
+    ],
+    "scope": "Isolated browser engine commands including TTS and lip render, prepared body motion. Excludes ASR; not arbitrary action generation or verified perceptual sync.",
+    "defect": "RTC track returns to original idle instead of engine held/near pose after reply.",
+    "server": {
+      "rows": [
+        {
+          "index": 1,
+          "case": "engine",
+          "start_s": 7.75,
+          "producer_done": true,
+          "finished": true,
+          "underflows": 0,
+          "frame_count": 40,
+          "first_frame_ready_s": 0.9209661000058986,
+          "max_queue": 28,
+          "fixture_index": 0,
+          "audio_sha256": "1ab8ec8ce66e7da582248d329449fb2dbad87032ac1ba7cf16b251d11ce0fe50",
+          "first_frame_sent_s": 0.947849900010624,
+          "completed_s": 2.9436076000129106
+        },
+        {
+          "index": 2,
+          "case": "engine",
+          "start_s": 17.55,
+          "producer_done": true,
+          "finished": true,
+          "underflows": 0,
+          "frame_count": 24,
+          "first_frame_ready_s": 0.2142286000016611,
+          "max_queue": 16,
+          "fixture_index": 0,
+          "audio_sha256": "050b10d72ae031555c80c81d342a9c359ed84ab8e812147cf9e0b97efb6eb955",
+          "first_frame_sent_s": 0.2543352000066079,
+          "completed_s": 1.4235573000041768
+        }
+      ],
+      "scope": "Synthetic local GPU-to-browser transport benchmark. No ASR, dialogue or TTS time; WAVs are retained fixed inputs. No external ICE servers. Marked copies go to RTC only; archived renders are unmarked.",
+      "aiortc": "1.15.0",
+      "av": "17.1.0",
+      "face_shift": -0.05,
+      "transport": "webrtc",
+      "jitter_ms": 20,
+      "source_video_sha256": {
+        "description": "4c07a0fea8b307fa21ec8d1fb285ab72383ffdfcc285d933f9a451cf52a28f13",
+        "unsupported": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494",
+        "conversation": "3769ad599b0cf0e4c5c2d191c943db96525d80f5b4ef79c0c99b9abc639c3494"
+      }
+    }
   }
 }

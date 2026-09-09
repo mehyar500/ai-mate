@@ -97,22 +97,28 @@ def live_session(engine_turns=False):
     folder.mkdir(exist_ok=False)
     session = Session(renderer, idle, fixtures, folder)
     if engine_turns:
-        from local_app.engine import CompanionEngine
-        from local_app.models import Models
-        directory = folder/'engine'
-        directory.mkdir()
-        for name in ['fullbody.png', 'performance-near.png', 'performance.json', 'performance-closer.mp4',
-                     'performance-farther.mp4', 'performance-wave.mp4', 'performance-wave.json',
-                     'performance-near-wave.mp4', 'performance-near-wave.json',
-                     'idle-fullbody.mp4', 'idle-fullbody.json', 'idle-near.mp4', 'idle-near.json']:
-            asset = ROOT/'generated/local-app'/name
-            if asset.is_file():
-                shutil.copyfile(asset, directory/name)
-        session.engine = CompanionEngine(directory, frame_output=session.output)
-        session.engine.models = Models()
-        session.engine.models.visual = renderer
-        session.engine.ready = True
+        attach_test_engine(session)
     return session
+
+
+def attach_test_engine(session):
+    folder, renderer = session.folder, session.renderer
+    from local_app.engine import CompanionEngine, configure_runtime
+    configure_runtime()
+    from local_app.models import Models
+    directory = folder/'engine'
+    directory.mkdir()
+    for name in ['fullbody.png', 'performance-near.png', 'performance.json', 'performance-closer.mp4',
+                 'performance-farther.mp4', 'performance-wave.mp4', 'performance-wave.json',
+                 'performance-near-wave.mp4', 'performance-near-wave.json',
+                 'idle-fullbody.mp4', 'idle-fullbody.json', 'idle-near.mp4', 'idle-near.json']:
+        asset = ROOT/'generated/local-app'/name
+        if asset.is_file():
+            shutil.copyfile(asset, directory/name)
+    session.engine = CompanionEngine(directory, frame_output=session.output)
+    session.engine.models = Models()
+    session.engine.models.visual = renderer
+    session.engine.ready = True
 
 
 async def measure(auth, result, media='both', clip=None, session=None, interrupt=False):

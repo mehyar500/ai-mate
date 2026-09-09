@@ -171,6 +171,14 @@ class Handler(BaseHTTPRequestHandler):
                 except TimeoutError:
                     future.cancel()
                     raise
+            if self.path == '/turn':
+                if not hasattr(self.server.session, 'engine'):
+                    raise ValueError('Engine probe is not enabled.')
+                command = payload.get('text')
+                if command not in {'Wave hello', 'Stop moving', 'Come closer', 'Step back'}:
+                    raise ValueError('Select a supported test command.')
+                key = self.server.session.engine.submit(command, 'video', 'fullbody')
+                return self.respond(200, {'id': key})
             if self.path == '/run':
                 return self.respond(200, self.server.session.begin(payload.get('fixture')))
             if self.path == '/results':
@@ -215,6 +223,9 @@ async def main(args):
     if not idle:
         raise ValueError('No reviewed idle frames.')
     session = Session(renderer, idle, fixtures, folder, args.transport)
+    if args.engine_turns:
+        from experiments.benchmark_cloud_realtime import attach_test_engine
+        attach_test_engine(session)
     peers = []
 
     async def offer(payload):
@@ -275,6 +286,8 @@ async def main(args):
             await asyncio.sleep(.2)
     finally:
         session.cancel.set()
+        if hasattr(session, 'engine'):
+            session.engine.cancel()
         for peer in peers:
             await peer.close()
         await asyncio.to_thread(server.shutdown)
@@ -292,6 +305,7 @@ async def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
+    parser.add_argument('--engine-turns', action='store_true')
     parser.add_argument('--transport', choices=['webrtc', 'mse'], default='webrtc')
     parser.add_argument('--jitter-ms', type=int, choices=[0, 20, 50])
     args = parser.parse_args()
