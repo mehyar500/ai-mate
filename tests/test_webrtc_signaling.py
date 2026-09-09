@@ -1,11 +1,29 @@
 import unittest
 import io
+import tempfile
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 from scripts.webrtc_signaling import validate_offer
 
 
 class CloudRTCTransportTests(unittest.TestCase):
+    def test_fixture_rejects_non_audit_files_and_missing_audio(self):
+        from experiments.benchmark_cloud_realtime import fixture_path
+        with tempfile.TemporaryDirectory() as folder, patch('experiments.benchmark_cloud_realtime.ROOT', Path(folder)):
+            outside = Path(folder)/'private.mp4'
+            outside.write_bytes(b'video')
+            with self.assertRaises(ValueError):
+                fixture_path(outside)
+            audit = Path(folder)/'generated/local-app/audit'
+            audit.mkdir(parents=True)
+            clip = audit/'synthetic.mp4'
+            clip.write_bytes(b'video')
+            with self.assertRaises(FileNotFoundError):
+                fixture_path(clip)
+            clip.with_suffix('.wav').write_bytes(b'audio')
+            self.assertEqual(fixture_path(clip), clip.resolve())
+
     def test_client_identifier_and_no_redirect_handler(self):
         from experiments.benchmark_cloud_realtime import exchange, NoRedirect
         opener = MagicMock()

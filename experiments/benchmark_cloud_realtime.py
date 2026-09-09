@@ -1,4 +1,4 @@
-"""Bounded Cloudflare SFU transport test; synthetic CPU media, no camera or GPU.
+"""Bounded Cloudflare SFU test; synthetic or reviewed generated media, no camera.
 
 Creates one temporary SFU app, connects two peers for five seconds, then closes
 the peers and deletes only the app created by this invocation. No public UI.
@@ -7,6 +7,7 @@ Session IDs, SDP, IP addresses and credentials never enter the evidence file.
 import asyncio
 import argparse
 from datetime import datetime, timezone
+from fractions import Fraction
 import json
 from pathlib import Path
 import sys
@@ -50,7 +51,18 @@ def exchange(url, headers, method='POST', body=None):
     return data
 
 
-async def measure(auth, result, media='both'):
+def fixture_path(value):
+    path = Path(value).resolve(strict=True)
+    root = (ROOT / 'generated/local-app/audit').resolve()
+    if not path.is_relative_to(root) or path.suffix != '.mp4' or path.stat().st_size > 50_000_000:
+        raise ValueError('Use a bounded generated audit MP4 with a matching synthetic speech WAV')
+    audio = path.with_suffix('.wav').resolve(strict=True)
+    if not audio.is_relative_to(root) or audio.stat().st_size > 2_000_000:
+        raise ValueError('Invalid audit speech fixture')
+    return path
+
+
+async def measure(auth, result, media='both', clip=None):
     import av
     import numpy as np
     from aiortc import (RTCPeerConnection, RTCConfiguration, RTCIceServer, RTCBundlePolicy, RTCRtpSender,
@@ -58,17 +70,43 @@ async def measure(auth, result, media='both'):
 
     sent_frames = {}
     transit_ms = []
+    interrupted = None
+    first_stopped_video = None
+    first_silent_audio = None
+    silent_frames = 0
+    images, speech = [], None
+    if clip:
+        with av.open(str(clip)) as source:
+            fps = float(source.streams.video[0].average_rate)
+            for frame in source.decode(video=0):
+                images.append(frame.reformat(width=384, height=576).to_ndarray(format='rgb24'))
+                if len(images) > 300:
+                    raise ValueError('Fixture must be at most 300 frames')
+        with av.open(str(clip.with_suffix('.wav'))) as source:
+            resampler = av.AudioResampler(format='s16', layout='mono', rate=48000)
+            chunks = [out.to_ndarray().reshape(-1) for frame in source.decode(audio=0)
+                      for out in resampler.resample(frame)]
+            chunks.extend(out.to_ndarray().reshape(-1) for out in resampler.resample(None))
+            speech = np.concatenate(chunks) if chunks else np.array([], dtype=np.int16)
+        if not images or not len(speech) or not 1 <= fps <= 60:
+            raise ValueError('Empty or invalid fixture')
+        result['fixture'] = {'video_frames': len(images), 'fps': fps, 'transport_resolution': '384x576',
+                             'scope': 'Previously generated clothed character and synthetic speech; replayed, then held/silenced on the same tracks.'}
 
     class Video(VideoStreamTrack):
         async def recv(self):
             pts, base = await self.next_timestamp()
-            pixels = np.zeros((180, 320, 3), dtype=np.uint8)
-            pixels[:, (pts // 3000 * 5) % 300:][:, :20] = (40, 180, 80)
+            if images:
+                index = min(len(images)-1, int(float(pts*base)*fps) % len(images))
+                pixels = images[-1 if interrupted is not None else index].copy()
+            else:
+                pixels = np.zeros((180, 320, 3), dtype=np.uint8)
+                pixels[:, (pts // 3000 * 5) % 300:][:, :20] = (40, 180, 80)
             # Codec-tolerant frame counter: 16 grayscale cells, sampled centrally.
             counter = (pts // 3000) % 65536
             for bit in range(16):
                 pixels[:20, bit*20:(bit+1)*20] = 240 if counter & (1 << bit) else 16
-            sent_frames[counter] = time.monotonic()
+            sent_frames[counter] = (time.monotonic(), interrupted is not None)
             if len(sent_frames) > 1800:
                 del sent_frames[next(iter(sent_frames))]
             frame = av.VideoFrame.from_ndarray(pixels, format='rgb24')
@@ -79,7 +117,16 @@ async def measure(auth, result, media='both'):
         async def recv(self):
             frame = await super().recv()
             t = (np.arange(frame.samples) + frame.pts) / frame.sample_rate
-            pcm = (3000 * np.sin(2 * np.pi * 440 * t)).astype(np.int16)
+            if speech is not None:
+                # Keep the base track's 20ms pacing while emitting Opus-rate PCM.
+                timestamp = frame.pts * 48000 // frame.sample_rate
+                frame = av.AudioFrame(format='s16', layout='mono', samples=960)
+                frame.pts, frame.sample_rate, frame.time_base = timestamp, 48000, Fraction(1, 48000)
+                pcm = speech[(np.arange(frame.samples)+frame.pts) % len(speech)].copy()
+                if interrupted is not None:
+                    pcm[:] = 0
+            else:
+                pcm = (3000 * np.sin(2 * np.pi * 440 * t)).astype(np.int16)
             frame.planes[0].update(pcm.tobytes())
             return frame
 
@@ -107,18 +154,26 @@ async def measure(auth, result, media='both'):
         peaks = []
 
         async def receive(track):
+            nonlocal first_stopped_video, first_silent_audio, silent_frames
             while True:
                 frame = await track.recv()
                 counts[track.kind] += 1
                 if track.kind == 'audio':
-                    peaks.append(int(np.abs(frame.to_ndarray().astype(np.int32)).max()))
+                    peak = int(np.abs(frame.to_ndarray().astype(np.int32)).max())
+                    peaks.append(peak)
+                    if interrupted is not None:
+                        silent_frames = silent_frames+1 if peak < 100 else 0
+                        if silent_frames >= 3 and first_silent_audio is None:
+                            first_silent_audio = time.monotonic()
                 elif track.kind == 'video':
                     pixels = frame.to_ndarray(format='rgb24')
                     counter = sum(1 << bit for bit in range(16)
                                   if pixels[5:15, bit*20+5:bit*20+15].mean() > 128)
                     sent = sent_frames.get(counter)
                     if sent is not None:
-                        transit_ms.append((time.monotonic()-sent)*1000)
+                        transit_ms.append((time.monotonic()-sent[0])*1000)
+                        if sent[1] and first_stopped_video is None:
+                            first_stopped_video = time.monotonic()
 
         @receiver.on('track')
         def on_track(track):
@@ -149,10 +204,26 @@ async def measure(auth, result, media='both'):
             headers, 'PUT', {'sessionDescription': {'type': 'answer', 'sdp': receiver.localDescription.sdp}})
         result['stage'] = 'receive_media'
         began = time.monotonic()
+        last_keyframe_request = began-1
         while not all(counts.values()) and time.monotonic() - began < 15:
+            if clip and receiver.connectionState == 'connected' and time.monotonic()-last_keyframe_request >= 1:
+                # Experimental aiortc hook: force an IDR for a late subscriber.
+                for transceiver in sender.getTransceivers():
+                    if transceiver.kind == 'video':
+                        transceiver.sender._send_keyframe()
+                last_keyframe_request = time.monotonic()
             await asyncio.sleep(.05)
         result['first_both_media_after_renegotiation_s'] = round(time.monotonic() - began, 3)
-        await asyncio.sleep(5)
+        if clip:
+            await asyncio.sleep(2)
+            interrupted = time.monotonic()
+            await asyncio.sleep(3)
+            result['interruption_ms'] = {
+                'first_held_video': round((first_stopped_video-interrupted)*1000, 1) if first_stopped_video else None,
+                'three_quiet_audio_frames': round((first_silent_audio-interrupted)*1000, 1) if first_silent_audio else None,
+                'renegotiated': False}
+        else:
+            await asyncio.sleep(5)
         result.update(received_frames=counts, audio_peak=max(peaks, default=0),
             sender_connected=sender.connectionState == 'connected',
             receiver_connected=receiver.connectionState == 'connected')
@@ -171,6 +242,8 @@ async def measure(auth, result, media='both'):
         result['bundle_policy'] = 'balanced'
         result['passed'] = (counts.get('video', 60) >= 60 and counts.get('audio', 100) >= 100
                             and ('audio' not in counts or max(peaks, default=0) > 100))
+        if clip:
+            result['passed'] = result['passed'] and first_stopped_video is not None and first_silent_audio is not None
         result['stage'] = 'finished'
     finally:
         for task in tasks:
@@ -189,18 +262,21 @@ async def measure(auth, result, media='both'):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--media', choices=['audio', 'video', 'both'], default='both')
+    parser.add_argument('--clip', type=fixture_path, help='Reviewed generated audit MP4 plus matching synthetic WAV; sends both through Cloudflare')
     args = parser.parse_args()
+    if args.clip and args.media != 'both':
+        parser.error('--clip requires --media both')
     configure_runtime()
     result = {'time': datetime.now(timezone.utc).isoformat(), 'passed': False, 'media': args.media,
-              'scope': 'Synthetic CPU peers through Cloudflare SFU; no remote GPU, browser, model, microphone or end-to-end call latency test.'}
+              'scope': 'CPU peers through Cloudflare SFU; synthetic media or prerecorded generated fixture. No live inference, browser, microphone or end-to-end call latency test.'}
     try:
-        asyncio.run(measure(Conversation(''), result, args.media))
+        asyncio.run(measure(Conversation(''), result, args.media, args.clip))
     except Exception as error:
         result['error_type'] = type(error).__name__
         if isinstance(error, urllib.error.HTTPError):
             result['http_status'] = error.code
             result['diagnostic'] = getattr(error, 'transport_diagnostic', 'unknown')
-    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{args.media}.json'
+    target = ROOT / f'generated/local-app/audit/cloud-realtime-transport-{"fixture" if args.clip else args.media}.json'
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(result))

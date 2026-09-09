@@ -23512,5 +23512,50 @@
     },
     "bundle_policy": "balanced",
     "temporary_app_deleted": true
+  },
+  "cloud_realtime_generated_fixture_20260909": {
+    "time": "2026-09-09T19:08:44.492888+00:00",
+    "passed": true,
+    "media": "both",
+    "scope": "Previously generated clothed character and synthetic speech over Cloudflare; no live inference, browser, physical sound or end-to-end call test.",
+    "fixture": {
+      "video_frames": 23,
+      "fps": 19.284369114877588,
+      "transport_resolution": "384x576",
+      "scope": "Previously generated clothed character and synthetic speech; replayed, then held/silenced on the same tracks."
+    },
+    "stage": "finished",
+    "first_both_media_after_renegotiation_s": 1.266,
+    "interruption_ms": {
+      "first_held_video": 78.0,
+      "three_quiet_audio_frames": 156.0,
+      "renegotiated": false
+    },
+    "received_frames": {
+      "audio": 298,
+      "video": 152
+    },
+    "audio_peak": 15675,
+    "sender_connected": true,
+    "receiver_connected": true,
+    "sent_packets": {
+      "audio": 610,
+      "video": 1211
+    },
+    "received_packets": {
+      "audio": 302,
+      "video": 608
+    },
+    "video_codec": "H264",
+    "video_encode_transport_decode_ms": {
+      "samples": 152,
+      "median": 62.0,
+      "p95": 79.0,
+      "max": 109.0,
+      "scope": "Same-process monotonic frame creation to received decoded frame; includes codec, SFU and jitter buffering, excludes inference, browser and physical display."
+    },
+    "bundle_policy": "balanced",
+    "temporary_app_deleted": true,
+    "preceding_failure": "Without the explicit late-subscriber keyframe request, corrected audio arrived but zero video frames decoded in 15 seconds. Both temporary apps were deleted."
   }
 }
