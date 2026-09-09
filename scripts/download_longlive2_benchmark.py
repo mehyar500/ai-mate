@@ -12,10 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / '.cache/local-poc/longlive2-models'
 
 
-def download(spec):
-    folder = (CACHE / spec['folder']).resolve()
+def download(spec, cache=CACHE):
+    folder = (cache / spec['folder']).resolve()
     destination = (folder / spec['filename']).resolve()
-    if not destination.is_relative_to(CACHE.resolve()):
+    if not destination.is_relative_to(cache.resolve()):
         raise ValueError('Download must remain inside the experiment cache.')
     if not destination.exists():
         path = Path(hf_hub_download(spec['repo'], spec['filename'], revision=spec['revision'],
@@ -33,10 +33,13 @@ def download(spec):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--light-vae-only', action='store_true')
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument('--light-vae-only', action='store_true')
+    selection.add_argument('--two-step-only', action='store_true')
     args = parser.parse_args()
     manifest = json.loads((ROOT / 'config/longlive2-benchmark.json').read_text(encoding='utf-8'))
-    files = manifest.get('optional_files', []) if args.light_vae_only else manifest['files']
+    files = (manifest['two_step_files'] if args.two_step_only else
+             manifest.get('optional_files', []) if args.light_vae_only else manifest['files'])
     if sum(row['size'] for row in files) > 25_000_000_000:
         raise ValueError('Selected downloads exceed the 25 GB cap.')
     missing = sum(row['size'] for row in files

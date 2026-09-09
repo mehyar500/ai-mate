@@ -26,7 +26,7 @@ def checksum(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def preflight(manifest, light_vae=False):
+def preflight(manifest, light_vae=False, s2=False):
     revision = subprocess.check_output(['git', '-C', str(CODE), 'rev-parse', 'HEAD'], text=True).strip()
     if revision != manifest['code']['revision']:
         raise ValueError('Unexpected LongLive code revision.')
@@ -34,7 +34,9 @@ def preflight(manifest, light_vae=False):
     actual = subprocess.check_output(['git', '-C', str(CODE), 'diff', '--no-ext-diff', '--unified=0']).replace(b'\r\n', b'\n')
     if actual != expected:
         raise ValueError('LongLive source must have only the recorded compatibility patch.')
-    for row in manifest['files'] + (manifest.get('optional_files', []) if light_vae else []):
+    rows = manifest['files'] + (manifest.get('optional_files', []) if light_vae else [])
+    rows += manifest.get('two_step_files', []) if s2 else []
+    for row in rows:
         path = WEIGHTS / row['folder'] / row['filename']
         if not path.is_file() or path.stat().st_size != row['size']:
             raise ValueError('Missing/incomplete weight: ' + row['filename'])
@@ -66,6 +68,11 @@ def prompt_pair(case):
     if case == 'raise-lower':
         return [setting + 'She slowly raises her right hand beside her shoulder, palm facing the camera. Her left arm stays down.',
                 setting + 'She gently lowers her raised right hand to her side and stands still with both arms down.']
+    if case == 'unilateral-raise-lower':
+        return [setting + 'Her left hand rests against her left thigh throughout. Only her right elbow bends, '
+                'lifting her right hand on the LEFT side of the picture to shoulder height. One hand is raised, the other stays at her thigh.',
+                setting + 'Both hands now rest against her thighs. Her right elbow straightens and her right hand '
+                'descends on the LEFT side of the picture until it rests against her right thigh. She keeps both hands down.']
     return [setting + 'She slowly turns her whole body sideways to her left while keeping both feet on the ground.',
             setting + 'She turns her whole body back to face the camera, then stands still.']
 
@@ -200,8 +207,14 @@ def run(args, record, output):
             self.seq_len = 8 * (args.width // 32) * (args.height // 32)
             self._compiled_model_call = None
             self.post_init()
-            state = torch.load(WEIGHTS / 'generator/model_bf16.pt', weights_only=True, mmap=True, map_location='cpu')
-            if 'generator' in state:
+            checkpoint_file = ('generator-s2/model_4o6.pt' if args.checkpoint == 's2-dequantized'
+                               else 'generator/model_bf16.pt')
+            state = torch.load(WEIGHTS / checkpoint_file, weights_only=True, mmap=True, map_location='cpu')
+            if args.checkpoint == 's2-dequantized':
+                from scripts.longlive2_s2 import unpack_checkpoint
+                state, record['s2_conversion'] = unpack_checkpoint(state, CODE)
+                print(json.dumps({'s2_conversion': record['s2_conversion']}), flush=True)
+            elif 'generator' in state:
                 state = state['generator']
             elif 'model' in state:
                 state = state['model']
@@ -243,10 +256,15 @@ def run(args, record, output):
         'model_kwargs': {'model_name': 'Wan2.2-TI2V-5B', 'timestep_shift': 5., 'num_frame_per_block': 8,
                          'local_attn_size': args.attention_frames},
         'data': {'image_or_video_shape': [1, args.blocks * 8, 48, args.height // 16, args.width // 16]},
-        'inference': {'sampling_steps': 4, 'independent_first_frame': True, 'sink_size': 8, 'guidance_scale': 1.,
+        'inference': {'sampling_steps': args.sampling_steps, 'independent_first_frame': True, 'sink_size': 8, 'guidance_scale': 1.,
                       'multi_shot_sink': False, 'streaming_vae': True, 'async_vae': False},
     }))
     pipe = CausalDiffusionInferencePipeline(config, device, generator=generator, text_encoder=EncodedText(), vae=vae)
+    record['effective_sampling_steps'] = pipe.sampling_steps
+    record['sampling_scope'] = ('released merged BF16 checkpoint at four steps' if args.sampling_steps == 4 else
+                                'reduced-step ablation of the four-step checkpoint; not the separately trained NVFP4-S2 model')
+    if args.checkpoint == 's2-dequantized':
+        record['sampling_scope'] = 'trained NVFP4-S2 weights dequantized to BF16; BF16 activations; not native NVFP4'
     blocks = [prompts[0]] * (args.blocks // 2) + [prompts[1]] * (args.blocks // 2)
     record['runs'] = []
     original_decode = vae.model.cached_decode
@@ -274,6 +292,8 @@ def run(args, record, output):
             video = pipe.inference(noise, [blocks], initial_latent=initial)
         torch.cuda.synchronize()
         elapsed = time.perf_counter() - inference_start
+        if not torch.isfinite(video).all():
+            raise ValueError('Renderer produced non-finite pixels.')
         frames = (video[0].permute(0, 2, 3, 1).cpu().float().clamp(0, 1).numpy() * 255).round().astype(np.uint8)
         path = output / f'run-{i}.mp4'
         subprocess.run(['ffmpeg', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgb24',
@@ -294,7 +314,9 @@ def run(args, record, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
-    parser.add_argument('--case', choices=['raise-lower', 'turn-return'], default='raise-lower')
+    parser.add_argument('--case', choices=['raise-lower', 'unilateral-raise-lower', 'turn-return'], default='raise-lower')
+    parser.add_argument('--sampling-steps', type=int, choices=[2, 4], default=4)
+    parser.add_argument('--checkpoint', choices=['bf16', 's2-dequantized'], default='bf16')
     parser.add_argument('--blocks', type=int, choices=[2, 4], default=2)
     parser.add_argument('--attention-frames', type=int, choices=[16, 32], default=16)
     parser.add_argument('--precision', choices=['bf16', 'fp8-selective'], default='bf16')
@@ -307,13 +329,17 @@ def main():
     args = parser.parse_args()
     if not re.fullmatch('[a-z0-9][a-z0-9-]{0,47}', args.label):
         parser.error('Use a new lowercase experiment label.')
+    if args.checkpoint == 's2-dequantized' and (args.sampling_steps != 2 or args.precision != 'bf16'):
+        parser.error('The S2 diagnostic requires two steps and BF16 compute.')
     manifest = json.loads((ROOT / 'config/longlive2-benchmark.json').read_text(encoding='utf-8'))
-    preflight(manifest, light_vae=args.vae == 'light-v2')
+    preflight(manifest, light_vae=args.vae == 'light-v2', s2=args.checkpoint == 's2-dequantized')
     output = ROOT / 'generated/local-app/audit' / ('longlive2-' + args.label)
     output.mkdir(exist_ok=False)
     record = {'complete': False, 'settings': vars(args), 'model_revision': manifest['files'][0]['revision'],
               'code_revision': manifest['code']['revision'], 'scope': 'fresh motion only; no speech, live input or browser transport',
               'api_cost_usd': 0, 'commercial_service_qualified': False}
+    if args.checkpoint == 's2-dequantized':
+        record['model_revision'] = manifest['two_step_files'][0]['revision']
     try:
         run(args, record, output)
     except Exception as error:

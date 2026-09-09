@@ -74,6 +74,8 @@ def controls(args, output, record):
         phase = i / (args.frames - 1)
         progress = min(1., phase * 4) if phase < .5 else max(0., 3 - phase * 4)
         progress = progress * progress * (3 - 2 * progress)
+        if args.motion == 'static':
+            progress = 0.
         moved = points.copy()
         moved[elbow] = points[shoulder] + rotate(upper, sign * np.deg2rad(70) * progress)
         moved[wrist] = moved[elbow] + rotate(lower, sign * np.deg2rad(160) * progress)
@@ -85,7 +87,7 @@ def controls(args, output, record):
         subset = np.where(scores[:18] > .3, np.arange(18), -1)[None]
         pose = {'bodies': {'candidate': moved[:18], 'subset': subset}, 'faces': moved[None, 24:92],
                 'hands': np.stack([moved[92:113], moved[113:134]])}
-        canvas = draw_pose(pose, args.size, args.size, [], None, False)
+        canvas = draw_pose(pose, args.size, args.size, [], None, args.pose_format == 'face-only')
         frames.append(Image.fromarray(canvas))
     trajectory = np.stack(trajectories)
     for i in sorted({0, args.frames // 4, args.frames // 2, args.frames - 1}):
@@ -94,7 +96,9 @@ def controls(args, output, record):
                         np.linalg.norm(trajectory[:, wrist] - trajectory[:, elbow], axis=-1)])
     record['controls'] = {'side': args.side, 'frames': args.frames, 'size': args.size,
                           'max_arm_length_deviation': float(np.abs(lengths - lengths[:, :1]).max()),
-                          'type': 'deterministic joint-angle raise, hold, lower; no language planner',
+                          'type': ('static reference pose' if args.motion == 'static' else
+                                   'deterministic joint-angle raise, hold, lower; no language planner'),
+                          'pose_format': args.pose_format,
                           'other_body_points_fixed': True}
     np.savez_compressed(output / 'controls.npz', points=trajectory, scores=scores)
     del detector
@@ -131,6 +135,14 @@ def run(args, output, record):
 
     def loaded(module, path):
         state = torch.load(path, weights_only=True, mmap=True, map_location='cpu')
+        # Older CLIP saves this deterministic buffer; newer versions regenerate it.
+        key = 'vision_model.embeddings.position_ids'
+        if isinstance(module, CLIPVisionModelWithProjection) and key in state:
+            expected = module.vision_model.embeddings.position_ids.cpu()
+            if not torch.equal(state[key], expected):
+                raise ValueError('CLIP position IDs differ from the regenerated buffer.')
+            del state[key]
+            record['clip_position_ids_verified'] = True
         module.load_state_dict(state, assign=True, strict=True)
         del state
         return module.eval().requires_grad_(False).to(device='cuda', dtype=dtype)
@@ -161,6 +173,8 @@ def run(args, output, record):
                  num_inference_steps=4, guidance_scale=3.5, generator=torch.Generator('cuda').manual_seed(args.seed)).videos
     torch.cuda.synchronize()
     elapsed = time.perf_counter() - started
+    if not torch.isfinite(video).all():
+        raise ValueError('Renderer produced non-finite pixels.')
     frames = (video[0].permute(1, 2, 3, 0).cpu().float().clamp(0, 1).numpy() * 255).round().astype(np.uint8)
     path = output / 'run-0.mp4'
     subprocess.run(['ffmpeg', '-v', 'error', '-f', 'rawvideo', '-pixel_format', 'rgb24', '-video_size',
@@ -174,6 +188,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
     parser.add_argument('--side', choices=['right', 'left'], default='right')
+    parser.add_argument('--motion', choices=['raise-lower', 'static'], default='raise-lower')
+    parser.add_argument('--pose-format', choices=['full-body', 'face-only'], default='full-body')
     parser.add_argument('--size', type=int, choices=[384, 512], default=512)
     parser.add_argument('--frames', type=int, choices=[16, 32, 64], default=32)
     parser.add_argument('--seed', type=int, default=42)

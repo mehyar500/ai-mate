@@ -21404,5 +21404,588 @@
     "migration_rollback": "No live configuration or memory migration. Revert the experiment commit to remove harness changes; downloaded caches remain ignored.",
     "independent_review": "Pending; no public-release or perceptual acceptance claimed.",
     "next_experiment": "After checking the active download and verifying all assets, benchmark RAIN with actual synthetic arm poses; inspect output before attempting streaming/speech integration."
+  },
+  "pose_quality_and_two_step_checkpoint_20260909": {
+    "scope": "Offline fully clothed renderer qualification; no new live-call capability claimed",
+    "source_commit": "63689950fd74f0384a67eb9963ba5df0507ffabd",
+    "risk_class": "R1",
+    "requirements": [
+      "fresh right/left body control",
+      "stable anatomy and identity",
+      "generated visual response within 16GB VRAM",
+      "verified model provenance and honest performance evidence"
+    ],
+    "previous_goal_turn_classification": "progress",
+    "experiments": [
+      {
+        "label": "rain-right-arm-compatible-render",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "right-arm-compatible-render",
+            "side": "right",
+            "size": 512,
+            "frames": 32,
+            "seed": 42,
+            "prepare_only": false
+          },
+          "api_cost_usd": 0,
+          "scope": "offline pose-driven renderer experiment; no speech or browser call",
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.3412222000042675,
+          "controls": {
+            "side": "right",
+            "frames": 32,
+            "size": 512,
+            "max_arm_length_deviation": 5.551115123125783e-17,
+            "type": "deterministic joint-angle raise, hold, lower; no language planner",
+            "other_body_points_fixed": true
+          },
+          "clip_position_ids_verified": true,
+          "models_loaded_s": 10.865398800000548,
+          "inference_s": 11.585998100010329,
+          "frames": 32,
+          "generated_fps": 2.7619545354466677,
+          "peak_allocated_bytes": 6626501120,
+          "file": "run-0.mp4",
+          "sha256": "850158d2f3236f5bc5d314142fdc77dbb607f29d6c035d498e38889cf97dd5f4"
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/rain-right-arm-compatible-render/benchmark.json",
+          "sha256": "7f26a6c16249884f76f760402e22db7cc1cce31dd68f3e7a864716dd17272a52"
+        },
+        "manual_review": {
+          "observed": [
+            "Right-hand path roughly follows the moving input, but the hand detaches visually from the arm.",
+            "Face and identity distort; sweater and blue jeans become an elongated pale garment with merged legs.",
+            "Background loses detail and changes; feet and body outline are unstable."
+          ],
+          "accepted": false,
+          "video_sha256": "850158d2f3236f5bc5d314142fdc77dbb607f29d6c035d498e38889cf97dd5f4",
+          "scope": "All 32 frames visually inspected in ordered sheets; no audio or browser integration.",
+          "frames_visually_inspected": 32,
+          "normal_speed_playback_reviewed": false,
+          "audible_speech_tested": false,
+          "live_app_selected": false
+        },
+        "review_artifact": {
+          "path": "generated/local-app/audit/rain-right-arm-compatible-render/manual-review.json",
+          "sha256": "dd8d44653d36b9daa7cf222d27f268eccb7bd347fec5fda3f70f5fb1cc7d697e"
+        }
+      },
+      {
+        "label": "rain-static-fullbody-diagnostic",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "static-fullbody-diagnostic",
+            "side": "right",
+            "motion": "static",
+            "pose_format": "full-body",
+            "size": 512,
+            "frames": 32,
+            "seed": 42,
+            "prepare_only": false
+          },
+          "api_cost_usd": 0,
+          "scope": "offline pose-driven renderer experiment; no speech or browser call",
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.3257731999910902,
+          "controls": {
+            "side": "right",
+            "frames": 32,
+            "size": 512,
+            "max_arm_length_deviation": 0.0,
+            "type": "static reference pose",
+            "pose_format": "full-body",
+            "other_body_points_fixed": true
+          },
+          "clip_position_ids_verified": true,
+          "models_loaded_s": 10.66039850001107,
+          "inference_s": 11.596067499995115,
+          "frames": 32,
+          "generated_fps": 2.7595562029984286,
+          "peak_allocated_bytes": 6626501120,
+          "file": "run-0.mp4",
+          "sha256": "3aaf09f8aa57b9e0913a9107e17fa62b6d49414329c0f4b64e5bd9f59b56ee01"
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/rain-static-fullbody-diagnostic/benchmark.json",
+          "sha256": "1fac01df347f01ccf08b850f3f5705319500ddabe549479100119e82396bd6c7"
+        },
+        "manual_review": {
+          "observed": [
+            "Static full-body pose still produces a warped face, altered pale clothing, elongated legs and background drift.",
+            "The same defects without a moving arm rule out arm trajectory motion as their sole cause."
+          ],
+          "accepted": false,
+          "video_sha256": "3aaf09f8aa57b9e0913a9107e17fa62b6d49414329c0f4b64e5bd9f59b56ee01",
+          "scope": "All 32 frames visually inspected in ordered sheets; no audio or browser integration.",
+          "frames_visually_inspected": 32,
+          "normal_speed_playback_reviewed": false,
+          "audible_speech_tested": false,
+          "live_app_selected": false
+        },
+        "review_artifact": {
+          "path": "generated/local-app/audit/rain-static-fullbody-diagnostic/manual-review.json",
+          "sha256": "d836a3cf581d9601d22bd85f64af3c5e89d42eea1de3944183fce3a9fa2db551"
+        }
+      },
+      {
+        "label": "rain-static-faceonly-diagnostic",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "static-faceonly-diagnostic",
+            "side": "right",
+            "motion": "static",
+            "pose_format": "face-only",
+            "size": 512,
+            "frames": 32,
+            "seed": 42,
+            "prepare_only": false
+          },
+          "api_cost_usd": 0,
+          "scope": "offline pose-driven renderer experiment; no speech or browser call",
+          "live_app_selected": false,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "reference_pose_s": 0.35597830000915565,
+          "controls": {
+            "side": "right",
+            "frames": 32,
+            "size": 512,
+            "max_arm_length_deviation": 0.0,
+            "type": "static reference pose",
+            "pose_format": "face-only",
+            "other_body_points_fixed": true
+          },
+          "clip_position_ids_verified": true,
+          "models_loaded_s": 10.874723900007666,
+          "inference_s": 11.640448600010131,
+          "frames": 32,
+          "generated_fps": 2.7490349469841004,
+          "peak_allocated_bytes": 6626501120,
+          "file": "run-0.mp4",
+          "sha256": "dd276a6eac09b673121b9868ec4e1a326e84d4fba3a376c4b01e0ace123fc933"
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/rain-static-faceonly-diagnostic/benchmark.json",
+          "sha256": "5ef0e73a1645316ac131380b1bbe083e5e099624c15026d5189a2f9b62112801"
+        },
+        "manual_review": {
+          "observed": [
+            "Removing body and hand pose marks substantially improves face and background reconstruction in this sample.",
+            "Clothing color still changes, feet initially fade, and the body shifts despite a static input.",
+            "This diagnostic removes body control; it does not establish working movement commands."
+          ],
+          "accepted": false,
+          "video_sha256": "dd276a6eac09b673121b9868ec4e1a326e84d4fba3a376c4b01e0ace123fc933",
+          "scope": "All 32 frames visually inspected in ordered sheets; no audio or browser integration.",
+          "frames_visually_inspected": 32,
+          "normal_speed_playback_reviewed": false,
+          "audible_speech_tested": false,
+          "live_app_selected": false
+        },
+        "review_artifact": {
+          "path": "generated/local-app/audit/rain-static-faceonly-diagnostic/manual-review.json",
+          "sha256": "69f2742a6b2f999c150afbdaf9f16c5affc60bb5d2928efd2f3303b8fbcb3b51"
+        }
+      },
+      {
+        "label": "longlive2-unilateral-fourstep",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "unilateral-fourstep",
+            "case": "unilateral-raise-lower",
+            "sampling_steps": 4,
+            "blocks": 4,
+            "attention_frames": 32,
+            "precision": "bf16",
+            "width": 320,
+            "height": 480,
+            "repeats": 1,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. Her left hand rests against her left thigh throughout. Only her right elbow bends, lifting her right hand on the LEFT side of the picture to shoulder height. One hand is raised, the other stays at her thigh.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. Both hands now rest against her thighs. Her right elbow straightens and her right hand descends on the LEFT side of the picture until it rests against her right thigh. She keeps both hands down."
+          ],
+          "prompt_cache_hit": false,
+          "prompt_preparation_s": 5.9046371000004,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.861621100004413,
+          "effective_sampling_steps": 4,
+          "sampling_scope": "released merged BF16 checkpoint at four steps",
+          "runs": [
+            {
+              "inference_s": 11.332726699998602,
+              "generated_frames": 125,
+              "generated_fps": 11.030002161793544,
+              "first_decoded_chunk_s": 2.8177276000060374,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.8177276000060374,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 5.515965400001733,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 8.32277780000004,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 11.230700400003116,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 14886596608,
+              "peak_reserved_bytes": 15875440640,
+              "file": "run-0.mp4",
+              "sha256": "fa276400bd685c4e63c099103dd3f9dbc654361e9d5715fdd04999dd6fcf024a"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-unilateral-fourstep/benchmark.json",
+          "sha256": "cb13b39829064b6e063564cb3f972ae1a39e7d14872666fafe3ee78b363475d4"
+        },
+        "manual_review": {
+          "accepted": false,
+          "video_sha256": "fa276400bd685c4e63c099103dd3f9dbc654361e9d5715fdd04999dd6fcf024a",
+          "frames_visually_inspected": 125,
+          "scope": "Every frame inspected in ordered sheets; no speech or browser playback.",
+          "normal_speed_playback_reviewed": false,
+          "live_app_selected": false,
+          "observed": [
+            "Both elbows move and hands remain near the waist; the right hand never reaches the requested shoulder height.",
+            "Left hand does not remain fixed. Body size/position drift and unwanted movement occur.",
+            "An unrelated colored rectangular object appears in the background at frames 121-124."
+          ]
+        },
+        "review_artifact": {
+          "path": "generated/local-app/audit/longlive2-unilateral-fourstep/manual-review.json",
+          "sha256": "40ef3f548de054206068e56455ef9fe138cf68a30a9036f7bfe6ba8ab1052e5e"
+        }
+      },
+      {
+        "label": "longlive2-unilateral-twostep",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "unilateral-twostep",
+            "case": "unilateral-raise-lower",
+            "sampling_steps": 2,
+            "blocks": 4,
+            "attention_frames": 32,
+            "precision": "bf16",
+            "width": 320,
+            "height": 480,
+            "repeats": 1,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "8521079b863720a57c1a8d9b19c8d9e6ccb04c0f",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. Her left hand rests against her left thigh throughout. Only her right elbow bends, lifting her right hand on the LEFT side of the picture to shoulder height. One hand is raised, the other stays at her thigh.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. Both hands now rest against her thighs. Her right elbow straightens and her right hand descends on the LEFT side of the picture until it rests against her right thigh. She keeps both hands down."
+          ],
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0005114999949000776,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "generator_load_s": 3.854143999997177,
+          "effective_sampling_steps": 2,
+          "sampling_scope": "reduced-step ablation of the four-step checkpoint; not the separately trained NVFP4-S2 model",
+          "runs": [
+            {
+              "inference_s": 7.735462900003768,
+              "generated_frames": 125,
+              "generated_fps": 16.159343224300013,
+              "first_decoded_chunk_s": 1.9601842999982182,
+              "decoded_chunks": [
+                {
+                  "ready_s": 1.9601842999982182,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 3.793845499996678,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 5.689728299999842,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 7.645568399995682,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 14888038400,
+              "peak_reserved_bytes": 15852371968,
+              "file": "run-0.mp4",
+              "sha256": "cd47f0e0d166bce722f83b9e612f267a62ee0352338f0feb7de0e7aed6fc210a"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-unilateral-twostep/benchmark.json",
+          "sha256": "0aeef2a6729c8d5d4f2625b4c7e9155fb1ea21de707c21c1f9b5a8db6479f87a"
+        },
+        "manual_review": {
+          "accepted": false,
+          "video_sha256": "cd47f0e0d166bce722f83b9e612f267a62ee0352338f0feb7de0e7aed6fc210a",
+          "frames_visually_inspected": 125,
+          "scope": "Every frame inspected in ordered sheets; no speech or browser playback.",
+          "normal_speed_playback_reviewed": false,
+          "live_app_selected": false,
+          "observed": [
+            "Right elbow bends but the right hand is hidden or merged near the waist, not raised to shoulder height.",
+            "Left hand moves behind the body before returning. Right elbow stays bent despite the lowering prompt.",
+            "Less background change than the four-step sample; still soft face detail and failed requested action."
+          ]
+        },
+        "review_artifact": {
+          "path": "generated/local-app/audit/longlive2-unilateral-twostep/manual-review.json",
+          "sha256": "f9f16be03b721bc9418c092b2928bf66b59f271df3d8454444af97953cf13ae4"
+        }
+      },
+      {
+        "label": "longlive2-s2-bf16-unilateral",
+        "benchmark": {
+          "complete": true,
+          "settings": {
+            "label": "s2-bf16-unilateral",
+            "case": "unilateral-raise-lower",
+            "sampling_steps": 2,
+            "checkpoint": "s2-dequantized",
+            "blocks": 4,
+            "attention_frames": 32,
+            "precision": "bf16",
+            "width": 320,
+            "height": 480,
+            "repeats": 1,
+            "seed": 42,
+            "text_device": "cuda",
+            "vae": "light-v2"
+          },
+          "model_revision": "9ab6c9c70db97e1994d87bca3b8c4ed31e5b62e2",
+          "code_revision": "6b36d20ec6f7958d29d11a704dfa64611a9f2572",
+          "scope": "fresh motion only; no speech, live input or browser transport",
+          "api_cost_usd": 0,
+          "commercial_service_qualified": false,
+          "triton_kernels": false,
+          "gpu": {
+            "name": "NVIDIA GeForce RTX 4060 Ti",
+            "free_bytes_before": 15972958208,
+            "total_bytes": 17175150592
+          },
+          "prompts": [
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. Her left hand rests against her left thigh throughout. Only her right elbow bends, lifting her right hand on the LEFT side of the picture to shoulder height. One hand is raised, the other stays at her thigh.",
+            "A continuous realistic video of the same adult woman in a cream sweater, blue jeans and white shoes standing in the same garden. Fixed camera, full body visible, natural human anatomy, calm background, no cuts. Both hands now rest against her thighs. Her right elbow straightens and her right hand descends on the LEFT side of the picture until it rests against her right thigh. She keeps both hands down."
+          ],
+          "prompt_cache_hit": true,
+          "prompt_preparation_s": 0.0005028000014135614,
+          "reference_sha256": "4f2f05585e99b9dc5efbd2fcbe950d2611a62177a0f1b6ccacd78b33bdcdad40",
+          "s2_conversion": {
+            "converted_linear_layers": 300,
+            "conversion_s": 24.851727999994182,
+            "numeric_fixture": {
+              "all_16_codes": true,
+              "nibble_order": true,
+              "signed_zero": true,
+              "global_scale": true,
+              "shape_crop": true
+            },
+            "compute_dtype": "bfloat16",
+            "native_nvfp4": false,
+            "activation_quantization": false,
+            "merged_lora": true,
+            "method": "pinned upstream QuantizedTensor.dequantize on CPU"
+          },
+          "generator_load_s": 27.34488710000005,
+          "effective_sampling_steps": 2,
+          "sampling_scope": "trained NVFP4-S2 weights dequantized to BF16; BF16 activations; not native NVFP4",
+          "runs": [
+            {
+              "inference_s": 7.84649029999855,
+              "generated_frames": 125,
+              "generated_fps": 15.930689419194605,
+              "first_decoded_chunk_s": 2.098559399993974,
+              "decoded_chunks": [
+                {
+                  "ready_s": 2.098559399993974,
+                  "frames": 29
+                },
+                {
+                  "ready_s": 3.9327882999932626,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 5.829550800001016,
+                  "frames": 32
+                },
+                {
+                  "ready_s": 7.786395599992829,
+                  "frames": 32
+                }
+              ],
+              "peak_allocated_bytes": 14888038400,
+              "peak_reserved_bytes": 15852371968,
+              "file": "run-0.mp4",
+              "sha256": "84ea3267fd88360d4bb12f9be428edb06d9aae00a1f6e6b4ff0a511b654707bf"
+            }
+          ]
+        },
+        "artifact": {
+          "path": "generated/local-app/audit/longlive2-s2-bf16-unilateral/benchmark.json",
+          "sha256": "71a7706b6787e718f65db3f46796244f6e8aa43c45db0639f3082d16e7ab9956"
+        },
+        "manual_review": {
+          "inspected_frames": 125,
+          "inspected_run": 0,
+          "scope": "Every decoded frame inspected in seven ordered contact sheets; no normal-speed or audio review",
+          "requested": "Right hand to shoulder while left hand remains at thigh, then lower right hand",
+          "observed": "Both arms rise by frame 20. Right arm lowers before the prompt switch at frame 61; left arm stays bent until approximately frame 73. Framing moves closer and feet leave the image.",
+          "defects": [
+            "Both arms rise against instruction",
+            "Hands blur or merge near the shoulders",
+            "Action timing does not respect prompt switch",
+            "Camera/body scale drifts and feet leave frame",
+            "Background shifts and ghosting around frame 90"
+          ],
+          "first_correct_action_s": null,
+          "normal_speed_reviewed": false,
+          "audio_present": false,
+          "action_acceptance": false,
+          "live_app_selected": false
+        },
+        "review_artifact": {
+          "path": "generated/local-app/audit/longlive2-s2-bf16-unilateral/manual-review.json",
+          "sha256": "8e053803ffd7d7cf4ba7334073925b4a8dcfdb1e6d8a8dea96db98373bb378bd"
+        }
+      }
+    ],
+    "decisions": [
+      "RAIN full-body control rejected: moving and static pose sequences distort anatomy/clothing; face-only improves appearance but removes body control.",
+      "S2 conversion strict-loads all 300 linear layers but its generated output fails unilateral movement and framing. No candidate replaces the live engine.",
+      "Smaller text-only timestep counts improve throughput but do not establish reliable commanded movement.",
+      "Proceed to original Wan2.1-VACE-1.3B reference-plus-pose quality test; streaming remains an independent unproven step."
+    ],
+    "additional_numeric_validation": {
+      "optional_tests_passed": 5,
+      "checks": [
+        "all FP4 codes and nibble order",
+        "signed zero",
+        "global scale",
+        "independently indexed blocked scale layout",
+        "shape cropping",
+        "300-layer conversion preserves input",
+        "wrong scale/missing/conflicting buffers/bad shape/nonfinite scale rejected"
+      ],
+      "timing": "Blocked-layout fixture strengthened and passed after the render; conversion algorithm unchanged."
+    },
+    "source_screening": [
+      {
+        "model": "Scope v0.2.5",
+        "revision": "2aced4ded3513a76cd35f0dbfb42fbfbf5e98ab0",
+        "source": "https://github.com/daydreamlive/scope/blob/2aced4ded3513a76cd35f0dbfb42fbfbf5e98ab0/LICENSE.md",
+        "observed": "Checked-in source CC BY-NC-SA 4.0 conflicts with MIT package metadata. Excluded; no code integrated or weights downloaded."
+      },
+      {
+        "model": "MusePose",
+        "source": "https://github.com/TMElyralab/MusePose",
+        "observed": "MIT code, noncommercial research weights; excluded from commercial implementation."
+      },
+      {
+        "model": "LHM / LHM++",
+        "sources": [
+          "https://github.com/aigc3d/LHM/blob/main/modelcard.md",
+          "https://raw.githubusercontent.com/aigc3d/LHM-plusplus/main/LICENSE_WEIGHT"
+        ],
+        "observed": "Weight terms identify CC BY-NC; not downloaded."
+      },
+      {
+        "model": "F3G-Avatar",
+        "source": "https://huggingface.co/wjmenu/F3G-avatar",
+        "observed": "Pretrained weights described as forthcoming; not an immediately available replacement."
+      },
+      {
+        "model": "MotionStream",
+        "source": "https://github.com/alex4727/MotionStream",
+        "observed": "Code release remains under internal review; no runnable release used."
+      },
+      {
+        "model": "Original Wan2.1-VACE-1.3B",
+        "source": "https://huggingface.co/Wan-AI/Wan2.1-VACE-1.3B",
+        "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+        "observed": "Original Apache-2.0 model license downloaded and hash pinned; independent reference/pose benchmark next, no throughput or service-eligibility claim."
+      }
+    ],
+    "next_candidate_manifest": {
+      "path": "config/vace-benchmark.json",
+      "sha256": "51a766c5a7c719e8f92200afdf85dd91af4b873b3130781905aa86174a6e342c"
+    },
+    "next_candidate_status": "Downloader session 99174 confirmed running with worker PID 14048. Six reused files and three small downloaded files verified; generator still downloading. Inspect process before restarting.",
+    "validation": {
+      "python_compileall": "passed",
+      "python_unittest": {
+        "passed": 200,
+        "failed": 0
+      },
+      "javascript": {
+        "passed": 32,
+        "failed": 0
+      },
+      "preview": {
+        "ready": true,
+        "busy": false,
+        "private_memory_unchanged": true
+      },
+      "browser": "Actual 8765 page opens as Mira with Text/Voice/Video and Call Mira control; no call or physical audio test performed this checkpoint.",
+      "independent_review": "not performed; this is an experiment checkpoint, not a completed feature",
+      "ci": "not run this checkpoint"
+    },
+    "cost": {
+      "paid_render_api_usd": 0,
+      "gpu_rental_usd": 0,
+      "electricity": "unmeasured",
+      "new_vace_download_bytes": 7146120039
+    },
+    "rollback": "Revert checkpoint to remove isolated harness/docs changes; runtime configuration, UI and private memory untouched.",
+    "next_owner": "current AI Mate engineering task",
+    "remaining": [
+      "No accepted fresh-body renderer",
+      "No new complete-call or physical-audio acceptance",
+      "No public deployment/paid provider eligibility established",
+      "VACE inference and streaming remain untested"
+    ]
   }
 }

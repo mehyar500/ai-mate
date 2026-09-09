@@ -107,5 +107,25 @@
       "size": 5464,
       "sha256": "e787a7d974f5f4c7b0fd66e4d4f0ffb5c7270ac546660c498a27172dcd6bf671"
     }
+  ],
+  "two_step_files": [
+    {
+      "repo": "Efficient-Large-Model/LongLive-2.0-5B-NVFP4-S2",
+      "revision": "9ab6c9c70db97e1994d87bca3b8c4ed31e5b62e2",
+      "folder": "generator-s2",
+      "license": "NVIDIA Open Model License; separate component terms apply",
+      "filename": "model_4o6.pt",
+      "size": 2945857184,
+      "sha256": "e767e58414fb8d961ea0705f710b3272723a7389dbe6dc50ee1b0dbff68b0469"
+    },
+    {
+      "repo": "Efficient-Large-Model/LongLive-2.0-5B-NVFP4-S2",
+      "revision": "9ab6c9c70db97e1994d87bca3b8c4ed31e5b62e2",
+      "folder": "generator-s2",
+      "license": "NVIDIA Open Model License; separate component terms apply",
+      "filename": "README.md",
+      "size": 7585,
+      "sha256": "929cd7998593e556e37b6c3d17d6df8e0fd05808751d14bade7de0b2e970447d"
+    }
   ]
 }

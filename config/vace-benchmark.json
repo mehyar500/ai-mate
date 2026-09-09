@@ -1,0 +1,95 @@
+{
+  "scope": "Isolated fully clothed pose-control feasibility experiment; not a live renderer or public-service qualification",
+  "code": {
+    "repo": "https://github.com/ali-vilab/VACE",
+    "revision": "48eb44f1c4be87cc65a98bff985a26976841e9f3",
+    "license": "Apache-2.0"
+  },
+  "model_license": "Apache-2.0 in original model LICENSE.txt; separate service requirements remain",
+  "files": [
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "LICENSE.txt",
+      "size": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "folder": "Wan2.1-VACE-1.3B"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "README.md",
+      "size": 40485,
+      "sha256": "1eed52faea991fffe9c4bbd3f2df4e7ba376a05b1ab87ce734b0d2af18fd4aff",
+      "folder": "Wan2.1-VACE-1.3B"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "config.json",
+      "size": 349,
+      "sha256": "e19df24acf3f440e0aea37d299f22b96f88d164f3349ae696daecd960a35ab1e",
+      "folder": "Wan2.1-VACE-1.3B"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "diffusion_pytorch_model.safetensors",
+      "size": 7146067848,
+      "sha256": "c46a6f5f7d32c453c3983bbc59761ea41cd02ad584fb55d1a7ee2b76145847a2",
+      "folder": "Wan2.1-VACE-1.3B"
+    }
+  ],
+  "reused_files": [
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "Wan2.1_VAE.pth",
+      "size": 507609880,
+      "sha256": "38071ab59bd94681c686fa51d75a1968f64e470262043be31f7a094e442fd981",
+      "path": ".cache/local-poc/OmniAvatar/pretrained_models/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "google/umt5-xxl/special_tokens_map.json",
+      "size": 6623,
+      "sha256": "7b8a9f5040adb67b5805abdfd42c1f8d0f3d0e711f10726580eb3789cd0ad61d",
+      "path": ".cache/local-poc/OmniAvatar/pretrained_models/Wan2.1-T2V-1.3B/google/umt5-xxl/special_tokens_map.json"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "google/umt5-xxl/spiece.model",
+      "size": 4548313,
+      "sha256": "e3909a67b780650b35cf529ac782ad2b6b26e6d1f849d3fbb6a872905f452458",
+      "path": ".cache/local-poc/OmniAvatar/pretrained_models/Wan2.1-T2V-1.3B/google/umt5-xxl/spiece.model"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "google/umt5-xxl/tokenizer.json",
+      "size": 16837417,
+      "sha256": "6e197b4d3dbd71da14b4eb255f4fa91c9c1f2068b20a2de2472967ca3d22602b",
+      "path": ".cache/local-poc/OmniAvatar/pretrained_models/Wan2.1-T2V-1.3B/google/umt5-xxl/tokenizer.json"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "google/umt5-xxl/tokenizer_config.json",
+      "size": 61728,
+      "sha256": "ed9a3a8b0faa71a70a32847e0435fe036e6e112d4df4edb7bb48a921e344dc05",
+      "path": ".cache/local-poc/OmniAvatar/pretrained_models/Wan2.1-T2V-1.3B/google/umt5-xxl/tokenizer_config.json"
+    },
+    {
+      "repo": "Wan-AI/Wan2.1-VACE-1.3B",
+      "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+      "filename": "models_t5_umt5-xxl-enc-bf16.pth",
+      "size": 11361920418,
+      "sha256": "7cace0da2b446bbbbc57d031ab6cf163a3d59b366da94e5afe36745b746fd81d",
+      "path": ".cache/local-poc/OmniAvatar/pretrained_models/Wan2.1-T2V-1.3B/models_t5_umt5-xxl-enc-bf16.pth"
+    }
+  ],
+  "total_download_bytes": 7146120039,
+  "next_test": "Reference plus generated right-arm pose frames; establish control quality before independent streaming/acceleration work. Do not use Scope source (CC BY-NC-SA)."
+}
