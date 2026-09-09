@@ -23934,5 +23934,27 @@
       "torch.float32"
     ],
     "scope": "Meta-device weights-only inspection, no checkpoint code execution or GPU allocation."
+  },
+  "shotstream_runtime_license_20260909": {
+    "code_revision": "917a0478fe47d71ddcf3269d052cbe3be2ae10e8",
+    "noncommercial_runtime_headers": [
+      {
+        "path": "wan/modules/causal_model.py",
+        "spdx": "CC-BY-NC-SA-4.0"
+      },
+      {
+        "path": "wan/modules/causal_model_change_rope.py",
+        "spdx": "CC-BY-NC-SA-4.0"
+      },
+      {
+        "path": "wan/modules/causal_model_ori.py",
+        "spdx": "CC-BY-NC-SA-4.0"
+      }
+    ],
+    "spdx_counts": {
+      "Apache-2.0": 25,
+      "CC-BY-NC-SA-4.0": 3
+    },
+    "decision": "Do not integrate this runtime into the commercial MVP without license clarification or an independently licensed implementation. Model-card Apache labeling does not resolve source-file restrictions. No upstream runtime executed."
   }
 }
